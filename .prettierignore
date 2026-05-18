@@ -1,0 +1,11 @@
+.git
+.turbo
+.vscode
+coverage
+dist
+build
+docs
+graphify-out
+node_modules
+pnpm-lock.yaml
+README.md

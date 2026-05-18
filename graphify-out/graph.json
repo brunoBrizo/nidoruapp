@@ -1,0 +1,81 @@
+{
+  "directed": false,
+  "multigraph": false,
+  "graph": {},
+  "nodes": [
+    {
+      "label": "eslint.config.mjs",
+      "file_type": "code",
+      "source_file": "eslint.config.mjs",
+      "source_location": "L1",
+      "id": "eslint_config_mjs",
+      "community": 2,
+      "norm_label": "eslint.config.mjs"
+    },
+    {
+      "label": "base.mjs",
+      "file_type": "code",
+      "source_file": "packages/config/eslint/base.mjs",
+      "source_location": "L1",
+      "id": "packages_config_eslint_base_mjs",
+      "community": 3,
+      "norm_label": "base.mjs"
+    },
+    {
+      "label": "index.ts",
+      "file_type": "code",
+      "source_file": "packages/i18n/src/index.ts",
+      "source_location": "L1",
+      "id": "packages_i18n_src_index_ts",
+      "community": 5,
+      "norm_label": "index.ts"
+    },
+    {
+      "label": "index.ts",
+      "file_type": "code",
+      "source_file": "packages/ui-tokens/src/index.ts",
+      "source_location": "L1",
+      "id": "packages_ui_tokens_src_index_ts",
+      "community": 6,
+      "norm_label": "index.ts"
+    },
+    {
+      "label": "index.ts",
+      "file_type": "code",
+      "source_file": "packages/domain/src/index.ts",
+      "source_location": "L1",
+      "id": "packages_domain_src_index_ts",
+      "community": 4,
+      "norm_label": "index.ts"
+    },
+    {
+      "label": "index.ts",
+      "file_type": "code",
+      "source_file": "packages/validation/src/index.ts",
+      "source_location": "L1",
+      "id": "packages_validation_src_index_ts",
+      "community": 7,
+      "norm_label": "index.ts"
+    },
+    {
+      "label": "index.ts",
+      "file_type": "code",
+      "source_file": "apps/web/src/index.ts",
+      "source_location": "L1",
+      "id": "apps_web_src_index_ts",
+      "community": 1,
+      "norm_label": "index.ts"
+    },
+    {
+      "label": "index.ts",
+      "file_type": "code",
+      "source_file": "apps/mobile/src/index.ts",
+      "source_location": "L1",
+      "id": "apps_mobile_src_index_ts",
+      "community": 0,
+      "norm_label": "index.ts"
+    }
+  ],
+  "links": [],
+  "hyperedges": []
+}

@@ -1,0 +1,10 @@
+{
+  "name": "@nidoru/mobile",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "eslint . --max-warnings=0",
+    "test": "echo \"No tests configured for @nidoru/mobile yet\""
+  }
+}

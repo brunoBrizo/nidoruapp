@@ -1,0 +1,29 @@
+{
+  "name": "@nidoru/config",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./eslint": "./eslint/base.mjs",
+    "./prettier": "./prettier.config.cjs",
+    "./typescript/base": "./typescript/base.json"
+  },
+  "files": [
+    "eslint",
+    "prettier.config.cjs",
+    "typescript"
+  ],
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "eslint . --max-warnings=0",
+    "test": "echo \"No tests configured for @nidoru/config yet\""
+  },
+  "peerDependencies": {
+    "@eslint/js": ">=9",
+    "eslint": ">=9",
+    "globals": ">=16",
+    "prettier": ">=3",
+    "typescript": ">=5",
+    "typescript-eslint": ">=8"
+  }
+}

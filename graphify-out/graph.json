@@ -9,7 +9,7 @@
       "source_file": "eslint.config.mjs",
       "source_location": "L1",
       "id": "eslint_config_mjs",
-      "community": 2,
+      "community": 3,
       "norm_label": "eslint.config.mjs"
     },
     {
@@ -18,8 +18,17 @@
       "source_file": "packages/config/eslint/base.mjs",
       "source_location": "L1",
       "id": "packages_config_eslint_base_mjs",
-      "community": 3,
+      "community": 4,
       "norm_label": "base.mjs"
+    },
+    {
+      "label": "locale-coverage.test.ts",
+      "file_type": "code",
+      "source_file": "packages/i18n/src/locale-coverage.test.ts",
+      "source_location": "L1",
+      "id": "packages_i18n_src_locale_coverage_test_ts",
+      "community": 5,
+      "norm_label": "locale-coverage.test.ts"
     },
     {
       "label": "index.ts",
@@ -27,8 +36,17 @@
       "source_file": "packages/i18n/src/index.ts",
       "source_location": "L1",
       "id": "packages_i18n_src_index_ts",
-      "community": 5,
+      "community": 6,
       "norm_label": "index.ts"
+    },
+    {
+      "label": "index.test.ts",
+      "file_type": "code",
+      "source_file": "packages/ui-tokens/src/index.test.ts",
+      "source_location": "L1",
+      "id": "packages_ui_tokens_src_index_test_ts",
+      "community": 7,
+      "norm_label": "index.test.ts"
     },
     {
       "label": "index.ts",
@@ -36,8 +54,26 @@
       "source_file": "packages/ui-tokens/src/index.ts",
       "source_location": "L1",
       "id": "packages_ui_tokens_src_index_ts",
-      "community": 6,
+      "community": 2,
       "norm_label": "index.ts"
+    },
+    {
+      "label": "token()",
+      "file_type": "code",
+      "source_file": "packages/ui-tokens/src/index.ts",
+      "source_location": "L1",
+      "id": "index_token",
+      "community": 2,
+      "norm_label": "token()"
+    },
+    {
+      "label": "index.test.ts",
+      "file_type": "code",
+      "source_file": "packages/domain/src/index.test.ts",
+      "source_location": "L1",
+      "id": "packages_domain_src_index_test_ts",
+      "community": 8,
+      "norm_label": "index.test.ts"
     },
     {
       "label": "index.ts",
@@ -45,8 +81,17 @@
       "source_file": "packages/domain/src/index.ts",
       "source_location": "L1",
       "id": "packages_domain_src_index_ts",
-      "community": 4,
+      "community": 9,
       "norm_label": "index.ts"
+    },
+    {
+      "label": "index.test.ts",
+      "file_type": "code",
+      "source_file": "packages/validation/src/index.test.ts",
+      "source_location": "L1",
+      "id": "packages_validation_src_index_test_ts",
+      "community": 10,
+      "norm_label": "index.test.ts"
     },
     {
       "label": "index.ts",
@@ -54,7 +99,7 @@
       "source_file": "packages/validation/src/index.ts",
       "source_location": "L1",
       "id": "packages_validation_src_index_ts",
-      "community": 7,
+      "community": 11,
       "norm_label": "index.ts"
     },
     {
@@ -63,19 +108,92 @@
       "source_file": "apps/web/src/index.ts",
       "source_location": "L1",
       "id": "apps_web_src_index_ts",
-      "community": 1,
+      "community": 12,
       "norm_label": "index.ts"
     },
     {
-      "label": "index.ts",
+      "label": "app.config.js",
       "file_type": "code",
-      "source_file": "apps/mobile/src/index.ts",
+      "source_file": "apps/mobile/app.config.js",
       "source_location": "L1",
-      "id": "apps_mobile_src_index_ts",
+      "id": "apps_mobile_app_config_js",
+      "community": 13,
+      "norm_label": "app.config.js"
+    },
+    {
+      "label": "index.tsx",
+      "file_type": "code",
+      "source_file": "apps/mobile/src/app/index.tsx",
+      "source_location": "L1",
+      "id": "apps_mobile_src_app_index_tsx",
+      "community": 1,
+      "norm_label": "index.tsx"
+    },
+    {
+      "label": "HomeScreen()",
+      "file_type": "code",
+      "source_file": "apps/mobile/src/app/index.tsx",
+      "source_location": "L9",
+      "id": "index_homescreen",
+      "community": 1,
+      "norm_label": "homescreen()"
+    },
+    {
+      "label": "_layout.tsx",
+      "file_type": "code",
+      "source_file": "apps/mobile/src/app/_layout.tsx",
+      "source_location": "L1",
+      "id": "apps_mobile_src_app_layout_tsx",
       "community": 0,
-      "norm_label": "index.ts"
+      "norm_label": "_layout.tsx"
+    },
+    {
+      "label": "RootLayout()",
+      "file_type": "code",
+      "source_file": "apps/mobile/src/app/_layout.tsx",
+      "source_location": "L6",
+      "id": "layout_rootlayout",
+      "community": 0,
+      "norm_label": "rootlayout()"
     }
   ],
-  "links": [],
+  "links": [
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/ui-tokens/src/index.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_src": "packages_ui_tokens_src_index_ts",
+      "_tgt": "index_token",
+      "source": "packages_ui_tokens_src_index_ts",
+      "target": "index_token",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/mobile/src/app/index.tsx",
+      "source_location": "L9",
+      "weight": 1.0,
+      "_src": "apps_mobile_src_app_index_tsx",
+      "_tgt": "index_homescreen",
+      "source": "apps_mobile_src_app_index_tsx",
+      "target": "index_homescreen",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/mobile/src/app/_layout.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_src": "apps_mobile_src_app_layout_tsx",
+      "_tgt": "layout_rootlayout",
+      "source": "apps_mobile_src_app_layout_tsx",
+      "target": "layout_rootlayout",
+      "confidence_score": 1.0
+    }
+  ],
   "hyperedges": []
 }

@@ -6,5 +6,11 @@
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "lint": "eslint . --max-warnings=0",
     "test": "echo \"No tests configured for @nidoru/web yet\""
+  },
+  "dependencies": {
+    "@nidoru/domain": "workspace:*",
+    "@nidoru/i18n": "workspace:*",
+    "@nidoru/ui-tokens": "workspace:*",
+    "@nidoru/validation": "workspace:*"
   }
 }

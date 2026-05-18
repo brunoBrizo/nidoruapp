@@ -11,5 +11,9 @@
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "lint": "eslint . --max-warnings=0",
     "test": "echo \"No tests configured for @nidoru/validation yet\""
+  },
+  "dependencies": {
+    "@nidoru/domain": "workspace:*",
+    "zod": "^4.4.3"
   }
 }

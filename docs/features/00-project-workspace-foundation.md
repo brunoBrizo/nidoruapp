@@ -158,52 +158,52 @@ No broad autocapture is allowed on sensitive bedtime, sleep, billing, or support
 - [ ] Add Turborepo configuration.
 - [ ] Create `apps/mobile`.
 - [ ] Create `apps/web`.
-- [ ] Create `packages/config`.
-- [ ] Create `packages/domain`.
-- [ ] Create `packages/i18n`.
-- [ ] Create `packages/ui-tokens`.
-- [ ] Create `packages/validation`.
+- [x] Create `packages/config`.
+- [x] Create `packages/domain`.
+- [x] Create `packages/i18n`.
+- [x] Create `packages/ui-tokens`.
+- [x] Create `packages/validation`.
 - [ ] Create `supabase/migrations`.
 - [ ] Create `supabase/functions`.
 - [ ] Create `supabase/seed`.
 - [ ] Configure TypeScript across workspace packages.
 - [ ] Configure ESLint across workspace packages.
 - [ ] Configure shared formatting.
-- [ ] Configure Expo React Native with TypeScript.
-- [ ] Configure Expo Router.
-- [ ] Configure Expo development builds.
-- [ ] Configure EAS Build.
-- [ ] Configure EAS Submit.
-- [ ] Configure EAS Update with runtime-version rules.
-- [ ] Install React Native Reanimated.
-- [ ] Install React Native SVG.
-- [ ] Install `expo-audio`.
-- [ ] Install `expo-haptics`.
-- [ ] Install `expo-brightness`.
-- [ ] Install `expo-sqlite`.
-- [ ] Install `expo-secure-store`.
-- [ ] Install `expo-localization`.
-- [ ] Install `expo-notifications`.
-- [ ] Install Expo Font.
-- [ ] Install Lucide React Native.
-- [ ] Install Zustand.
-- [ ] Install TanStack Query.
-- [ ] Install Sentry React Native SDK.
-- [ ] Install PostHog React Native SDK.
-- [ ] Install Supabase client.
-- [ ] Install RevenueCat SDK.
+- [x] Configure Expo React Native with TypeScript.
+- [x] Configure Expo Router.
+- [x] Configure Expo development builds.
+- [x] Configure EAS Build.
+- [x] Configure EAS Submit.
+- [x] Configure EAS Update with runtime-version rules.
+- [x] Install React Native Reanimated.
+- [x] Install React Native SVG.
+- [x] Install `expo-audio`.
+- [x] Install `expo-haptics`.
+- [x] Install `expo-brightness`.
+- [x] Install `expo-sqlite`.
+- [x] Install `expo-secure-store`.
+- [x] Install `expo-localization`.
+- [x] Install `expo-notifications`.
+- [x] Install Expo Font.
+- [x] Install Lucide React Native.
+- [x] Install Zustand.
+- [x] Install TanStack Query.
+- [x] Install Sentry React Native SDK.
+- [x] Install PostHog React Native SDK.
+- [x] Install Supabase client.
+- [x] Install RevenueCat SDK.
 - [ ] Add Nunito font assets.
 - [ ] Add Inter font assets.
-- [ ] Add Midnight Indigo design tokens.
-- [ ] Add motion timing tokens.
-- [ ] Add launch breath technique definitions.
-- [ ] Add launch sound ID constants.
-- [ ] Add initial streak rule constants.
-- [ ] Add initial insight rule types derived from docs.
-- [ ] Add English locale resources.
-- [ ] Add Spanish locale resources.
-- [ ] Add Brazilian Portuguese locale resources.
-- [ ] Add i18n missing-key check.
+- [x] Add Midnight Indigo design tokens.
+- [x] Add motion timing tokens.
+- [x] Add launch breath technique definitions.
+- [x] Add launch sound ID constants.
+- [x] Add initial streak rule constants.
+- [x] Add initial insight rule types derived from docs.
+- [x] Add English locale resources.
+- [x] Add Spanish locale resources.
+- [x] Add Brazilian Portuguese locale resources.
+- [x] Add i18n missing-key check.
 - [ ] Configure Next.js web app.
 - [ ] Configure Netlify-ready web app structure.
 - [ ] Add marketing/legal/support/admin route shells.

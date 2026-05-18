@@ -1,0 +1,2 @@
+-- Foundation seed file intentionally contains no rows.
+-- Local development must not depend on production data.

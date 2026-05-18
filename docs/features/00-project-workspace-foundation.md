@@ -163,9 +163,9 @@ No broad autocapture is allowed on sensitive bedtime, sleep, billing, or support
 - [x] Create `packages/i18n`.
 - [x] Create `packages/ui-tokens`.
 - [x] Create `packages/validation`.
-- [ ] Create `supabase/migrations`.
-- [ ] Create `supabase/functions`.
-- [ ] Create `supabase/seed`.
+- [x] Create `supabase/migrations`.
+- [x] Create `supabase/functions`.
+- [x] Create `supabase/seed`.
 - [ ] Configure TypeScript across workspace packages.
 - [ ] Configure ESLint across workspace packages.
 - [ ] Configure shared formatting.
@@ -204,20 +204,20 @@ No broad autocapture is allowed on sensitive bedtime, sleep, billing, or support
 - [x] Add Spanish locale resources.
 - [x] Add Brazilian Portuguese locale resources.
 - [x] Add i18n missing-key check.
-- [ ] Configure Next.js web app.
-- [ ] Configure Netlify-ready web app structure.
-- [ ] Add marketing/legal/support/admin route shells.
-- [ ] Configure Supabase local development.
-- [ ] Add first Supabase migration shell.
-- [ ] Add RLS convention documentation or migration guard.
-- [ ] Add Edge Function test harness.
+- [x] Configure Next.js web app.
+- [x] Configure Netlify-ready web app structure.
+- [x] Add marketing/legal/support/admin route shells.
+- [x] Configure Supabase local development.
+- [x] Add first Supabase migration shell.
+- [x] Add RLS convention documentation or migration guard.
+- [x] Add Edge Function test harness.
 - [ ] Add local SQLite migration runner.
 - [ ] Add SQLite migration tests.
 - [ ] Add Jest.
 - [ ] Add React Native Testing Library.
 - [ ] Add Maestro project structure.
-- [ ] Add Supabase migration validation command.
-- [ ] Add Supabase local integration test command that runs with Docker.
+- [x] Add Supabase migration validation command.
+- [x] Add Supabase local integration test command that runs with Docker.
 - [ ] Add RevenueCat webhook fixture test structure.
 - [ ] Add k6 backend load-test scaffold for webhook, sync, catalog, and entitlement paths.
 - [ ] Add GitHub Actions workflow for TypeScript, ESLint, tests, migrations, and i18n checks.
@@ -225,12 +225,12 @@ No broad autocapture is allowed on sensitive bedtime, sleep, billing, or support
 - [ ] Configure Sentry release and environment tags.
 - [ ] Configure Sentry source-map upload path.
 - [ ] Configure PostHog explicit-event client wrapper with autocapture off for sensitive screens.
-- [ ] Add environment variable examples for development.
-- [ ] Document staging and production environment requirements.
+- [x] Add environment variable examples for development.
+- [x] Document staging and production environment requirements.
 - [ ] Create first mobile proof screen for fonts, tokens, and palette.
 - [ ] Verify development build can run on a real iOS device or simulator for non-device-specific checks.
 - [ ] Verify development build can run on a real Android device or emulator for non-device-specific checks.
 - [ ] Verify Sentry captures a test error with release context.
 - [ ] Verify PostHog receives an explicit test event in non-production.
-- [ ] Verify local Supabase starts through Docker.
-- [ ] Verify no production data is required for local development.
+- [x] Verify local Supabase starts through Docker.
+- [x] Verify no production data is required for local development.

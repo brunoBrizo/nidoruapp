@@ -9,8 +9,44 @@
       "source_file": "eslint.config.mjs",
       "source_location": "L1",
       "id": "eslint_config_mjs",
-      "community": 3,
+      "community": 9,
       "norm_label": "eslint.config.mjs"
+    },
+    {
+      "label": "foundation-health.test.ts",
+      "file_type": "code",
+      "source_file": "supabase/functions/tests/foundation-health.test.ts",
+      "source_location": "L1",
+      "id": "supabase_functions_tests_foundation_health_test_ts",
+      "community": 0,
+      "norm_label": "foundation-health.test.ts"
+    },
+    {
+      "label": "assertEquals()",
+      "file_type": "code",
+      "source_file": "supabase/functions/tests/foundation-health.test.ts",
+      "source_location": "L3",
+      "id": "foundation_health_test_assertequals",
+      "community": 0,
+      "norm_label": "assertequals()"
+    },
+    {
+      "label": "index.ts",
+      "file_type": "code",
+      "source_file": "supabase/functions/foundation-health/index.ts",
+      "source_location": "L1",
+      "id": "supabase_functions_foundation_health_index_ts",
+      "community": 0,
+      "norm_label": "index.ts"
+    },
+    {
+      "label": "fetch()",
+      "file_type": "code",
+      "source_file": "supabase/functions/foundation-health/index.ts",
+      "source_location": "L7",
+      "id": "index_fetch",
+      "community": 0,
+      "norm_label": "fetch()"
     },
     {
       "label": "base.mjs",
@@ -18,7 +54,7 @@
       "source_file": "packages/config/eslint/base.mjs",
       "source_location": "L1",
       "id": "packages_config_eslint_base_mjs",
-      "community": 4,
+      "community": 10,
       "norm_label": "base.mjs"
     },
     {
@@ -27,7 +63,7 @@
       "source_file": "packages/i18n/src/locale-coverage.test.ts",
       "source_location": "L1",
       "id": "packages_i18n_src_locale_coverage_test_ts",
-      "community": 5,
+      "community": 11,
       "norm_label": "locale-coverage.test.ts"
     },
     {
@@ -36,7 +72,7 @@
       "source_file": "packages/i18n/src/index.ts",
       "source_location": "L1",
       "id": "packages_i18n_src_index_ts",
-      "community": 6,
+      "community": 12,
       "norm_label": "index.ts"
     },
     {
@@ -45,7 +81,7 @@
       "source_file": "packages/ui-tokens/src/index.test.ts",
       "source_location": "L1",
       "id": "packages_ui_tokens_src_index_test_ts",
-      "community": 7,
+      "community": 13,
       "norm_label": "index.test.ts"
     },
     {
@@ -72,7 +108,7 @@
       "source_file": "packages/domain/src/index.test.ts",
       "source_location": "L1",
       "id": "packages_domain_src_index_test_ts",
-      "community": 8,
+      "community": 14,
       "norm_label": "index.test.ts"
     },
     {
@@ -81,7 +117,7 @@
       "source_file": "packages/domain/src/index.ts",
       "source_location": "L1",
       "id": "packages_domain_src_index_ts",
-      "community": 9,
+      "community": 15,
       "norm_label": "index.ts"
     },
     {
@@ -90,7 +126,7 @@
       "source_file": "packages/validation/src/index.test.ts",
       "source_location": "L1",
       "id": "packages_validation_src_index_test_ts",
-      "community": 10,
+      "community": 16,
       "norm_label": "index.test.ts"
     },
     {
@@ -99,8 +135,35 @@
       "source_file": "packages/validation/src/index.ts",
       "source_location": "L1",
       "id": "packages_validation_src_index_ts",
-      "community": 11,
+      "community": 17,
       "norm_label": "index.ts"
+    },
+    {
+      "label": "next.config.mjs",
+      "file_type": "code",
+      "source_file": "apps/web/next.config.mjs",
+      "source_location": "L1",
+      "id": "apps_web_next_config_mjs",
+      "community": 18,
+      "norm_label": "next.config.mjs"
+    },
+    {
+      "label": "next-env.d.ts",
+      "file_type": "code",
+      "source_file": "apps/web/next-env.d.ts",
+      "source_location": "L1",
+      "id": "apps_web_next_env_d_ts",
+      "community": 19,
+      "norm_label": "next-env.d.ts"
+    },
+    {
+      "label": "eslint.config.mjs",
+      "file_type": "code",
+      "source_file": "apps/web/eslint.config.mjs",
+      "source_location": "L1",
+      "id": "apps_web_eslint_config_mjs",
+      "community": 20,
+      "norm_label": "eslint.config.mjs"
     },
     {
       "label": "index.ts",
@@ -108,8 +171,134 @@
       "source_file": "apps/web/src/index.ts",
       "source_location": "L1",
       "id": "apps_web_src_index_ts",
-      "community": 12,
+      "community": 21,
       "norm_label": "index.ts"
+    },
+    {
+      "label": "shell-page.tsx",
+      "file_type": "code",
+      "source_file": "apps/web/src/app/shell-page.tsx",
+      "source_location": "L1",
+      "id": "apps_web_src_app_shell_page_tsx",
+      "community": 3,
+      "norm_label": "shell-page.tsx"
+    },
+    {
+      "label": "ShellPage()",
+      "file_type": "code",
+      "source_file": "apps/web/src/app/shell-page.tsx",
+      "source_location": "L9",
+      "id": "shell_page_shellpage",
+      "community": 3,
+      "norm_label": "shellpage()"
+    },
+    {
+      "label": "route-shells.test.ts",
+      "file_type": "code",
+      "source_file": "apps/web/src/app/route-shells.test.ts",
+      "source_location": "L1",
+      "id": "apps_web_src_app_route_shells_test_ts",
+      "community": 22,
+      "norm_label": "route-shells.test.ts"
+    },
+    {
+      "label": "layout.tsx",
+      "file_type": "code",
+      "source_file": "apps/web/src/app/layout.tsx",
+      "source_location": "L1",
+      "id": "apps_web_src_app_layout_tsx",
+      "community": 1,
+      "norm_label": "layout.tsx"
+    },
+    {
+      "label": "RootLayout()",
+      "file_type": "code",
+      "source_file": "apps/mobile/src/app/_layout.tsx",
+      "source_location": "L6",
+      "id": "layout_rootlayout",
+      "community": 1,
+      "norm_label": "rootlayout()"
+    },
+    {
+      "label": "route-shells.ts",
+      "file_type": "code",
+      "source_file": "apps/web/src/app/route-shells.ts",
+      "source_location": "L1",
+      "id": "apps_web_src_app_route_shells_ts",
+      "community": 23,
+      "norm_label": "route-shells.ts"
+    },
+    {
+      "label": "page.tsx",
+      "file_type": "code",
+      "source_file": "apps/web/src/app/page.tsx",
+      "source_location": "L1",
+      "id": "apps_web_src_app_page_tsx",
+      "community": 4,
+      "norm_label": "page.tsx"
+    },
+    {
+      "label": "MarketingPage()",
+      "file_type": "code",
+      "source_file": "apps/web/src/app/page.tsx",
+      "source_location": "L13",
+      "id": "page_marketingpage",
+      "community": 4,
+      "norm_label": "marketingpage()"
+    },
+    {
+      "label": "page.tsx",
+      "file_type": "code",
+      "source_file": "apps/web/src/app/admin/page.tsx",
+      "source_location": "L1",
+      "id": "apps_web_src_app_admin_page_tsx",
+      "community": 5,
+      "norm_label": "page.tsx"
+    },
+    {
+      "label": "AdminPage()",
+      "file_type": "code",
+      "source_file": "apps/web/src/app/admin/page.tsx",
+      "source_location": "L13",
+      "id": "page_adminpage",
+      "community": 5,
+      "norm_label": "adminpage()"
+    },
+    {
+      "label": "page.tsx",
+      "file_type": "code",
+      "source_file": "apps/web/src/app/support/page.tsx",
+      "source_location": "L1",
+      "id": "apps_web_src_app_support_page_tsx",
+      "community": 6,
+      "norm_label": "page.tsx"
+    },
+    {
+      "label": "SupportPage()",
+      "file_type": "code",
+      "source_file": "apps/web/src/app/support/page.tsx",
+      "source_location": "L13",
+      "id": "page_supportpage",
+      "community": 6,
+      "norm_label": "supportpage()"
+    },
+    {
+      "label": "page.tsx",
+      "file_type": "code",
+      "source_file": "apps/web/src/app/legal/page.tsx",
+      "source_location": "L1",
+      "id": "apps_web_src_app_legal_page_tsx",
+      "community": 7,
+      "norm_label": "page.tsx"
+    },
+    {
+      "label": "LegalPage()",
+      "file_type": "code",
+      "source_file": "apps/web/src/app/legal/page.tsx",
+      "source_location": "L13",
+      "id": "page_legalpage",
+      "community": 7,
+      "norm_label": "legalpage()"
     },
     {
       "label": "app.config.js",
@@ -117,7 +306,7 @@
       "source_file": "apps/mobile/app.config.js",
       "source_location": "L1",
       "id": "apps_mobile_app_config_js",
-      "community": 13,
+      "community": 24,
       "norm_label": "app.config.js"
     },
     {
@@ -126,7 +315,7 @@
       "source_file": "apps/mobile/src/app/index.tsx",
       "source_location": "L1",
       "id": "apps_mobile_src_app_index_tsx",
-      "community": 1,
+      "community": 8,
       "norm_label": "index.tsx"
     },
     {
@@ -135,7 +324,7 @@
       "source_file": "apps/mobile/src/app/index.tsx",
       "source_location": "L9",
       "id": "index_homescreen",
-      "community": 1,
+      "community": 8,
       "norm_label": "homescreen()"
     },
     {
@@ -144,20 +333,47 @@
       "source_file": "apps/mobile/src/app/_layout.tsx",
       "source_location": "L1",
       "id": "apps_mobile_src_app_layout_tsx",
-      "community": 0,
+      "community": 1,
       "norm_label": "_layout.tsx"
-    },
-    {
-      "label": "RootLayout()",
-      "file_type": "code",
-      "source_file": "apps/mobile/src/app/_layout.tsx",
-      "source_location": "L6",
-      "id": "layout_rootlayout",
-      "community": 0,
-      "norm_label": "rootlayout()"
     }
   ],
   "links": [
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "supabase/functions/tests/foundation-health.test.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_src": "supabase_functions_tests_foundation_health_test_ts",
+      "_tgt": "supabase_functions_foundation_health_index_ts",
+      "source": "supabase_functions_tests_foundation_health_test_ts",
+      "target": "supabase_functions_foundation_health_index_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "supabase/functions/tests/foundation-health.test.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_src": "supabase_functions_tests_foundation_health_test_ts",
+      "_tgt": "foundation_health_test_assertequals",
+      "source": "supabase_functions_tests_foundation_health_test_ts",
+      "target": "foundation_health_test_assertequals",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "supabase/functions/foundation-health/index.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_src": "supabase_functions_foundation_health_index_ts",
+      "_tgt": "index_fetch",
+      "source": "supabase_functions_foundation_health_index_ts",
+      "target": "index_fetch",
+      "confidence_score": 1.0
+    },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
@@ -173,13 +389,25 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "apps/mobile/src/app/index.tsx",
+      "source_file": "apps/web/src/app/shell-page.tsx",
       "source_location": "L9",
       "weight": 1.0,
-      "_src": "apps_mobile_src_app_index_tsx",
-      "_tgt": "index_homescreen",
-      "source": "apps_mobile_src_app_index_tsx",
-      "target": "index_homescreen",
+      "_src": "apps_web_src_app_shell_page_tsx",
+      "_tgt": "shell_page_shellpage",
+      "source": "apps_web_src_app_shell_page_tsx",
+      "target": "shell_page_shellpage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/app/layout.tsx",
+      "source_location": "L18",
+      "weight": 1.0,
+      "_src": "apps_web_src_app_layout_tsx",
+      "_tgt": "layout_rootlayout",
+      "source": "apps_web_src_app_layout_tsx",
+      "target": "layout_rootlayout",
       "confidence_score": 1.0
     },
     {
@@ -190,8 +418,68 @@
       "weight": 1.0,
       "_src": "apps_mobile_src_app_layout_tsx",
       "_tgt": "layout_rootlayout",
-      "source": "apps_mobile_src_app_layout_tsx",
-      "target": "layout_rootlayout",
+      "source": "layout_rootlayout",
+      "target": "apps_mobile_src_app_layout_tsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/app/page.tsx",
+      "source_location": "L13",
+      "weight": 1.0,
+      "_src": "apps_web_src_app_page_tsx",
+      "_tgt": "page_marketingpage",
+      "source": "apps_web_src_app_page_tsx",
+      "target": "page_marketingpage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/app/admin/page.tsx",
+      "source_location": "L13",
+      "weight": 1.0,
+      "_src": "apps_web_src_app_admin_page_tsx",
+      "_tgt": "page_adminpage",
+      "source": "apps_web_src_app_admin_page_tsx",
+      "target": "page_adminpage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/app/support/page.tsx",
+      "source_location": "L13",
+      "weight": 1.0,
+      "_src": "apps_web_src_app_support_page_tsx",
+      "_tgt": "page_supportpage",
+      "source": "apps_web_src_app_support_page_tsx",
+      "target": "page_supportpage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/app/legal/page.tsx",
+      "source_location": "L13",
+      "weight": 1.0,
+      "_src": "apps_web_src_app_legal_page_tsx",
+      "_tgt": "page_legalpage",
+      "source": "apps_web_src_app_legal_page_tsx",
+      "target": "page_legalpage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/mobile/src/app/index.tsx",
+      "source_location": "L9",
+      "weight": 1.0,
+      "_src": "apps_mobile_src_app_index_tsx",
+      "_tgt": "index_homescreen",
+      "source": "apps_mobile_src_app_index_tsx",
+      "target": "index_homescreen",
       "confidence_score": 1.0
     }
   ],

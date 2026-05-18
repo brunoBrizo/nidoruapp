@@ -3,14 +3,24 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "lint": "eslint . --max-warnings=0",
-    "test": "echo \"No tests configured for @nidoru/web yet\""
+    "test": "tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
     "@nidoru/domain": "workspace:*",
     "@nidoru/i18n": "workspace:*",
     "@nidoru/ui-tokens": "workspace:*",
-    "@nidoru/validation": "workspace:*"
+    "@nidoru/validation": "workspace:*",
+    "next": "^16.2.6",
+    "react": "19.1.0",
+    "react-dom": "19.1.0"
+  },
+  "devDependencies": {
+    "@types/react": "~19.2.14",
+    "@types/react-dom": "^19.2.3"
   }
 }

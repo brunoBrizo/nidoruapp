@@ -1,0 +1,15 @@
+# Netlify setup: set Package directory to "apps/web" and leave Base directory unset.
+
+[build]
+  command = "pnpm --filter @nidoru/web build"
+  publish = "apps/web/.next"
+
+[build.environment]
+  NODE_VERSION = "22"
+  PNPM_VERSION = "10.33.0"
+
+[dev]
+  command = "pnpm --filter @nidoru/web dev"
+  targetPort = 3000
+  port = 8888
+  framework = "#auto"

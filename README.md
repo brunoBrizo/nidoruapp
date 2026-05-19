@@ -30,6 +30,7 @@ The source blueprint is dense, so the project knowledge is split by future use c
 | TikTok/Instagram strategy, pricing, Nidoru brand metadata | [Growth, Pricing, and Brand](docs/growth/growth-pricing-brand.md) |
 | Stack, module boundaries, data model, integrations | [Technical Foundation](docs/architecture/technical-foundation.md) |
 | Final tech stack decision record and scale posture | [Tech Stack Decision Record](docs/architecture/tech-stack-proposal.md) |
+| Development, staging, production, and external service separation | [Environment Model](docs/architecture/environment-model.md) |
 | Animation engineering playbook and implementation docs | [Animation Engineering Index](docs/engineering/animation-engineering-index.md) |
 | Assumptions, ambiguity, risks, research gaps | [Assumptions, Risks, and Open Questions](docs/research/assumptions-risks-open-questions.md) |
 | Source links and verification notes | [Source Map](docs/research/source-map.md) |
@@ -50,3 +51,32 @@ The source blueprint is dense, so the project knowledge is split by future use c
 For product and engineering decisions, default to the narrowest implementation that protects the core promise:
 
 > One tap at night, one guided breath, audio that keeps working, and a morning check-in that turns use into insight.
+
+## Quality Gates
+
+Local proof commands mirror the GitHub Actions workflow:
+
+```sh
+pnpm typecheck
+pnpm lint
+pnpm test:unit
+pnpm test:component
+pnpm test:sqlite
+pnpm test:revenuecat:webhooks
+pnpm i18n:check
+```
+
+Supabase migration validation and database integration tests require Docker access:
+
+```sh
+pnpm supabase:start
+pnpm supabase:migrations:validate
+pnpm supabase:test:db
+pnpm supabase:stop
+```
+
+k6 load-test scaffolds are opt-in until the backend endpoints exist:
+
+```sh
+BASE_URL=http://127.0.0.1:54321 SUPABASE_SERVICE_ROLE_KEY=local-service-role-key pnpm loadtest:k6:backend
+```

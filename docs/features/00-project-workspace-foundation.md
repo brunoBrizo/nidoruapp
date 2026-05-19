@@ -89,6 +89,31 @@ The goal is not to build user-facing product features. The goal is to make the w
 - PostHog can receive explicit test events without broad autocapture.
 - No production data is used in local development.
 
+## Closeout Verification - 2026-05-19
+
+Status: local foundation gates are ready for the next feature files. Device, Expo account, and live vendor proofs remain separate blockers and must not be treated as staging or public-launch proof.
+
+Proven in this closeout pass:
+
+- Workspace layout matches the Tech Stack Decision Record: `apps/mobile`, `apps/web`, `packages/config`, `packages/domain`, `packages/i18n`, `packages/ui-tokens`, `packages/validation`, `supabase/migrations`, `supabase/functions`, `supabase/seed`, and `docs` are present.
+- Root checks passed: `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm test:unit`, `pnpm test:component`, `pnpm test:sqlite`, `pnpm test:revenuecat:webhooks`, `pnpm i18n:check`, and `pnpm format:check`.
+- Web proof passed: `pnpm --filter @nidoru/web build` completed, and the Next.js dev server returned HTTP 200 for `/`, `/legal`, `/support`, and `/admin`.
+- Mobile Expo proof passed as far as local tooling allows: `pnpm --filter @nidoru/mobile exec expo config --type public`, `pnpm --filter @nidoru/mobile exec expo install --check`, and `pnpm --filter @nidoru/mobile exec expo export --platform ios --output-dir /private/tmp/nidoru-mobile-export-closeout` all completed. The Expo config includes `expo-dev-client`; the start script is `expo start --dev-client`, so local testing is configured for development builds rather than Expo Go.
+- Shared package imports are proven by TypeScript/build/test coverage: mobile imports `@nidoru/domain` and `@nidoru/ui-tokens`; web imports `@nidoru/domain`, `@nidoru/i18n`, `@nidoru/ui-tokens`, and `@nidoru/validation`.
+- Supabase Docker proof passed: `pnpm supabase:start`, `pnpm supabase:migrations:validate`, `pnpm supabase:test:db`, `pnpm supabase:db:lint`, and `pnpm supabase:functions:test`.
+- First mobile proof screen is covered by `apps/mobile/tests/home-screen.component.jest.test.tsx` and renders Nunito, Inter, design-token values, and the Midnight Indigo palette from `@nidoru/ui-tokens`.
+- Local environment files use local URLs, blank disabled optional integrations, placeholder support addresses, and no production data. `supabase/seed/00_foundation.sql` intentionally contains no rows.
+- Sentry/PostHog implementation boundaries are present: Sentry tags environment/release when configured, PostHog uses an explicit-event wrapper with lifecycle capture, session replay, error autocapture, feature-flag events, and unapproved event names disabled.
+
+Remaining blockers:
+
+- iOS runtime proof is not complete on this machine because only Xcode Command Line Tools are selected and `xcrun simctl` is unavailable. A full Xcode install plus simulator, or a real iOS device, is required.
+- Android runtime proof is not complete because `adb` is not installed or on `PATH`. Android Studio/platform tools plus an emulator or a real Android device are required.
+- EAS cloud configuration/build proof is blocked until `eas login` or `EXPO_TOKEN` is available. `pnpm --filter @nidoru/mobile run eas:config` stops at Expo authentication.
+- Sentry live test-error receipt is not complete until a non-production DSN and release/source-map credentials are provided, then verified through the `/observability-proof` route in a development build.
+- PostHog live explicit-event receipt is not complete until a non-production PostHog key/host are provided, then verified through the `/observability-proof` route in a development build.
+- R2, RevenueCat, Resend, and Help Scout credentials remain staging/public-launch blockers, not local development blockers.
+
 ## UX References
 
 - [Product Strategy](../product/product-strategy.md)
@@ -99,6 +124,7 @@ The goal is not to build user-facing product features. The goal is to make the w
 ## Engineering References
 
 - [Tech Stack Decision Record](../architecture/tech-stack-proposal.md)
+- [Environment Model](../architecture/environment-model.md)
 - [Technical Foundation](../architecture/technical-foundation.md)
 - [Animation Source Alignment](../engineering/animation-source-alignment.md)
 - [Breathing Orb Implementation Spec](../design/breathing-orb-implementation-spec.md)
@@ -107,13 +133,14 @@ The goal is not to build user-facing product features. The goal is to make the w
 
 - Supabase local project with migrations, functions, seed data, and local config.
 - RLS enabled by default for user-owned tables once tables are added.
-- Development, staging, and production Supabase projects kept separate.
-- Cloudflare R2 development/staging/production buckets or documented stand-ins for media setup.
-- RevenueCat sandbox and production configuration separated by environment.
-- PostHog staging and production configuration separated by environment.
-- Sentry development/staging/production environments and source-map upload path prepared.
-- Resend test mode for staging email paths.
-- Help Scout support inbox planned for public launch support workflow.
+- Development, staging, and production environment boundaries follow the [Environment Model](../architecture/environment-model.md).
+- Development, staging, and production Supabase projects are kept separate.
+- Cloudflare R2 development/staging/production buckets or documented stand-ins are separated from bundled local media.
+- RevenueCat sandbox and production configuration are separated by environment.
+- PostHog staging and production configuration are separated by environment.
+- Sentry development/staging/production environments and source-map upload path are documented.
+- Resend test mode is required for staging email paths.
+- Help Scout support inbox is a public launch blocker, not a local development blocker.
 
 ## Analytics Events
 
@@ -154,10 +181,10 @@ No broad autocapture is allowed on sensitive bedtime, sleep, billing, or support
 
 ## Task Checklist
 
-- [ ] Initialize pnpm workspace.
-- [ ] Add Turborepo configuration.
-- [ ] Create `apps/mobile`.
-- [ ] Create `apps/web`.
+- [x] Initialize pnpm workspace.
+- [x] Add Turborepo configuration.
+- [x] Create `apps/mobile`.
+- [x] Create `apps/web`.
 - [x] Create `packages/config`.
 - [x] Create `packages/domain`.
 - [x] Create `packages/i18n`.
@@ -166,9 +193,9 @@ No broad autocapture is allowed on sensitive bedtime, sleep, billing, or support
 - [x] Create `supabase/migrations`.
 - [x] Create `supabase/functions`.
 - [x] Create `supabase/seed`.
-- [ ] Configure TypeScript across workspace packages.
-- [ ] Configure ESLint across workspace packages.
-- [ ] Configure shared formatting.
+- [x] Configure TypeScript across workspace packages.
+- [x] Configure ESLint across workspace packages.
+- [x] Configure shared formatting.
 - [x] Configure Expo React Native with TypeScript.
 - [x] Configure Expo Router.
 - [x] Configure Expo development builds.
@@ -192,8 +219,8 @@ No broad autocapture is allowed on sensitive bedtime, sleep, billing, or support
 - [x] Install PostHog React Native SDK.
 - [x] Install Supabase client.
 - [x] Install RevenueCat SDK.
-- [ ] Add Nunito font assets.
-- [ ] Add Inter font assets.
+- [x] Add Nunito font assets.
+- [x] Add Inter font assets.
 - [x] Add Midnight Indigo design tokens.
 - [x] Add motion timing tokens.
 - [x] Add launch breath technique definitions.
@@ -211,23 +238,23 @@ No broad autocapture is allowed on sensitive bedtime, sleep, billing, or support
 - [x] Add first Supabase migration shell.
 - [x] Add RLS convention documentation or migration guard.
 - [x] Add Edge Function test harness.
-- [ ] Add local SQLite migration runner.
-- [ ] Add SQLite migration tests.
-- [ ] Add Jest.
-- [ ] Add React Native Testing Library.
-- [ ] Add Maestro project structure.
+- [x] Add local SQLite migration runner.
+- [x] Add SQLite migration tests.
+- [x] Add Jest.
+- [x] Add React Native Testing Library.
+- [x] Add Maestro project structure.
 - [x] Add Supabase migration validation command.
 - [x] Add Supabase local integration test command that runs with Docker.
-- [ ] Add RevenueCat webhook fixture test structure.
-- [ ] Add k6 backend load-test scaffold for webhook, sync, catalog, and entitlement paths.
-- [ ] Add GitHub Actions workflow for TypeScript, ESLint, tests, migrations, and i18n checks.
-- [ ] Add EAS workflow configuration.
-- [ ] Configure Sentry release and environment tags.
-- [ ] Configure Sentry source-map upload path.
-- [ ] Configure PostHog explicit-event client wrapper with autocapture off for sensitive screens.
+- [x] Add RevenueCat webhook fixture test structure.
+- [x] Add k6 backend load-test scaffold for webhook, sync, catalog, and entitlement paths.
+- [x] Add GitHub Actions workflow for TypeScript, ESLint, tests, migrations, and i18n checks.
+- [x] Add EAS workflow configuration.
+- [x] Configure Sentry release and environment tags.
+- [x] Configure Sentry source-map upload path.
+- [x] Configure PostHog explicit-event client wrapper with autocapture off for sensitive screens.
 - [x] Add environment variable examples for development.
 - [x] Document staging and production environment requirements.
-- [ ] Create first mobile proof screen for fonts, tokens, and palette.
+- [x] Create first mobile proof screen for fonts, tokens, and palette.
 - [ ] Verify development build can run on a real iOS device or simulator for non-device-specific checks.
 - [ ] Verify development build can run on a real Android device or emulator for non-device-specific checks.
 - [ ] Verify Sentry captures a test error with release context.

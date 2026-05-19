@@ -15,9 +15,13 @@
     "eas:update:development": "eas update --branch development",
     "eas:update:preview": "eas update --branch preview",
     "eas:update:production": "eas update --branch production",
+    "sentry:sourcemaps:update": "sentry-expo-upload-sourcemaps dist",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "lint": "eslint . --max-warnings=0",
-    "test": "echo \"No tests configured for @nidoru/mobile yet\""
+    "test": "pnpm run test:unit && pnpm run test:component && pnpm run test:sqlite",
+    "test:unit": "jest --runInBand --selectProjects unit",
+    "test:component": "jest --runInBand --selectProjects component",
+    "test:sqlite": "deno test --allow-run=sqlite3 --allow-read --allow-write tests/sqlite-migrations.test.ts"
   },
   "dependencies": {
     "@nidoru/domain": "workspace:*",
@@ -55,7 +59,11 @@
     "zustand": "^5.0.13"
   },
   "devDependencies": {
+    "@testing-library/react-native": "^13.3.3",
+    "@types/jest": "^29.5.14",
     "@types/react": "~19.1.17",
-    "eas-cli": "^18.13.0"
+    "eas-cli": "^18.13.0",
+    "jest": "^29.7.0",
+    "jest-expo": "~54.0.17"
   }
 }

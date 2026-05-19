@@ -1,0 +1,18 @@
+{
+  "api_version": "1.0",
+  "event": {
+    "aliases": ["local-install-test"],
+    "app_id": "app_nidoru_test",
+    "app_user_id": "local-install-test",
+    "event_timestamp_ms": 1779140000000,
+    "expiration_at_ms": 1781732000000,
+    "id": "event_initial_purchase_fixture",
+    "original_app_user_id": "local-install-test",
+    "period_type": "TRIAL",
+    "product_id": "nidoru_premium_monthly",
+    "purchased_at_ms": 1779140000000,
+    "store": "APP_STORE",
+    "subscriber_attributes": {},
+    "type": "INITIAL_PURCHASE"
+  }
+}

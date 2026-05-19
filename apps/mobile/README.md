@@ -27,6 +27,8 @@ pnpm --filter @nidoru/mobile eas:submit:production
 
 Run `pnpm --filter @nidoru/mobile exec eas init` after signing in to Expo, then set `EAS_PROJECT_ID` from the generated project ID when running local config checks or update commands.
 
+The manual EAS workflow at `.eas/workflows/foundation-preview.yml` runs the repo quality gates before creating preview native builds. It does not publish EAS Updates; native dependency, config plugin, SDK, or subscription/native contract changes require a new binary because `runtimeVersion.policy = "fingerprint"` gates update compatibility.
+
 ## EAS Update Runtime Rule
 
 The app uses `runtimeVersion.policy = "fingerprint"`. EAS Update is for JavaScript and asset updates that match an installed binary runtime. Native dependency changes, Expo config plugin changes, SDK upgrades, or subscription/native contract changes require a new binary build before an OTA update can be considered compatible.
@@ -38,6 +40,10 @@ pnpm --filter @nidoru/mobile eas:update:development
 pnpm --filter @nidoru/mobile eas:update:preview
 pnpm --filter @nidoru/mobile eas:update:production
 ```
+
+## Maestro
+
+Maestro flow scaffolds live in `.maestro/flows/` and target installed development or preview binaries. They are not a CI gate until a runner can build, install, and launch the native app.
 
 ## Current Proof Gaps
 

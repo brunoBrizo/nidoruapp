@@ -1,9 +1,12 @@
 .git
 .turbo
+.agents
+.codex
 .vscode
 coverage
 dist
 build
+apps/web/.next
 docs
 graphify-out
 node_modules

@@ -1,4 +1,13 @@
 const easProjectId = process.env.EAS_PROJECT_ID;
+const sentryUrl = process.env.SENTRY_URL;
+const sentryOrg = process.env.SENTRY_ORG;
+const sentryProject = process.env.SENTRY_PROJECT;
+
+const sentryPluginOptions = {
+  ...(sentryUrl ? { url: sentryUrl } : {}),
+  ...(sentryOrg ? { organization: sentryOrg } : {}),
+  ...(sentryProject ? { project: sentryProject } : {}),
+};
 
 /** @type {import("expo/config").ExpoConfig} */
 const config = {
@@ -33,7 +42,7 @@ const config = {
     "expo-secure-store",
     "expo-localization",
     "expo-font",
-    "@sentry/react-native",
+    ["@sentry/react-native/expo", sentryPluginOptions],
   ],
   experiments: {
     typedRoutes: true,

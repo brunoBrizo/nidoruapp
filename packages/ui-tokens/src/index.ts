@@ -54,6 +54,18 @@ export const typography = {
     primary: "Nunito",
     data: "Inter",
   },
+  mobileFontFamily: {
+    primary: {
+      regular: "Nunito-400",
+      semiBold: "Nunito-600",
+      bold: "Nunito-700",
+      extraBold: "Nunito-800",
+    },
+    data: {
+      light: "Inter-300",
+      regular: "Inter-400",
+    },
+  },
   fontAssets: {
     primary: {
       family: "Nunito",

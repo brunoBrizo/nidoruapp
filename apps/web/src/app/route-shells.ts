@@ -22,9 +22,11 @@ const marketingShell = {
   navLabel: "Marketing",
   label: "Public web",
   title: "Sleep sounds and breathwork",
-  summary: "The launch home for Nidoru will introduce the nighttime ritual without adding product flows yet.",
+  summary:
+    "The launch home for Nidoru will introduce the nighttime ritual without adding product flows yet.",
   cardTitle: "Foundation scope",
-  cardText: "This shell keeps the public route in place while future marketing copy, assets, and conversion paths are designed.",
+  cardText:
+    "This shell keeps the public route in place while future marketing copy, assets, and conversion paths are designed.",
 } as const satisfies RouteShell;
 
 const legalShell = {
@@ -35,7 +37,8 @@ const legalShell = {
   title: "Legal center",
   summary: "Policy, privacy, and terms pages will live here before public launch.",
   cardTitle: "Foundation scope",
-  cardText: "This shell reserves the legal surface without final policy text or jurisdiction-specific language.",
+  cardText:
+    "This shell reserves the legal surface without final policy text or jurisdiction-specific language.",
 } as const satisfies RouteShell;
 
 const supportShell = {
@@ -46,7 +49,8 @@ const supportShell = {
   title: "Support center",
   summary: "Help, contact, and support routing will start here once launch operations are ready.",
   cardTitle: "Foundation scope",
-  cardText: "This shell avoids support automation until the support workflow and provider setup are chosen.",
+  cardText:
+    "This shell avoids support automation until the support workflow and provider setup are chosen.",
 } as const satisfies RouteShell;
 
 const adminShell = {
@@ -55,12 +59,19 @@ const adminShell = {
   navLabel: "Admin",
   label: "Admin web",
   title: "Admin shell",
-  summary: "Internal operations and content workflows will start here after authentication and admin requirements are scoped.",
+  summary:
+    "Internal operations and content workflows will start here after authentication and admin requirements are scoped.",
   cardTitle: "Foundation scope",
-  cardText: "This shell reserves the route without building real admin workflows, data access, or privileged actions.",
+  cardText:
+    "This shell reserves the route without building real admin workflows, data access, or privileged actions.",
 } as const satisfies RouteShell;
 
-export const routeShells = [marketingShell, legalShell, supportShell, adminShell] as const satisfies readonly RouteShell[];
+export const routeShells = [
+  marketingShell,
+  legalShell,
+  supportShell,
+  adminShell,
+] as const satisfies readonly RouteShell[];
 
 export const routeShellById = {
   marketing: marketingShell,

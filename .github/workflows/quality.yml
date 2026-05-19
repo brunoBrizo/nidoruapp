@@ -1,0 +1,68 @@
+name: Quality
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+env:
+  CI: "true"
+  SUPABASE_TELEMETRY_DISABLED: "1"
+
+jobs:
+  quality:
+    name: TypeScript, lint, tests, migrations, and i18n
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: TypeScript
+        run: pnpm typecheck
+
+      - name: ESLint
+        run: pnpm lint
+
+      - name: Jest unit tests
+        run: pnpm test:unit
+
+      - name: React Native component tests
+        run: pnpm test:component
+
+      - name: SQLite migration tests
+        run: pnpm test:sqlite
+
+      - name: RevenueCat webhook fixture tests
+        run: pnpm test:revenuecat:webhooks
+
+      - name: i18n missing-key check
+        run: pnpm i18n:check
+
+      - name: Start local Supabase
+        run: pnpm supabase:start
+
+      - name: Supabase migration validation
+        run: pnpm supabase:migrations:validate
+
+      - name: Supabase database integration tests
+        run: pnpm supabase:test:db
+
+      - name: Stop local Supabase
+        if: always()
+        run: pnpm supabase:stop

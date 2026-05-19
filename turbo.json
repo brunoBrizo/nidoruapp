@@ -10,6 +10,15 @@
     },
     "test": {
       "outputs": []
+    },
+    "test:unit": {
+      "outputs": []
+    },
+    "test:component": {
+      "outputs": []
+    },
+    "test:sqlite": {
+      "outputs": []
     }
   }
 }

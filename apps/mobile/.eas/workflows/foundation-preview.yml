@@ -1,0 +1,51 @@
+name: Foundation Preview
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: Native platform to build.
+        type: choice
+        options:
+          - android
+          - ios
+          - all
+        default: all
+
+defaults:
+  tools:
+    node: "22"
+    pnpm: "10.33.0"
+  run:
+    working_directory: /
+
+jobs:
+  quality:
+    type: custom
+    runs_on: linux-medium
+    steps:
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm test:unit
+      - run: pnpm test:component
+      - run: pnpm test:sqlite
+      - run: pnpm i18n:check
+
+  build_android:
+    type: build
+    needs:
+      - quality
+    if: ${{ inputs.platform == 'android' || inputs.platform == 'all' }}
+    params:
+      platform: android
+      profile: preview
+
+  build_ios:
+    type: build
+    needs:
+      - quality
+    if: ${{ inputs.platform == 'ios' || inputs.platform == 'all' }}
+    params:
+      platform: ios
+      profile: preview

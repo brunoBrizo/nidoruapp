@@ -1,6 +1,54 @@
 {
   "version": 1,
   "skills": {
+    "code-security": {
+      "source": "semgrep/skills",
+      "sourceType": "github",
+      "skillPath": "skills/code-security/SKILL.md",
+      "computedHash": "56cbeeac5ccf346461e60f08fde411aa1f6e97ffed94fc83d871c2e4ce2ee4a6"
+    },
+    "ghost-scan-code": {
+      "source": "ghostsecurity/skills",
+      "sourceType": "github",
+      "skillPath": "plugins/ghost/skills/scan-code/SKILL.md",
+      "computedHash": "88939a27fc5a4b7623fdffffab41e43c9c9b0aab7ff770a27f1dbd89a19bbca6"
+    },
+    "ghost-scan-deps": {
+      "source": "ghostsecurity/skills",
+      "sourceType": "github",
+      "skillPath": "plugins/ghost/skills/scan-deps/SKILL.md",
+      "computedHash": "83eb27ad319a96f6887d2665f380c19b392025fd43b6c4c142acd594932a4171"
+    },
+    "ghost-scan-secrets": {
+      "source": "ghostsecurity/skills",
+      "sourceType": "github",
+      "skillPath": "plugins/ghost/skills/scan-secrets/SKILL.md",
+      "computedHash": "1debe9b20af3a0bb4e483ca09e84db27be223263a519800b069fff51144d744c"
+    },
+    "owasp-security": {
+      "source": "hoodini/ai-agents-skills",
+      "sourceType": "github",
+      "skillPath": "skills/owasp-security/SKILL.md",
+      "computedHash": "96ddeeb1eab361ebb8e18c1770a3baab804526fb94966f644a21ae72cc7841e2"
+    },
+    "semgrep": {
+      "source": "trailofbits/skills",
+      "sourceType": "github",
+      "skillPath": "plugins/static-analysis/skills/semgrep/SKILL.md",
+      "computedHash": "c347b05c997fcc13dc17f3f289f1e02ccb66ffbe5212288a24048ab016e30930"
+    },
+    "supabase": {
+      "source": "supabase/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/supabase/SKILL.md",
+      "computedHash": "45a3cdccc364a4bbd6cdf700fc069e9f24ebc0428098746cbfbf8b18a5e160d2"
+    },
+    "supabase-postgres-best-practices": {
+      "source": "supabase/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/supabase-postgres-best-practices/SKILL.md",
+      "computedHash": "d606a1146be6d54fb9e73f718b5320b9acac5ff2ba2d7230a555df4b5a923b4a"
+    },
     "verification-before-completion": {
       "source": "obra/superpowers",
       "sourceType": "github",

@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en" style=""><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Nidoru - Home</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-primary-container": "#281575",
+                      "surface-container-high": "#272935",
+                      "on-tertiary": "#3d2e00",
+                      "on-secondary-fixed-variant": "#004f58",
+                      "on-error-container": "#ffdad6",
+                      "primary": "#c8bfff",
+                      "surface": "#11131e",
+                      "on-surface": "#e1e1f2",
+                      "primary-container": "#9184e4",
+                      "on-tertiary-container": "#503d00",
+                      "secondary-container": "#2f9eae",
+                      "surface-variant": "#323440",
+                      "error": "#ffb4ab",
+                      "tertiary-fixed-dim": "#e2c375",
+                      "tertiary": "#e2c375",
+                      "secondary-fixed": "#99f0ff",
+                      "surface-container-low": "#191b26",
+                      "primary-fixed": "#e5deff",
+                      "surface-container-lowest": "#0c0e18",
+                      "background": "#11131e",
+                      "inverse-on-surface": "#2e303c",
+                      "outline-variant": "#484551",
+                      "secondary-fixed-dim": "#70d5e5",
+                      "on-secondary-container": "#002f35",
+                      "primary-fixed-dim": "#c8bfff",
+                      "error-container": "#93000a",
+                      "on-tertiary-fixed-variant": "#584400",
+                      "on-tertiary-fixed": "#241a00",
+                      "inverse-primary": "#5e51ad",
+                      "surface-dim": "#11131e",
+                      "on-error": "#690005",
+                      "on-primary": "#2f1e7c",
+                      "surface-tint": "#c8bfff",
+                      "tertiary-fixed": "#ffdf91",
+                      "on-surface-variant": "#c9c4d3",
+                      "inverse-surface": "#e1e1f2",
+                      "on-secondary-fixed": "#001f24",
+                      "on-background": "#e1e1f2",
+                      "on-primary-fixed": "#190064",
+                      "tertiary-container": "#c5a85d",
+                      "on-primary-fixed-variant": "#463893",
+                      "on-secondary": "#00363d",
+                      "surface-bright": "#373845",
+                      "surface-container-highest": "#323440",
+                      "surface-container": "#1d1f2b",
+                      "secondary": "#70d5e5",
+                      "outline": "#928f9d"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "lg": "40px",
+                      "sm": "12px",
+                      "gutter": "16px",
+                      "md": "24px",
+                      "xs": "4px",
+                      "base": "8px",
+                      "container-padding": "20px"
+              },
+              "fontFamily": {
+                      "display-greeting": [
+                              "Nunito Sans"
+                      ],
+                      "metric-sm": [
+                              "Inter"
+                      ],
+                      "label-caps": [
+                              "Inter"
+                      ],
+                      "body-main": [
+                              "Nunito Sans"
+                      ],
+                      "headline-card": [
+                              "Nunito Sans"
+                      ],
+                      "metric-lg": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "display-greeting": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "metric-sm": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-caps": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-main": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-card": [
+                              "22px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "metric-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "48px",
+                                      "letterSpacing": "-0.04em",
+                                      "fontWeight": "500"
+                              }
+                      ]
+              }
+            },
+          }
+        }
+    </script>
+<style>
+        body {
+            background: linear-gradient(180deg, #0D0F1A 0%, #0F1230 100%);
+            min-height: 100vh;
+            color: #e1e1f2;
+            overflow-x: hidden;
+        }
+
+        /* Glassmorphism Styles */
+        .glass-card {
+            background: rgba(20, 23, 43, 0.7);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .glass-chip {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* Atmospheric Particles */
+        #particles-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Orb Animation */
+        @keyframes pulse-orb {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 0.4; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+        
+        .orb-layer {
+            animation: pulse-orb 4s ease-in-out infinite;
+        }
+        .orb-layer:nth-child(2) { animation-delay: 1s; }
+        .orb-layer:nth-child(3) { animation-delay: 2s; }
+
+        /* Silk Border utility */
+        .silk-border {
+            box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+        }
+
+        /* Orb colors */
+        .orb-core { background-color: #7C6FCD; }
+        .orb-glow { background-color: #A89CE0; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="antialiased">
+<canvas height="884" id="particles-canvas" width="390"></canvas>
+<div class="relative z-10 w-full max-w-[480px] mx-auto min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="sticky top-0 w-full z-50 backdrop-blur-3xl bg-surface-container-low/70 dark:bg-surface-container-low/70 shadow-sm tap-highlight-transparent flex flex-col px-container-padding border-b-0 py-container-padding">
+<div class="flex justify-between items-start w-full">
+<div>
+<h1 class="font-headline-card text-headline-card text-[#E8E6F2]">Good evening, Bruno</h1>
+<div class="flex items-center gap-2 mt-xs"><p class="font-body-main text-body-main text-[#8A8FA8] whitespace-nowrap">Tonight’s wind-down is ready</p></div>
+</div>
+<div class="flex flex-col items-end">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center silk-border glass-chip relative overflow-hidden">
+<span class="material-symbols-outlined text-primary">bedtime</span>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 px-container-padding flex flex-col pt-base pb-24 gap-base">
+<!-- Primary Action Card -->
+<section class="glass-card rounded-[20px] p-md silk-border flex flex-col items-center text-center relative overflow-hidden py-md">
+<div class="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none"></div>
+<div class="w-20 h-20 relative flex items-center justify-center mb-base" style="transform: scale(1.1);">
+<div class="absolute w-full h-full rounded-full border border-primary/10 orb-layer"></div>
+<div class="absolute w-[110%] h-[110%] rounded-full border border-primary/5 orb-layer scale-110 opacity-30"></div>
+<div class="absolute w-[85%] h-[85%] rounded-full border border-primary/5 orb-layer"></div>
+<div class="absolute w-3/4 h-3/4 rounded-full bg-[#A89CE0] blur-2xl opacity-30 orb-layer"></div>
+<div class="absolute w-1/2 h-1/2 rounded-full bg-[#7C6FCD] blur-[2px] opacity-90 z-10"></div>
+<div class="absolute w-[140%] h-[140%] rounded-full border border-primary/5 orb-layer animate-pulse opacity-60"></div>
+</div>
+<h2 class="font-headline-card text-headline-card text-on-surface mb-xs leading-tight whitespace-nowrap">Evening Wind-Down</h2>
+<p class="font-body-main text-body-main text-on-surface-variant mb-sm text-sm opacity-80 whitespace-nowrap">4-7-8 breathing · 20 min sounds</p>
+<button class="w-full bg-gradient-to-r from-primary-container to-primary rounded-full py-2.5 px-6 font-label-caps text-label-caps text-on-primary-container flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
+<span class="whitespace-nowrap">Begin Wind-Down</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</section>
+<!-- Quick Actions -->
+<section class="flex flex-col gap-base">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest pl-2">Quick actions</h3>
+<div class="grid grid-cols-3 gap-gutter">
+<!-- Rescue Me -->
+<div class="glass-chip rounded-xl flex flex-col items-center text-center gap-xs hover:bg-white/10 transition-colors cursor-pointer relative overflow-hidden bg-white/[0.06] border-white/[0.05] py-base"><span class="material-symbols-outlined text-primary mb-1">monitor_heart</span><span class="font-label-caps text-label-caps text-on-surface leading-tight">Rescue Me</span></div>
+<!-- Sounds -->
+<div class="glass-chip rounded-xl flex flex-col items-center text-center gap-xs hover:bg-white/10 transition-colors cursor-pointer bg-white/[0.06] border-white/[0.05] py-base">
+<span class="material-symbols-outlined text-primary/80 mb-1">waves</span>
+<span class="font-label-caps text-label-caps text-on-surface leading-tight">Sounds</span>
+<span class="font-metric-sm text-metric-sm text-on-surface-variant text-[10px]">Mixer</span>
+</div>
+<!-- Breathe -->
+<div class="glass-chip rounded-xl flex flex-col items-center text-center gap-xs hover:bg-white/10 transition-colors cursor-pointer bg-white/[0.06] border-white/[0.05] py-base">
+<span class="material-symbols-outlined text-primary/60 mb-1">air</span>
+<span class="font-label-caps text-label-caps text-on-surface leading-tight">Breathe</span>
+<span class="font-metric-sm text-metric-sm text-on-surface-variant text-[10px]">Just the orb</span>
+</div>
+</div>
+</section>
+<!-- Last Night Summary -->
+<section class="glass-card rounded-[20px] p-md silk-border flex flex-col gap-sm">
+<div class="flex justify-between items-center">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">Last night</h3>
+<div class="flex gap-1">
+<span class="material-symbols-outlined text-primary text-[16px]" style="font-variation-settings: 'FILL' 1;">bedtime</span>
+<span class="material-symbols-outlined text-primary text-[16px]" style="font-variation-settings: 'FILL' 1;">bedtime</span>
+<span class="material-symbols-outlined text-primary text-[16px]" style="font-variation-settings: 'FILL' 1;">bedtime</span>
+<span class="material-symbols-outlined text-primary text-[16px]" style="font-variation-settings: 'FILL' 1;">bedtime</span>
+<span class="material-symbols-outlined text-on-surface-variant/30 text-[16px]" style="font-variation-settings: 'FILL' 1;">bedtime</span>
+</div>
+</div>
+<div>
+<p class="font-body-main text-body-main text-on-surface">4/5 · Rain helped you settle</p>
+<p class="font-metric-sm text-metric-sm text-on-surface-variant mt-1">Box breathing may help tonight.</p>
+</div>
+<div class="mt-2 flex justify-end">
+<button class="font-label-caps text-label-caps text-primary hover:text-primary-fixed transition-colors whitespace-nowrap">View insight</button>
+</div>
+</section>
+<!-- Compassionate Streak Strip -->
+<section class="flex flex-col mb-lg">
+<div class="flex justify-between items-end pl-2">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">Your sleep rhythm</h3>
+<span class="font-metric-sm text-metric-sm text-primary text-[11px]">8-day rhythm · compassionate</span>
+</div>
+<div class="glass-card rounded-full py-4 px-md flex justify-between items-center silk-border mt-12">
+<!-- Day 1-4 (Filled) -->
+<div class="w-3 h-3 rounded-full bg-primary/80"></div>
+<div class="w-3 h-3 rounded-full bg-primary/80"></div>
+<div class="w-3 h-3 rounded-full bg-primary/80"></div>
+<div class="w-3 h-3 rounded-full bg-primary/80"></div>
+<!-- Day 5 (Paused - soft ring) -->
+<div class="w-3 h-3 rounded-full border border-primary/50 flex items-center justify-center">
+<div class="w-1 h-1 rounded-full bg-primary/50"></div>
+</div>
+<!-- Day 6-7 (Future - haze rings) -->
+<div class="w-3 h-3 rounded-full border border-white/10"></div>
+<div class="w-3 h-3 rounded-full border border-white/10"></div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-gutter py-base bg-surface-container/70 dark:bg-surface-container/70 backdrop-blur-3xl md:hidden pb-[safe-area-inset-bottom]">
+<!-- Home (Active) -->
+<a class="flex flex-col items-center justify-center text-primary active:scale-95 transition-transform duration-200 relative px-4 py-1.5" href="#">
+<div class="absolute -top-1 w-6 rounded-full bg-primary h-[2px]"></div>
+<span class="material-symbols-outlined">home</span>
+<span class="text-label-caps mt-1 text-[10px] font-normal whitespace-nowrap font-medium opacity-100">Home</span>
+</a>
+<!-- Sleep -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors active:scale-95 duration-200 px-4 py-1.5" href="#">
+<span class="material-symbols-outlined">bedtime</span>
+<span class="text-label-caps mt-1 text-[10px] font-normal opacity-70 whitespace-nowrap">Sleep</span>
+</a>
+<!-- Breathe -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors active:scale-95 duration-200 px-4 py-1.5" href="#">
+<span class="material-symbols-outlined">air</span>
+<span class="text-label-caps mt-1 text-[10px] font-normal opacity-70 whitespace-nowrap">Breathe</span>
+</a>
+<!-- Progress -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors active:scale-95 duration-200 px-4 py-1.5" href="#">
+<span class="material-symbols-outlined">bar_chart</span>
+<span class="text-label-caps mt-1 text-[10px] font-normal opacity-70 whitespace-nowrap">Progress</span>
+</a>
+<!-- Profile -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors active:scale-95 duration-200 px-4 py-1.5" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-label-caps mt-1 text-[10px] font-normal opacity-70 whitespace-nowrap">Profile</span>
+</a>
+</nav>
+</div>
+<!-- Script for Atmospheric Particles -->
+<script>
+        const canvas = document.getElementById('particles-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        let width, height;
+        let particles = [];
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.size = Math.random() * 1.5 + 0.5;
+                this.speedY = Math.random() * 0.2 - 0.1;
+                this.speedX = Math.random() * 0.2 - 0.1;
+                // Very subtle opacity for low contrast living atmosphere
+                this.opacity = Math.random() * 0.3 + 0.05; 
+                this.fadeSpeed = Math.random() * 0.002 + 0.001;
+                this.fadingOut = Math.random() > 0.5;
+            }
+
+            update() {
+                this.y += this.speedY;
+                this.x += this.speedX;
+
+                if (this.fadingOut) {
+                    this.opacity -= this.fadeSpeed;
+                    if (this.opacity <= 0.05) this.fadingOut = false;
+                } else {
+                    this.opacity += this.fadeSpeed;
+                    if (this.opacity >= 0.35) this.fadingOut = true;
+                }
+
+                if (this.y < 0) this.y = height;
+                if (this.y > height) this.y = 0;
+                if (this.x < 0) this.x = width;
+                if (this.x > width) this.x = 0;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(200, 191, 255, ${this.opacity})`; // Using primary color tint
+                ctx.fill();
+            }
+        }
+
+        function init() {
+            resize();
+            particles = [];
+            // Create fewer particles to keep it uncluttered
+            for (let i = 0; i < 40; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            
+            particles.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
+            
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', init);
+        init();
+        animate();
+    </script>
+</body></html>

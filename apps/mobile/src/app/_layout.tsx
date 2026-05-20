@@ -1,11 +1,11 @@
 import "expo-dev-client";
 
-import { colors, typography } from "@nidoru/ui-tokens";
+import { typography } from "@nidoru/ui-tokens";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { ActivityIndicator, StyleSheet, View } from "react-native";
 
+import { OnboardingSplashScreen } from "../onboarding/onboarding-splash-screen";
 import { ObservabilityProvider } from "../observability/ObservabilityProvider";
 import { initializeSentry, withSentryRoot } from "../observability/sentry";
 import inter300 from "../../assets/fonts/Inter-300.ttf";
@@ -32,18 +32,14 @@ function RootLayout() {
   }
 
   if (!fontsLoaded) {
-    return (
-      <View style={styles.loadingScreen}>
-        <StatusBar style="light" />
-        <ActivityIndicator color={colors.dark.primaryGlow.value} />
-      </View>
-    );
+    return <OnboardingSplashScreen useWordmarkFont={false} />;
   }
 
   return (
     <ObservabilityProvider>
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="onboarding" />
         <Stack.Screen name="observability-proof" />
       </Stack>
       <StatusBar style="light" />
@@ -52,12 +48,3 @@ function RootLayout() {
 }
 
 export default withSentryRoot(RootLayout);
-
-const styles = StyleSheet.create({
-  loadingScreen: {
-    alignItems: "center",
-    backgroundColor: colors.dark.background.value,
-    flex: 1,
-    justifyContent: "center",
-  },
-});

@@ -4,6 +4,7 @@ import { ArrowRight, Heart, Moon, Music, Wind, type LucideIcon } from "lucide-re
 import { useEffect, useRef, type ReactNode } from "react";
 import { Animated, Easing, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
+import { RestingBreathingOrb } from "../breathing/breathing-orb";
 import { useReduceMotionPreference } from "../motion/use-reduce-motion-enabled";
 import { type HomeQuickActionId } from "./home-actions";
 import { createHomeOverview, type HomeRhythmSegment } from "./home-state";
@@ -136,14 +137,7 @@ export function HomeScreen({ hasMorningCheckIn = true, now = new Date() }: HomeS
           </Text>
         </View>
 
-        <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={styles.orbStage}>
-          <View style={[styles.orbRing, styles.orbOuterRing]} />
-          <View style={[styles.orbRing, styles.orbMiddleRing]} />
-          <View style={styles.orbSoftGlow} />
-          <View style={styles.orbCore}>
-            <View style={styles.orbHighlight} />
-          </View>
-        </View>
+        <RestingBreathingOrb testID="home-resting-breathing-orb" />
 
         <Link asChild href={primaryAction.routeTarget}>
           <Pressable
@@ -343,53 +337,6 @@ const styles = StyleSheet.create({
     fontFamily: typography.mobileFontFamily.primary.regular,
     fontSize: typography.scale.body.size,
     lineHeight: 21,
-  },
-  orbStage: {
-    alignItems: "center",
-    height: 112,
-    justifyContent: "center",
-  },
-  orbRing: {
-    position: "absolute",
-  },
-  orbOuterRing: {
-    borderColor: "rgba(124, 111, 205, 0.42)",
-    borderRadius: 56,
-    borderWidth: 1,
-    height: 112,
-    width: 112,
-  },
-  orbMiddleRing: {
-    backgroundColor: "rgba(124, 111, 205, 0.08)",
-    borderColor: "rgba(168, 156, 224, 0.24)",
-    borderRadius: 40,
-    borderWidth: 1,
-    height: 80,
-    width: 80,
-  },
-  orbSoftGlow: {
-    backgroundColor: "rgba(168, 156, 224, 0.35)",
-    borderRadius: 34,
-    boxShadow: "0 0 24px rgba(168, 156, 224, 0.4)",
-    height: 68,
-    position: "absolute",
-    width: 68,
-  },
-  orbCore: {
-    alignItems: "center",
-    backgroundColor: colors.dark.primary.value,
-    borderRadius: 28,
-    boxShadow: "0 0 24px rgba(124, 111, 205, 0.5)",
-    height: 56,
-    justifyContent: "center",
-    overflow: "hidden",
-    width: 56,
-  },
-  orbHighlight: {
-    backgroundColor: "rgba(238, 240, 255, 0.34)",
-    borderRadius: 18,
-    height: 36,
-    width: 36,
   },
   primaryButton: {
     alignItems: "center",

@@ -108,8 +108,171 @@ Deno.test("applies local SQLite migrations from an empty database", async () => 
     );
     assertEquals(
       foundationTables.map((row) => row.name),
-      ["local_database_metadata", "local_schema_migrations"],
+      [
+        "local_database_metadata",
+        "local_event_queue",
+        "local_install_identity",
+        "local_schema_migrations",
+      ],
     );
+  } finally {
+    await cleanup();
+  }
+});
+
+Deno.test("supports Feature 02 local-first onboarding and first-session records", async () => {
+  const { database, cleanup } = await createDatabase();
+
+  try {
+    await runSqliteMigrations(database);
+    await database.execAsync(`
+      INSERT INTO local_install_identity (local_install_id, created_at, last_seen_at)
+      VALUES ('install_0123456789abcdef', '2026-05-18T02:00:00.000Z', '2026-05-18T02:00:00.000Z');
+
+      INSERT INTO onboarding_responses (
+        local_install_id,
+        status,
+        started_at,
+        completed_at,
+        goal,
+        sleep_baseline,
+        wind_down_minutes_after_midnight,
+        breathwork_familiarity,
+        display_name,
+        recommended_plan_id,
+        recommended_technique_id,
+        first_session_duration_seconds,
+        updated_at
+      )
+      VALUES (
+        'install_0123456789abcdef',
+        'completed',
+        '2026-05-18T02:00:00.000Z',
+        '2026-05-18T02:02:00.000Z',
+        'curiosity',
+        3,
+        1350,
+        'new_to_me',
+        'Bruno',
+        'general_wellness',
+        'coherent-breathing',
+        240,
+        '2026-05-18T02:02:00.000Z'
+      );
+
+      INSERT INTO first_breath_demo_events (
+        event_id,
+        local_install_id,
+        event_type,
+        occurred_at,
+        elapsed_seconds
+      )
+      VALUES (
+        'event_0123456789abcdef',
+        'install_0123456789abcdef',
+        'completed',
+        '2026-05-18T02:00:30.000Z',
+        30
+      );
+
+      INSERT INTO first_session_records (
+        session_id,
+        local_install_id,
+        status,
+        plan_id,
+        technique_id,
+        started_at,
+        completed_at,
+        duration_seconds,
+        completed_breath_cycles,
+        completion_persisted_at
+      )
+      VALUES (
+        'session_0123456789abcdef',
+        'install_0123456789abcdef',
+        'completed',
+        'general_wellness',
+        'coherent-breathing',
+        '2026-05-18T02:03:00.000Z',
+        '2026-05-18T02:07:00.000Z',
+        240,
+        24,
+        '2026-05-18T02:07:01.000Z'
+      );
+
+      INSERT INTO post_session_reflections (
+        reflection_id,
+        local_install_id,
+        session_id,
+        reflected_at,
+        feeling
+      )
+      VALUES (
+        'reflection_0123456789abcdef',
+        'install_0123456789abcdef',
+        'session_0123456789abcdef',
+        '2026-05-18T02:08:00.000Z',
+        'better'
+      );
+
+      INSERT INTO notification_gate_state (
+        local_install_id,
+        first_active_day,
+        completed_session_count,
+        permission_state,
+        updated_at
+      )
+      VALUES (
+        'install_0123456789abcdef',
+        '2026-05-18',
+        2,
+        'not_shown',
+        '2026-05-20T02:00:00.000Z'
+      );
+
+      INSERT INTO local_event_queue (
+        event_id,
+        local_install_id,
+        event_name,
+        record_type,
+        record_id,
+        payload_json,
+        status,
+        created_at,
+        updated_at
+      )
+      VALUES (
+        'queue_0123456789abcdef',
+        'install_0123456789abcdef',
+        'first_session_completed',
+        'first_session_record',
+        'session_0123456789abcdef',
+        '{"sessionId":"session_0123456789abcdef"}',
+        'pending',
+        '2026-05-18T02:07:02.000Z',
+        '2026-05-18T02:07:02.000Z'
+      );
+    `);
+
+    const recoveredSessionRows = await database.getAllAsync<{
+      session_id: string;
+      status: string;
+      completion_persisted_at: string;
+    }>(
+      "SELECT session_id, status, completion_persisted_at FROM first_session_records WHERE status = 'completed';",
+    );
+    const pendingQueueRows = await database.getAllAsync<{ event_name: string }>(
+      "SELECT event_name FROM local_event_queue WHERE status = 'pending';",
+    );
+
+    assertEquals(recoveredSessionRows, [
+      {
+        session_id: "session_0123456789abcdef",
+        status: "completed",
+        completion_persisted_at: "2026-05-18T02:07:01.000Z",
+      },
+    ]);
+    assertEquals(pendingQueueRows, [{ event_name: "first_session_completed" }]);
   } finally {
     await cleanup();
   }

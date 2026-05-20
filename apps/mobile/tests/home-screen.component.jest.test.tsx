@@ -2,6 +2,7 @@ import { describe, expect, it, jest } from "@jest/globals";
 import { render, screen, within } from "@testing-library/react-native";
 import { AccessibilityInfo } from "react-native";
 
+import { RESTING_BREATHING_ORB_TEST_IDS } from "../src/breathing/breathing-orb";
 import { AppTabBar } from "../src/navigation/app-tab-bar";
 import HomeScreen from "../src/app/(tabs)/index";
 import {
@@ -70,6 +71,15 @@ describe("HomeScreen", () => {
     expect(screen.getByText("8 days")).toBeTruthy();
     expect(screen.getByText("Wind-Down Flow")).toBeTruthy();
     expect(screen.getByText("4-7-8 breathing and 20 min sounds")).toBeTruthy();
+    expect(
+      within(
+        screen.getByTestId("home-resting-breathing-orb", {
+          includeHiddenElements: true,
+        }),
+      ).getByTestId(RESTING_BREATHING_ORB_TEST_IDS.core, {
+        includeHiddenElements: true,
+      }),
+    ).toBeTruthy();
     expect(screen.getByText("Last night")).toBeTruthy();
     expect(screen.getByText("Rain helped you settle")).toBeTruthy();
     expect(screen.getByText("Your sleep rhythm")).toBeTruthy();

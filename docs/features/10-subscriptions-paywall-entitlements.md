@@ -23,7 +23,7 @@ Subscriptions use RevenueCat with a single launch entitlement, `premium`. Moneti
   - Annual subscription.
   - Lifetime purchase if approved for launch positioning.
 - First session has no paywall.
-- Recommended first test after first completed session: 7-day full-access trial, no credit card if technically and commercially feasible.
+- Recommended first test after first completed session: 14-day full-access trial, no credit card if technically and commercially feasible.
 - If no-credit-card trial is not feasible through store flow, use free first session, soft account creation after value, and paid trial only after full routine value.
 - Free tier includes core breathing, Rescue Me, limited sounds, morning check-in, and basic history.
 - Renewal reminders before annual renewal where platform rules allow.

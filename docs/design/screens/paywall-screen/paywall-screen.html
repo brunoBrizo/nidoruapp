@@ -1,0 +1,306 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>nidoru - Save Progress &amp; Premium</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Nunito:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+    <style>
+      body {
+      font-family: 'Nunito', sans-serif;
+      background-color: #0D0F1A;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      }
+      .font-inter {
+      font-family: 'Inter', sans-serif;
+      }
+      /* Calm Entrance Animation */
+      @keyframes fade-up-enter {
+      0% { opacity: 0; transform: translateY(12px); }
+      100% { opacity: 1; transform: translateY(0); }
+      }
+      .animate-fade-up {
+      animation: fade-up-enter 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+      }
+      .delay-100 { animation-delay: 100ms; }
+      .delay-200 { animation-delay: 200ms; }
+      .delay-300 { animation-delay: 300ms; }
+      .delay-400 { animation-delay: 400ms; }
+      /* Custom scrollbar hide for cleaner native feel */
+      .scrollbar-hide::-webkit-scrollbar {
+      display: none;
+      }
+      .scrollbar-hide {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+      }
+      /* Reduced Motion Override */
+      @media (prefers-reduced-motion: reduce) {
+      .animate-fade-up {
+      animation: none;
+      opacity: 1;
+      transform: none;
+      }
+      * {
+      transition: none !important;
+      }
+      }
+    </style>
+  </head>
+  <body class="text-[#EEF0FF] selection:bg-[#7C6FCD]/30">
+    <main class="max-w-[390px] mx-auto min-h-[100dvh] h-[100dvh] flex flex-col relative bg-[#0D0F1A]">
+      <!-- Settled Ambient Orb Glow -->
+      <div class="absolute top-[-5%] left-1/2 -translate-x-1/2 w-[340px] h-[340px] bg-[#7C6FCD]/15 blur-[90px] rounded-full pointer-events-none z-0"></div>
+
+      <!-- Scrollable Main Content -->
+      <div class="flex-1 overflow-y-auto overflow-x-hidden px-5 pt-12 scrollbar-hide z-10 relative pb-[380px]">
+        <!-- Top: Completion Proof -->
+        <div class="flex items-center gap-2 mb-4 animate-fade-up opacity-0">
+          <iconify-icon icon="solar:check-circle-bold" width="18" class="text-[#5EC4D4]"></iconify-icon>
+          <span class="text-[13px] font-medium text-[#A4AAC4] tracking-wide">
+            First session complete
+          </span>
+        </div>
+
+        <!-- Headline & Subcopy -->
+        <h1 class="text-[28px] tracking-tight font-semibold text-[#EEF0FF] mb-3 animate-fade-up opacity-0 delay-100">
+          Keep tonight’s calm going
+        </h1>
+        <p class="text-[15px] font-normal text-[#8A8FA8] leading-relaxed mb-8 animate-fade-up opacity-0 delay-100">
+          Tonight’s session is saved on this phone. Link an account to protect
+          your progress and restore it later.
+        </p>
+
+        <!-- Session Proof Result Card -->
+        <div class="w-full rounded-[16px] bg-[#14172B] border border-[#1C2040] py-4 flex justify-between items-center mb-10 animate-fade-up opacity-0 delay-200">
+          <div class="flex-1 flex flex-col items-center gap-1 border-r border-[#1C2040]">
+            <span class="font-inter text-[15px] font-semibold text-[#EEF0FF]">
+              4 min
+            </span>
+            <span class="text-[12px] font-medium text-[#8A8FA8]">Session</span>
+          </div>
+          <div class="flex-1 flex flex-col items-center gap-1 border-r border-[#1C2040]">
+            <span class="font-inter text-[15px] font-semibold text-[#EEF0FF]">
+              18
+            </span>
+            <span class="text-[12px] font-medium text-[#8A8FA8]">Breaths</span>
+          </div>
+          <div class="flex-1 flex flex-col items-center gap-1">
+            <span class="font-inter text-[15px] font-semibold text-[#5EC4D4]">
+              1
+            </span>
+            <span class="text-[12px] font-medium text-[#8A8FA8]">Streak</span>
+          </div>
+        </div>
+
+        <!-- Account Link Area -->
+        <div class="flex flex-col gap-3 animate-fade-up opacity-0 delay-300 mb-[30dvh]">
+          <span class="text-[15px] font-semibold text-[#EEF0FF] mb-1">
+            Save tonight’s progress
+          </span>
+          <button class="w-full h-[52px] rounded-[16px] bg-[#1C2040] hover:bg-[#252A50] text-[#EEF0FF] font-medium text-[15px] flex items-center justify-center gap-2.5 transition-colors active:scale-[0.98]">
+            <iconify-icon icon="ic:baseline-apple" width="20"></iconify-icon>
+            Continue with Apple
+          </button>
+          <button class="w-full h-[52px] rounded-[16px] bg-[#14172B] border border-[#1C2040] hover:bg-[#1C2040] text-[#EEF0FF] font-medium text-[15px] flex items-center justify-center gap-2.5 transition-colors active:scale-[0.98]">
+            <iconify-icon icon="logos:google-icon" width="18"></iconify-icon>
+            Continue with Google
+          </button>
+          <span class="text-[13px] font-normal text-[#8A8FA8] text-center mt-1">
+            Used for progress sync, purchase restore, and data controls.
+          </span>
+        </div>
+
+        <!-- Premium Trial Area -->
+        <div class="animate-fade-up opacity-0 delay-400">
+          <h2 class="text-[20px] tracking-tight font-semibold text-[#EEF0FF] mb-2">
+            Try 14 days of Nidoru Premium
+          </h2>
+          <p class="text-[15px] font-normal text-[#8A8FA8] leading-relaxed mb-6">
+            Build on the routine that helped tonight.
+          </p>
+
+          <ul class="flex flex-col gap-3.5 mb-12">
+            <li class="flex items-start gap-3">
+              <iconify-icon icon="solar:check-circle-linear" class="text-[#A89CE0] mt-[2px]" width="20"></iconify-icon>
+              <span class="text-[15px] font-normal text-[#EEF0FF] leading-snug">
+                Unlimited sleep sessions and breath techniques
+              </span>
+            </li>
+            <li class="flex items-start gap-3">
+              <iconify-icon icon="solar:check-circle-linear" class="text-[#A89CE0] mt-[2px]" width="20"></iconify-icon>
+              <span class="text-[15px] font-normal text-[#EEF0FF] leading-snug">
+                Full sound library for wind-downs and late nights
+              </span>
+            </li>
+            <li class="flex items-start gap-3">
+              <iconify-icon icon="solar:check-circle-linear" class="text-[#A89CE0] mt-[2px]" width="20"></iconify-icon>
+              <span class="text-[15px] font-normal text-[#EEF0FF] leading-snug">
+                Sleep insights as your first two weeks fill in
+              </span>
+            </li>
+          </ul>
+
+          <!-- Plan Selector -->
+          <div class="flex flex-col gap-3 mb-6" id="plans-section">
+            <!-- Annual Plan (Default) -->
+            <button id="plan-annual" class="relative w-full p-4 rounded-[16px] border-[1.5px] border-[#7C6FCD] bg-[#7C6FCD]/10 text-left flex items-center justify-between transition-all active:scale-[0.98]">
+              <div class="absolute bg-[#7C6FCD] text-[#EEF0FF] font-inter text-[11px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider -top-3 right-6">
+                BEST VALUE
+              </div>
+              <div class="flex items-center gap-3">
+                <div id="annual-radio" class="w-5 h-5 rounded-full border-[1.5px] border-[#7C6FCD] flex items-center justify-center shrink-0 transition-colors">
+                  <div id="annual-dot" class="w-2.5 h-2.5 rounded-full bg-[#7C6FCD] transition-transform scale-100"></div>
+                </div>
+                <div class="flex flex-col">
+                  <span class="text-[16px] font-semibold text-[#EEF0FF]">
+                    Annual
+                  </span>
+                  <span class="text-[13px] font-normal text-[#A89CE0]">
+                    14 days free
+                  </span>
+                </div>
+              </div>
+              <div class="flex flex-col items-end">
+                <span class="font-inter text-[16px] font-semibold text-[#EEF0FF]">
+                  $39.99
+                </span>
+                <span class="font-inter text-[13px] text-[#8A8FA8]">
+                  / year
+                </span>
+              </div>
+            </button>
+
+            <!-- Monthly Plan -->
+            <button id="plan-monthly" class="w-full p-4 rounded-[16px] border-[1.5px] border-[#1C2040] bg-[#14172B] hover:border-[#3A3F60] text-left flex items-center justify-between transition-all active:scale-[0.98]">
+              <div class="flex items-center gap-3">
+                <div id="monthly-radio" class="w-5 h-5 rounded-full border-[1.5px] border-[#4A4E6A] flex items-center justify-center shrink-0 transition-colors">
+                  <div id="monthly-dot" class="w-2.5 h-2.5 rounded-full bg-[#7C6FCD] transition-transform scale-0"></div>
+                </div>
+                <div class="flex flex-col">
+                  <span class="text-[16px] font-semibold text-[#EEF0FF]">
+                    Monthly
+                  </span>
+                  <span class="text-[13px] font-normal text-[#8A8FA8]">
+                    14 days free
+                  </span>
+                </div>
+              </div>
+              <div class="flex flex-col items-end">
+                <span class="font-inter text-[16px] font-semibold text-[#EEF0FF]">
+                  $7.99
+                </span>
+                <span class="font-inter text-[13px] text-[#8A8FA8]">
+                  / month
+                </span>
+              </div>
+            </button>
+          </div>
+
+          <!-- Prominent Trust Area -->
+          <div class="flex flex-col items-center mt-3 mb-6">
+            <span class="text-[13px] font-normal text-[#8A8FA8] text-center px-4">
+              14 days free. Then $39.99/year unless canceled.
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fixed Bottom CTA Area -->
+      <div class="absolute bottom-0 w-full px-5 pb-8 bg-gradient-to-t from-[#0D0F1A] via-[#0D0F1A]/95 to-transparent z-20 pointer-events-none animate-fade-up opacity-0 delay-400 pt-48">
+        <div class="pointer-events-auto w-full flex flex-col bg-[#0D0F1A]">
+          <button id="main-cta" class="w-full h-[56px] rounded-[16px] bg-[#7C6FCD] text-[#EEF0FF] font-semibold text-[16px] flex items-center justify-center transition-all hover:bg-[#685BB3] active:scale-[0.96] mb-1.5 shadow-[0_4px_24px_rgba(124,111,205,0.25)]">
+            See plans
+          </button>
+          <p id="cta-helper" class="text-center text-[12px] font-medium text-[#A89CE0] mb-5 transition-opacity">
+            Plans shown before trial starts.
+          </p>
+
+          <button class="w-full py-3 flex items-center justify-center text-[15px] font-semibold text-[#8A8FA8] hover:text-[#EEF0FF] transition-colors mb-4 active:scale-[0.98]">
+            Continue with free
+          </button>
+
+          <div id="restore-btn-container" class="flex justify-center transition-opacity duration-300 opacity-0 pointer-events-none h-[20px]">
+            <button class="text-[13px] font-medium transition-colors text-[#6A6F93] hover:text-[#EEF0FF] p-3 -m-3">
+              Restore purchase
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const annualBtn = document.getElementById('plan-annual');
+        const monthlyBtn = document.getElementById('plan-monthly');
+        const annualRadio = document.getElementById('annual-radio');
+        const monthlyRadio = document.getElementById('monthly-radio');
+        const annualDot = document.getElementById('annual-dot');
+        const monthlyDot = document.getElementById('monthly-dot');
+
+        const selectPlan = (plan) => {
+          if (navigator.vibrate) navigator.vibrate(15);
+          if (plan === 'annual') {
+            annualBtn.classList.add('border-[#7C6FCD]', 'bg-[#7C6FCD]/10');
+            annualBtn.classList.remove('border-[#1C2040]', 'bg-[#14172B]', 'hover:border-[#3A3F60]');
+            annualRadio.classList.replace('border-[#4A4E6A]', 'border-[#7C6FCD]');
+            annualDot.classList.replace('scale-0', 'scale-100');
+
+            monthlyBtn.classList.remove('border-[#7C6FCD]', 'bg-[#7C6FCD]/10');
+            monthlyBtn.classList.add('border-[#1C2040]', 'bg-[#14172B]', 'hover:border-[#3A3F60]');
+            monthlyRadio.classList.replace('border-[#7C6FCD]', 'border-[#4A4E6A]');
+            monthlyDot.classList.replace('scale-100', 'scale-0');
+          } else {
+            monthlyBtn.classList.add('border-[#7C6FCD]', 'bg-[#7C6FCD]/10');
+            monthlyBtn.classList.remove('border-[#1C2040]', 'bg-[#14172B]', 'hover:border-[#3A3F60]');
+            monthlyRadio.classList.replace('border-[#4A4E6A]', 'border-[#7C6FCD]');
+            monthlyDot.classList.replace('scale-0', 'scale-100');
+
+            annualBtn.classList.remove('border-[#7C6FCD]', 'bg-[#7C6FCD]/10');
+            annualBtn.classList.add('border-[#1C2040]', 'bg-[#14172B]', 'hover:border-[#3A3F60]');
+            annualRadio.classList.replace('border-[#7C6FCD]', 'border-[#4A4E6A]');
+            annualDot.classList.replace('scale-100', 'scale-0');
+          }
+        };
+
+        if (annualBtn) annualBtn.addEventListener('click', () => selectPlan('annual'));
+        if (monthlyBtn) monthlyBtn.addEventListener('click', () => selectPlan('monthly'));
+
+        const mainCta = document.getElementById('main-cta');
+        const plansSection = document.getElementById('plans-section');
+        const scrollContainer = document.querySelector('.overflow-y-auto');
+        const ctaHelper = document.getElementById('cta-helper');
+        const restoreBtnContainer = document.getElementById('restore-btn-container');
+
+        if (mainCta && plansSection && scrollContainer) {
+          const observer = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting) {
+              mainCta.textContent = 'Start 14-day free trial';
+              mainCta.onclick = null;
+              if (ctaHelper) ctaHelper.textContent = 'No payment now';
+              if (restoreBtnContainer) {
+                restoreBtnContainer.classList.remove('opacity-0', 'pointer-events-none');
+              }
+            } else {
+              mainCta.textContent = 'See plans';
+              mainCta.onclick = () => {
+                plansSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              };
+              if (ctaHelper) ctaHelper.textContent = 'Plans shown before trial starts.';
+              if (restoreBtnContainer) {
+                restoreBtnContainer.classList.add('opacity-0', 'pointer-events-none');
+              }
+            }
+          }, { root: scrollContainer, rootMargin: '0px 0px -260px 0px', threshold: 0 });
+          observer.observe(plansSection);
+        }
+      });
+    </script>
+  
+</body></html>

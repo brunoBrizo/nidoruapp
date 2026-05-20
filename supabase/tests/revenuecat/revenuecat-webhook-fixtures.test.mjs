@@ -5,6 +5,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const fixturesDir = join(dirname(fileURLToPath(import.meta.url)), "fixtures");
+const fourteenDayTrialDurationMs = 14 * 24 * 60 * 60 * 1000;
 
 describe("RevenueCat webhook fixtures", () => {
   it("keeps future webhook fixtures shaped like RevenueCat events", async () => {
@@ -21,6 +22,14 @@ describe("RevenueCat webhook fixtures", () => {
       assert.equal(typeof payload.event.type, "string", `${fixtureFile} event.type`);
       assert.equal(typeof payload.event.app_user_id, "string", `${fixtureFile} event.app_user_id`);
       assert.equal(typeof payload.event.product_id, "string", `${fixtureFile} event.product_id`);
+
+      if (payload.event.period_type === "TRIAL") {
+        assert.equal(
+          payload.event.expiration_at_ms - payload.event.purchased_at_ms,
+          fourteenDayTrialDurationMs,
+          `${fixtureFile} trial duration`,
+        );
+      }
     }
   });
 });

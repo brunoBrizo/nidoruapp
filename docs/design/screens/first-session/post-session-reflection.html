@@ -1,0 +1,490 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>nidoru - 4-7-8 Breathing Session</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Nunito:wght@400;500;600&amp;display=swap" rel="stylesheet">
+    <style>
+      body {
+      font-family: 'Nunito', sans-serif;
+      background-color: #0D0F1A;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      }
+      .font-inter {
+      font-family: 'Inter', sans-serif;
+      }
+      /* Base Screen Entrance */
+      @keyframes fade-up-enter {
+      0% { opacity: 0; transform: translateY(12px); }
+      100% { opacity: 1; transform: translateY(0); }
+      }
+      .animate-fade-up {
+      animation: fade-up-enter 0.4s cubic-bezier(0.2, 0, 0, 1) forwards;
+      }
+      /* Subtle Fade Up for Reflection Content */
+      @keyframes soft-fade-up {
+      0% { opacity: 0; transform: translateY(16px); }
+      100% { opacity: 1; transform: translateY(0); }
+      }
+      .show-content .animate-reflection {
+      animation: soft-fade-up 0.8s cubic-bezier(0.2, 0, 0, 1) forwards;
+      }
+      .delay-150 { animation-delay: 150ms; }
+      .delay-300 { animation-delay: 300ms; }
+      .delay-450 { animation-delay: 450ms; }
+      /* Orb Breathing Transitions */
+      .orb-inhale {
+      transform: scale(1.45);
+      transition: transform 4s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .orb-hold {
+      transform: scale(1.45);
+      transition: transform 7s linear;
+      }
+      .orb-exhale {
+      transform: scale(1);
+      transition: transform 8s cubic-bezier(0.3, 0, 0.3, 1);
+      }
+      /* Inner Core Shimmer on Hold */
+      @keyframes core-shimmer {
+      0%, 100% { opacity: 0.9; box-shadow: 0 0 30px rgba(124,111,205,0.4); }
+      50% { opacity: 1; box-shadow: 0 0 50px rgba(124,111,205,0.6); }
+      }
+      .shimmer-active {
+      animation: core-shimmer 3.5s ease-in-out infinite;
+      }
+      /* Expanding Pulse Ring on Inhale */
+      @keyframes pulse-expand {
+      0% { transform: scale(1); opacity: 0.6; }
+      100% { transform: scale(1.8); opacity: 0; }
+      }
+      .animate-pulse-expand {
+      animation: pulse-expand 4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      }
+      /* Crossfade Utility */
+      .crossfade-out {
+      opacity: 0;
+      transform: translateY(-2px);
+      transition: all 0.2s ease-out;
+      }
+      .crossfade-in {
+      opacity: 1;
+      transform: translateY(0);
+      transition: all 0.2s ease-in;
+      }
+      /* Reduced Motion Override */
+      @media (prefers-reduced-motion: reduce) {
+      .orb-inhale, .orb-hold, .orb-exhale {
+      transition: opacity 2s ease;
+      transform: scale(1) !important;
+      }
+      .orb-inhale { opacity: 1; }
+      .orb-hold { opacity: 0.85; }
+      .orb-exhale { opacity: 0.6; }
+      .animate-pulse-expand { animation: none; display: none; }
+      .show-content .animate-reflection { animation: none; opacity: 1; transform: none; }
+      #completion-overlay { transition: opacity 0.5s ease !important; transform: none !important; }
+      }
+    </style>
+  </head>
+  <body class="text-[#EEF0FF] selection:bg-[#7C6FCD]/30">
+    <!-- Main Mobile Canvas -->
+    <main id="app-container" class="max-w-[390px] mx-auto min-h-[100dvh] h-full flex flex-col relative overflow-hidden bg-[#0D0F1A] animate-fade-up">
+      <!-- Subtle Indigo Background Ambient Glow -->
+      <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_#0F1230_0%,_#0D0F1A_80%)] opacity-80 pointer-events-none"></div>
+
+      <!-- Top Area: Quiet Header -->
+      <header class="relative z-10 px-6 pt-16 pb-4 flex flex-col items-center text-center gap-1">
+        <h1 class="text-base font-medium text-[#EEF0FF]">Let’s wind down.</h1>
+        <p class="text-sm font-normal text-[#8A8FA8]">4-7-8 Sleep · 4 min</p>
+      </header>
+
+      <!-- Center Area: Breathing Orb -->
+      <section class="relative z-10 flex-1 flex flex-col items-center justify-center w-full min-h-[400px]">
+        <!-- Orb Visual Centerpiece -->
+        <div id="orb-controller" class="relative flex items-center justify-center orb-exhale">
+          <!-- Outer Ring -->
+          <div class="absolute w-[240px] h-[240px] rounded-full border-[1.5px] border-[#A89CE0]/10 border-t-[#A89CE0]/40 animate-spin [animation-duration:60s]"></div>
+          <!-- Inner Glow -->
+          <div class="absolute w-[200px] h-[200px] rounded-full bg-[#7C6FCD]/20 blur-2xl"></div>
+          <!-- Core Iris -->
+          <div id="orb-core" class="absolute w-[150px] h-[150px] rounded-full bg-[radial-gradient(circle_at_center,_#7C6FCD_0%,_#5A4E9E_100%)] shadow-[0_0_40px_rgba(124,111,205,0.4)] flex items-center justify-center overflow-hidden">
+            <!-- Background atmosphere inside core -->
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(238,240,255,0.15)_0%,_transparent_60%)] mix-blend-overlay"></div>
+          </div>
+          <!-- Phase Label (Floating inside core) -->
+          <span id="phase-label" class="relative z-20 text-xl tracking-wide font-medium text-[#EEF0FF] drop-shadow-sm crossfade-in">
+            Ready
+          </span>
+          <!-- Inhale Pulse Ring (Generated by JS) -->
+          <div id="pulse-ring" class="absolute w-[150px] h-[150px] rounded-full border-[1.5px] border-[#EEF0FF]/40 opacity-0 pointer-events-none"></div>
+        </div>
+
+        <!-- Quiet Timer -->
+        <div class="absolute bottom-6 flex items-center justify-center">
+          <span id="timer-display" class="font-inter text-base font-medium tracking-widest text-[#8A8FA8] tabular-nums text-opacity-80">
+            04:00
+          </span>
+        </div>
+      </section>
+
+      <!-- Bottom Area: Status Controls -->
+      <footer class="relative z-10 px-8 pb-10 pt-4 flex justify-between items-center bg-gradient-to-t from-[#0D0F1A] via-[#0D0F1A] to-transparent mt-auto">
+        <!-- Audio Status -->
+        <button class="flex flex-col items-center justify-center w-16 h-16 gap-1.5 transition-colors active:scale-95 group">
+          <div class="w-12 h-12 flex items-center justify-center rounded-full bg-[#14172B] border border-[#1C2040] text-[#8A8FA8] group-hover:bg-[#1C2040] group-hover:text-[#EEF0FF] transition-colors">
+            <iconify-icon icon="solar:bell-linear" width="20" stroke-width="1.5"></iconify-icon>
+          </div>
+          <span class="text-[13px] font-medium text-[#8A8FA8] group-hover:text-[#EEF0FF]">
+            Bell
+          </span>
+        </button>
+
+        <!-- End Session (Quiet) -->
+        <button id="end-btn" class="flex items-center justify-center w-14 h-14 rounded-full bg-[#14172B] border border-[#1C2040] text-[#8A8FA8] hover:text-[#EEF0FF] hover:bg-[#1C2040] transition-all active:scale-95" aria-label="Pause session">
+          <iconify-icon icon="solar:pause-linear" width="24" stroke-width="1.5"></iconify-icon>
+        </button>
+
+        <!-- Haptic Status -->
+        <button class="flex flex-col items-center justify-center w-16 h-16 gap-1.5 transition-colors active:scale-95 group">
+          <div class="w-12 h-12 flex items-center justify-center rounded-full bg-[#14172B] border border-[#7C6FCD]/40 text-[#A89CE0] group-hover:bg-[#1C2040] transition-colors">
+            <iconify-icon icon="solar:smartphone-linear" width="20" stroke-width="1.5"></iconify-icon>
+          </div>
+          <span class="text-[13px] font-medium text-[#A89CE0]">Haptics</span>
+        </button>
+      </footer>
+
+      <!-- Post-Session Reflection Screen (Screen 10) -->
+      <!-- Scales up softly from the center to emulate emerging from the completed orb -->
+      <div id="completion-overlay" class="absolute inset-0 bg-[#0D0F1A] z-50 flex flex-col items-center justify-center opacity-0 scale-95 pointer-events-none transition-all duration-[1200ms] ease-[cubic-bezier(0.2,0.8,0.2,1)]">
+        <!-- Faint resting orb glow in the background connecting to the session -->
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_#0F1230_0%,_#0D0F1A_100%)] pointer-events-none z-0"></div>
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
+          <div class="w-[280px] h-[280px] rounded-full bg-[#7C6FCD]/20 blur-[80px]"></div>
+        </div>
+
+        <div class="w-full flex flex-col items-center justify-center relative z-10 px-6 -mt-8">
+          <!-- Subtle Completion Cue -->
+          <div class="flex items-center justify-center gap-2 mb-3 animate-reflection opacity-0">
+            <iconify-icon icon="solar:check-circle-bold" width="18" class="text-[#A89CE0]"></iconify-icon>
+            <span class="text-[13px] font-medium text-[#A4AAC4] tracking-wide">
+              First session complete
+            </span>
+          </div>
+
+          <h2 class="text-[28px] tracking-tight font-semibold text-[#EEF0FF] mb-8 animate-reflection opacity-0 delay-150 text-center">
+            How do you feel?
+          </h2>
+
+          <!-- Choice Buttons -->
+          <div id="reflection-buttons" class="w-full max-w-[320px] flex flex-col gap-3.5 mb-6 animate-reflection opacity-0 delay-300">
+            <button class="reflection-btn w-full h-[56px] rounded-[16px] bg-[#14172B] border border-[#1C2040] shadow-sm text-[16px] font-medium text-[#EEF0FF] transition-all duration-200 flex items-center justify-between px-5 active:scale-[0.96] group">
+              <span>Same</span>
+              <div class="relative w-6 h-6 flex items-center justify-center shrink-0">
+                <div class="absolute inset-0 rounded-full border-[1.5px] border-[#2A2E50] group-hover:border-[#3A3F60] transition-colors"></div>
+                <iconify-icon icon="solar:check-circle-bold" width="24" class="check-icon absolute z-10 opacity-0 scale-50 transition-all duration-200 text-[#A89CE0] drop-shadow-[0_0_8px_rgba(168,156,224,0.4)]"></iconify-icon>
+              </div>
+            </button>
+            <button class="reflection-btn w-full h-[56px] rounded-[16px] bg-[#14172B] border border-[#1C2040] shadow-sm text-[16px] font-medium text-[#EEF0FF] transition-all duration-200 flex items-center justify-between px-5 active:scale-[0.96] group">
+              <span>Better</span>
+              <div class="relative w-6 h-6 flex items-center justify-center shrink-0">
+                <div class="absolute inset-0 rounded-full border-[1.5px] border-[#2A2E50] group-hover:border-[#3A3F60] transition-colors"></div>
+                <iconify-icon icon="solar:check-circle-bold" width="24" class="check-icon absolute z-10 opacity-0 scale-50 transition-all duration-200 text-[#A89CE0] drop-shadow-[0_0_8px_rgba(168,156,224,0.4)]"></iconify-icon>
+              </div>
+            </button>
+            <button class="reflection-btn w-full h-[56px] rounded-[16px] bg-[#14172B] border border-[#1C2040] shadow-sm text-[16px] font-medium text-[#EEF0FF] transition-all duration-200 flex items-center justify-between px-5 active:scale-[0.96] group">
+              <span>Much better</span>
+              <div class="relative w-6 h-6 flex items-center justify-center shrink-0">
+                <div class="absolute inset-0 rounded-full border-[1.5px] border-[#2A2E50] group-hover:border-[#3A3F60] transition-colors"></div>
+                <iconify-icon icon="solar:check-circle-bold" width="24" class="check-icon absolute z-10 opacity-0 scale-50 transition-all duration-200 text-[#A89CE0] drop-shadow-[0_0_8px_rgba(168,156,224,0.4)]"></iconify-icon>
+              </div>
+            </button>
+          </div>
+
+          <!-- Supporting Science Sentence -->
+          <p id="science-sentence" class="text-[14px] text-center px-4 leading-relaxed font-normal opacity-0 translate-y-2 max-w-[300px] transition-all duration-500 pointer-events-none text-[#A4AAC4]">
+            Deep breathing shifts your nervous system into rest mode.
+          </p>
+        </div>
+
+        <!-- Quiet Primary Continue Button -->
+        <div class="absolute bottom-12 w-full px-6 flex justify-center z-20">
+          <button id="continue-btn" class="w-full max-w-[342px] h-[56px] rounded-2xl bg-[#1C2040] border border-[#1C2040] text-[#EEF0FF] font-medium text-[16px] opacity-0 pointer-events-none transition-all duration-500 transform translate-y-4 hover:bg-[#252A50] active:scale-[0.96]">
+            Continue
+          </button>
+        </div>
+      </div>
+
+      <!-- Pause Overlay (Remains unchanged for early exits) -->
+      <div id="pause-overlay" class="absolute inset-0 bg-[#0D0F1A]/85 backdrop-blur-lg z-40 flex flex-col items-center justify-center px-6 opacity-0 pointer-events-none transition-opacity duration-500">
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
+          <div class="w-[200px] h-[200px] rounded-full bg-[#7C6FCD]/15 blur-[60px]"></div>
+        </div>
+        <p class="text-[13px] font-medium text-[#A4AAC4] mb-2 tracking-wide relative z-10">
+          4-7-8 Sleep · Paused
+        </p>
+        <h2 class="text-2xl tracking-tight font-semibold text-[#EEF0FF] mb-2 relative z-10">
+          Paused
+        </h2>
+        <p class="text-sm text-[#8A8FA8] mb-10 font-normal relative z-10">
+          You can continue when you're ready.
+        </p>
+        <div class="w-full max-w-[280px] flex flex-col gap-3 relative z-10">
+          <button id="resume-btn" class="w-full py-4 rounded-full bg-[#1C2040] border border-[#7C6FCD]/40 shadow-[0_0_20px_rgba(124,111,205,0.2)] text-[#EEF0FF] font-medium text-base hover:bg-[#252A50] hover:border-[#7C6FCD]/60 hover:shadow-[0_0_25px_rgba(124,111,205,0.3)] active:scale-[0.96] active:shadow-[0_0_30px_rgba(124,111,205,0.5)] active:bg-[#1C2040] transition-all">
+            Continue
+          </button>
+          <button id="end-early-btn" class="w-full min-h-[44px] py-3 flex items-center justify-center text-[#8A8FA8] font-medium text-base hover:text-[#EEF0FF] active:scale-[0.98] active:text-[#EEF0FF] active:opacity-90 transition-all">
+            End for now
+          </button>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const orb = document.getElementById('orb-controller');
+        const core = document.getElementById('orb-core');
+        const phaseLabel = document.getElementById('phase-label');
+        const pulseRing = document.getElementById('pulse-ring');
+        const timerDisplay = document.getElementById('timer-display');
+        const endBtn = document.getElementById('end-btn');
+        const completionOverlay = document.getElementById('completion-overlay');
+        const pauseOverlay = document.getElementById('pause-overlay');
+        const resumeBtn = document.getElementById('resume-btn');
+        const endEarlyBtn = document.getElementById('end-early-btn');
+        const reflectionButtons = document.getElementById('reflection-buttons').querySelectorAll('.reflection-btn');
+        const continueBtn = document.getElementById('continue-btn');
+        const scienceSentence = document.getElementById('science-sentence');
+
+        let cycleTimeout;
+        let timerInterval;
+        let timeRemaining = 240;
+        let isSessionActive = true;
+        let isPaused = false;
+
+        const setPhase = (text, transformClass, addShimmer = false) => {
+          if (!isSessionActive || isPaused) return;
+
+          phaseLabel.classList.remove('crossfade-in');
+          phaseLabel.classList.add('crossfade-out');
+
+          setTimeout(() => {
+            if (!isSessionActive || isPaused) return;
+            phaseLabel.innerText = text;
+            phaseLabel.classList.remove('crossfade-out');
+            phaseLabel.classList.add('crossfade-in');
+          }, 200);
+
+          orb.className = `relative flex items-center justify-center ${transformClass}`;
+
+          if (addShimmer) {
+            core.classList.add('shimmer-active');
+          } else {
+            core.classList.remove('shimmer-active');
+          }
+        };
+
+        const triggerPulse = () => {
+          if (!isSessionActive || isPaused) return;
+          pulseRing.classList.remove('animate-pulse-expand');
+          void pulseRing.offsetWidth;
+          pulseRing.classList.add('animate-pulse-expand');
+        };
+
+        const runBreathingCycle = () => {
+          if (!isSessionActive || isPaused) return;
+
+          setPhase('Inhale', 'orb-inhale');
+          triggerPulse();
+
+          cycleTimeout = setTimeout(() => {
+            if (!isSessionActive || isPaused) return;
+
+            setPhase('Hold', 'orb-hold', true);
+
+            cycleTimeout = setTimeout(() => {
+              if (!isSessionActive || isPaused) return;
+
+              setPhase('Exhale', 'orb-exhale');
+
+              cycleTimeout = setTimeout(runBreathingCycle, 8000);
+            }, 7000);
+          }, 4000);
+        };
+
+        const startTimer = () => {
+          timerInterval = setInterval(() => {
+            if (!isSessionActive || isPaused) return;
+            timeRemaining--;
+
+            if (timeRemaining <= 0) {
+              endSession(false);
+            } else {
+              const m = Math.floor(timeRemaining / 60).toString().padStart(2, '0');
+              const s = (timeRemaining % 60).toString().padStart(2, '0');
+              timerDisplay.innerText = `${m}:${s}`;
+            }
+          }, 1000);
+        };
+
+        const pauseSession = () => {
+            if (!isSessionActive) return;
+            isPaused = true;
+            clearTimeout(cycleTimeout);
+            clearInterval(timerInterval);
+
+            orb.style.cssText = 'transition: all 1s ease-out; transform: scale(0.85); opacity: 0.3;';
+            core.classList.remove('shimmer-active');
+            phaseLabel.style.opacity = '0';
+            pulseRing.style.display = 'none';
+
+            pauseOverlay.classList.remove('pointer-events-none', 'opacity-0');
+            pauseOverlay.classList.add('opacity-100');
+        };
+
+        const resumeSession = () => {
+            isPaused = false;
+
+            orb.style.cssText = '';
+            phaseLabel.style.opacity = '1';
+            pulseRing.style.display = 'block';
+
+            pauseOverlay.classList.add('pointer-events-none', 'opacity-0');
+            pauseOverlay.classList.remove('opacity-100');
+
+            startTimer();
+            runBreathingCycle();
+        };
+
+        const endSession = (isEarly) => {
+          isSessionActive = false;
+          isPaused = false;
+          clearTimeout(cycleTimeout);
+          clearInterval(timerInterval);
+
+          pauseOverlay.classList.add('pointer-events-none', 'opacity-0');
+          pauseOverlay.classList.remove('opacity-100');
+
+          orb.style.cssText = '';
+          orb.className = 'relative flex items-center justify-center orb-exhale';
+          core.classList.remove('shimmer-active');
+          phaseLabel.style.opacity = '0';
+          pulseRing.style.display = 'none';
+
+          if (isEarly) {
+              // Early exit - reset back to ready state without showing reflection.
+              phaseLabel.innerText = 'Ready';
+              phaseLabel.style.opacity = '1';
+              timerDisplay.innerText = '04:00';
+              timeRemaining = 240;
+              isSessionActive = true;
+              return;
+          }
+
+          // Full Session Complete Haptic Feedback
+          if (navigator.vibrate) {
+              navigator.vibrate([40, 60, 40]);
+          }
+
+          // Show reflection screen only on completed session with soft radial transition
+          completionOverlay.classList.remove('pointer-events-none', 'opacity-0', 'scale-95');
+          completionOverlay.classList.add('opacity-100', 'scale-100');
+
+          setTimeout(() => {
+              completionOverlay.classList.add('show-content');
+          }, 300);
+        };
+
+        endBtn.addEventListener('click', pauseSession);
+        resumeBtn.addEventListener('click', resumeSession);
+        endEarlyBtn.addEventListener('click', () => endSession(true));
+
+        // Reflection Button Interactions
+        reflectionButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Reset all to default Surface state
+                reflectionButtons.forEach(b => {
+                    b.classList.remove('bg-[#1C2040]', 'border-[#7C6FCD]/40', 'shadow-[0_0_10px_rgba(124,111,205,0.15)]');
+                    b.classList.add('bg-[#14172B]', 'border-[#1C2040]');
+                    const icon = b.querySelector('.check-icon');
+                    if (icon) {
+                        icon.classList.remove('opacity-100', 'scale-100');
+                        icon.classList.add('opacity-0', 'scale-50');
+                    }
+                });
+
+                // Set active (Subtle Iris/Lavender glow)
+                btn.classList.remove('bg-[#14172B]', 'border-[#1C2040]');
+                btn.classList.add('bg-[#1C2040]', 'border-[#7C6FCD]/40', 'shadow-[0_0_10px_rgba(124,111,205,0.15)]');
+                const activeIcon = btn.querySelector('.check-icon');
+                if (activeIcon) {
+                    activeIcon.classList.remove('opacity-0', 'scale-50');
+                    activeIcon.classList.add('opacity-100', 'scale-100');
+                }
+
+                // Subtle selection haptic
+                if (navigator.vibrate) navigator.vibrate(20);
+
+                // Fade in Continue button gently
+                continueBtn.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+                continueBtn.classList.add('opacity-100', 'translate-y-0');
+
+                // Reveal science sentence
+                if (scienceSentence) {
+                    scienceSentence.classList.remove('opacity-0', 'translate-y-2');
+                    scienceSentence.classList.add('opacity-100', 'translate-y-0');
+                }
+            });
+        });
+
+        continueBtn.addEventListener('click', () => {
+            completionOverlay.classList.remove('opacity-100', 'scale-100', 'show-content');
+            completionOverlay.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+
+            // Subtle transition haptic
+            if (navigator.vibrate) navigator.vibrate(15);
+
+            // Reset state for presentation purposes
+            setTimeout(() => {
+                phaseLabel.innerText = 'Ready';
+                phaseLabel.style.opacity = '1';
+                timerDisplay.innerText = '04:00';
+                timeRemaining = 240;
+                isSessionActive = true;
+
+                // Reset reflection selections
+                reflectionButtons.forEach(b => {
+                    b.classList.remove('bg-[#1C2040]', 'border-[#7C6FCD]/40', 'shadow-[0_0_10px_rgba(124,111,205,0.15)]');
+                    b.classList.add('bg-[#14172B]', 'border-[#1C2040]');
+                    const icon = b.querySelector('.check-icon');
+                    if (icon) {
+                        icon.classList.remove('opacity-100', 'scale-100');
+                        icon.classList.add('opacity-0', 'scale-50');
+                    }
+                });
+                continueBtn.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
+                continueBtn.classList.remove('opacity-100', 'translate-y-0');
+
+                if (scienceSentence) {
+                    scienceSentence.classList.remove('opacity-100', 'translate-y-0');
+                    scienceSentence.classList.add('opacity-0', 'translate-y-2');
+                }
+            }, 500);
+        });
+
+        // Initialize Session
+        setTimeout(() => {
+          startTimer();
+          runBreathingCycle();
+        }, 800);
+      });
+    </script>
+  
+</body></html>

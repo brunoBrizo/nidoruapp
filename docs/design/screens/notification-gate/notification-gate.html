@@ -1,0 +1,227 @@
+<html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>nidoru - Gentle Reminders Gate</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Nunito:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body {
+font-family: 'Nunito', sans-serif;
+background-color: #0D0F1A;
+-webkit-font-smoothing: antialiased;
+-moz-osx-font-smoothing: grayscale;
+margin: 0;
+padding: 0;
+overflow: hidden;
+}
+.font-inter {
+font-family: 'Inter', sans-serif;
+}
+/* Calm Entrance Animation */
+@keyframes fade-up-enter {
+0% { opacity: 0; transform: translateY(16px); }
+100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes fade-in {
+0% { opacity: 0; }
+100% { opacity: 1; }
+}
+@keyframes slide-down-exit {
+0% { opacity: 1; transform: translateY(0); }
+100% { opacity: 0; transform: translateY(20px); pointer-events: none; }
+}
+.animate-fade-up {
+animation: fade-up-enter 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+.animate-fade-in {
+animation: fade-in 0.8s ease-out forwards;
+}
+.animate-exit {
+animation: slide-down-exit 0.4s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+/* Reduced Motion Override */
+@media (prefers-reduced-motion: reduce) {
+.animate-fade-up, .animate-fade-in, .animate-exit {
+animation: none;
+opacity: 1;
+transform: none;
+}
+.animate-exit {
+display: none;
+}
+* {
+transition: none !important;
+}
+}
+</style></head>
+  <body class="text-[#EEF0FF] selection:bg-[#7C6FCD]/30">
+    <!-- Dummy Home Screen Context (Visible behind/after gate) -->
+    <div id="app-background" class="absolute inset-0 flex flex-col items-center justify-center bg-[#0D0F1A] opacity-0 transition-opacity duration-700">
+      <div class="w-16 h-16 rounded-full bg-[#1C2040] flex items-center justify-center mb-4">
+        <iconify-icon icon="solar:moon-fog-linear" width="28" class="text-[#A89CE0]"></iconify-icon>
+      </div>
+      <p class="text-[#8A8FA8] text-[15px]">Nidoru Home Screen</p>
+    </div>
+
+    <!-- Notification Pre-Permission Gate -->
+    <main id="notification-gate" class="max-w-[390px] mx-auto min-h-[100dvh] h-[100dvh] flex flex-col relative bg-[#0D0F1A] z-10 hidden">
+      <!-- Settled Ambient Orb Glow -->
+      <div class="absolute top-[-5%] left-1/2 -translate-x-1/2 w-[380px] h-[380px] bg-[#7C6FCD]/10 blur-[100px] rounded-full pointer-events-none z-0"></div>
+
+      <!-- Main Content Area -->
+      <div class="flex-1 px-6 pt-16 z-10 relative flex flex-col">
+        <!-- Context Label -->
+        <div class="flex items-center gap-2 mb-4 animate-fade-up opacity-0">
+          <span class="text-[13px] font-semibold text-[#A89CE0] tracking-wide">
+            Gentle reminders
+          </span>
+        </div>
+
+        <!-- Headline & Subcopy -->
+        <h1 class="text-[28px] tracking-tight font-semibold text-[#EEF0FF] leading-[1.2] mb-3 animate-fade-up opacity-0 delay-100">
+          Want one quiet reminder
+          <br>
+          for your wind-down?
+        </h1>
+        <p class="text-[16px] font-normal text-[#8A8FA8] leading-relaxed mb-10 animate-fade-up opacity-0 delay-100">
+          We’ll send one evening reminder only if you haven’t opened Nidoru yet
+          that day. No spam, no sales. Turn it off anytime.
+        </p>
+
+        <!-- Trust Bullets -->
+        <div class="flex flex-col gap-5 animate-fade-up opacity-0 delay-200">
+          <div class="flex items-start gap-4">
+            <div class="w-8 h-8 rounded-full bg-[#14172B] border border-[#1C2040] flex items-center justify-center shrink-0 shadow-sm mt-0.5">
+              <iconify-icon icon="lucide:moon" class="text-[#5EC4D4]" width="18"></iconify-icon>
+            </div>
+            <span class="text-[16px] font-medium text-[#EEF0FF] leading-snug pt-1">
+              One evening reminder
+            </span>
+          </div>
+
+          <div class="flex items-start gap-4">
+            <div class="w-8 h-8 rounded-full bg-[#14172B] border border-[#1C2040] flex items-center justify-center shrink-0 shadow-sm mt-0.5">
+              <iconify-icon icon="lucide:bell" class="text-[#5EC4D4]" width="18"></iconify-icon>
+            </div>
+            <span class="text-[16px] font-medium text-[#EEF0FF] leading-snug pt-1">
+              Silent if you already opened Nidoru
+            </span>
+          </div>
+
+          <div class="flex items-start gap-4">
+            <div class="w-8 h-8 rounded-full bg-[#14172B] border border-[#1C2040] flex items-center justify-center shrink-0 shadow-sm mt-0.5">
+              <iconify-icon icon="lucide:shield-check" class="text-[#5EC4D4]" width="18"></iconify-icon>
+            </div>
+            <span class="text-[16px] font-medium text-[#EEF0FF] leading-snug pt-1">
+              No sales, pressure, or red badges
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Area -->
+      <div class="w-full px-5 pt-4 bg-gradient-to-t from-[#0D0F1A] via-[#0D0F1A] to-transparent z-20 animate-fade-up opacity-0 delay-300 pb-28">
+        <button id="btn-accept" class="w-full h-[56px] rounded-[16px] bg-[#7C6FCD] hover:bg-[#685BB3] text-[#EEF0FF] font-semibold text-[16px] flex items-center justify-center transition-all active:scale-[0.97] mb-2 shadow-[0_4px_16px_rgba(124,111,205,0.12)] min-h-[44px]">
+          Turn on evening reminder
+        </button>
+
+        <button id="btn-decline" class="w-full h-[48px] flex items-center justify-center text-[15px] font-semibold text-[#8A8FA8] hover:text-[#EEF0FF] transition-colors active:scale-[0.98] min-h-[44px]">
+          Not now
+        </button>
+
+        <p class="text-center text-[13px] font-normal text-[#8A8FA8] mt-1">
+          You can change this later in Profile.
+        </p>
+      </div>
+    </main>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        // Mocking Local App State & Eligibility
+        const localAppState = {
+          localDaysActive: 3,
+          completedSessionCount: 2,
+          hasSeenNotificationGate: false,
+          systemNotificationPermission: 'undetermined'
+        };
+
+        const gateElement = document.getElementById('notification-gate');
+        const bgElement = document.getElementById('app-background');
+
+        // 1. Eligibility Check
+        const isEligibleForGate = () => {
+          return (
+            localAppState.localDaysActive >= 3 &&
+            localAppState.completedSessionCount >= 2 &&
+            !localAppState.hasSeenNotificationGate &&
+            localAppState.systemNotificationPermission === 'undetermined'
+          );
+        };
+
+        // Emit telemetry purely for tracking state (Simulating PostHog/Analytics)
+        const emitAnalytics = (eventName, properties = {}) => {
+          console.log(`[Analytics] ${eventName}`, properties);
+        };
+
+        // Dismiss gate and show normal app view
+        const dismissGate = () => {
+          gateElement.classList.add('animate-exit');
+          setTimeout(() => {
+            gateElement.classList.add('hidden');
+            bgElement.classList.remove('opacity-0');
+            bgElement.classList.add('opacity-100');
+          }, 400); // match exit animation duration
+        };
+
+        // Initialize View
+        if (isEligibleForGate()) {
+          gateElement.classList.remove('hidden');
+        } else {
+          // If not eligible, just render the app normally
+          bgElement.classList.remove('opacity-0');
+          bgElement.classList.add('opacity-100');
+        }
+
+        // 2. Accept Behavior
+        document.getElementById('btn-accept')?.addEventListener('click', () => {
+          if (navigator.vibrate) navigator.vibrate(10);
+
+          emitAnalytics('notification_permission_prompted', { source: 'day_3_gate' });
+
+          // Simulate OS-level permission prompt natively
+          setTimeout(() => {
+            const osPermissionGranted = window.confirm('“Nidoru” Would Like to Send You Notifications\n\nNotifications may include alerts, sounds, and icon badges.');
+
+            localAppState.hasSeenNotificationGate = true;
+
+            if (osPermissionGranted) {
+              localAppState.systemNotificationPermission = 'granted';
+              emitAnalytics('notification_permission_accepted', { source: 'day_3_gate' });
+              // Here is where Expo Push token sync would actually happen
+            } else {
+              localAppState.systemNotificationPermission = 'denied';
+              emitAnalytics('notification_permission_denied', { source: 'day_3_gate' });
+            }
+
+            dismissGate();
+          }, 200);
+        });
+
+        // 3. Decline Behavior
+        document.getElementById('btn-decline')?.addEventListener('click', () => {
+          localAppState.hasSeenNotificationGate = true;
+          emitAnalytics('notification_permission_declined_prescreen', { source: 'day_3_gate' });
+
+          // Do not trigger OS prompt, allow app to continue gracefully
+          dismissGate();
+        });
+      });
+    </script>
+  
+</body></html>

@@ -5,7 +5,7 @@
     "app_id": "app_nidoru_test",
     "app_user_id": "local-install-test",
     "event_timestamp_ms": 1779140000000,
-    "expiration_at_ms": 1781732000000,
+    "expiration_at_ms": 1780349600000,
     "id": "event_initial_purchase_fixture",
     "original_app_user_id": "local-install-test",
     "period_type": "TRIAL",

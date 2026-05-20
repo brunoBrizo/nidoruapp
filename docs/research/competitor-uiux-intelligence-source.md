@@ -217,7 +217,7 @@ The paywall appears after the user completes their first full session. This is t
 The paywall screen must show:
 - Annual plan as the visual default (larger, highlighted, "Most Popular" label)
 - Monthly plan as the secondary option
-- A 7-day free trial on both (no credit card required for trial start)
+- A 14-day free trial on both (no credit card required for trial start)
 - "No payment now" text prominently visible
 - The refund policy: "Change your mind within 7 days for a full refund"
 
@@ -519,4 +519,3 @@ I tried Headspace, Calm, and Insight Timer. They're goo...
 45. [Color Psychology in Web Design: How to Choose the Perfect Palette ...](https://abp.io/community/posts/color-psychology-in-web-design-how-to-choose-the-perfect-palette-in-2025-z383jph8) - Discover how color psychology shapes web design in 2025. Learn how hues influence trust, conversions...
 
 46. [Dark Mode in 2025: From Trend to Web Standard | EMOTIONStudios](https://emotionstudios.net/design/dark-mode-in-2025-from-trend-to-web-standard/) - In 2025, dark mode is a vital design trend, reducing screen fatigue, conserving energy, and improvin...
-

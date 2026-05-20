@@ -44,7 +44,7 @@ The paywall appears after the user completes their first full session. This is t
 The paywall screen must show:
 - Annual plan as the visual default (larger, highlighted, "Most Popular" label)
 - Monthly plan as the secondary option
-- A 7-day free trial on both (no credit card required for trial start)
+- A 14-day free trial on both (no credit card required for trial start)
 - "No payment now" text prominently visible
 - The refund policy: "Change your mind within 7 days for a full refund"
 

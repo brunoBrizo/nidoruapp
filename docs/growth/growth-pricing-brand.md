@@ -131,9 +131,9 @@ Pricing rationale:
 
 Recommended first test after the first completed session:
 
-- 7-day full-access trial.
+- 14-day full-access trial.
 - No credit card required if technically and commercially feasible.
-- Day 7 insight card as conversion moment.
+- Day 14 insight recap as conversion moment.
 - After trial, fall back to a real free tier instead of locking the app.
 
 If no-credit-card trials are not supported by the chosen store flow, the alternative is:
@@ -142,7 +142,7 @@ If no-credit-card trials are not supported by the chosen store flow, the alterna
 - Soft account creation after value.
 - Paid trial only after the user sees the full routine value.
 
-Later pricing experiments can test a 14-day trial, but the first competitor-informed default is 7 days because it pairs cleanly with the first-week insight loop and lowers perceived commitment.
+Later pricing experiments can test a shorter 7-day trial, but the current default is 14 days because it gives the insight engine enough data to show a stronger two-week progress pattern while still keeping the commitment limited.
 
 ## Renewal Trust Policy
 

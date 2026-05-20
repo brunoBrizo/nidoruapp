@@ -34,7 +34,7 @@ The app can be science-informed, but the exact wording around sleep improvement,
 
 ### No-Credit-Card Trial
 
-The newer competitor UI/UX decision is a 7-day full-access trial after the first completed session, with no credit card if technically and commercially feasible. App store subscription mechanics may make no-credit-card trials hard depending on the final payment flow. Validate this before finalizing pricing UX. A 14-day trial remains a later pricing experiment, not the current default.
+The newer competitor UI/UX decision is a 14-day full-access trial after the first completed session, with no credit card if technically and commercially feasible. App store subscription mechanics may make no-credit-card trials hard depending on the final payment flow. Validate this before finalizing pricing UX. A shorter 7-day trial remains a later pricing experiment, not the current default.
 
 ### Backend Shape
 

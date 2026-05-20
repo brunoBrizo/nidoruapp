@@ -1,0 +1,232 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nidoru - Nightly Ritual</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&amp;family=Nunito:wght@400;500&amp;display=swap" rel="stylesheet">
+    <style>
+      :root {
+      --void: #0D0F1A;
+      --midnight-blue: #0F1230;
+      --deep-ink: #14172B;
+      --midnight: #1C2040;
+      --iris: #7C6FCD;
+      --lavender: #A89CE0;
+      --moonstone: #5EC4D4;
+      --cloud: #EEF0FF;
+      --mist: #8A8FA8;
+      --haze: #4A4E6A;
+      }
+      body {
+      font-family: 'Nunito', sans-serif;
+      background-color: #000; /* Outer canvas background */
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      }
+      .font-inter {
+      font-family: 'Inter', sans-serif;
+      }
+      /* Custom Animations */
+      @keyframes fade-in-up {
+      0% { opacity: 0; transform: translateY(12px); }
+      100% { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes orb-pulse {
+      0%, 100% { transform: scale(1); opacity: 0.85; box-shadow: 0 0 24px rgba(124,111,205,0.5); }
+      50% { transform: scale(1.04); opacity: 1; box-shadow: 0 0 40px rgba(168,156,224,0.75); }
+      }
+      @keyframes ring-expand {
+      0%, 100% { transform: scale(0.95); opacity: 0.2; }
+      50% { transform: scale(1.08); opacity: 0.05; }
+      }
+      @keyframes glow-pulse {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 1; }
+      }
+      .animate-fade-in-1 { animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+      .animate-fade-in-2 { animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards; opacity: 0; }
+      .animate-fade-in-3 { animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards; opacity: 0; }
+      .animate-fade-in-4 { animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards; opacity: 0; }
+      .animate-fade-in-5 { animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards; opacity: 0; }
+      .orb-core {
+      animation: orb-pulse 6s ease-in-out infinite;
+      }
+      .orb-ring {
+      animation: ring-expand 6s ease-in-out infinite;
+      }
+      .orb-glow {
+      animation: glow-pulse 6s ease-in-out infinite;
+      }
+      /* Hide scrollbar for a cleaner mobile feel */
+      .scrollbar-hide::-webkit-scrollbar {
+      display: none;
+      }
+      .scrollbar-hide {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+      }
+    </style>
+  </head>
+  <body class="flex items-center justify-center min-h-screen text-[#EEF0FF]">
+    <!-- Native Mobile Canvas Simulation -->
+    <div class="w-full max-w-[390px] h-[844px] bg-[#0D0F1A] relative overflow-hidden shadow-2xl sm:rounded-[40px] sm:border-[8px] sm:border-[#0F1230] flex flex-col">
+      <!-- Scrollable Content Area -->
+      <main class="flex-1 overflow-y-auto scrollbar-hide px-5 pt-12 pb-[96px] space-y-4 relative z-10">
+        <!-- 1. Header -->
+        <header class="flex justify-between items-start animate-fade-in-1">
+          <div class="space-y-1">
+            <h1 class="text-[22px] tracking-tight font-semibold text-[#EEF0FF]">
+              Breathe
+            </h1>
+            <p class="text-[14px] text-[#8A8FA8] font-normal">
+              Find a rhythm for right now.
+            </p>
+          </div>
+        </header>
+
+        <!-- 2. State Segmented Control -->
+        <section class="flex bg-[#14172B]/50 p-1.5 rounded-2xl animate-fade-in-2 shadow-[inset_0_1px_0_rgba(238,240,255,0.05)]">
+          <button class="flex-1 py-2.5 text-[14px] font-medium rounded-[14px] bg-[#1C2040]/60 text-[#D4D8F0] shadow-[0_2px_8px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(238,240,255,0.02)] ring-1 ring-[#7C6FCD]/20 transition-all min-h-[40px]">
+            Sleep
+          </button>
+          <button class="flex-1 py-2.5 text-[14px] font-medium rounded-[14px] text-[#8A8FA8] hover:text-[#EEF0FF] hover:bg-[#1C2040]/40 transition-all min-h-[40px]">
+            Calm
+          </button>
+          <button class="flex-1 py-2.5 text-[14px] font-medium rounded-[14px] text-[#8A8FA8] hover:text-[#EEF0FF] hover:bg-[#1C2040]/40 transition-all min-h-[40px]">
+            Energy
+          </button>
+          <button class="flex-1 py-2.5 text-[14px] font-medium rounded-[14px] text-[#8A8FA8] hover:text-[#EEF0FF] hover:bg-[#1C2040]/40 transition-all min-h-[40px]">
+            Focus
+          </button>
+        </section>
+        <div class="animate-fade-in-3 px-2 pt-4 pb-1">
+          <p class="text-[13px] text-[#8A8FA8]">
+            Choose by how you want to feel.
+          </p>
+        </div>
+
+        <!-- 3. Technique Cards (Sleep) -->
+        <section class="space-y-2 animate-fade-in-3">
+          <!-- 4-7-8 -->
+          <div class="bg-[#14172B]/50 hover:bg-[#1C2040]/80 rounded-[20px] p-4 flex flex-col justify-center cursor-pointer active:scale-[0.96] transition-all duration-200 shadow-[inset_0_1px_0_rgba(238,240,255,0.05)] border border-transparent relative overflow-hidden group min-h-[100px]">
+            <div class="absolute -left-12 top-1/2 -translate-y-1/2 w-24 h-24 bg-[#7C6FCD]/15 rounded-full blur-2xl pointer-events-none transition-colors group-hover:bg-[#7C6FCD]/25"></div>
+            <div class="relative z-10 flex justify-between items-center gap-4 w-full">
+              <div class="flex-1 flex flex-col text-left space-y-1">
+                <h3 class="text-[16px] font-medium text-[#EEF0FF]">
+                  4-7-8 Sleep
+                </h3>
+                <p class="text-[14px] text-[#8A8FA8] font-normal leading-snug">
+                  Settle into the night.
+                </p>
+                <div class="pt-1.5">
+                  <div class="font-inter text-[11px] text-[#8A8FA8] font-medium tabular-nums bg-[#0D0F1A]/40 px-2 py-0.5 rounded-[6px] border border-white/[0.03] inline-flex">
+                    4 in · 7 hold · 8 out
+                  </div>
+                </div>
+              </div>
+              <iconify-icon icon="lucide:chevron-right" class="text-[#4A4E6A] text-[20px] group-hover:text-[#8A8FA8] transition-colors shrink-0"></iconify-icon>
+            </div>
+          </div>
+
+          <!-- Coherent -->
+          <div class="bg-[#14172B]/50 hover:bg-[#1C2040]/80 rounded-[20px] p-4 flex flex-col justify-center cursor-pointer active:scale-[0.96] transition-all duration-200 shadow-[inset_0_1px_0_rgba(238,240,255,0.05)] border border-transparent relative overflow-hidden group min-h-[100px]">
+            <div class="relative z-10 flex justify-between items-center gap-4 w-full">
+              <div class="flex-1 flex flex-col text-left space-y-1">
+                <h3 class="text-[16px] font-medium text-[#EEF0FF]">
+                  Coherent Breathing
+                </h3>
+                <p class="text-[14px] text-[#8A8FA8] font-normal leading-snug">
+                  Smooth, steady rhythm.
+                </p>
+                <div class="pt-1.5">
+                  <div class="font-inter text-[11px] text-[#8A8FA8] font-medium tabular-nums bg-[#0D0F1A]/40 px-2 py-0.5 rounded-[6px] border border-white/[0.03] inline-flex">
+                    5 in · 5 out
+                  </div>
+                </div>
+              </div>
+              <iconify-icon icon="lucide:chevron-right" class="text-[#4A4E6A] text-[20px] group-hover:text-[#8A8FA8] transition-colors shrink-0"></iconify-icon>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4. Free Breathe -->
+        <section class="animate-fade-in-4 pt-1 pb-6">
+          <div class="bg-[#14172B]/20 hover:bg-[#1C2040]/50 rounded-[20px] p-4 flex items-center justify-between cursor-pointer active:scale-[0.96] transition-all duration-200 border border-transparent min-h-[88px] group">
+            <div class="flex-1 flex flex-col justify-center text-left space-y-1">
+              <h3 class="text-[16px] font-medium text-[#EEF0FF]">
+                Free Breathe
+              </h3>
+              <p class="text-[14px] text-[#8A8FA8] font-normal leading-snug">
+                Set your own inhale, hold, and exhale.
+              </p>
+              <div class="pt-1.5">
+                <span class="font-inter text-[11px] font-medium text-[#A89CE0] bg-[#A89CE0]/5 border border-[#A89CE0]/10 px-2 py-0.5 rounded-[6px] inline-flex tabular-nums">
+                  Custom rhythm
+                </span>
+              </div>
+            </div>
+            <div class="flex items-center gap-3 shrink-0">
+              <div class="w-10 h-10 rounded-full bg-[#1C2040]/60 flex items-center justify-center relative overflow-hidden group-hover:bg-[#1C2040]/80 transition-colors">
+                <div class="absolute inset-0 bg-gradient-to-tr from-[#7C6FCD]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <iconify-icon icon="lucide:wind" class="text-[#A89CE0] text-[18px]" stroke-width="1.5"></iconify-icon>
+              </div>
+              <iconify-icon icon="lucide:chevron-right" class="text-[#4A4E6A] text-[20px] group-hover:text-[#8A8FA8] transition-colors"></iconify-icon>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <!-- 6. Fixed Bottom Navigation -->
+      <nav class="absolute bottom-0 w-full h-[84px] bg-[#0D0F1A]/90 backdrop-blur-xl border-t border-[#1C2040] flex justify-around items-start pt-2.5 pb-safe z-50 px-2">
+        <!-- Home (Active) -->
+        <button class="flex flex-col items-center gap-1 w-16 group">
+          <iconify-icon icon="lucide:home" class="group-hover:text-[#EEF0FF] text-2xl transition-all group-active:scale-95 text-[#8A8FA8]" stroke-width="1.5"></iconify-icon>
+          <span class="text-xs font-normal group-hover:text-[#EEF0FF] transition-colors text-[#8A8FA8]">
+            Home
+          </span>
+        </button>
+
+        <!-- Sleep -->
+        <button class="flex flex-col items-center gap-1 w-16 group">
+          <iconify-icon icon="lucide:moon" class="group-hover:text-[#EEF0FF] text-2xl transition-all group-active:scale-95 text-[#8A8FA8]" stroke-width="1.5"></iconify-icon>
+          <span class="text-xs font-normal group-hover:text-[#EEF0FF] transition-colors text-[#8A8FA8]">
+            Sleep
+          </span>
+        </button>
+
+        <!-- Breathe -->
+        <button class="flex flex-col items-center gap-1 w-16 group">
+          <div class="relative flex items-center justify-center">
+            <iconify-icon icon="lucide:wind" class="text-[#7C6FCD] text-2xl transition-transform group-active:scale-95" stroke-width="1.5"></iconify-icon>
+          </div>
+          <span class="text-xs font-medium text-[#7C6FCD]">Breathe</span>
+        </button>
+
+        <!-- Progress -->
+        <button class="flex flex-col items-center gap-1 w-16 group">
+          <iconify-icon icon="lucide:bar-chart-2" class="group-hover:text-[#EEF0FF] text-2xl transition-all group-active:scale-95 text-[#8A8FA8]" stroke-width="1.5"></iconify-icon>
+          <span class="text-xs font-normal group-hover:text-[#EEF0FF] transition-colors text-[#8A8FA8]">
+            Progress
+          </span>
+        </button>
+
+        <!-- Profile -->
+        <button class="flex flex-col items-center gap-1 w-16 group">
+          <iconify-icon icon="lucide:user" class="group-hover:text-[#EEF0FF] text-2xl transition-all group-active:scale-95 text-[#8A8FA8]" stroke-width="1.5"></iconify-icon>
+          <span class="text-xs font-normal group-hover:text-[#EEF0FF] transition-colors text-[#8A8FA8]">
+            Profile
+          </span>
+        </button>
+
+        <!-- Bottom Home Indicator for native feel -->
+        <div class="absolute bottom-2 left-1/2 -translate-x-1/2 w-[120px] h-1 bg-[#EEF0FF]/20 rounded-full"></div>
+      </nav>
+
+      <!-- Top Safe Area Gradient / Blur (optional for native feel) -->
+      <div class="absolute top-0 w-full h-10 bg-gradient-to-b from-[#0D0F1A] to-transparent pointer-events-none z-20"></div>
+    </div>
+  
+</body></html>

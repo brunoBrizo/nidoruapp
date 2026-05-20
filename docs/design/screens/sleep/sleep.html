@@ -1,0 +1,260 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nidoru - Sleep Tab</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Nunito:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+    <style>
+      :root {
+        --void: #0D0F1A;
+        --midnight-blue: #0F1230;
+        --deep-ink: #14172B;
+        --midnight: #1C2040;
+        --iris: #7C6FCD;
+        --lavender: #A89CE0;
+        --moonstone: #5EC4D4;
+        --cloud: #EEF0FF;
+        --mist: #8A8FA8;
+        --haze: #4A4E6A;
+      }
+      body {
+        font-family: 'Nunito', sans-serif;
+        background-color: #000;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      .font-inter {
+        font-family: 'Inter', sans-serif;
+      }
+      /* Custom Animations */
+      @keyframes fade-in-up {
+        0% { opacity: 0; transform: translateY(12px); }
+        100% { opacity: 1; transform: translateY(0); }
+      }
+      .animate-fade-in-1 { animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+      .animate-fade-in-2 { animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards; opacity: 0; }
+      .animate-fade-in-3 { animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards; opacity: 0; }
+      .animate-fade-in-4 { animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards; opacity: 0; }
+      .animate-fade-in-5 { animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards; opacity: 0; }
+
+      .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+      }
+      .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+    </style>
+  </head>
+  <body class="flex items-center justify-center min-h-screen text-[#EEF0FF]">
+    <div class="w-full max-w-[390px] h-[844px] bg-[#0D0F1A] relative overflow-hidden shadow-2xl sm:rounded-[40px] sm:border-[8px] sm:border-[#0F1230] flex flex-col">
+      <main class="flex-1 overflow-y-auto scrollbar-hide px-5 pt-12 pb-[104px] relative z-10 flex flex-col gap-5">
+        <!-- 1. Header -->
+        <header class="flex justify-between items-start animate-fade-in-1 pt-2">
+          <div class="space-y-1">
+            <h1 class="text-xl tracking-tight font-semibold text-[#EEF0FF]">
+              Sleep
+            </h1>
+            <p class="text-sm text-[#8A8FA8] font-normal">
+              Settle into tonight.
+            </p>
+          </div>
+        </header>
+
+        <!-- 2. Primary Card: Evening Wind-Down -->
+        <div class="bg-[#1C2040] rounded-[24px] px-5 pt-[18px] pb-4 flex flex-col relative overflow-hidden shadow-[inset_0_1px_0_rgba(238,240,255,0.06),0_8px_32px_-8px_rgba(15,18,48,0.6)] animate-fade-in-2 mt-1">
+          <!-- Soft Lavender glow -->
+          <div class="absolute -top-12 -right-12 w-32 h-32 bg-[#A89CE0] opacity-[0.12] blur-[40px] rounded-full pointer-events-none"></div>
+
+          <div class="flex items-start justify-between relative z-10 mb-5">
+            <div class="space-y-1">
+              <h2 class="text-base font-semibold text-[#EEF0FF] tracking-tight">
+                Evening Wind-Down
+              </h2>
+              <p class="text-sm text-[#8A8FA8] leading-tight">
+                4-7-8 breath · body relax · sleep sounds
+              </p>
+            </div>
+            <!-- Refined breathing orb motif -->
+          </div>
+
+          <div class="relative z-10 flex flex-col">
+            <button class="w-full bg-[#7C6FCD] hover:bg-[#7C6FCD]/90 text-[#EEF0FF] h-[44px] rounded-[16px] font-medium text-sm transition-transform duration-200 flex items-center justify-center active:scale-[0.96] shadow-[inset_0_1px_0_rgba(238,240,255,0.2)]">
+              <div class="flex items-center gap-2 translate-x-[2px]">
+                <iconify-icon icon="solar:play-linear" class="text-lg"></iconify-icon>
+                <span>Start wind-down</span>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- 3. Sound Mixer Entry -->
+        <div class="bg-[#14172B] hover:bg-[#14172B]/80 border border-[#1E2236]/60 rounded-[24px] p-5 flex flex-col gap-4 shadow-[inset_0_1px_0_rgba(238,240,255,0.03)] cursor-pointer active:scale-[0.98] transition-transform duration-200 group animate-fade-in-3">
+          <div class="flex justify-between items-start">
+            <div class="space-y-0.5">
+              <h3 class="text-base font-semibold text-[#EEF0FF] tracking-tight">
+                Sound Mixer
+              </h3>
+              <p class="text-sm text-[#8A8FA8]">Layer sounds for sleep.</p>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <div class="flex items-center gap-1.5 bg-[#0D0F1A]/80 border border-[#1E2236] px-2.5 py-1 rounded-[10px]">
+                <iconify-icon icon="solar:timer-linear" class="text-[#4A4E6A] text-xs"></iconify-icon>
+                <span class="font-inter text-xs font-normal text-[#8A8FA8] tabular-nums">
+                  30 min
+                </span>
+              </div>
+              <iconify-icon icon="solar:alt-arrow-right-linear" class="text-[#4A4E6A] text-xl group-hover:text-[#8A8FA8] transition-colors"></iconify-icon>
+            </div>
+          </div>
+
+          <!-- Compact active layers -->
+          <div class="flex flex-col gap-2.5 pt-1">
+            <!-- Rain -->
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <iconify-icon icon="solar:cloud-water-linear" class="text-[#8A8FA8] text-lg"></iconify-icon>
+                <span class="text-sm font-medium text-[#EEF0FF]">Rain</span>
+              </div>
+              <div class="flex items-center gap-2.5">
+                <span class="font-inter text-xs text-[#4A4E6A] tabular-nums">
+                  70%
+                </span>
+                <div class="w-10 h-1.5 bg-[#1E2236] rounded-full overflow-hidden shrink-0">
+                  <div class="h-full bg-[#A89CE0] rounded-full w-[70%]"></div>
+                </div>
+              </div>
+            </div>
+            <!-- Brown noise -->
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <iconify-icon icon="solar:soundwave-linear" class="text-[#8A8FA8] text-lg"></iconify-icon>
+                <span class="text-sm font-medium text-[#EEF0FF]">
+                  Brown noise
+                </span>
+              </div>
+              <div class="flex items-center gap-2.5">
+                <span class="font-inter text-xs text-[#4A4E6A] tabular-nums">
+                  55%
+                </span>
+                <div class="w-10 h-1.5 bg-[#1E2236] rounded-full overflow-hidden shrink-0">
+                  <div class="h-full bg-[#A89CE0] rounded-full w-[55%]"></div>
+                </div>
+              </div>
+            </div>
+            <!-- Fireplace -->
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <iconify-icon icon="solar:fire-linear" class="text-[#8A8FA8] text-lg"></iconify-icon>
+                <span class="text-sm font-medium text-[#EEF0FF]">
+                  Fireplace
+                </span>
+              </div>
+              <div class="flex items-center gap-2.5">
+                <span class="font-inter text-xs text-[#4A4E6A] tabular-nums">
+                  35%
+                </span>
+                <div class="w-10 h-1.5 bg-[#1E2236] rounded-full overflow-hidden shrink-0">
+                  <div class="h-full bg-[#A89CE0] rounded-full w-[35%]"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Optional Quick Sound Row -->
+        <div class="flex flex-wrap gap-2.5 animate-fade-in-4">
+          <button class="bg-[#14172B] hover:bg-[#1C2040] border border-[#1E2236]/60 rounded-[16px] px-4 py-3 flex items-center gap-2.5 shrink-0 active:scale-[0.96] transition-transform duration-200 min-h-[44px]">
+            <iconify-icon icon="solar:cloud-water-linear" class="text-[#8A8FA8] text-lg"></iconify-icon>
+            <span class="text-sm font-medium text-[#EEF0FF]">Rain</span>
+          </button>
+          <button class="bg-[#14172B] hover:bg-[#1C2040] border border-[#1E2236]/60 rounded-[16px] px-4 py-3 flex items-center gap-2.5 shrink-0 active:scale-[0.96] transition-transform duration-200 min-h-[44px]">
+            <iconify-icon icon="solar:waterdrops-linear" class="text-[#8A8FA8] text-lg"></iconify-icon>
+            <span class="text-sm font-medium text-[#EEF0FF]">Ocean</span>
+          </button>
+          <button class="bg-[#14172B] hover:bg-[#1C2040] border border-[#1E2236]/60 rounded-[16px] px-4 py-3 flex items-center gap-2.5 shrink-0 active:scale-[0.96] transition-transform duration-200 min-h-[44px]">
+            <iconify-icon icon="solar:wind-linear" class="text-[#8A8FA8] text-lg"></iconify-icon>
+            <span class="text-sm font-medium text-[#EEF0FF]">Fan</span>
+          </button>
+        </div>
+
+        <!-- 5. Sleep Stories Entry -->
+        <div class="bg-[#14172B] hover:bg-[#14172B]/80 border border-[#1E2236]/60 rounded-[20px] p-4 flex flex-col gap-3 shadow-[inset_0_1px_0_rgba(238,240,255,0.03)] cursor-pointer active:scale-[0.98] transition-transform duration-200 group animate-fade-in-5">
+          <div class="flex justify-between items-start">
+            <div class="space-y-0.5">
+              <h3 class="text-base font-semibold text-[#EEF0FF] tracking-tight">
+                Sleep Stories
+              </h3>
+              <p class="text-sm text-[#8A8FA8]">
+                Quiet narration for restless thoughts.
+              </p>
+            </div>
+            <iconify-icon icon="solar:alt-arrow-right-linear" class="text-[#4A4E6A] text-xl group-hover:text-[#8A8FA8] transition-colors mt-0.5"></iconify-icon>
+          </div>
+          <!-- Quiet Preview -->
+          <div class="bg-[#0D0F1A]/60 rounded-[16px] p-2.5 flex items-center gap-3.5 border border-[#1E2236]/50">
+            <div class="w-10 h-10 rounded-[12px] bg-[#1C2040] flex items-center justify-center shrink-0 border border-[#1E2236]/80 shadow-[inset_0_1px_0_rgba(238,240,255,0.05)]">
+              <iconify-icon icon="solar:book-bookmark-linear" class="text-[#5EC4D4] opacity-80 text-lg"></iconify-icon>
+            </div>
+            <div>
+              <div class="text-sm font-medium text-[#EEF0FF]">
+                The Quiet Shoreline
+              </div>
+              <div class="font-inter text-xs text-[#4A4E6A] mt-0.5 tabular-nums">
+                45 min
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- Fixed Bottom Navigation -->
+      <nav class="absolute bottom-0 w-full h-[84px] bg-[#0D0F1A]/95 backdrop-blur-xl border-t border-[#1C2040]/80 flex justify-around items-start pt-2.5 pb-safe z-50 px-2">
+        <button class="flex flex-col items-center gap-1.5 w-16 group">
+          <iconify-icon icon="solar:home-2-linear" class="group-hover:text-[#EEF0FF] text-[24px] transition-transform group-active:scale-95 text-[#4A4E6A]" stroke-width="1.5"></iconify-icon>
+          <span class="text-xs font-normal group-hover:text-[#EEF0FF] transition-colors text-[#4A4E6A]">
+            Home
+          </span>
+        </button>
+
+        <!-- Active Tab -->
+        <button class="flex flex-col items-center gap-1.5 w-16 group">
+          <div class="relative flex items-center justify-center">
+            <iconify-icon icon="solar:moon-sleep-linear" class="text-[#7C6FCD] text-[24px] transition-transform group-active:scale-95" stroke-width="1.5"></iconify-icon>
+          </div>
+          <span class="text-xs font-semibold text-[#7C6FCD]">Sleep</span>
+        </button>
+
+        <button class="flex flex-col items-center gap-1.5 w-16 group">
+          <iconify-icon icon="solar:leaf-linear" class="group-hover:text-[#EEF0FF] text-[24px] transition-transform group-active:scale-95 text-[#4A4E6A]" stroke-width="1.5"></iconify-icon>
+          <span class="text-xs font-normal group-hover:text-[#EEF0FF] transition-colors text-[#4A4E6A]">
+            Breathe
+          </span>
+        </button>
+
+        <button class="flex flex-col items-center gap-1.5 w-16 group">
+          <iconify-icon icon="solar:chart-square-linear" class="group-hover:text-[#EEF0FF] text-[24px] transition-transform group-active:scale-95 text-[#4A4E6A]" stroke-width="1.5"></iconify-icon>
+          <span class="text-xs font-normal group-hover:text-[#EEF0FF] transition-colors text-[#4A4E6A]">
+            Progress
+          </span>
+        </button>
+
+        <button class="flex flex-col items-center gap-1.5 w-16 group">
+          <iconify-icon icon="solar:user-linear" class="group-hover:text-[#EEF0FF] text-[24px] transition-transform group-active:scale-95 text-[#4A4E6A]" stroke-width="1.5"></iconify-icon>
+          <span class="text-xs font-normal group-hover:text-[#EEF0FF] transition-colors text-[#4A4E6A]">
+            Profile
+          </span>
+        </button>
+
+        <!-- Bottom Home Indicator -->
+        <div class="absolute bottom-2 left-1/2 -translate-x-1/2 w-[120px] h-1 bg-[#EEF0FF]/20 rounded-full"></div>
+      </nav>
+
+      <!-- Top Safe Area Gradient -->
+      <div class="absolute top-0 w-full h-10 bg-gradient-to-b from-[#0D0F1A] to-transparent pointer-events-none z-20"></div>
+    </div>
+  
+</body></html>

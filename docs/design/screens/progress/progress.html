@@ -1,0 +1,248 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nidoru - Nightly Ritual</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Nunito:wght@400;500;600&amp;display=swap" rel="stylesheet">
+    <style>
+      :root {
+      --void: #0D0F1A;
+      --midnight-blue: #0F1230;
+      --deep-ink: #14172B;
+      --midnight: #1C2040;
+      --iris: #7C6FCD;
+      --lavender: #A89CE0;
+      --moonstone: #5EC4D4;
+      --cloud: #EEF0FF;
+      --mist: #8A8FA8;
+      --haze: #4A4E6A;
+      }
+      body {
+      font-family: 'Nunito', sans-serif;
+      background-color: #000;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      }
+      .font-inter {
+      font-family: 'Inter', sans-serif;
+      }
+      /* Custom Animations */
+      @keyframes fade-in-up {
+      0% { opacity: 0; transform: translateY(12px); }
+      100% { opacity: 1; transform: translateY(0); }
+      }
+      .animate-fade-in-1 { animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+      .animate-fade-in-2 { animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards; opacity: 0; }
+      .animate-fade-in-3 { animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards; opacity: 0; }
+      .animate-fade-in-4 { animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards; opacity: 0; }
+      .animate-fade-in-5 { animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards; opacity: 0; }
+      
+      .scrollbar-hide::-webkit-scrollbar {
+      display: none;
+      }
+      .scrollbar-hide {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+      }
+    </style>
+  </head>
+  <body class="flex items-center justify-center min-h-screen text-[#EEF0FF]">
+    <div class="w-full max-w-[390px] h-[844px] bg-[#0D0F1A] relative overflow-hidden shadow-2xl sm:rounded-[40px] sm:border-[8px] sm:border-[#0F1230] flex flex-col">
+      <main class="flex-1 overflow-y-auto scrollbar-hide px-5 pt-12 pb-[96px] relative z-10">
+        <!-- 1. Header (Icon removed for a quieter feel) -->
+        <header class="flex justify-between items-start animate-fade-in-1 mb-6">
+          <div class="space-y-1">
+            <h1 class="text-[22px] tracking-tight font-semibold text-[#EEF0FF]">
+              Progress
+            </h1>
+            <p class="text-[14px] text-[#8A8FA8] font-normal">
+              Small patterns, no pressure.
+            </p>
+          </div>
+        </header>
+
+        <!-- 2. Quiet Summary Row -->
+        <section class="flex gap-3 mb-8 animate-fade-in-2">
+          <div class="flex-1 bg-[#14172B]/50 rounded-[16px] p-3 shadow-[inset_0_1px_0_rgba(238,240,255,0.05)] text-center flex flex-col justify-center min-h-[72px]">
+            <div class="font-inter text-[18px] font-semibold text-[#EEF0FF] tabular-nums">
+              8 <span class="text-[13px] font-medium text-[#8A8FA8]">days</span>
+            </div>
+            <div class="text-[12px] text-[#4A4E6A] mt-0.5">current rhythm</div>
+          </div>
+          
+          <div class="flex-1 bg-[#14172B]/50 rounded-[16px] p-3 shadow-[inset_0_1px_0_rgba(238,240,255,0.05)] text-center flex flex-col justify-center min-h-[72px]">
+            <div class="font-inter text-[18px] font-semibold text-[#EEF0FF] tabular-nums">
+              12
+            </div>
+            <div class="text-[12px] text-[#4A4E6A] mt-0.5">sessions</div>
+          </div>
+
+          <div class="flex-1 bg-[#14172B]/50 rounded-[16px] p-3 shadow-[inset_0_1px_0_rgba(238,240,255,0.05)] text-center flex flex-col justify-center min-h-[72px]">
+            <div class="font-inter text-[18px] font-semibold text-[#EEF0FF] tabular-nums">
+              48 <span class="text-[13px] font-medium text-[#8A8FA8]">min</span>
+            </div>
+            <div class="text-[12px] text-[#4A4E6A] mt-0.5">breath time</div>
+          </div>
+        </section>
+
+        <!-- 3-6. Stacked Entry Cards -->
+        <section class="space-y-3">
+          <!-- Streak Calendar -->
+          <div class="bg-[#14172B]/50 hover:bg-[#1C2040]/80 rounded-[20px] p-4 flex flex-col gap-3 cursor-pointer active:scale-[0.96] transition-transform duration-200 shadow-[inset_0_1px_0_rgba(238,240,255,0.05)] border border-transparent group animate-fade-in-3 min-h-[88px]">
+            <div class="flex justify-between items-start w-full">
+              <div class="space-y-0.5">
+                <h3 class="text-[16px] font-semibold text-[#EEF0FF]">
+                  Streak calendar
+                </h3>
+                <p class="text-[14px] text-[#8A8FA8] font-normal leading-snug">
+                  Missed days pause. They do not reset.
+                </p>
+              </div>
+              <iconify-icon icon="solar:alt-arrow-right-linear" class="text-[#4A4E6A] text-[20px] group-hover:text-[#8A8FA8] transition-colors shrink-0"></iconify-icon>
+            </div>
+            
+            <!-- Horizontal Week Strip (Restrained Colors) -->
+            <div class="flex items-center gap-2 pt-1">
+              <!-- Completed (Soft Lavender fill, no shadow) -->
+              <div class="w-6 h-6 rounded-full bg-[#A89CE0]/90 flex items-center justify-center"></div>
+              <div class="w-6 h-6 rounded-full bg-[#A89CE0]/90 flex items-center justify-center"></div>
+              <!-- Paused (Mist ring) -->
+              <div class="w-6 h-6 rounded-full border-[1.5px] border-[#8A8FA8]/40 flex items-center justify-center"></div>
+              <!-- Completed -->
+              <div class="w-6 h-6 rounded-full bg-[#A89CE0]/90 flex items-center justify-center"></div>
+              <!-- Today (Subtle Lavender outline) -->
+              <div class="w-6 h-6 rounded-full border-[1.5px] border-[#A89CE0]/60 flex items-center justify-center"></div>
+              <!-- Future (Haze outline) -->
+              <div class="w-6 h-6 rounded-full border border-[#4A4E6A]/40"></div>
+              <div class="w-6 h-6 rounded-full border border-[#4A4E6A]/40"></div>
+            </div>
+          </div>
+
+          <!-- Weekly Summary -->
+          <div class="bg-[#14172B]/50 hover:bg-[#1C2040]/80 rounded-[20px] p-4 flex flex-col justify-center cursor-pointer active:scale-[0.96] transition-transform duration-200 shadow-[inset_0_1px_0_rgba(238,240,255,0.05)] border border-transparent group animate-fade-in-4 min-h-[88px]">
+            <div class="flex justify-between items-center w-full gap-4">
+              <div class="flex-1 flex flex-col text-left space-y-0.5">
+                <h3 class="text-[16px] font-semibold text-[#EEF0FF]">
+                  Weekly summary
+                </h3>
+                <p class="text-[14px] text-[#8A8FA8] font-normal leading-snug">
+                  A gentle look at your last 7 nights.
+                </p>
+              </div>
+              <!-- Softened metadata instead of CTA pill -->
+              <div class="flex items-center gap-2 shrink-0">
+                <span class="font-inter text-[13px] font-normal text-[#8A8FA8] tabular-nums">
+                  5 of 7 nights
+                </span>
+                <iconify-icon icon="solar:alt-arrow-right-linear" class="text-[#4A4E6A] text-[20px] group-hover:text-[#8A8FA8] transition-colors"></iconify-icon>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mood History -->
+          <div class="bg-[#14172B]/50 hover:bg-[#1C2040]/80 rounded-[20px] p-4 flex flex-col gap-3 cursor-pointer active:scale-[0.96] transition-transform duration-200 shadow-[inset_0_1px_0_rgba(238,240,255,0.05)] border border-transparent group animate-fade-in-5 min-h-[88px]">
+            <div class="flex justify-between items-start w-full">
+              <div class="space-y-0.5">
+                <h3 class="text-[16px] font-semibold text-[#EEF0FF]">
+                  Mood history
+                </h3>
+                <p class="text-[14px] text-[#8A8FA8] font-normal leading-snug">
+                  Morning check-ins over time.
+                </p>
+              </div>
+              <iconify-icon icon="solar:alt-arrow-right-linear" class="text-[#4A4E6A] text-[20px] group-hover:text-[#8A8FA8] transition-colors shrink-0"></iconify-icon>
+            </div>
+            <!-- Restrained Tags Preview (One accent, rest muted outlines) -->
+            <div class="flex gap-2 pt-1 overflow-hidden">
+              <span class="text-[11px] px-2 py-0.5 rounded-[6px] text-[#8A8FA8] font-medium border border-[#4A4E6A]/30">
+                calm
+              </span>
+              <span class="text-[11px] px-2 py-0.5 rounded-[6px] text-[#8A8FA8] font-medium border border-[#4A4E6A]/30">
+                tired
+              </span>
+              <span class="text-[11px] px-2 py-0.5 rounded-[6px] bg-[#A89CE0]/15 text-[#A89CE0] font-medium border border-[#A89CE0]/20">
+                clear
+              </span>
+              <span class="text-[11px] px-2 py-0.5 rounded-[6px] text-[#8A8FA8] font-medium border border-[#4A4E6A]/30 opacity-50">
+                calm
+              </span>
+            </div>
+          </div>
+
+          <!-- Sleep Trends -->
+          <div class="bg-[#14172B]/50 hover:bg-[#1C2040]/80 rounded-[20px] p-4 flex flex-col justify-center cursor-pointer active:scale-[0.96] transition-transform duration-200 shadow-[inset_0_1px_0_rgba(238,240,255,0.05)] border border-transparent group animate-fade-in-5 min-h-[88px]" style="animation-delay: 0.1s">
+            <div class="flex justify-between items-center w-full gap-4">
+              <div class="flex-1 flex flex-col text-left space-y-0.5">
+                <h3 class="text-[16px] font-semibold text-[#EEF0FF]">
+                  Sleep trends
+                </h3>
+                <p class="text-[14px] text-[#8A8FA8] font-normal leading-snug">
+                  Patterns appear after a few check-ins.
+                </p>
+              </div>
+              <div class="flex items-center gap-3 shrink-0">
+                <!-- Minimal Trend Bars Preview -->
+                <div class="flex items-end gap-1 h-5 pt-1 opacity-80">
+                  <div class="w-1.5 h-[12px] bg-[#4A4E6A] rounded-t-[2px]"></div>
+                  <div class="w-1.5 h-[16px] bg-[#4A4E6A] rounded-t-[2px]"></div>
+                  <div class="w-1.5 h-[14px] bg-[#4A4E6A] rounded-t-[2px]"></div>
+                  <div class="w-1.5 h-[20px] bg-[#7C6FCD] rounded-t-[2px]"></div>
+                  <div class="w-1.5 h-[16px] bg-[#4A4E6A] rounded-t-[2px]"></div>
+                </div>
+                <iconify-icon icon="solar:alt-arrow-right-linear" class="text-[#4A4E6A] text-[20px] group-hover:text-[#8A8FA8] transition-colors"></iconify-icon>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <!-- Fixed Bottom Navigation -->
+      <nav class="absolute bottom-0 w-full h-[84px] bg-[#0D0F1A]/90 backdrop-blur-xl border-t border-[#1C2040] flex justify-around items-start pt-2.5 pb-safe z-50 px-2">
+        <button class="flex flex-col items-center gap-1 w-16 group">
+          <iconify-icon icon="solar:home-2-linear" class="group-hover:text-[#EEF0FF] text-2xl transition-all group-active:scale-95 text-[#8A8FA8]" stroke-width="1.5"></iconify-icon>
+          <span class="text-xs font-normal group-hover:text-[#EEF0FF] transition-colors text-[#8A8FA8]">
+            Home
+          </span>
+        </button>
+
+        <button class="flex flex-col items-center gap-1 w-16 group">
+          <iconify-icon icon="solar:moon-sleep-linear" class="group-hover:text-[#EEF0FF] text-2xl transition-all group-active:scale-95 text-[#8A8FA8]" stroke-width="1.5"></iconify-icon>
+          <span class="text-xs font-normal group-hover:text-[#EEF0FF] transition-colors text-[#8A8FA8]">
+            Sleep
+          </span>
+        </button>
+
+        <button class="flex flex-col items-center gap-1 w-16 group">
+          <iconify-icon icon="solar:leaf-linear" class="group-hover:text-[#EEF0FF] text-2xl transition-all group-active:scale-95 text-[#8A8FA8]" stroke-width="1.5"></iconify-icon>
+          <span class="text-xs font-normal group-hover:text-[#EEF0FF] transition-colors text-[#8A8FA8]">
+            Breathe
+          </span>
+        </button>
+
+        <!-- Active Tab -->
+        <button class="flex flex-col items-center gap-1 w-16 group">
+          <div class="relative flex items-center justify-center">
+            <iconify-icon icon="solar:chart-square-linear" class="text-[#7C6FCD] text-2xl transition-transform group-active:scale-95" stroke-width="1.5"></iconify-icon>
+          </div>
+          <span class="text-xs font-medium text-[#7C6FCD]">Progress</span>
+        </button>
+
+        <button class="flex flex-col items-center gap-1 w-16 group">
+          <iconify-icon icon="solar:user-linear" class="group-hover:text-[#EEF0FF] text-2xl transition-all group-active:scale-95 text-[#8A8FA8]" stroke-width="1.5"></iconify-icon>
+          <span class="text-xs font-normal group-hover:text-[#EEF0FF] transition-colors text-[#8A8FA8]">
+            Profile
+          </span>
+        </button>
+
+        <!-- Bottom Home Indicator -->
+        <div class="absolute bottom-2 left-1/2 -translate-x-1/2 w-[120px] h-1 bg-[#EEF0FF]/20 rounded-full"></div>
+      </nav>
+
+      <!-- Top Safe Area Gradient -->
+      <div class="absolute top-0 w-full h-10 bg-gradient-to-b from-[#0D0F1A] to-transparent pointer-events-none z-20"></div>
+    </div>
+  
+</body></html>

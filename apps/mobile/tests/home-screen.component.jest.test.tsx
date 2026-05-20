@@ -1,17 +1,170 @@
-import { describe, expect, it } from "@jest/globals";
-import { render, screen } from "@testing-library/react-native";
+import { describe, expect, it, jest } from "@jest/globals";
+import { render, screen, within } from "@testing-library/react-native";
+import { AccessibilityInfo } from "react-native";
 
-import HomeScreen from "../src/app/index";
+import { AppTabBar } from "../src/navigation/app-tab-bar";
+import HomeScreen from "../src/app/(tabs)/index";
+import {
+  HOME_CONTENT_ENTRANCE_MOTION,
+  getHomeContentEntranceMotionConfig,
+} from "../src/home/home-screen";
+
+const routes = [
+  { key: "home-key", name: "index" },
+  { key: "sleep-key", name: "sleep" },
+  { key: "breathe-key", name: "breathe" },
+  { key: "progress-key", name: "progress" },
+  { key: "profile-key", name: "profile" },
+] as const;
+
+const tabLabels = ["Home", "Sleep", "Breathe", "Progress", "Profile"] as const;
+
+const descriptors = Object.fromEntries(
+  routes.map((route, index) => [
+    route.key,
+    {
+      options: {
+        tabBarAccessibilityLabel: `${tabLabels[index]} tab`,
+      },
+    },
+  ]),
+);
+
+jest
+  .spyOn(AccessibilityInfo, "isReduceMotionEnabled")
+  .mockImplementation(() => new Promise<boolean>(() => undefined));
+jest.spyOn(AccessibilityInfo, "addEventListener").mockImplementation(() => ({ remove: jest.fn() }));
+
+const localDateAt = (hour: number, minute = 0) => new Date(2026, 0, 1, hour, minute);
 
 describe("HomeScreen", () => {
-  it("renders the mobile design proof content", () => {
+  it("defines decorative Home entrance timing without delaying action routes", () => {
+    expect(HOME_CONTENT_ENTRANCE_MOTION).toEqual({
+      durationMs: 400,
+      easing: "ease-out",
+      isDecorativeOnly: true,
+    });
+    expect(getHomeContentEntranceMotionConfig(false)).toEqual({
+      durationMs: 400,
+      easing: "ease-out",
+      translateY: 12,
+    });
+    expect(getHomeContentEntranceMotionConfig(true)).toEqual({
+      durationMs: 0,
+      easing: "ease-out",
+      translateY: 0,
+    });
+
+    render(<HomeScreen now={localDateAt(0)} />);
+
+    expect(screen.getByRole("link", { name: "Start now" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Rescue Me quick action" })).toBeTruthy();
+    expect(screen.getByTestId("home-entrance-polish")).toBeTruthy();
+  });
+
+  it("renders the verified Home layout sections", () => {
+    render(<HomeScreen now={localDateAt(20)} />);
+
+    expect(screen.getByRole("header", { name: "Good evening, Bruno" })).toBeTruthy();
+    expect(screen.getByText("Tonight’s wind-down is ready")).toBeTruthy();
+    expect(screen.getByText("8 days")).toBeTruthy();
+    expect(screen.getByText("Wind-Down Flow")).toBeTruthy();
+    expect(screen.getByText("4-7-8 breathing and 20 min sounds")).toBeTruthy();
+    expect(screen.getByText("Last night")).toBeTruthy();
+    expect(screen.getByText("Rain helped you settle")).toBeTruthy();
+    expect(screen.getByText("Your sleep rhythm")).toBeTruthy();
+    expect(screen.getByText("A steady week, with room to rest.")).toBeTruthy();
+  });
+
+  it("keeps one primary CTA and exactly three secondary quick actions", () => {
     render(<HomeScreen />);
 
-    expect(screen.getByText("Mobile design foundation")).toBeTruthy();
-    expect(screen.getByText("Nunito 800")).toBeTruthy();
-    expect(screen.getByText("Inter 300")).toBeTruthy();
-    expect(screen.getByText("Midnight Indigo palette")).toBeTruthy();
-    expect(screen.getByText("#0D0F1A")).toBeTruthy();
-    expect(screen.getByText("#7C6FCD")).toBeTruthy();
+    expect(screen.getAllByRole("link", { name: "Start now" })).toHaveLength(1);
+    expect(screen.getAllByLabelText(/quick action$/i).map((action) => action.props.accessibilityLabel)).toEqual([
+      "Rescue Me quick action",
+      "Sounds quick action",
+      "Breathe quick action",
+    ]);
+  });
+
+  it("exposes route-aware accessible hints for the persistent quick actions", () => {
+    render(<HomeScreen />);
+
+    expect(screen.getByRole("link", { name: "Rescue Me quick action" })).toHaveProp(
+      "accessibilityHint",
+      "Starts the Rescue Me anchor immediately.",
+    );
+    expect(screen.getByRole("link", { name: "Sounds quick action" })).toHaveProp(
+      "accessibilityHint",
+      "Opens the Sound Mixer anchor.",
+    );
+    expect(screen.getByRole("link", { name: "Breathe quick action" })).toHaveProp(
+      "accessibilityHint",
+      "Opens the Breathe anchor.",
+    );
+  });
+
+  it.each([
+    ["00:00", localDateAt(0), "Rescue Me", "Immediate 4-7-8 relief"],
+    ["05:00", localDateAt(5), "Morning Breathwork", "3 min energizing breath"],
+    ["12:00", localDateAt(12), "Midday Reset", "Box breathing for stress"],
+    ["17:00", localDateAt(17), "Evening Prep", "Transition out of the day"],
+    ["20:00", localDateAt(20), "Wind-Down Flow", "4-7-8 breathing and 20 min sounds"],
+  ])("renders only the %s local-time primary action", (_timeLabel, now, expectedLabel, expectedSubtitle) => {
+    render(<HomeScreen now={now} />);
+
+    expect(screen.getByRole("header", { name: expectedLabel })).toBeTruthy();
+    expect(screen.getByText(expectedSubtitle)).toBeTruthy();
+    expect(screen.getAllByRole("link", { name: "Start now" })).toHaveLength(1);
+  });
+
+  it("renders a one-tap check-in entry when last-night data is missing", () => {
+    render(<HomeScreen hasMorningCheckIn={false} now={localDateAt(8)} />);
+
+    expect(screen.queryByText("Last night")).toBeNull();
+    expect(screen.getByRole("header", { name: "How did you sleep?" })).toBeTruthy();
+    expect(screen.getByText("Take a quiet check-in for last night.")).toBeTruthy();
+    expect(screen.getByText("One tap to log it. Skip anytime.")).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Tap to log" })).toHaveProp(
+      "accessibilityHint",
+      "Opens the morning check-in anchor.",
+    );
+    expect(screen.getAllByRole("link", { name: "Start now" })).toHaveLength(1);
+  });
+
+  it("keeps the rhythm strip compassionate and pressure-free", () => {
+    render(<HomeScreen now={localDateAt(20)} />);
+
+    expect(screen.getByText("A steady week, with room to rest.")).toBeTruthy();
+    expect(screen.queryByText(/red badge|reset|failed|lost|broken|missed/i)).toBeNull();
+  });
+
+  it("omits prohibited Home surfaces", () => {
+    render(<HomeScreen />);
+
+    expect(screen.queryByText(/library/i)).toBeNull();
+    expect(screen.queryByText(/feed/i)).toBeNull();
+    expect(screen.queryByText(/trending/i)).toBeNull();
+    expect(screen.queryByText(/upsell/i)).toBeNull();
+    expect(screen.queryByText(/badge/i)).toBeNull();
+    expect(screen.queryByText("Technical proof screen")).toBeNull();
+    expect(screen.queryByText("Mobile design foundation")).toBeNull();
+  });
+
+  it("renders the fixed five tab labels in shell order", () => {
+    render(
+      <AppTabBar
+        state={{ index: 0, routes }}
+        descriptors={descriptors}
+        navigation={{
+          emit: jest.fn(() => ({ defaultPrevented: false })),
+          navigate: jest.fn(),
+        }}
+      />,
+    );
+
+    expect(screen.getAllByRole("tab").map((tab) => within(tab).getByText(/.+/).props.children)).toEqual([
+      ...tabLabels,
+    ]);
   });
 });

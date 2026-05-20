@@ -1,0 +1,264 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nidoru - Profile Tab</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Nunito:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+    <style>
+      :root {
+      --void: #0D0F1A;
+      --midnight-blue: #0F1230;
+      --deep-ink: #14172B;
+      --midnight: #1C2040;
+      --iris: #7C6FCD;
+      --lavender: #A89CE0;
+      --moonstone: #5EC4D4;
+      --cloud: #EEF0FF;
+      --mist: #8A8FA8;
+      --haze: #4A4E6A;
+      }
+      body {
+      font-family: 'Nunito', sans-serif;
+      background-color: #000;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      }
+      .font-inter {
+      font-family: 'Inter', sans-serif;
+      }
+      /* Custom Animations */
+      @keyframes fade-in-up {
+      0% { opacity: 0; transform: translateY(12px); }
+      100% { opacity: 1; transform: translateY(0); }
+      }
+      .animate-fade-in-1 { animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+      .animate-fade-in-2 { animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.05s forwards; opacity: 0; }
+      .animate-fade-in-3 { animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards; opacity: 0; }
+      .animate-fade-in-4 { animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.15s forwards; opacity: 0; }
+      .animate-fade-in-5 { animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards; opacity: 0; }
+      .scrollbar-hide::-webkit-scrollbar {
+      display: none;
+      }
+      .scrollbar-hide {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+      }
+    </style>
+  </head>
+  <body class="flex items-center justify-center min-h-screen text-[#EEF0FF]">
+    <div class="w-full max-w-[390px] h-[844px] bg-[#0D0F1A] relative overflow-hidden shadow-2xl sm:rounded-[40px] sm:border-[8px] sm:border-[#0F1230] flex flex-col">
+      <!-- Main Content Area -->
+      <main class="flex-1 overflow-y-auto scrollbar-hide px-5 pt-8 pb-[112px] relative z-10 flex flex-col gap-6">
+        <!-- Group 1: Profile Header Card -->
+        <div class="flex flex-col animate-fade-in-1">
+          <button class="relative w-full bg-[#14172B] hover:bg-[#1C2040]/80 border border-[#1E2236]/80 rounded-[20px] p-4 overflow-hidden text-left active:scale-[0.96] transition-all duration-200 group shadow-[0_8px_32px_rgba(0,0,0,0.25),inset_0_1px_0_rgba(168,156,224,0.15)]">
+            <!-- Subtle Glow effect -->
+            <div class="absolute -top-12 -right-12 w-40 h-40 bg-[#7C6FCD] rounded-full blur-[48px] opacity-[0.15] pointer-events-none transition-opacity group-hover:opacity-25"></div>
+
+            <div class="flex flex-col gap-4 relative z-10">
+              <!-- Top section: Avatar, Info, Chevron -->
+              <div class="flex items-center gap-4">
+                <!-- Avatar -->
+                <div class="w-[52px] h-[52px] rounded-full bg-gradient-to-b from-[#1C2040] to-[#14172B] border border-[#1E2236] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] flex items-center justify-center shrink-0">
+                  <span class="text-[20px] font-semibold text-[#EEF0FF]">
+                    B
+                  </span>
+                </div>
+
+                <!-- Info -->
+                <div class="flex-1 flex flex-col justify-center gap-1">
+                  <h1 class="text-[18px] font-semibold text-[#EEF0FF] tracking-tight leading-none text-balance">
+                    Bruno
+                  </h1>
+                  <p class="text-[13px] text-[#8A8FA8] leading-none">
+                    Nidoru member
+                  </p>
+                </div>
+
+                <!-- Chevron Affordance -->
+                <div class="w-10 h-10 -mr-2 flex items-center justify-center shrink-0">
+                  <iconify-icon icon="solar:alt-arrow-right-linear" class="text-[#4A4E6A] text-[20px] group-hover:text-[#EEF0FF] transition-colors"></iconify-icon>
+                </div>
+              </div>
+
+              <!-- Bottom section: Metadata -->
+              <div class="flex flex-wrap items-center gap-2">
+                <div class="bg-[#0D0F1A]/50 border border-[#1E2236]/50 rounded-[12px] px-3 py-2 flex items-center gap-1.5 backdrop-blur-sm">
+                  <iconify-icon icon="solar:history-linear" class="text-[#5EC4D4] text-[14px] opacity-90"></iconify-icon>
+                  <span class="font-inter text-[12px] text-[#8A8FA8] tabular-nums font-medium leading-none">
+                    8-day rhythm
+                  </span>
+                </div>
+                <div class="bg-[#0D0F1A]/50 border border-[#1E2236]/50 rounded-[12px] px-3 py-2 flex items-center gap-1.5 backdrop-blur-sm">
+                  <iconify-icon icon="solar:leaf-linear" class="text-[#A89CE0] text-[14px] opacity-90"></iconify-icon>
+                  <span class="font-inter text-[12px] text-[#8A8FA8] tabular-nums font-medium leading-none">
+                    48 min breath time
+                  </span>
+                </div>
+              </div>
+            </div>
+          </button>
+        </div>
+
+        <!-- Group 2: Subscription -->
+        <div class="flex flex-col animate-fade-in-2 pt-2">
+          <button class="w-full bg-[#14172B] hover:bg-[#1C2040]/80 border border-[#1E2236]/60 rounded-[20px] p-4 flex items-center justify-between shadow-[inset_0_1px_0_rgba(255,255,255,0.02)] active:scale-[0.96] transition-all duration-200 group text-left">
+            <div class="flex flex-col gap-1 flex-1">
+              <span class="text-[15px] font-semibold text-[#EEF0FF] tracking-tight leading-none">
+                Subscription
+              </span>
+              <span class="text-[13px] text-[#8A8FA8] text-pretty leading-snug">
+                Plan, renewal, cancellation.
+              </span>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <span class="font-inter text-[13px] text-[#8A8FA8] font-medium transition-colors group-hover:text-[#EEF0FF]">
+                Manage
+              </span>
+              <iconify-icon icon="solar:alt-arrow-right-linear" class="text-[#4A4E6A] text-[20px] opacity-70 group-hover:opacity-100 transition-opacity"></iconify-icon>
+            </div>
+          </button>
+        </div>
+
+        <!-- Group 3: Preferences -->
+        <div class="flex flex-col gap-2 animate-fade-in-3">
+          <!-- Settings -->
+          <button class="w-full bg-[#14172B] hover:bg-[#1C2040]/80 border border-[#1E2236]/60 rounded-[20px] p-4 flex items-center gap-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.02)] active:scale-[0.96] transition-all duration-200 group text-left">
+            <div class="w-10 h-10 rounded-[12px] bg-[#0D0F1A]/60 flex items-center justify-center shrink-0 border border-[#1E2236]/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.02)]">
+              <iconify-icon icon="solar:settings-linear" class="text-[#8A8FA8] text-[22px] group-hover:text-[#EEF0FF] transition-colors"></iconify-icon>
+            </div>
+            <div class="flex-1 flex flex-col justify-center gap-1">
+              <span class="text-[15px] font-semibold text-[#EEF0FF] tracking-tight leading-none">
+                Settings
+              </span>
+              <span class="text-[13px] text-[#8A8FA8] text-pretty leading-snug">
+                Account and app preferences.
+              </span>
+            </div>
+            <iconify-icon icon="solar:alt-arrow-right-linear" class="text-[#4A4E6A] text-[20px] opacity-70 group-hover:opacity-100 transition-opacity shrink-0"></iconify-icon>
+          </button>
+
+          <!-- Notifications -->
+          <button class="w-full bg-[#14172B] hover:bg-[#1C2040]/80 border border-[#1E2236]/60 rounded-[20px] p-4 flex items-center gap-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.02)] active:scale-[0.96] transition-all duration-200 group text-left">
+            <div class="w-10 h-10 rounded-[12px] bg-[#0D0F1A]/60 flex items-center justify-center shrink-0 border border-[#1E2236]/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.02)]">
+              <iconify-icon icon="solar:bell-linear" class="text-[#8A8FA8] text-[22px] group-hover:text-[#EEF0FF] transition-colors"></iconify-icon>
+            </div>
+            <div class="flex-1 flex flex-col justify-center gap-1">
+              <span class="text-[15px] font-semibold text-[#EEF0FF] tracking-tight leading-none">
+                Notifications
+              </span>
+              <span class="text-[13px] text-[#8A8FA8] text-pretty leading-snug">
+                Evening reminders, milestones, no pressure.
+              </span>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <span class="font-inter text-[13px] text-[#8A8FA8] font-medium transition-colors group-hover:text-[#EEF0FF]">
+                Quiet
+              </span>
+              <iconify-icon icon="solar:alt-arrow-right-linear" class="text-[#4A4E6A] text-[20px] opacity-70 group-hover:opacity-100 transition-opacity"></iconify-icon>
+            </div>
+          </button>
+
+          <!-- Sound Preferences -->
+          <button class="w-full bg-[#14172B] hover:bg-[#1C2040]/80 border border-[#1E2236]/60 rounded-[20px] p-4 flex items-center gap-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.02)] active:scale-[0.96] transition-all duration-200 group text-left">
+            <div class="w-10 h-10 rounded-[12px] bg-[#0D0F1A]/60 flex items-center justify-center shrink-0 border border-[#1E2236]/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.02)]">
+              <iconify-icon icon="solar:soundwave-linear" class="text-[#8A8FA8] text-[22px] group-hover:text-[#EEF0FF] transition-colors"></iconify-icon>
+            </div>
+            <div class="flex-1 flex flex-col justify-center gap-1">
+              <span class="text-[15px] font-semibold text-[#EEF0FF] tracking-tight leading-none">
+                Sound preferences
+              </span>
+              <span class="text-[13px] text-[#8A8FA8] text-pretty leading-snug">
+                Voice, haptics, and sleep sounds.
+              </span>
+            </div>
+            <iconify-icon icon="solar:alt-arrow-right-linear" class="text-[#4A4E6A] text-[20px] opacity-70 group-hover:opacity-100 transition-opacity shrink-0"></iconify-icon>
+          </button>
+        </div>
+
+        <!-- Group 4: Trust & Help -->
+        <div class="flex flex-col gap-2 animate-fade-in-4">
+          <!-- Support -->
+          <button class="w-full bg-[#14172B] hover:bg-[#1C2040]/80 border border-[#1E2236]/60 rounded-[20px] p-4 flex items-center gap-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.02)] active:scale-[0.96] transition-all duration-200 group text-left">
+            <div class="w-10 h-10 rounded-[12px] bg-[#0D0F1A]/60 flex items-center justify-center shrink-0 border border-[#1E2236]/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.02)]">
+              <iconify-icon icon="solar:hand-heart-linear" class="text-[#8A8FA8] text-[22px] group-hover:text-[#EEF0FF] transition-colors"></iconify-icon>
+            </div>
+            <div class="flex-1 flex flex-col justify-center gap-1">
+              <span class="text-[15px] font-semibold text-[#EEF0FF] tracking-tight leading-none">
+                Support
+              </span>
+              <span class="text-[13px] text-[#8A8FA8] text-pretty leading-snug">
+                Get help from a real person.
+              </span>
+            </div>
+            <iconify-icon icon="solar:alt-arrow-right-linear" class="text-[#4A4E6A] text-[20px] opacity-70 group-hover:opacity-100 transition-opacity shrink-0"></iconify-icon>
+          </button>
+
+          <!-- Privacy -->
+          <button class="w-full bg-[#14172B] hover:bg-[#1C2040]/80 border border-[#1E2236]/60 rounded-[20px] p-4 flex items-center gap-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.02)] active:scale-[0.96] transition-all duration-200 group text-left">
+            <div class="w-10 h-10 rounded-[12px] bg-[#0D0F1A]/60 flex items-center justify-center shrink-0 border border-[#1E2236]/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.02)]">
+              <iconify-icon icon="solar:shield-keyhole-linear" class="text-[#8A8FA8] text-[22px] group-hover:text-[#EEF0FF] transition-colors"></iconify-icon>
+            </div>
+            <div class="flex-1 flex flex-col justify-center gap-1">
+              <span class="text-[15px] font-semibold text-[#EEF0FF] tracking-tight leading-none">
+                Privacy
+              </span>
+              <span class="text-[13px] text-[#8A8FA8] text-pretty leading-snug">
+                Data, permissions, and local history.
+              </span>
+            </div>
+            <iconify-icon icon="solar:alt-arrow-right-linear" class="text-[#4A4E6A] text-[20px] opacity-70 group-hover:opacity-100 transition-opacity shrink-0"></iconify-icon>
+          </button>
+        </div>
+      </main>
+
+      <!-- Fixed Bottom Navigation -->
+      <nav class="absolute bottom-0 w-full h-[84px] bg-[#0D0F1A]/95 backdrop-blur-xl border-t border-[#1C2040]/80 flex justify-around items-start pt-2.5 pb-safe z-50 px-2">
+        <button class="flex flex-col items-center gap-1.5 w-16 group active:scale-[0.96] transition-transform">
+          <iconify-icon icon="solar:home-2-linear" class="group-hover:text-[#EEF0FF] text-[24px] text-[#4A4E6A] transition-colors" stroke-width="1.5"></iconify-icon>
+          <span class="text-xs font-normal group-hover:text-[#EEF0FF] transition-colors text-[#4A4E6A]">
+            Home
+          </span>
+        </button>
+
+        <button class="flex flex-col items-center gap-1.5 w-16 group active:scale-[0.96] transition-transform">
+          <iconify-icon icon="solar:moon-sleep-linear" class="group-hover:text-[#EEF0FF] text-[24px] text-[#4A4E6A] transition-colors" stroke-width="1.5"></iconify-icon>
+          <span class="text-xs font-normal group-hover:text-[#EEF0FF] transition-colors text-[#4A4E6A]">
+            Sleep
+          </span>
+        </button>
+
+        <button class="flex flex-col items-center gap-1.5 w-16 group active:scale-[0.96] transition-transform">
+          <iconify-icon icon="solar:leaf-linear" class="group-hover:text-[#EEF0FF] text-[24px] text-[#4A4E6A] transition-colors" stroke-width="1.5"></iconify-icon>
+          <span class="text-xs font-normal group-hover:text-[#EEF0FF] transition-colors text-[#4A4E6A]">
+            Breathe
+          </span>
+        </button>
+
+        <button class="flex flex-col items-center gap-1.5 w-16 group active:scale-[0.96] transition-transform">
+          <iconify-icon icon="solar:chart-square-linear" class="group-hover:text-[#EEF0FF] text-[24px] text-[#4A4E6A] transition-colors" stroke-width="1.5"></iconify-icon>
+          <span class="text-xs font-normal group-hover:text-[#EEF0FF] transition-colors text-[#4A4E6A]">
+            Progress
+          </span>
+        </button>
+
+        <!-- Active Tab -->
+        <button class="flex flex-col items-center gap-1.5 w-16 group active:scale-[0.96] transition-transform">
+          <div class="relative flex items-center justify-center">
+            <iconify-icon icon="solar:user-linear" class="text-[#7C6FCD] text-[24px]" stroke-width="1.5"></iconify-icon>
+          </div>
+          <span class="text-xs font-semibold text-[#7C6FCD]">Profile</span>
+        </button>
+
+        <!-- Bottom Home Indicator -->
+        <div class="absolute bottom-2 left-1/2 -translate-x-1/2 w-[120px] h-1 bg-[#EEF0FF]/20 rounded-full"></div>
+      </nav>
+
+      <!-- Top Safe Area Gradient -->
+      <div class="absolute top-0 w-full h-10 bg-gradient-to-b from-[#0D0F1A] to-transparent pointer-events-none z-20"></div>
+    </div>
+  
+</body></html>

@@ -39,6 +39,20 @@ Security scan routing:
 
 Use current Codex session skills/plugins when relevant. Prefer exact skill names below when routing work.
 
+Project-local skill rules:
+
+- Project-local skills live under `.agents/skills/` and are tracked in `skills-lock.json`.
+- When a task matches a project-local skill, prefer the exact local skill name over a similarly named global/plugin skill.
+- If the current Codex session does not list a local skill that exists in `.agents/skills/`, read `.agents/skills/<skill-name>/SKILL.md` directly and follow it.
+- Keep routing specific: use the narrowest matching skill instead of loading broad adjacent skills.
+
+UI/frontend work:
+
+- For any task that creates, changes, or reviews UI, screens, components, visual styling, layout, or interaction details, always check the UI impact before completion.
+- Use `frontend-design` together with `make-interfaces-feel-better`: `frontend-design` for product/layout/design-system decisions, then `make-interfaces-feel-better` for polish details like typography, surfaces, motion, hit areas, and optical alignment.
+- Use `imagegen-frontend-mobile` for mobile app concept images, onboarding/auth/home/profile/settings flow renders, and premium iOS/Android screen mockups. This skill generates images only; do not use it for code implementation.
+- Verify the rendered UI when feasible: use Browser/Playwright for local web targets, Expo/Test Android/iOS simulator tooling for mobile targets, or state exactly what blocked visual verification.
+
 Available plugins:
 
 - Browser
@@ -65,6 +79,7 @@ Available plugins:
 General skills:
 
 - Image generation/editing: `imagegen`
+- Mobile app screen/flow image generation: `imagegen-frontend-mobile`
 - OpenAI docs and API guidance: `openai-docs`
 - Plugin creation: `plugin-creator`
 - Skill creation: `skill-creator`
@@ -78,10 +93,11 @@ Web, frontend, and browser skills:
 - Browser automation: `browser:browser`, `chrome:Chrome`, `playwright`
 - Core Web Vitals/performance: `core-web-vitals`, `performance`, `web-quality-audit`
 - Frontend app build/test: `build-web-apps:frontend-app-builder`, `build-web-apps:frontend-testing-debugging`
+- Frontend design and UI polish: `frontend-design`, `make-interfaces-feel-better` (use together for UI work)
 - React/Next.js: `build-web-apps:react-best-practices`
 - shadcn: `build-web-apps:shadcn`
 - Stripe: `build-web-apps:stripe-best-practices`
-- SEO: `seo`
+- SEO: `seo` for general search optimization, `seo-audit` for technical/on-page SEO audits and ranking diagnostics, `ai-seo` for AI search visibility and LLM citations, and `programmatic-seo` for SEO pages at scale
 
 Expo and mobile skills:
 

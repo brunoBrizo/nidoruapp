@@ -1,0 +1,570 @@
+import { colors, radii, spacing, typography } from "@nidoru/ui-tokens";
+import { Link } from "expo-router";
+import { ArrowRight, Heart, Moon, Music, Wind, type LucideIcon } from "lucide-react-native";
+import { useEffect, useRef, type ReactNode } from "react";
+import { Animated, Easing, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+
+import { useReduceMotionPreference } from "../motion/use-reduce-motion-enabled";
+import { type HomeQuickActionId } from "./home-actions";
+import { createHomeOverview, type HomeRhythmSegment } from "./home-state";
+
+const homeColors = {
+  backgroundEnd: "#0F1230",
+  cardGlass: "rgba(20, 23, 43, 0.62)",
+  cardGlassStrong: "rgba(20, 23, 43, 0.78)",
+  borderSilk: "rgba(238, 240, 255, 0.08)",
+  textPrimary: "#E8E6F2",
+  inactiveTab: "#A0A5C0",
+} as const;
+
+export const HOME_CONTENT_ENTRANCE_MOTION = {
+  durationMs: 400,
+  easing: "ease-out",
+  isDecorativeOnly: true,
+} as const;
+
+export const getHomeContentEntranceMotionConfig = (reduceMotionEnabled: boolean) => ({
+  durationMs: reduceMotionEnabled ? 0 : HOME_CONTENT_ENTRANCE_MOTION.durationMs,
+  easing: HOME_CONTENT_ENTRANCE_MOTION.easing,
+  translateY: reduceMotionEnabled ? 0 : 12,
+});
+
+type HomeScreenProps = {
+  readonly hasMorningCheckIn?: boolean;
+  readonly now?: Date;
+};
+
+const quickActionIcons: Record<HomeQuickActionId, LucideIcon> = {
+  "rescue-me": Heart,
+  sounds: Music,
+  breathe: Wind,
+};
+
+const getRhythmSegmentStyles = (segment: HomeRhythmSegment) => [
+  styles.rhythmSegment,
+  segment.filled ? styles.rhythmSegmentFilled : styles.rhythmSegmentEmpty,
+  { opacity: segment.opacity },
+];
+
+function HomeEntrancePolish({ children }: { readonly children: ReactNode }) {
+  const reduceMotionPreference = useReduceMotionPreference();
+  const reduceMotionEnabled =
+    !reduceMotionPreference.isResolved || reduceMotionPreference.reduceMotionEnabled;
+  const motionConfig = getHomeContentEntranceMotionConfig(reduceMotionEnabled);
+  const entranceProgress = useRef(new Animated.Value(0)).current;
+  const entranceTranslateY = entranceProgress.interpolate({
+    inputRange: [0, 1],
+    outputRange: [motionConfig.translateY, 0],
+    extrapolate: "clamp",
+  });
+
+  useEffect(() => {
+    if (!reduceMotionPreference.isResolved) {
+      return;
+    }
+
+    if (motionConfig.durationMs === 0) {
+      entranceProgress.setValue(1);
+      return;
+    }
+
+    entranceProgress.setValue(0);
+    Animated.timing(entranceProgress, {
+      duration: motionConfig.durationMs,
+      easing: Easing.out(Easing.ease),
+      toValue: 1,
+      useNativeDriver: true,
+    }).start();
+  }, [entranceProgress, motionConfig.durationMs, reduceMotionPreference.isResolved]);
+
+  return (
+    <Animated.View
+      style={[
+        styles.entrancePolish,
+        {
+          opacity: entranceProgress,
+          transform: [{ translateY: entranceTranslateY }],
+        },
+      ]}
+      testID="home-entrance-polish"
+    >
+      {children}
+    </Animated.View>
+  );
+}
+
+export function HomeScreen({ hasMorningCheckIn = true, now = new Date() }: HomeScreenProps) {
+  const homeState = createHomeOverview({ hasMorningCheckIn, now });
+  const primaryAction = homeState.primaryAction;
+  const summarySlot = homeState.summarySlot;
+  const rhythm = homeState.rhythm;
+
+  return (
+    <ScrollView
+      style={styles.screen}
+      contentContainerStyle={styles.content}
+      contentInsetAdjustmentBehavior="automatic"
+    >
+      <View style={styles.header}>
+        <View style={styles.greetingCopy}>
+          <Text accessibilityRole="header" selectable style={styles.greeting}>
+            Good evening, Bruno
+          </Text>
+          <Text selectable style={styles.subtitle}>
+            Tonight’s wind-down is ready
+          </Text>
+        </View>
+        <View accessibilityLabel={`Current rhythm, ${rhythm.streakText}`} style={styles.streakChip}>
+          <Moon color={colors.dark.primary.value} size={16} strokeWidth={1.6} />
+          <Text selectable style={styles.streakText}>
+            {rhythm.streakText}
+          </Text>
+        </View>
+      </View>
+
+      <View style={[styles.primaryCard, primaryAction.isDistressUrgent && styles.distressPrimaryCard]}>
+        <View
+          pointerEvents="none"
+          style={[styles.orbGlow, primaryAction.isDistressUrgent && styles.distressOrbGlow]}
+        />
+        <View style={styles.primaryCopy}>
+          <Text accessibilityRole="header" selectable style={styles.primaryTitle}>
+            {primaryAction.label}
+          </Text>
+          <Text selectable style={styles.primarySubtitle}>
+            {primaryAction.subtitle}
+          </Text>
+        </View>
+
+        <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={styles.orbStage}>
+          <View style={[styles.orbRing, styles.orbOuterRing]} />
+          <View style={[styles.orbRing, styles.orbMiddleRing]} />
+          <View style={styles.orbSoftGlow} />
+          <View style={styles.orbCore}>
+            <View style={styles.orbHighlight} />
+          </View>
+        </View>
+
+        <Link asChild href={primaryAction.routeTarget}>
+          <Pressable
+            accessibilityHint={`Opens the ${primaryAction.label} anchor.`}
+            accessibilityRole="link"
+            style={({ pressed }) => [styles.primaryButton, pressed && styles.pressed]}
+          >
+            <Text style={styles.primaryButtonText}>{primaryAction.ctaText}</Text>
+          </Pressable>
+        </Link>
+      </View>
+
+      <View style={styles.quickActionGrid}>
+        {homeState.quickActions.map((action) => {
+          const Icon = quickActionIcons[action.id];
+
+          return (
+            <Link asChild href={action.routeTarget} key={action.id}>
+              <Pressable
+                accessibilityHint={action.accessibilityHint}
+                accessibilityLabel={`${action.label} quick action`}
+                accessibilityRole="link"
+                style={({ pressed }) => [styles.quickAction, pressed && styles.pressed]}
+              >
+                <Icon color={homeColors.inactiveTab} size={21} strokeWidth={1.7} />
+                <View style={styles.quickActionCopy}>
+                  <Text style={styles.quickActionLabel}>{action.label}</Text>
+                  <Text style={styles.quickActionSubtitle}>{action.subtitle}</Text>
+                </View>
+              </Pressable>
+            </Link>
+          );
+        })}
+      </View>
+
+      <HomeEntrancePolish>
+        <View style={styles.lastNightCard}>
+          <View style={styles.cardRow}>
+            <Text
+              accessibilityRole={summarySlot.kind === "check-in" ? "header" : undefined}
+              selectable
+              style={styles.cardEyebrow}
+            >
+              {summarySlot.title}
+            </Text>
+            {summarySlot.kind === "last-night" ? (
+              <Text accessibilityLabel={summarySlot.ratingAccessibilityLabel} selectable style={styles.scorePill}>
+                {summarySlot.ratingText}
+              </Text>
+            ) : null}
+          </View>
+          <View style={styles.lastNightCopy}>
+            <Text selectable style={styles.lastNightTitle}>
+              {summarySlot.summary}
+            </Text>
+            <Text selectable style={styles.lastNightBody}>
+              {summarySlot.suggestion}
+            </Text>
+          </View>
+          <Link asChild href={summarySlot.routeTarget}>
+            <Pressable
+              accessibilityHint={summarySlot.kind === "check-in" ? summarySlot.accessibilityHint : undefined}
+              accessibilityRole="link"
+              style={({ pressed }) => [styles.insightLink, pressed && styles.insightLinkPressed]}
+            >
+              <Text style={styles.insightText}>{summarySlot.actionLabel}</Text>
+              <ArrowRight color={colors.dark.primary.value} size={15} strokeWidth={1.8} />
+            </Pressable>
+          </Link>
+        </View>
+
+        <View style={styles.rhythmSection}>
+          <View style={styles.cardRow}>
+            <Text selectable style={styles.rhythmTitle}>
+              {rhythm.title}
+            </Text>
+            <Text selectable style={styles.rhythmMeta}>
+              {rhythm.meta}
+            </Text>
+          </View>
+          <View
+            accessibilityLabel={rhythm.accessibilityLabel}
+            accessibilityRole="image"
+            style={styles.rhythmStrip}
+          >
+            {rhythm.segments.map((segment) => (
+              <View
+                key={segment.id}
+                style={getRhythmSegmentStyles(segment)}
+              >
+                {segment.today ? <View style={styles.todayDot} /> : null}
+              </View>
+            ))}
+          </View>
+          <Text selectable style={styles.rhythmCopy}>
+            {rhythm.compassionateCopy}
+          </Text>
+        </View>
+      </HomeEntrancePolish>
+    </ScrollView>
+  );
+}
+
+const styles = StyleSheet.create({
+  screen: {
+    backgroundColor: colors.dark.background.value,
+    flex: 1,
+  },
+  content: {
+    gap: spacing.sm,
+    paddingBottom: spacing.bottomNavigationHeight + spacing.xl,
+    paddingHorizontal: spacing.screenPadding,
+    paddingTop: spacing.xl,
+  },
+  header: {
+    alignItems: "flex-start",
+    flexDirection: "row",
+    gap: spacing.sm,
+    justifyContent: "space-between",
+  },
+  greetingCopy: {
+    flex: 1,
+    gap: 4,
+  },
+  greeting: {
+    color: homeColors.textPrimary,
+    fontFamily: typography.mobileFontFamily.primary.semiBold,
+    fontSize: 20,
+    letterSpacing: 0,
+    lineHeight: 26,
+  },
+  subtitle: {
+    color: colors.dark.textSecondary.value,
+    fontFamily: typography.mobileFontFamily.primary.regular,
+    fontSize: typography.scale.body.size,
+    lineHeight: 22,
+  },
+  streakChip: {
+    alignItems: "center",
+    backgroundColor: homeColors.cardGlassStrong,
+    borderColor: homeColors.borderSilk,
+    borderRadius: radii.pill,
+    borderWidth: 1,
+    flexDirection: "row",
+    gap: 6,
+    minHeight: 40,
+    paddingHorizontal: 12,
+  },
+  streakText: {
+    color: homeColors.textPrimary,
+    fontFamily: typography.mobileFontFamily.data.regular,
+    fontSize: typography.scale.label.size,
+    fontVariant: ["tabular-nums"],
+    lineHeight: 18,
+  },
+  primaryCard: {
+    backgroundColor: homeColors.cardGlass,
+    borderColor: homeColors.borderSilk,
+    borderRadius: 24,
+    borderWidth: 1,
+    boxShadow: "inset 0 1px 0 rgba(238, 240, 255, 0.1), 0 8px 32px rgba(124, 111, 205, 0.25)",
+    gap: 18,
+    overflow: "hidden",
+    padding: spacing.sm,
+  },
+  distressPrimaryCard: {
+    backgroundColor: "rgba(13, 15, 26, 0.82)",
+    boxShadow: "inset 0 1px 0 rgba(238, 240, 255, 0.08), 0 8px 28px rgba(124, 111, 205, 0.16)",
+  },
+  orbGlow: {
+    backgroundColor: "rgba(124, 111, 205, 0.18)",
+    borderRadius: 96,
+    height: 192,
+    left: "50%",
+    position: "absolute",
+    top: 46,
+    transform: [{ translateX: -96 }],
+    width: 192,
+  },
+  distressOrbGlow: {
+    backgroundColor: "rgba(124, 111, 205, 0.1)",
+  },
+  primaryCopy: {
+    alignItems: "center",
+    gap: 3,
+    zIndex: 1,
+  },
+  primaryTitle: {
+    color: homeColors.textPrimary,
+    fontFamily: typography.mobileFontFamily.primary.semiBold,
+    fontSize: 18,
+    letterSpacing: 0,
+    lineHeight: 24,
+  },
+  primarySubtitle: {
+    color: colors.dark.textSecondary.value,
+    fontFamily: typography.mobileFontFamily.primary.regular,
+    fontSize: typography.scale.body.size,
+    lineHeight: 21,
+  },
+  orbStage: {
+    alignItems: "center",
+    height: 112,
+    justifyContent: "center",
+  },
+  orbRing: {
+    position: "absolute",
+  },
+  orbOuterRing: {
+    borderColor: "rgba(124, 111, 205, 0.42)",
+    borderRadius: 56,
+    borderWidth: 1,
+    height: 112,
+    width: 112,
+  },
+  orbMiddleRing: {
+    backgroundColor: "rgba(124, 111, 205, 0.08)",
+    borderColor: "rgba(168, 156, 224, 0.24)",
+    borderRadius: 40,
+    borderWidth: 1,
+    height: 80,
+    width: 80,
+  },
+  orbSoftGlow: {
+    backgroundColor: "rgba(168, 156, 224, 0.35)",
+    borderRadius: 34,
+    boxShadow: "0 0 24px rgba(168, 156, 224, 0.4)",
+    height: 68,
+    position: "absolute",
+    width: 68,
+  },
+  orbCore: {
+    alignItems: "center",
+    backgroundColor: colors.dark.primary.value,
+    borderRadius: 28,
+    boxShadow: "0 0 24px rgba(124, 111, 205, 0.5)",
+    height: 56,
+    justifyContent: "center",
+    overflow: "hidden",
+    width: 56,
+  },
+  orbHighlight: {
+    backgroundColor: "rgba(238, 240, 255, 0.34)",
+    borderRadius: 18,
+    height: 36,
+    width: 36,
+  },
+  primaryButton: {
+    alignItems: "center",
+    backgroundColor: "rgba(124, 111, 205, 0.88)",
+    borderRadius: 16,
+    boxShadow: "inset 0 1px 0 rgba(255, 255, 255, 0.15)",
+    justifyContent: "center",
+    minHeight: 48,
+    transform: [{ scale: 1 }],
+    zIndex: 1,
+  },
+  pressed: {
+    transform: [{ scale: 0.96 }],
+  },
+  primaryButtonText: {
+    color: colors.dark.textPrimary.value,
+    fontFamily: typography.mobileFontFamily.primary.semiBold,
+    fontSize: typography.scale.body.size,
+    lineHeight: 20,
+  },
+  quickActionGrid: {
+    flexDirection: "row",
+    gap: 10,
+  },
+  quickAction: {
+    alignItems: "center",
+    backgroundColor: homeColors.cardGlass,
+    borderColor: homeColors.borderSilk,
+    borderRadius: 16,
+    borderWidth: 1,
+    boxShadow: "inset 0 1px 0 rgba(238, 240, 255, 0.08)",
+    flex: 1,
+    gap: 7,
+    justifyContent: "center",
+    minHeight: 80,
+    paddingHorizontal: 6,
+    paddingVertical: 12,
+    transform: [{ scale: 1 }],
+  },
+  quickActionCopy: {
+    alignItems: "center",
+    gap: 1,
+  },
+  quickActionLabel: {
+    color: homeColors.textPrimary,
+    fontFamily: typography.mobileFontFamily.primary.semiBold,
+    fontSize: 14,
+    lineHeight: 17,
+    textAlign: "center",
+  },
+  quickActionSubtitle: {
+    color: colors.dark.textSecondary.value,
+    fontFamily: typography.mobileFontFamily.primary.regular,
+    fontSize: 12,
+    lineHeight: 15,
+    textAlign: "center",
+  },
+  entrancePolish: {
+    gap: spacing.sm,
+  },
+  lastNightCard: {
+    backgroundColor: homeColors.cardGlass,
+    borderColor: homeColors.borderSilk,
+    borderRadius: radii.card,
+    borderWidth: 1,
+    boxShadow: "inset 0 1px 0 rgba(238, 240, 255, 0.08)",
+    gap: 12,
+    padding: spacing.sm,
+  },
+  cardRow: {
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  cardEyebrow: {
+    color: colors.dark.textSecondary.value,
+    fontFamily: typography.mobileFontFamily.primary.regular,
+    fontSize: typography.scale.body.size,
+    lineHeight: 20,
+  },
+  scorePill: {
+    backgroundColor: "rgba(13, 15, 26, 0.48)",
+    borderColor: homeColors.borderSilk,
+    borderRadius: 8,
+    borderWidth: 1,
+    color: homeColors.textPrimary,
+    fontFamily: typography.mobileFontFamily.data.regular,
+    fontSize: 11,
+    fontVariant: ["tabular-nums"],
+    lineHeight: 16,
+    overflow: "hidden",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  lastNightCopy: {
+    gap: 2,
+  },
+  lastNightTitle: {
+    color: homeColors.textPrimary,
+    fontFamily: typography.mobileFontFamily.primary.semiBold,
+    fontSize: typography.scale.bodyLarge.size,
+    lineHeight: 22,
+  },
+  lastNightBody: {
+    color: colors.dark.textSecondary.value,
+    fontFamily: typography.mobileFontFamily.primary.regular,
+    fontSize: typography.scale.body.size,
+    lineHeight: 20,
+  },
+  insightLink: {
+    alignItems: "center",
+    alignSelf: "flex-start",
+    flexDirection: "row",
+    gap: 6,
+    minHeight: 40,
+    transform: [{ scale: 1 }],
+  },
+  insightLinkPressed: {
+    transform: [{ scale: 0.96 }],
+  },
+  insightText: {
+    color: colors.dark.primary.value,
+    fontFamily: typography.mobileFontFamily.primary.semiBold,
+    fontSize: typography.scale.body.size,
+    lineHeight: 20,
+  },
+  rhythmSection: {
+    gap: 14,
+    paddingHorizontal: 2,
+  },
+  rhythmTitle: {
+    color: homeColors.textPrimary,
+    fontFamily: typography.mobileFontFamily.primary.semiBold,
+    fontSize: typography.scale.body.size,
+    lineHeight: 20,
+  },
+  rhythmMeta: {
+    color: colors.dark.textSecondary.value,
+    fontFamily: typography.mobileFontFamily.data.regular,
+    fontSize: typography.scale.caption.size,
+    lineHeight: 16,
+  },
+  rhythmCopy: {
+    color: colors.dark.textSecondary.value,
+    fontFamily: typography.mobileFontFamily.primary.regular,
+    fontSize: typography.scale.caption.size,
+    lineHeight: 18,
+  },
+  rhythmStrip: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 14,
+    height: 28,
+    justifyContent: "space-between",
+  },
+  rhythmSegment: {
+    borderRadius: 9999,
+    flex: 1,
+    height: 6,
+  },
+  rhythmSegmentFilled: {
+    backgroundColor: colors.dark.primary.value,
+  },
+  rhythmSegmentEmpty: {
+    backgroundColor: homeColors.backgroundEnd,
+    borderColor: colors.dark.surfaceRaised.value,
+    borderWidth: 1,
+  },
+  todayDot: {
+    alignSelf: "center",
+    backgroundColor: colors.dark.primaryGlow.value,
+    borderRadius: 3,
+    height: 6,
+    position: "absolute",
+    top: -11,
+    width: 6,
+  },
+});

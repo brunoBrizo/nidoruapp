@@ -1,4 +1,4 @@
-const easProjectId = process.env.EAS_PROJECT_ID;
+const easProjectId = process.env.EAS_PROJECT_ID ?? process.env.EAS_BUILD_PROJECT_ID;
 const sentryUrl = process.env.SENTRY_URL;
 const sentryOrg = process.env.SENTRY_ORG;
 const sentryProject = process.env.SENTRY_PROJECT;

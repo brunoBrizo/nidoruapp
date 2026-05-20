@@ -42,7 +42,10 @@ function RootLayout() {
 
   return (
     <ObservabilityProvider>
-      <Stack screenOptions={{ headerShown: false }} />
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="observability-proof" />
+      </Stack>
       <StatusBar style="light" />
     </ObservabilityProvider>
   );

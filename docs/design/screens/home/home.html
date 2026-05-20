@@ -1,417 +1,287 @@
-<!DOCTYPE html>
-
-<html class="dark" lang="en" style=""><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Nidoru - Home</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-        tailwind.config = {
-          darkMode: "class",
-          theme: {
-            extend: {
-              "colors": {
-                      "on-primary-container": "#281575",
-                      "surface-container-high": "#272935",
-                      "on-tertiary": "#3d2e00",
-                      "on-secondary-fixed-variant": "#004f58",
-                      "on-error-container": "#ffdad6",
-                      "primary": "#c8bfff",
-                      "surface": "#11131e",
-                      "on-surface": "#e1e1f2",
-                      "primary-container": "#9184e4",
-                      "on-tertiary-container": "#503d00",
-                      "secondary-container": "#2f9eae",
-                      "surface-variant": "#323440",
-                      "error": "#ffb4ab",
-                      "tertiary-fixed-dim": "#e2c375",
-                      "tertiary": "#e2c375",
-                      "secondary-fixed": "#99f0ff",
-                      "surface-container-low": "#191b26",
-                      "primary-fixed": "#e5deff",
-                      "surface-container-lowest": "#0c0e18",
-                      "background": "#11131e",
-                      "inverse-on-surface": "#2e303c",
-                      "outline-variant": "#484551",
-                      "secondary-fixed-dim": "#70d5e5",
-                      "on-secondary-container": "#002f35",
-                      "primary-fixed-dim": "#c8bfff",
-                      "error-container": "#93000a",
-                      "on-tertiary-fixed-variant": "#584400",
-                      "on-tertiary-fixed": "#241a00",
-                      "inverse-primary": "#5e51ad",
-                      "surface-dim": "#11131e",
-                      "on-error": "#690005",
-                      "on-primary": "#2f1e7c",
-                      "surface-tint": "#c8bfff",
-                      "tertiary-fixed": "#ffdf91",
-                      "on-surface-variant": "#c9c4d3",
-                      "inverse-surface": "#e1e1f2",
-                      "on-secondary-fixed": "#001f24",
-                      "on-background": "#e1e1f2",
-                      "on-primary-fixed": "#190064",
-                      "tertiary-container": "#c5a85d",
-                      "on-primary-fixed-variant": "#463893",
-                      "on-secondary": "#00363d",
-                      "surface-bright": "#373845",
-                      "surface-container-highest": "#323440",
-                      "surface-container": "#1d1f2b",
-                      "secondary": "#70d5e5",
-                      "outline": "#928f9d"
-              },
-              "borderRadius": {
-                      "DEFAULT": "0.25rem",
-                      "lg": "0.5rem",
-                      "xl": "0.75rem",
-                      "full": "9999px"
-              },
-              "spacing": {
-                      "lg": "40px",
-                      "sm": "12px",
-                      "gutter": "16px",
-                      "md": "24px",
-                      "xs": "4px",
-                      "base": "8px",
-                      "container-padding": "20px"
-              },
-              "fontFamily": {
-                      "display-greeting": [
-                              "Nunito Sans"
-                      ],
-                      "metric-sm": [
-                              "Inter"
-                      ],
-                      "label-caps": [
-                              "Inter"
-                      ],
-                      "body-main": [
-                              "Nunito Sans"
-                      ],
-                      "headline-card": [
-                              "Nunito Sans"
-                      ],
-                      "metric-lg": [
-                              "Inter"
-                      ]
-              },
-              "fontSize": {
-                      "display-greeting": [
-                              "32px",
-                              {
-                                      "lineHeight": "40px",
-                                      "letterSpacing": "-0.02em",
-                                      "fontWeight": "700"
-                              }
-                      ],
-                      "metric-sm": [
-                              "14px",
-                              {
-                                      "lineHeight": "20px",
-                                      "fontWeight": "400"
-                              }
-                      ],
-                      "label-caps": [
-                              "12px",
-                              {
-                                      "lineHeight": "16px",
-                                      "letterSpacing": "0.05em",
-                                      "fontWeight": "600"
-                              }
-                      ],
-                      "body-main": [
-                              "16px",
-                              {
-                                      "lineHeight": "24px",
-                                      "fontWeight": "400"
-                              }
-                      ],
-                      "headline-card": [
-                              "22px",
-                              {
-                                      "lineHeight": "28px",
-                                      "fontWeight": "600"
-                              }
-                      ],
-                      "metric-lg": [
-                              "48px",
-                              {
-                                      "lineHeight": "48px",
-                                      "letterSpacing": "-0.04em",
-                                      "fontWeight": "500"
-                              }
-                      ]
-              }
-            },
-          }
-        }
-    </script>
-<style>
-        body {
-            background: linear-gradient(180deg, #0D0F1A 0%, #0F1230 100%);
-            min-height: 100vh;
-            color: #e1e1f2;
-            overflow-x: hidden;
-        }
-
-        /* Glassmorphism Styles */
-        .glass-card {
-            background: rgba(20, 23, 43, 0.7);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-top: 1px solid rgba(255, 255, 255, 0.12);
-        }
-
-        .glass-chip {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        /* Atmospheric Particles */
-        #particles-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        /* Orb Animation */
-        @keyframes pulse-orb {
-            0% { transform: scale(1); opacity: 0.8; }
-            50% { transform: scale(1.1); opacity: 0.4; }
-            100% { transform: scale(1); opacity: 0.8; }
-        }
-        
-        .orb-layer {
-            animation: pulse-orb 4s ease-in-out infinite;
-        }
-        .orb-layer:nth-child(2) { animation-delay: 1s; }
-        .orb-layer:nth-child(3) { animation-delay: 2s; }
-
-        /* Silk Border utility */
-        .silk-border {
-            box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
-        }
-
-        /* Orb colors */
-        .orb-core { background-color: #7C6FCD; }
-        .orb-glow { background-color: #A89CE0; }
+<html lang="en"><head>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nidoru - Nightly Ritual</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&amp;family=Nunito:wght@400;500&amp;display=swap" rel="stylesheet">
+    <style>
+      :root {
+      --void: #0D0F1A;
+      --midnight-blue: #0F1230;
+      --deep-ink: #14172B;
+      --midnight: #1C2040;
+      --iris: #7C6FCD;
+      --lavender: #A89CE0;
+      --moonstone: #5EC4D4;
+      --cloud: #EEF0FF;
+      --mist: #8A8FA8;
+      --haze: #4A4E6A;
+      }
+      body {
+      font-family: 'Nunito', sans-serif;
+      background-color: #000; /* Outer canvas background */
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      }
+      .font-inter {
+      font-family: 'Inter', sans-serif;
+      }
+      /* Custom Animations */
+      @keyframes fade-in-up {
+      0% { opacity: 0; transform: translateY(12px); }
+      100% { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes orb-pulse {
+      0%, 100% { transform: scale(1); opacity: 0.85; box-shadow: 0 0 24px rgba(124,111,205,0.5); }
+      50% { transform: scale(1.04); opacity: 1; box-shadow: 0 0 40px rgba(168,156,224,0.75); }
+      }
+      @keyframes ring-expand {
+      0%, 100% { transform: scale(0.95); opacity: 0.2; }
+      50% { transform: scale(1.08); opacity: 0.05; }
+      }
+      @keyframes glow-pulse {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 1; }
+      }
+      .animate-fade-in-1 { animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+      .animate-fade-in-2 { animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards; opacity: 0; }
+      .animate-fade-in-3 { animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards; opacity: 0; }
+      .animate-fade-in-4 { animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards; opacity: 0; }
+      .animate-fade-in-5 { animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards; opacity: 0; }
+      .orb-core {
+      animation: orb-pulse 6s ease-in-out infinite;
+      }
+      .orb-ring {
+      animation: ring-expand 6s ease-in-out infinite;
+      }
+      .orb-glow {
+      animation: glow-pulse 6s ease-in-out infinite;
+      }
+      /* Hide scrollbar for a cleaner mobile feel */
+      .scrollbar-hide::-webkit-scrollbar {
+      display: none;
+      }
+      .scrollbar-hide {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+      }
     </style>
-<style>
-    body {
-      min-height: max(884px, 100dvh);
-    }
-  </style>
-</head>
-<body class="antialiased">
-<canvas height="884" id="particles-canvas" width="390"></canvas>
-<div class="relative z-10 w-full max-w-[480px] mx-auto min-h-screen flex flex-col">
-<!-- TopAppBar -->
-<header class="sticky top-0 w-full z-50 backdrop-blur-3xl bg-surface-container-low/70 dark:bg-surface-container-low/70 shadow-sm tap-highlight-transparent flex flex-col px-container-padding border-b-0 py-container-padding">
-<div class="flex justify-between items-start w-full">
-<div>
-<h1 class="font-headline-card text-headline-card text-[#E8E6F2]">Good evening, Bruno</h1>
-<div class="flex items-center gap-2 mt-xs"><p class="font-body-main text-body-main text-[#8A8FA8] whitespace-nowrap">Tonight’s wind-down is ready</p></div>
-</div>
-<div class="flex flex-col items-end">
-<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center silk-border glass-chip relative overflow-hidden">
-<span class="material-symbols-outlined text-primary">bedtime</span>
-</div>
-</div>
-</div>
-</header>
-<!-- Main Content Canvas -->
-<main class="flex-1 px-container-padding flex flex-col pt-base pb-24 gap-base">
-<!-- Primary Action Card -->
-<section class="glass-card rounded-[20px] p-md silk-border flex flex-col items-center text-center relative overflow-hidden py-md">
-<div class="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none"></div>
-<div class="w-20 h-20 relative flex items-center justify-center mb-base" style="transform: scale(1.1);">
-<div class="absolute w-full h-full rounded-full border border-primary/10 orb-layer"></div>
-<div class="absolute w-[110%] h-[110%] rounded-full border border-primary/5 orb-layer scale-110 opacity-30"></div>
-<div class="absolute w-[85%] h-[85%] rounded-full border border-primary/5 orb-layer"></div>
-<div class="absolute w-3/4 h-3/4 rounded-full bg-[#A89CE0] blur-2xl opacity-30 orb-layer"></div>
-<div class="absolute w-1/2 h-1/2 rounded-full bg-[#7C6FCD] blur-[2px] opacity-90 z-10"></div>
-<div class="absolute w-[140%] h-[140%] rounded-full border border-primary/5 orb-layer animate-pulse opacity-60"></div>
-</div>
-<h2 class="font-headline-card text-headline-card text-on-surface mb-xs leading-tight whitespace-nowrap">Evening Wind-Down</h2>
-<p class="font-body-main text-body-main text-on-surface-variant mb-sm text-sm opacity-80 whitespace-nowrap">4-7-8 breathing · 20 min sounds</p>
-<button class="w-full bg-gradient-to-r from-primary-container to-primary rounded-full py-2.5 px-6 font-label-caps text-label-caps text-on-primary-container flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
-<span class="whitespace-nowrap">Begin Wind-Down</span>
-<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
-</button>
-</section>
-<!-- Quick Actions -->
-<section class="flex flex-col gap-base">
-<h3 class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest pl-2">Quick actions</h3>
-<div class="grid grid-cols-3 gap-gutter">
-<!-- Rescue Me -->
-<div class="glass-chip rounded-xl flex flex-col items-center text-center gap-xs hover:bg-white/10 transition-colors cursor-pointer relative overflow-hidden bg-white/[0.06] border-white/[0.05] py-base"><span class="material-symbols-outlined text-primary mb-1">monitor_heart</span><span class="font-label-caps text-label-caps text-on-surface leading-tight">Rescue Me</span></div>
-<!-- Sounds -->
-<div class="glass-chip rounded-xl flex flex-col items-center text-center gap-xs hover:bg-white/10 transition-colors cursor-pointer bg-white/[0.06] border-white/[0.05] py-base">
-<span class="material-symbols-outlined text-primary/80 mb-1">waves</span>
-<span class="font-label-caps text-label-caps text-on-surface leading-tight">Sounds</span>
-<span class="font-metric-sm text-metric-sm text-on-surface-variant text-[10px]">Mixer</span>
-</div>
-<!-- Breathe -->
-<div class="glass-chip rounded-xl flex flex-col items-center text-center gap-xs hover:bg-white/10 transition-colors cursor-pointer bg-white/[0.06] border-white/[0.05] py-base">
-<span class="material-symbols-outlined text-primary/60 mb-1">air</span>
-<span class="font-label-caps text-label-caps text-on-surface leading-tight">Breathe</span>
-<span class="font-metric-sm text-metric-sm text-on-surface-variant text-[10px]">Just the orb</span>
-</div>
-</div>
-</section>
-<!-- Last Night Summary -->
-<section class="glass-card rounded-[20px] p-md silk-border flex flex-col gap-sm">
-<div class="flex justify-between items-center">
-<h3 class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">Last night</h3>
-<div class="flex gap-1">
-<span class="material-symbols-outlined text-primary text-[16px]" style="font-variation-settings: 'FILL' 1;">bedtime</span>
-<span class="material-symbols-outlined text-primary text-[16px]" style="font-variation-settings: 'FILL' 1;">bedtime</span>
-<span class="material-symbols-outlined text-primary text-[16px]" style="font-variation-settings: 'FILL' 1;">bedtime</span>
-<span class="material-symbols-outlined text-primary text-[16px]" style="font-variation-settings: 'FILL' 1;">bedtime</span>
-<span class="material-symbols-outlined text-on-surface-variant/30 text-[16px]" style="font-variation-settings: 'FILL' 1;">bedtime</span>
-</div>
-</div>
-<div>
-<p class="font-body-main text-body-main text-on-surface">4/5 · Rain helped you settle</p>
-<p class="font-metric-sm text-metric-sm text-on-surface-variant mt-1">Box breathing may help tonight.</p>
-</div>
-<div class="mt-2 flex justify-end">
-<button class="font-label-caps text-label-caps text-primary hover:text-primary-fixed transition-colors whitespace-nowrap">View insight</button>
-</div>
-</section>
-<!-- Compassionate Streak Strip -->
-<section class="flex flex-col mb-lg">
-<div class="flex justify-between items-end pl-2">
-<h3 class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">Your sleep rhythm</h3>
-<span class="font-metric-sm text-metric-sm text-primary text-[11px]">8-day rhythm · compassionate</span>
-</div>
-<div class="glass-card rounded-full py-4 px-md flex justify-between items-center silk-border mt-12">
-<!-- Day 1-4 (Filled) -->
-<div class="w-3 h-3 rounded-full bg-primary/80"></div>
-<div class="w-3 h-3 rounded-full bg-primary/80"></div>
-<div class="w-3 h-3 rounded-full bg-primary/80"></div>
-<div class="w-3 h-3 rounded-full bg-primary/80"></div>
-<!-- Day 5 (Paused - soft ring) -->
-<div class="w-3 h-3 rounded-full border border-primary/50 flex items-center justify-center">
-<div class="w-1 h-1 rounded-full bg-primary/50"></div>
-</div>
-<!-- Day 6-7 (Future - haze rings) -->
-<div class="w-3 h-3 rounded-full border border-white/10"></div>
-<div class="w-3 h-3 rounded-full border border-white/10"></div>
-</div>
-</section>
-</main>
-<!-- BottomNavBar -->
-<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-gutter py-base bg-surface-container/70 dark:bg-surface-container/70 backdrop-blur-3xl md:hidden pb-[safe-area-inset-bottom]">
-<!-- Home (Active) -->
-<a class="flex flex-col items-center justify-center text-primary active:scale-95 transition-transform duration-200 relative px-4 py-1.5" href="#">
-<div class="absolute -top-1 w-6 rounded-full bg-primary h-[2px]"></div>
-<span class="material-symbols-outlined">home</span>
-<span class="text-label-caps mt-1 text-[10px] font-normal whitespace-nowrap font-medium opacity-100">Home</span>
-</a>
-<!-- Sleep -->
-<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors active:scale-95 duration-200 px-4 py-1.5" href="#">
-<span class="material-symbols-outlined">bedtime</span>
-<span class="text-label-caps mt-1 text-[10px] font-normal opacity-70 whitespace-nowrap">Sleep</span>
-</a>
-<!-- Breathe -->
-<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors active:scale-95 duration-200 px-4 py-1.5" href="#">
-<span class="material-symbols-outlined">air</span>
-<span class="text-label-caps mt-1 text-[10px] font-normal opacity-70 whitespace-nowrap">Breathe</span>
-</a>
-<!-- Progress -->
-<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors active:scale-95 duration-200 px-4 py-1.5" href="#">
-<span class="material-symbols-outlined">bar_chart</span>
-<span class="text-label-caps mt-1 text-[10px] font-normal opacity-70 whitespace-nowrap">Progress</span>
-</a>
-<!-- Profile -->
-<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors active:scale-95 duration-200 px-4 py-1.5" href="#">
-<span class="material-symbols-outlined">person</span>
-<span class="text-label-caps mt-1 text-[10px] font-normal opacity-70 whitespace-nowrap">Profile</span>
-</a>
-</nav>
-</div>
-<!-- Script for Atmospheric Particles -->
-<script>
-        const canvas = document.getElementById('particles-canvas');
-        const ctx = canvas.getContext('2d');
-        
-        let width, height;
-        let particles = [];
+  </head>
+  <body class="flex items-center justify-center min-h-screen text-[#EEF0FF]">
+    <!-- Native Mobile Canvas Simulation -->
+    <div class="w-full max-w-[390px] h-[844px] bg-[#0D0F1A] relative overflow-hidden shadow-2xl sm:rounded-[40px] sm:border-[8px] sm:border-[#0F1230] flex flex-col">
+      <!-- Scrollable Content Area -->
+      <main class="flex-1 overflow-y-auto scrollbar-hide px-5 pt-12 pb-[96px] space-y-4 relative z-10">
+        <!-- 1. Greeting & Streak -->
+        <header class="flex justify-between items-start animate-fade-in-1">
+          <div class="space-y-1">
+            <h1 class="text-xl tracking-tight font-medium text-[#EEF0FF]">
+              Good evening, Bruno
+            </h1>
+            <p class="text-sm text-[#8A8FA8] font-normal">
+              Tonight’s wind-down is ready
+            </p>
+          </div>
+          <div class="flex items-center gap-1.5 bg-[#14172B] px-3 py-1.5 rounded-full border border-[#EEF0FF]/5 shadow-sm">
+            <iconify-icon icon="solar:moon-fog-linear" class="text-[#7C6FCD] text-base" stroke-width="1.5"></iconify-icon>
+            <span class="font-inter text-sm font-medium text-[#EEF0FF]">
+              8 days
+            </span>
+          </div>
+        </header>
 
-        function resize() {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
-        }
+        <!-- 2. Primary Action Card (Glassmorphism & Orb) -->
+        <section class="bg-[#14172B]/50 backdrop-blur-xl rounded-[24px] p-4 relative overflow-hidden animate-fade-in-2 shadow-[inset_0_1px_0_rgba(238,240,255,0.1),0_8px_32px_rgba(124,111,205,0.25)]">
+          <!-- Soft background glow for the orb -->
+          <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-[#7C6FCD]/20 rounded-full blur-[48px] pointer-events-none"></div>
 
-        class Particle {
-            constructor() {
-                this.x = Math.random() * width;
-                this.y = Math.random() * height;
-                this.size = Math.random() * 1.5 + 0.5;
-                this.speedY = Math.random() * 0.2 - 0.1;
-                this.speedX = Math.random() * 0.2 - 0.1;
-                // Very subtle opacity for low contrast living atmosphere
-                this.opacity = Math.random() * 0.3 + 0.05; 
-                this.fadeSpeed = Math.random() * 0.002 + 0.001;
-                this.fadingOut = Math.random() > 0.5;
-            }
+          <div class="text-center z-10 relative space-y-1 mb-4 mt-1">
+            <h2 class="text-lg tracking-tight font-medium text-[#EEF0FF]">
+              Evening Wind-Down
+            </h2>
+            <p class="text-sm text-[#8A8FA8] font-normal">
+              <span class="font-inter">4-7-8</span>
+              breathing ·
+              <span class="font-inter">20</span>
+              min sounds
+            </p>
+          </div>
 
-            update() {
-                this.y += this.speedY;
-                this.x += this.speedX;
+          <!-- Central Breathing Orb -->
+          <div class="relative h-28 flex items-center justify-center mb-5 z-10">
+            <!-- Rhythm cue: 4-7-8 Timing Arcs -->
+            <svg class="absolute w-[116px] h-[116px] -rotate-90 z-0" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="48" fill="none" stroke="#7C6FCD" stroke-width="0.5" class="opacity-15"></circle>
+              <!-- Inhale (4) -->
+              <circle cx="50" cy="50" r="48" fill="none" stroke="#7C6FCD" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="60 241.6" stroke-dashoffset="0" class="opacity-70"></circle>
+              <!-- Hold (7) -->
+              <circle cx="50" cy="50" r="48" fill="none" stroke="#A89CE0" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="106 195.6" stroke-dashoffset="-66" class="opacity-50"></circle>
+              <!-- Exhale (8) -->
+              <circle cx="50" cy="50" r="48" fill="none" stroke="#8A8FA8" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="117 184.6" stroke-dashoffset="-178" class="opacity-40"></circle>
+            </svg>
 
-                if (this.fadingOut) {
-                    this.opacity -= this.fadeSpeed;
-                    if (this.opacity <= 0.05) this.fadingOut = false;
-                } else {
-                    this.opacity += this.fadeSpeed;
-                    if (this.opacity >= 0.35) this.fadingOut = true;
-                }
+            <!-- One very subtle pulse ring -->
+            <div class="absolute w-[84px] h-[84px] rounded-full border border-[#7C6FCD]/20 orb-ring z-10"></div>
 
-                if (this.y < 0) this.y = height;
-                if (this.y > height) this.y = 0;
-                if (this.x < 0) this.x = width;
-                if (this.x > width) this.x = 0;
-            }
+            <!-- Faint Lavender outer ring -->
+            <div class="absolute w-[68px] h-[68px] rounded-full border border-[#A89CE0]/15 bg-[#7C6FCD]/5 backdrop-blur-sm shadow-[inset_0_0_12px_rgba(168,156,224,0.1)] z-10"></div>
 
-            draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(200, 191, 255, ${this.opacity})`; // Using primary color tint
-                ctx.fill();
-            }
-        }
+            <!-- Soft inner glow -->
+            <div class="absolute w-[56px] h-[56px] rounded-full bg-gradient-to-tr from-[#7C6FCD]/40 to-[#A89CE0]/40 blur-lg shadow-[0_0_24px_rgba(168,156,224,0.4)] z-10 orb-glow"></div>
 
-        function init() {
-            resize();
-            particles = [];
-            // Create fewer particles to keep it uncluttered
-            for (let i = 0; i < 40; i++) {
-                particles.push(new Particle());
-            }
-        }
+            <!-- Iris core -->
+            <div class="relative w-[42px] h-[42px] rounded-full shadow-[0_0_24px_rgba(124,111,205,0.5)] z-20 orb-core overflow-hidden">
+              <div class="absolute inset-0 bg-gradient-to-tr from-[#7C6FCD] to-[#A89CE0] opacity-90"></div>
+              <div class="absolute inset-0 bg-gradient-to-b from-white/30 to-transparent mix-blend-overlay"></div>
+            </div>
+          </div>
 
-        function animate() {
-            ctx.clearRect(0, 0, width, height);
-            
-            particles.forEach(particle => {
-                particle.update();
-                particle.draw();
-            });
-            
-            requestAnimationFrame(animate);
-        }
+          <button class="w-full h-12 bg-[#7C6FCD]/85 backdrop-blur-md text-[#EEF0FF] rounded-[16px] font-medium text-sm active:scale-[0.96] transition-all duration-200 ease-out z-10 relative shadow-[inset_0_1px_0_rgba(255,255,255,0.15)]">
+            Start now
+          </button>
+        </section>
 
-        window.addEventListener('resize', init);
-        init();
-        animate();
-    </script>
+        <!-- 3. Quick Actions -->
+        <section class="grid grid-cols-3 gap-3 animate-fade-in-3">
+          <!-- Rescue Me (No red dot, calm) -->
+          <button class="bg-[#14172B]/50 hover:bg-[#1C2040]/80 rounded-[16px] py-3 flex flex-col items-center justify-center gap-1.5 active:scale-[0.96] transition-all duration-200 group shadow-[inset_0_1px_0_rgba(238,240,255,0.08)] min-h-[80px]">
+            <iconify-icon icon="lucide:heart" class="text-[#8A8FA8] group-hover:text-[#EEF0FF] text-[20px] transition-colors" stroke-width="1.5"></iconify-icon>
+            <div class="flex flex-col items-center">
+              <span class="text-sm font-medium text-[#EEF0FF] leading-tight">
+                Rescue Me
+              </span>
+              <span class="text-xs font-normal text-[#8A8FA8]">Immediate</span>
+            </div>
+          </button>
+
+          <!-- Sounds -->
+          <button class="bg-[#14172B]/50 hover:bg-[#1C2040]/80 rounded-[16px] py-3 flex flex-col items-center justify-center gap-1.5 active:scale-[0.96] transition-all duration-200 group shadow-[inset_0_1px_0_rgba(238,240,255,0.08)] min-h-[80px]">
+            <iconify-icon icon="lucide:music" class="text-[#8A8FA8] group-hover:text-[#EEF0FF] text-[20px] transition-colors" stroke-width="1.5"></iconify-icon>
+            <div class="flex flex-col items-center">
+              <span class="text-sm font-medium text-[#EEF0FF] leading-tight">
+                Sounds
+              </span>
+              <span class="text-xs font-normal text-[#8A8FA8]">Mixer</span>
+            </div>
+          </button>
+
+          <!-- Breathe -->
+          <button class="bg-[#14172B]/50 hover:bg-[#1C2040]/80 rounded-[16px] py-3 flex flex-col items-center justify-center gap-1.5 active:scale-[0.96] transition-all duration-200 group shadow-[inset_0_1px_0_rgba(238,240,255,0.08)] min-h-[80px]">
+            <iconify-icon icon="lucide:wind" class="text-[#8A8FA8] group-hover:text-[#EEF0FF] text-[20px] transition-colors" stroke-width="1.5"></iconify-icon>
+            <div class="flex flex-col items-center">
+              <span class="text-sm font-medium text-[#EEF0FF] leading-tight">
+                Breathe
+              </span>
+              <span class="text-xs font-normal text-[#8A8FA8]">
+                Just the orb
+              </span>
+            </div>
+          </button>
+        </section>
+
+        <!-- 4. Sleep Check-in (Last night) -->
+        <section class="bg-[#14172B]/50 rounded-[20px] p-4 animate-fade-in-4 relative group cursor-pointer active:scale-[0.98] transition-transform duration-200 shadow-[inset_0_1px_0_rgba(238,240,255,0.08)]">
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-sm text-[#8A8FA8] font-normal">Last night</span>
+            <span class="font-inter text-[11px] text-[#EEF0FF] font-medium tabular-nums bg-[#0D0F1A]/40 px-2 py-1 rounded-md shadow-[inset_0_1px_0_rgba(238,240,255,0.08)] ring-1 ring-white/5">
+              4/5
+            </span>
+          </div>
+          <div class="space-y-0.5 mb-3">
+            <p class="text-base font-medium text-[#EEF0FF] leading-snug">
+              Rain helped you settle
+            </p>
+            <p class="text-sm text-[#8A8FA8] font-normal">
+              Box breathing may help tonight.
+            </p>
+          </div>
+          <div class="flex items-center gap-1.5 text-[#7C6FCD] text-sm font-medium py-2 -my-2">
+            View insight
+            <iconify-icon icon="solar:arrow-right-linear" class="text-sm" stroke-width="1.5"></iconify-icon>
+          </div>
+        </section>
+
+        <!-- 5. Progress / Rhythm Strip -->
+        <section class="space-y-3 animate-fade-in-5 px-1">
+          <div class="flex justify-between items-end">
+            <h3 class="text-sm font-medium text-[#EEF0FF]">
+              Your sleep rhythm
+            </h3>
+            <span class="font-inter text-xs text-[#8A8FA8] font-normal">
+              This week
+            </span>
+          </div>
+
+          <div class="flex justify-between items-center w-full h-8">
+            <!-- Past days (completed) -->
+            <div class="w-8 h-1.5 rounded-full bg-[#7C6FCD] opacity-40"></div>
+            <div class="w-8 h-1.5 rounded-full bg-[#7C6FCD] opacity-60"></div>
+            <div class="w-8 h-1.5 rounded-full bg-[#7C6FCD] opacity-80"></div>
+            <div class="w-8 h-1.5 rounded-full bg-[#7C6FCD]"></div>
+            <!-- Past day (paused/missed) - subdued -->
+            <div class="w-8 h-1.5 rounded-full bg-[#1C2040]"></div>
+            <!-- Today (completed) -->
+            <div class="w-8 h-1.5 rounded-full bg-[#7C6FCD] shadow-[0_0_8px_rgba(124,111,205,0.4)] relative">
+              <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-[#A89CE0] rounded-full"></div>
+            </div>
+            <!-- Future day -->
+            <div class="w-8 h-1.5 rounded-full bg-transparent border border-[#1C2040]"></div>
+          </div>
+        </section>
+      </main>
+
+      <!-- 6. Fixed Bottom Navigation -->
+      <nav class="absolute bottom-0 w-full h-[84px] bg-[#0D0F1A]/90 backdrop-blur-xl border-t border-[#1C2040] flex justify-around items-start pt-2.5 pb-safe z-50 px-2">
+        <!-- Home (Active) -->
+        <button class="flex flex-col items-center gap-1 w-16 group">
+          <div class="relative flex items-center justify-center">
+            <iconify-icon icon="solar:home-smile-linear" class="text-[#7C6FCD] text-2xl transition-transform group-active:scale-95" stroke-width="1.5"></iconify-icon>
+          </div>
+          <span class="text-xs font-medium text-[#7C6FCD]">Home</span>
+        </button>
+
+        <!-- Sleep -->
+        <button class="flex flex-col items-center gap-1 w-16 group">
+          <iconify-icon icon="solar:moon-sleep-linear" class="group-hover:text-[#EEF0FF] text-2xl transition-all group-active:scale-95 text-[#A0A5C0]" stroke-width="1.5"></iconify-icon>
+          <span class="text-xs font-normal group-hover:text-[#EEF0FF] transition-colors text-[#A0A5C0]">
+            Sleep
+          </span>
+        </button>
+
+        <!-- Breathe -->
+        <button class="flex flex-col items-center gap-1 w-16 group">
+          <iconify-icon icon="solar:wind-linear" class="group-hover:text-[#EEF0FF] text-2xl transition-all group-active:scale-95 text-[#A0A5C0]" stroke-width="1.5"></iconify-icon>
+          <span class="text-xs font-normal group-hover:text-[#EEF0FF] transition-colors text-[#A0A5C0]">
+            Breathe
+          </span>
+        </button>
+
+        <!-- Progress -->
+        <button class="flex flex-col items-center gap-1 w-16 group">
+          <iconify-icon icon="solar:chart-linear" class="group-hover:text-[#EEF0FF] text-2xl transition-all group-active:scale-95 text-[#A0A5C0]" stroke-width="1.5"></iconify-icon>
+          <span class="text-xs font-normal group-hover:text-[#EEF0FF] transition-colors text-[#A0A5C0]">
+            Progress
+          </span>
+        </button>
+
+        <!-- Profile -->
+        <button class="flex flex-col items-center gap-1 w-16 group">
+          <iconify-icon icon="solar:user-linear" class="group-hover:text-[#EEF0FF] text-2xl transition-all group-active:scale-95 text-[#A0A5C0]" stroke-width="1.5"></iconify-icon>
+          <span class="text-xs font-normal group-hover:text-[#EEF0FF] transition-colors text-[#A0A5C0]">
+            Profile
+          </span>
+        </button>
+
+        <!-- Bottom Home Indicator for native feel -->
+        <div class="absolute bottom-2 left-1/2 -translate-x-1/2 w-[120px] h-1 bg-[#EEF0FF]/20 rounded-full"></div>
+      </nav>
+
+      <!-- Top Safe Area Gradient / Blur (optional for native feel) -->
+      <div class="absolute top-0 w-full h-10 bg-gradient-to-b from-[#0D0F1A] to-transparent pointer-events-none z-20"></div>
+    </div>
+  
 </body></html>

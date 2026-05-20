@@ -1,6 +1,7 @@
 import { describe, expect, it, jest } from "@jest/globals";
 
 import {
+  completeOnboardingPersonalizationLocally,
   completeFirstSessionLocally,
   createLocalInstallId,
   getOrCreateLocalInstallIdentity,
@@ -13,7 +14,9 @@ function createMockDatabase(firstRow: { local_install_id: string } | null = null
     readonly getFirstAsync: jest.MockedFunction<LocalFirstOnboardingDatabase["getFirstAsync"]>;
   } = {
     runAsync: jest.fn<LocalFirstOnboardingDatabase["runAsync"]>().mockResolvedValue(undefined),
-    getFirstAsync: jest.fn<LocalFirstOnboardingDatabase["getFirstAsync"]>().mockResolvedValue(firstRow),
+    getFirstAsync: jest
+      .fn<LocalFirstOnboardingDatabase["getFirstAsync"]>()
+      .mockResolvedValue(firstRow),
   };
 
   return database;
@@ -34,11 +37,7 @@ describe("local-first onboarding persistence", () => {
     );
     expect(database.runAsync).toHaveBeenCalledWith(
       expect.stringContaining("INSERT INTO local_install_identity"),
-      [
-        "install_0123456789abcdef",
-        "2026-05-18T02:00:00.000Z",
-        "2026-05-18T02:00:00.000Z",
-      ],
+      ["install_0123456789abcdef", "2026-05-18T02:00:00.000Z", "2026-05-18T02:00:00.000Z"],
     );
   });
 
@@ -92,5 +91,100 @@ describe("local-first onboarding persistence", () => {
         "2026-05-18T02:07:01.000Z",
       ],
     );
+  });
+
+  it("persists completed personalization answers with a typed local plan recommendation", async () => {
+    const database = createMockDatabase();
+
+    await expect(
+      completeOnboardingPersonalizationLocally(database, {
+        localInstallId: "install_0123456789abcdef",
+        startedAt: "2026-05-20T01:00:00.000Z",
+        completedAt: "2026-05-20T01:02:00.000Z",
+        goal: "anxiety",
+        sleepBaseline: 2,
+        windDownMinutesAfterMidnight: 21 * 60 + 30,
+        breathworkFamiliarity: "yes",
+        displayName: " Bruno ",
+      }),
+    ).resolves.toMatchObject({
+      breathworkFamiliarity: "yes",
+      displayName: "Bruno",
+      goal: "anxiety",
+      recommendedPlanId: "anxiety_relief",
+      recommendedTechniqueId: "box-breathing",
+      sleepBaseline: 2,
+      windDownMinutesAfterMidnight: 21 * 60 + 30,
+    });
+
+    expect(database.runAsync).toHaveBeenCalledWith(
+      expect.stringContaining("INSERT INTO onboarding_responses"),
+      [
+        "install_0123456789abcdef",
+        "completed",
+        "2026-05-20T01:00:00.000Z",
+        "2026-05-20T01:02:00.000Z",
+        "anxiety",
+        2,
+        21 * 60 + 30,
+        "yes",
+        "Bruno",
+        "anxiety_relief",
+        "box-breathing",
+        240,
+        "2026-05-20T01:02:00.000Z",
+      ],
+    );
+    expect(database.runAsync).toHaveBeenLastCalledWith(
+      expect.stringContaining("INSERT INTO local_event_queue"),
+      [
+        expect.stringMatching(/^event_[A-Za-z0-9_-]{8,64}$/),
+        "install_0123456789abcdef",
+        "onboarding_completed",
+        "onboarding_response",
+        "install_0123456789abcdef",
+        "{}",
+        "2026-05-20T01:02:00.000Z",
+        "2026-05-20T01:02:00.000Z",
+      ],
+    );
+  });
+
+  it("allows display-name skip but rejects unsafe display names before persistence", async () => {
+    const database = createMockDatabase();
+
+    await expect(
+      completeOnboardingPersonalizationLocally(database, {
+        localInstallId: "install_0123456789abcdef",
+        startedAt: "2026-05-20T01:00:00.000Z",
+        completedAt: "2026-05-20T01:02:00.000Z",
+        goal: "curiosity",
+        sleepBaseline: 4,
+        windDownMinutesAfterMidnight: 22 * 60 + 30,
+        breathworkFamiliarity: "new_to_me",
+        displayName: "   ",
+      }),
+    ).resolves.toMatchObject({
+      displayName: undefined,
+      recommendedPlanId: "general_wellness",
+      recommendedTechniqueId: "coherent-breathing",
+    });
+
+    expect(database.runAsync).toHaveBeenCalledTimes(2);
+
+    await expect(
+      completeOnboardingPersonalizationLocally(database, {
+        localInstallId: "install_0123456789abcdef",
+        startedAt: "2026-05-20T01:00:00.000Z",
+        completedAt: "2026-05-20T01:02:00.000Z",
+        goal: "curiosity",
+        sleepBaseline: 4,
+        windDownMinutesAfterMidnight: 22 * 60 + 30,
+        breathworkFamiliarity: "new_to_me",
+        displayName: "A".repeat(41),
+      }),
+    ).rejects.toThrow();
+
+    expect(database.runAsync).toHaveBeenCalledTimes(2);
   });
 });

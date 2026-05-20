@@ -5,6 +5,7 @@ import {
   canShowAccountPrompt,
   canShowPaywall,
   canStartDeferredAnonymousAuth,
+  createPersonalizedOnboardingPlan,
   firstBreathDemo,
   getOnboardingPlanForGoal,
   initialInsightRuleTypes,
@@ -97,7 +98,11 @@ assertEquals(
   ],
 );
 assertEquals(
-  breathworkFamiliarityOptions.map((option) => [option.value, option.label, option.instructionDepth]),
+  breathworkFamiliarityOptions.map((option) => [
+    option.value,
+    option.label,
+    option.instructionDepth,
+  ]),
   [
     ["yes", "Yes", "light"],
     ["new_to_me", "New to me", "gentle"],
@@ -113,6 +118,62 @@ assertEquals(getOnboardingPlanForGoal("sleep").id, "sleep_focused");
 assertEquals(getOnboardingPlanForGoal("anxiety").id, "anxiety_relief");
 assertEquals(getOnboardingPlanForGoal("stress").id, "stress_reset");
 assertEquals(getOnboardingPlanForGoal("curiosity").id, "general_wellness");
+assertEquals(
+  onboardingGoalOptions.map(
+    (option) =>
+      createPersonalizedOnboardingPlan({
+        breathworkFamiliarity: "new_to_me",
+        goal: option.value,
+        sleepBaseline: 4,
+        windDownMinutesAfterMidnight: 22 * 60 + 30,
+      }).id,
+  ),
+  ["sleep_focused", "anxiety_relief", "stress_reset", "general_wellness"],
+);
+assertEquals(
+  createPersonalizedOnboardingPlan({
+    breathworkFamiliarity: "yes",
+    displayName: "Riley",
+    goal: "anxiety",
+    sleepBaseline: 2,
+    windDownMinutesAfterMidnight: 21 * 60 + 30,
+  }),
+  {
+    id: "anxiety_relief",
+    label: "Anxiety Relief",
+    summary: "A steady box-breathing session to make the next breath easier.",
+    greeting: "Riley, your first session is ready",
+    firstSession: {
+      techniqueId: "box-breathing",
+      durationSeconds: 240,
+      title: "4 min guided breathing",
+      guidanceLevel: "light",
+      guidanceLabel: "Light guidance",
+      subtitle: "Light cues for your 9:30 PM wind-down",
+    },
+    answerRows: [
+      { id: "wind_down", label: "Wind-down around 9:30 PM" },
+      { id: "familiarity", label: "Breathwork familiar" },
+      { id: "sleep_baseline", label: "Start gently" },
+    ],
+  },
+);
+assertEquals(
+  createPersonalizedOnboardingPlan({
+    breathworkFamiliarity: "new_to_me",
+    goal: "curiosity",
+    sleepBaseline: 4,
+    windDownMinutesAfterMidnight: 22 * 60 + 30,
+  }).firstSession,
+  {
+    techniqueId: "coherent-breathing",
+    durationSeconds: 240,
+    title: "4 min guided breathing",
+    guidanceLevel: "gentle",
+    guidanceLabel: "Gentle guidance",
+    subtitle: "Gentle cues for your 10:30 PM wind-down",
+  },
+);
 assertEquals(firstBreathDemo.durationSeconds, 30);
 assertEquals(onboardingPlans.general_wellness.firstSession, {
   techniqueId: "coherent-breathing",
@@ -127,10 +188,7 @@ assertEquals(
   canShowPaywall({ hasCompletedFirstFullSession: true, rewardMomentSeen: false }),
   false,
 );
-assertEquals(
-  canShowPaywall({ hasCompletedFirstFullSession: true, rewardMomentSeen: true }),
-  true,
-);
+assertEquals(canShowPaywall({ hasCompletedFirstFullSession: true, rewardMomentSeen: true }), true);
 assertEquals(
   canStartDeferredAnonymousAuth({
     hasCompletedFirstFullSession: true,

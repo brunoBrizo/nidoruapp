@@ -15,18 +15,19 @@ export const launchSoundIdSchema = z.enum(launchSoundIds);
 export const onboardingGoalSchema = z.enum(
   onboardingGoalOptions.map((option) => option.value) as [
     (typeof onboardingGoalOptions)[number]["value"],
-    ...((typeof onboardingGoalOptions)[number]["value"])[],
+    ...(typeof onboardingGoalOptions)[number]["value"][],
   ],
 );
 export const onboardingPlanIdSchema = z.enum(onboardingPlanIds);
 export const breathworkFamiliaritySchema = z.enum(
   breathworkFamiliarityOptions.map((option) => option.value) as [
     (typeof breathworkFamiliarityOptions)[number]["value"],
-    ...((typeof breathworkFamiliarityOptions)[number]["value"])[],
+    ...(typeof breathworkFamiliarityOptions)[number]["value"][],
   ],
 );
 export const onboardingStatusSchema = z.enum(["draft", "completed"]);
 export const firstSessionStatusSchema = z.enum(["draft", "completed", "abandoned"]);
+export const breathSessionPhaseNameSchema = z.enum(["inhale", "hold", "second-inhale", "exhale"]);
 export const postSessionFeelingSchema = z.enum(["same", "better", "much_better"]);
 export const notificationPermissionStateSchema = z.enum([
   "not_shown",
@@ -112,7 +113,11 @@ export const firstSessionRecordSchema = z
     techniqueId: breathTechniqueIdSchema,
     startedAt: isoDateTimeSchema,
     completedAt: isoDateTimeSchema.optional(),
-    durationSeconds: z.number().int().positive().max(60 * 30),
+    durationSeconds: z
+      .number()
+      .int()
+      .positive()
+      .max(60 * 30),
     completedBreathCycles: z.number().int().min(0).optional(),
     completionPersistedAt: isoDateTimeSchema.optional(),
   })
@@ -137,6 +142,31 @@ export const firstSessionRecordSchema = z
       });
     }
   });
+
+export const recoverableFirstSessionDraftSchema = z.object({
+  localInstallId: localInstallIdSchema,
+  sessionId: localRecordIdSchema("session"),
+  status: z.literal("draft"),
+  planId: onboardingPlanIdSchema,
+  techniqueId: breathTechniqueIdSchema,
+  startedAt: isoDateTimeSchema,
+  durationSeconds: z
+    .number()
+    .int()
+    .positive()
+    .max(60 * 30),
+  completedBreathCycles: z.number().int().min(0),
+  elapsedDurationMs: z.number().int().min(0),
+  remainingDurationMs: z.number().int().min(1),
+  currentPhaseName: breathSessionPhaseNameSchema,
+  updatedAt: isoDateTimeSchema,
+});
+
+export const abandonedFirstSessionRecordSchema = recoverableFirstSessionDraftSchema.extend({
+  abandonedAt: isoDateTimeSchema,
+  remainingDurationMs: z.number().int().min(0),
+  status: z.literal("abandoned"),
+});
 
 export const postSessionReflectionSchema = z.object({
   localInstallId: localInstallIdSchema,
@@ -169,6 +199,8 @@ export type BreathSessionDraft = z.infer<typeof breathSessionDraftSchema>;
 export type LocalInstallIdentity = z.infer<typeof localInstallIdentitySchema>;
 export type OnboardingResponse = z.infer<typeof onboardingResponseSchema>;
 export type FirstSessionRecord = z.infer<typeof firstSessionRecordSchema>;
+export type RecoverableFirstSessionDraft = z.infer<typeof recoverableFirstSessionDraftSchema>;
+export type AbandonedFirstSessionRecord = z.infer<typeof abandonedFirstSessionRecordSchema>;
 export type PostSessionReflection = z.infer<typeof postSessionReflectionSchema>;
 export type NotificationGateEligibility = z.infer<typeof notificationGateEligibilitySchema>;
 export type SoundMixLayer = z.infer<typeof soundMixLayerSchema>;

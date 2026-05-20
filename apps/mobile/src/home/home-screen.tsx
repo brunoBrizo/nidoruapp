@@ -123,7 +123,9 @@ export function HomeScreen({ hasMorningCheckIn = true, now = new Date() }: HomeS
         </View>
       </View>
 
-      <View style={[styles.primaryCard, primaryAction.isDistressUrgent && styles.distressPrimaryCard]}>
+      <View
+        style={[styles.primaryCard, primaryAction.isDistressUrgent && styles.distressPrimaryCard]}
+      >
         <View
           pointerEvents="none"
           style={[styles.orbGlow, primaryAction.isDistressUrgent && styles.distressOrbGlow]}
@@ -184,7 +186,11 @@ export function HomeScreen({ hasMorningCheckIn = true, now = new Date() }: HomeS
               {summarySlot.title}
             </Text>
             {summarySlot.kind === "last-night" ? (
-              <Text accessibilityLabel={summarySlot.ratingAccessibilityLabel} selectable style={styles.scorePill}>
+              <Text
+                accessibilityLabel={summarySlot.ratingAccessibilityLabel}
+                selectable
+                style={styles.scorePill}
+              >
                 {summarySlot.ratingText}
               </Text>
             ) : null}
@@ -199,7 +205,9 @@ export function HomeScreen({ hasMorningCheckIn = true, now = new Date() }: HomeS
           </View>
           <Link asChild href={summarySlot.routeTarget}>
             <Pressable
-              accessibilityHint={summarySlot.kind === "check-in" ? summarySlot.accessibilityHint : undefined}
+              accessibilityHint={
+                summarySlot.kind === "check-in" ? summarySlot.accessibilityHint : undefined
+              }
               accessibilityRole="link"
               style={({ pressed }) => [styles.insightLink, pressed && styles.insightLinkPressed]}
             >
@@ -224,10 +232,7 @@ export function HomeScreen({ hasMorningCheckIn = true, now = new Date() }: HomeS
             style={styles.rhythmStrip}
           >
             {rhythm.segments.map((segment) => (
-              <View
-                key={segment.id}
-                style={getRhythmSegmentStyles(segment)}
-              >
+              <View key={segment.id} style={getRhythmSegmentStyles(segment)}>
                 {segment.today ? <View style={styles.todayDot} /> : null}
               </View>
             ))}

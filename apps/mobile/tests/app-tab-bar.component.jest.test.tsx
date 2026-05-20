@@ -46,9 +46,9 @@ describe("AppTabBar", () => {
   it("renders the fixed five tab labels in product order", () => {
     renderTabBar();
 
-    expect(screen.getAllByRole("tab").map((tab) => within(tab).getByText(/.+/).props.children)).toEqual([
-      ...tabLabels,
-    ]);
+    expect(
+      screen.getAllByRole("tab").map((tab) => within(tab).getByText(/.+/).props.children),
+    ).toEqual([...tabLabels]);
   });
 
   it("marks Home as the active landing tab without rendering badges", () => {

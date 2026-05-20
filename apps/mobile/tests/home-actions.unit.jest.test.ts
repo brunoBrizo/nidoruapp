@@ -8,8 +8,7 @@ import {
   selectHomePrimaryAction,
 } from "../src/home/home-actions";
 
-const localDateAt = (hour: number, minute = 0) =>
-  new Date(2026, 0, 1, hour, minute);
+const localDateAt = (hour: number, minute = 0) => new Date(2026, 0, 1, hour, minute);
 
 describe("home actions contract", () => {
   it("keeps the fixed app shell tabs in product order", () => {

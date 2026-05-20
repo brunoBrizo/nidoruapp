@@ -90,11 +90,9 @@ describe("HomeScreen", () => {
     render(<HomeScreen />);
 
     expect(screen.getAllByRole("link", { name: "Start now" })).toHaveLength(1);
-    expect(screen.getAllByLabelText(/quick action$/i).map((action) => action.props.accessibilityLabel)).toEqual([
-      "Rescue Me quick action",
-      "Sounds quick action",
-      "Breathe quick action",
-    ]);
+    expect(
+      screen.getAllByLabelText(/quick action$/i).map((action) => action.props.accessibilityLabel),
+    ).toEqual(["Rescue Me quick action", "Sounds quick action", "Breathe quick action"]);
   });
 
   it("exposes route-aware accessible hints for the persistent quick actions", () => {
@@ -120,13 +118,16 @@ describe("HomeScreen", () => {
     ["12:00", localDateAt(12), "Midday Reset", "Box breathing for stress"],
     ["17:00", localDateAt(17), "Evening Prep", "Transition out of the day"],
     ["20:00", localDateAt(20), "Wind-Down Flow", "4-7-8 breathing and 20 min sounds"],
-  ])("renders only the %s local-time primary action", (_timeLabel, now, expectedLabel, expectedSubtitle) => {
-    render(<HomeScreen now={now} />);
+  ])(
+    "renders only the %s local-time primary action",
+    (_timeLabel, now, expectedLabel, expectedSubtitle) => {
+      render(<HomeScreen now={now} />);
 
-    expect(screen.getByRole("header", { name: expectedLabel })).toBeTruthy();
-    expect(screen.getByText(expectedSubtitle)).toBeTruthy();
-    expect(screen.getAllByRole("link", { name: "Start now" })).toHaveLength(1);
-  });
+      expect(screen.getByRole("header", { name: expectedLabel })).toBeTruthy();
+      expect(screen.getByText(expectedSubtitle)).toBeTruthy();
+      expect(screen.getAllByRole("link", { name: "Start now" })).toHaveLength(1);
+    },
+  );
 
   it("renders a one-tap check-in entry when last-night data is missing", () => {
     render(<HomeScreen hasMorningCheckIn={false} now={localDateAt(8)} />);
@@ -173,8 +174,8 @@ describe("HomeScreen", () => {
       />,
     );
 
-    expect(screen.getAllByRole("tab").map((tab) => within(tab).getByText(/.+/).props.children)).toEqual([
-      ...tabLabels,
-    ]);
+    expect(
+      screen.getAllByRole("tab").map((tab) => within(tab).getByText(/.+/).props.children),
+    ).toEqual([...tabLabels]);
   });
 });

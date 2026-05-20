@@ -1,3 +1,3 @@
-import { OnboardingSplashScreen } from "../onboarding/onboarding-splash-screen";
+import { OnboardingFlowScreen } from "../onboarding/onboarding-flow-screen";
 
-export default OnboardingSplashScreen;
+export default OnboardingFlowScreen;

@@ -234,6 +234,39 @@ export type OnboardingPlan = {
   readonly firstSession: FirstSessionRecommendation;
 };
 
+export type PersonalizedPlanAnswerRowId = "wind_down" | "familiarity" | "sleep_baseline";
+
+export type PersonalizedPlanAnswerRow = {
+  readonly id: PersonalizedPlanAnswerRowId;
+  readonly label: string;
+};
+
+export type PersonalizedFirstSessionRecommendation = FirstSessionRecommendation & {
+  readonly guidanceLabel: string;
+  readonly subtitle: string;
+};
+
+export type PersonalizedOnboardingPlan = {
+  readonly id: OnboardingPlanId;
+  readonly label: string;
+  readonly summary: string;
+  readonly greeting: string;
+  readonly firstSession: PersonalizedFirstSessionRecommendation;
+  readonly answerRows: readonly [
+    PersonalizedPlanAnswerRow,
+    PersonalizedPlanAnswerRow,
+    PersonalizedPlanAnswerRow,
+  ];
+};
+
+export type PersonalizedOnboardingPlanInput = {
+  readonly breathworkFamiliarity: BreathworkFamiliarity;
+  readonly displayName?: string | undefined;
+  readonly goal: OnboardingGoal;
+  readonly sleepBaseline: SleepBaseline;
+  readonly windDownMinutesAfterMidnight: number;
+};
+
 export const onboardingPlans = {
   sleep_focused: {
     id: "sleep_focused",
@@ -287,6 +320,102 @@ const onboardingPlanIdByGoal = Object.fromEntries(
 
 export function getOnboardingPlanForGoal(goal: OnboardingGoal): OnboardingPlan {
   return onboardingPlans[onboardingPlanIdByGoal[goal]];
+}
+
+const sleepBaselinePlanCopy = {
+  1: "Start extra gentle",
+  2: "Start gently",
+  3: "Start balanced",
+  4: "Start simple",
+  5: "Keep it light",
+} as const satisfies Record<SleepBaseline, string>;
+
+const familiarityPlanCopy = {
+  yes: {
+    guidanceLabel: "Light guidance",
+    label: "Breathwork familiar",
+    subtitlePrefix: "Light cues",
+  },
+  new_to_me: {
+    guidanceLabel: "Gentle guidance",
+    label: "New to breathwork",
+    subtitlePrefix: "Gentle cues",
+  },
+} as const satisfies Record<
+  BreathworkFamiliarity,
+  {
+    readonly guidanceLabel: string;
+    readonly label: string;
+    readonly subtitlePrefix: string;
+  }
+>;
+
+export function createPersonalizedOnboardingPlan({
+  breathworkFamiliarity,
+  displayName,
+  goal,
+  sleepBaseline,
+  windDownMinutesAfterMidnight,
+}: PersonalizedOnboardingPlanInput): PersonalizedOnboardingPlan {
+  const plan = getOnboardingPlanForGoal(goal);
+  const familiarityCopy = familiarityPlanCopy[breathworkFamiliarity];
+  const windDownTime = formatWindDownTime(windDownMinutesAfterMidnight);
+  const normalizedDisplayName = normalizeOptionalDisplayName(displayName);
+
+  return {
+    id: plan.id,
+    label: plan.label,
+    summary: plan.summary,
+    greeting: normalizedDisplayName
+      ? `${normalizedDisplayName}, your first session is ready`
+      : "Your first session is ready",
+    firstSession: {
+      ...plan.firstSession,
+      guidanceLevel: getInstructionDepthForFamiliarity(breathworkFamiliarity),
+      guidanceLabel: familiarityCopy.guidanceLabel,
+      subtitle: `${familiarityCopy.subtitlePrefix} for your ${windDownTime} wind-down`,
+    },
+    answerRows: [
+      { id: "wind_down", label: `Wind-down around ${windDownTime}` },
+      { id: "familiarity", label: familiarityCopy.label },
+      { id: "sleep_baseline", label: sleepBaselinePlanCopy[sleepBaseline] },
+    ],
+  };
+}
+
+function getInstructionDepthForFamiliarity(
+  breathworkFamiliarity: BreathworkFamiliarity,
+): BreathworkInstructionDepth {
+  return (
+    breathworkFamiliarityOptions.find((option) => option.value === breathworkFamiliarity)
+      ?.instructionDepth ?? "gentle"
+  );
+}
+
+function formatWindDownTime(minutesAfterMidnight: number): string {
+  const boundedMinutes = Math.max(0, Math.min(1439, Math.trunc(minutesAfterMidnight)));
+  const hour24 = Math.floor(boundedMinutes / 60);
+  const minute = boundedMinutes % 60;
+  const period = hour24 >= 12 ? "PM" : "AM";
+  const hour12 = hour24 % 12 === 0 ? 12 : hour24 % 12;
+
+  return `${hour12}:${minute.toString().padStart(2, "0")} ${period}`;
+}
+
+function normalizeOptionalDisplayName(displayName: string | undefined): string | undefined {
+  const trimmedDisplayName = displayName?.trim();
+
+  if (!trimmedDisplayName) {
+    return undefined;
+  }
+
+  const hasControlCharacter = Array.from(trimmedDisplayName).some((character) => {
+    const characterCode = character.charCodeAt(0);
+
+    return characterCode <= 31 || characterCode === 127;
+  });
+
+  return hasControlCharacter ? undefined : trimmedDisplayName.slice(0, 40);
 }
 
 export const firstBreathDemo = {

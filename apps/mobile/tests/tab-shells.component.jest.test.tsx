@@ -70,9 +70,9 @@ describe("tab entry shells", () => {
     renderTabBar(2);
 
     expect(screen.getByTestId("tab-active-indicator")).toBeTruthy();
-    expect(screen.getAllByRole("tab").map((tab) => within(tab).getByText(/.+/).props.children)).toEqual([
-      ...tabLabels,
-    ]);
+    expect(
+      screen.getAllByRole("tab").map((tab) => within(tab).getByText(/.+/).props.children),
+    ).toEqual([...tabLabels]);
     expect(screen.getByRole("tab", { name: "Breathe tab" })).toHaveProp("accessibilityState", {
       selected: true,
     });
@@ -123,6 +123,10 @@ describe("tab entry shells", () => {
     expect(screen.getByRole("link", { name: "Sound Preferences" })).toBeTruthy();
     expect(screen.getByRole("link", { name: "Support" })).toBeTruthy();
     expect(screen.getByRole("link", { name: "Privacy Controls" })).toBeTruthy();
-    expect(screen.queryByText(/connect account|enable notifications|manage billing|contact support now/i)).toBeNull();
+    expect(
+      screen.queryByText(
+        /connect account|enable notifications|manage billing|contact support now/i,
+      ),
+    ).toBeNull();
   });
 });

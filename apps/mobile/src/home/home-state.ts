@@ -1,4 +1,8 @@
-import { createLocalHomeState, type HomeRouteTarget, type LocalHomeStateInput } from "./home-actions";
+import {
+  createLocalHomeState,
+  type HomeRouteTarget,
+  type LocalHomeStateInput,
+} from "./home-actions";
 
 export type HomeSummarySlot =
   | {
@@ -71,7 +75,8 @@ const localFallbackRhythm: HomeRhythmState = {
   title: "Your sleep rhythm",
   meta: "This week",
   streakText: "8 days",
-  accessibilityLabel: "Sleep rhythm strip for this week: five settled days, one rest day, and today in progress.",
+  accessibilityLabel:
+    "Sleep rhythm strip for this week: five settled days, one rest day, and today in progress.",
   compassionateCopy: "A steady week, with room to rest.",
   segments: [
     { id: "day-1", opacity: 0.4, filled: true, today: false },

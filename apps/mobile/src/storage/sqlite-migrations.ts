@@ -140,6 +140,30 @@ export const sqliteMigrations = [
         ON local_event_queue (status, next_attempt_at, created_at);
     `,
   },
+  {
+    id: "0003_first_session_recovery_progress",
+    sql: `
+      ALTER TABLE first_session_records
+        ADD COLUMN elapsed_ms INTEGER CHECK (elapsed_ms IS NULL OR elapsed_ms >= 0);
+
+      ALTER TABLE first_session_records
+        ADD COLUMN remaining_ms INTEGER CHECK (remaining_ms IS NULL OR remaining_ms >= 0);
+
+      ALTER TABLE first_session_records
+        ADD COLUMN current_phase TEXT CHECK (
+          current_phase IS NULL OR current_phase IN ('inhale', 'hold', 'second-inhale', 'exhale')
+        );
+
+      ALTER TABLE first_session_records
+        ADD COLUMN abandoned_at TEXT;
+
+      ALTER TABLE first_session_records
+        ADD COLUMN updated_at TEXT;
+
+      CREATE INDEX first_session_records_recovery_idx
+        ON first_session_records (local_install_id, status, updated_at);
+    `,
+  },
 ] as const satisfies readonly SQLiteMigration[];
 
 export async function runSqliteMigrations(

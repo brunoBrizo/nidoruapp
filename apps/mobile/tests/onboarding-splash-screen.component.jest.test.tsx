@@ -25,7 +25,9 @@ describe("OnboardingSplashScreen", () => {
       backgroundColor: ONBOARDING_SPLASH_BACKGROUND_COLOR,
       flex: 1,
     });
-    expect(StyleSheet.flatten(screen.getByTestId("onboarding-splash-wordmark").props.style)).toMatchObject({
+    expect(
+      StyleSheet.flatten(screen.getByTestId("onboarding-splash-wordmark").props.style),
+    ).toMatchObject({
       fontFamily: "Nunito-600",
     });
     expect(screen.getByRole("header", { name: "nidoru" })).toBeTruthy();

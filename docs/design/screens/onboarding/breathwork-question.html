@@ -1,0 +1,156 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>nidoru - Breathwork Familiarity</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600&amp;display=swap" rel="stylesheet">
+    <style>
+      body {
+        font-family: 'Nunito', sans-serif;
+        background-color: #0D0F1A;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        margin: 0;
+        padding: 0;
+      }
+
+      /* Screen Entrance */
+      @keyframes fade-up-enter {
+        0% { opacity: 0; transform: translateY(12px); }
+        100% { opacity: 1; transform: translateY(0); }
+      }
+      .animate-fade-up {
+        animation: fade-up-enter 0.4s cubic-bezier(0.2, 0, 0, 1) forwards;
+      }
+
+      /* Element Staggered Entrance */
+      @keyframes element-enter {
+        0% { opacity: 0; transform: translateY(8px); }
+        100% { opacity: 1; transform: translateY(0); }
+      }
+      .animate-element {
+        opacity: 0;
+        animation: element-enter 0.5s cubic-bezier(0.2, 0, 0, 1) forwards;
+      }
+      .delay-75 { animation-delay: 75ms; }
+      .delay-150 { animation-delay: 150ms; }
+      .delay-250 { animation-delay: 250ms; }
+
+      /* Soft Curtain Exit */
+      @keyframes curtain-exit {
+        0% { opacity: 1; transform: translateY(0); }
+        100% { opacity: 0; transform: translateY(-12px); }
+      }
+      .animate-curtain-exit {
+        animation: curtain-exit 0.6s ease-in forwards;
+        pointer-events: none;
+      }
+    </style>
+  </head>
+  <body class="flex items-center justify-center min-h-screen text-[#EEF0FF]">
+    <!-- Native Screen Canvas (390x844), Flat/No Chrome -->
+    <div id="screen-container" class="w-full max-w-[390px] min-h-screen bg-[#0D0F1A] relative flex flex-col animate-fade-up select-none overflow-hidden mx-auto shadow-2xl">
+      <!-- Top Area: Header & Context -->
+      <div class="px-6 pt-14 pb-6">
+        <div class="flex items-center justify-between mb-8 w-full">
+          <div class="flex items-center gap-1.5 w-24">
+            <div class="h-1 flex-1 bg-[#A89CE0] rounded-full"></div>
+            <div class="h-1 flex-1 bg-[#A89CE0] rounded-full"></div>
+            <div class="h-1 flex-1 bg-[#A89CE0] rounded-full"></div>
+            <div class="h-1 flex-1 bg-[#A89CE0] rounded-full"></div>
+            <div class="h-1 flex-1 bg-[#232743] rounded-full"></div>
+          </div>
+          <span class="text-[13px] text-[#8A8FA8] font-medium tracking-wide">
+            4 of 5
+          </span>
+        </div>
+        <h1 class="text-2xl font-semibold text-[#EEF0FF] tracking-tight mb-3 leading-tight">
+          Have you tried breathwork before?
+        </h1>
+        <p class="text-[15px] text-[#8A8FA8] leading-relaxed">
+          We’ll match the guidance to you.
+        </p>
+      </div>
+
+      <!-- Main Area: Binary Choice Cards -->
+      <div class="px-6 flex-1 flex flex-col gap-4 mt-2">
+        <!-- Option 1: Yes -->
+        <button class="choice-card group w-full text-left bg-[#14172B] border border-transparent rounded-[20px] p-5 flex items-start gap-[18px] transition-all duration-300 ease-out aria-selected:bg-[#16192E] aria-selected:border-[#A89CE0]/30 aria-selected:shadow-[0_8px_24px_-8px_rgba(168,156,224,0.2)] active:scale-[0.96] outline-none animate-element delay-75" aria-selected="false">
+          <div class="w-11 h-11 shrink-0 rounded-full bg-[#1C2040] flex items-center justify-center text-[#4A4E6A] group-aria-selected:text-[#A89CE0] group-aria-selected:bg-[#7C6FCD]/15 group-hover:text-[#8A8FA8] transition-colors duration-300">
+            <iconify-icon icon="lucide:infinity" width="24" height="24"></iconify-icon>
+          </div>
+          <div class="flex flex-col pt-0.5">
+            <span class="text-[17px] font-semibold text-[#EEF0FF] mb-1">
+              Yes
+            </span>
+            <span class="text-[14px] text-[#8A8FA8]">Keep cues light.</span>
+          </div>
+        </button>
+
+        <!-- Option 2: New to me -->
+        <button class="choice-card group w-full text-left bg-[#14172B] border border-transparent rounded-[20px] p-5 flex items-start gap-[18px] transition-all duration-300 ease-out aria-selected:bg-[#16192E] aria-selected:border-[#A89CE0]/30 aria-selected:shadow-[0_8px_24px_-8px_rgba(168,156,224,0.2)] active:scale-[0.96] outline-none animate-element delay-150" aria-selected="true">
+          <div class="w-11 h-11 shrink-0 rounded-full bg-[#1C2040] flex items-center justify-center text-[#4A4E6A] group-aria-selected:text-[#A89CE0] group-aria-selected:bg-[#7C6FCD]/15 group-hover:text-[#8A8FA8] transition-colors duration-300">
+            <iconify-icon icon="lucide:circle-dot" width="24" height="24"></iconify-icon>
+          </div>
+          <div class="flex flex-col pt-0.5">
+            <span class="text-[17px] font-semibold text-[#EEF0FF] mb-1">
+              New to me
+            </span>
+            <span class="text-[14px] text-[#8A8FA8]">Guide me gently.</span>
+          </div>
+        </button>
+      </div>
+
+      <!-- Bottom Area: Quiet CTA -->
+      <!-- Pre-rendered visible because "New to me" is selected by default based on spec -->
+      <div class="px-6 pb-16 mt-auto animate-element delay-250">
+        <button id="continue-btn" class="w-full bg-[#1C2040] hover:bg-[#232743] text-[#EEF0FF] text-[15px] font-medium py-4 rounded-[20px] transition-all duration-300 ease-out active:scale-[0.98] shadow-[0_4px_12px_rgba(0,0,0,0.1),inset_0_1px_0_0_rgba(255,255,255,0.02)] opacity-100 translate-y-0">
+          Continue
+        </button>
+      </div>
+    </div>
+
+    <!-- Interaction Script -->
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const cards = document.querySelectorAll('.choice-card');
+        const continueBtn = document.getElementById('continue-btn');
+        const screenContainer = document.getElementById('screen-container');
+
+        let hasSelection = true; // Set to true initially as second option is pre-selected
+
+        cards.forEach(card => {
+          card.addEventListener('click', () => {
+            // Deselect all
+            cards.forEach(c => c.setAttribute('aria-selected', 'false'));
+
+            // Select chosen
+            card.setAttribute('aria-selected', 'true');
+
+            // Reveal continue button if it wasn't visible
+            if (!hasSelection) {
+              hasSelection = true;
+              continueBtn.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
+              continueBtn.classList.add('opacity-100', 'translate-y-0');
+            }
+          });
+        });
+
+        // Handle auto-advance curtain exit
+        continueBtn.addEventListener('click', () => {
+          if (!hasSelection) return;
+
+          screenContainer.classList.add('animate-curtain-exit');
+
+          // Mimicking the transition to Screen 7 (Optional name question)
+          setTimeout(() => {
+            console.log("Proceed to final onboarding question...");
+          }, 600);
+        });
+      });
+    </script>
+  
+</body></html>

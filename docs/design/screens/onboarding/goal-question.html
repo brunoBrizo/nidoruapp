@@ -1,0 +1,196 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>nidoru - What brings you here?</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600&amp;display=swap" rel="stylesheet">
+    <style>
+      body {
+        font-family: 'Nunito', sans-serif;
+        background-color: #0D0F1A;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        margin: 0;
+        padding: 0;
+      }
+
+      /* Screen Entrance */
+      @keyframes fade-up-enter {
+        0% { opacity: 0; transform: translateY(12px); }
+        100% { opacity: 1; transform: translateY(0); }
+      }
+      .animate-fade-up {
+        animation: fade-up-enter 0.4s cubic-bezier(0.2, 0, 0, 1) forwards;
+      }
+
+      /* Tile Staggered Entrance */
+      @keyframes tile-enter {
+        0% { opacity: 0; transform: translateY(8px); }
+        100% { opacity: 1; transform: translateY(0); }
+      }
+      .animate-tile {
+        opacity: 0;
+        animation: tile-enter 0.4s cubic-bezier(0.2, 0, 0, 1) forwards;
+      }
+      .delay-100 { animation-delay: 100ms; }
+      .delay-200 { animation-delay: 200ms; }
+      .delay-300 { animation-delay: 300ms; }
+      .delay-400 { animation-delay: 400ms; }
+
+      /* Soft Curtain Exit */
+      @keyframes curtain-exit {
+        0% { opacity: 1; transform: translateY(0); }
+        100% { opacity: 0; transform: translateY(-12px); }
+      }
+      .animate-curtain-exit {
+        animation: curtain-exit 0.6s ease-in forwards;
+        pointer-events: none;
+      }
+    </style>
+  </head>
+  <body class="flex items-center justify-center min-h-screen text-[#EEF0FF]">
+    <!-- Native Screen Canvas (390x844), Flat/No Chrome -->
+    <div id="screen-container" class="w-full min-h-screen bg-[#0D0F1A] relative flex flex-col animate-fade-up select-none">
+      <!-- Top Area: Header & Context -->
+      <div class="px-6 pt-14 pb-6">
+        <div class="flex items-center justify-between mb-8 w-full">
+          <div class="flex items-center gap-1.5 w-24">
+            <div class="h-1 flex-1 bg-[#A89CE0] rounded-full"></div>
+            <div class="h-1 flex-1 bg-[#232743] rounded-full"></div>
+            <div class="h-1 flex-1 bg-[#232743] rounded-full"></div>
+            <div class="h-1 flex-1 bg-[#232743] rounded-full"></div>
+            <div class="h-1 flex-1 bg-[#232743] rounded-full"></div>
+          </div>
+          <span class="text-[13px] text-[#8A8FA8] font-medium tracking-wide">
+            1 of 5
+          </span>
+        </div>
+        <h1 class="text-[28px] font-semibold text-[#EEF0FF] tracking-tight mb-3 leading-tight">
+          What brings you here?
+        </h1>
+        <p class="text-[17px] text-[#8A8FA8] leading-relaxed">
+          We’ll shape your first session around this.
+        </p>
+      </div>
+
+      <!-- Middle Area: Option Tiles -->
+      <div class="px-6 grid grid-cols-2 gap-4 flex-1 content-start">
+        <!-- Tile 1: Sleep Focused -->
+        <button class="goal-tile animate-tile delay-100 group text-left bg-[#14172B] rounded-[24px] p-5 flex flex-col transition-all duration-300 active:scale-[0.96] aria-selected:bg-[#1A1E36] aria-selected:shadow-[inset_0_0_0_1px_rgba(168,156,224,0.25),0_8px_20px_rgba(168,156,224,0.08)] outline-none relative overflow-hidden" aria-selected="false">
+          <div class="absolute inset-0 bg-gradient-to-b from-[#A89CE0]/10 to-transparent opacity-0 group-aria-selected:opacity-100 transition-opacity duration-500"></div>
+          <div class="w-12 h-12 flex items-center justify-center text-[#8A8FA8] group-aria-selected:text-[#A89CE0] transition-all duration-300 mb-6 relative z-10">
+            <div class="absolute inset-0 bg-[#1C2040] rounded-full group-aria-selected:bg-[#7C6FCD]/20 transition-colors"></div>
+            <div class="absolute inset-0 bg-[#7C6FCD] blur-[12px] opacity-0 group-aria-selected:opacity-25 rounded-full transition-opacity duration-500"></div>
+            <iconify-icon icon="lucide:moon" class="text-2xl relative z-10"></iconify-icon>
+          </div>
+          <div class="relative z-10">
+            <h2 class="text-base font-medium text-[#EEF0FF] mb-1">
+              Sleep better
+            </h2>
+            <p class="text-[13px] text-[#8A8FA8] leading-relaxed group-aria-selected:text-[#B5B9D1] transition-colors">
+              Wind down tonight.
+            </p>
+          </div>
+        </button>
+
+        <!-- Tile 2: Anxiety Relief -->
+        <button class="goal-tile animate-tile delay-200 group text-left bg-[#14172B] rounded-[24px] p-5 flex flex-col transition-all duration-300 active:scale-[0.96] aria-selected:bg-[#1A1E36] aria-selected:shadow-[inset_0_0_0_1px_rgba(168,156,224,0.25),0_8px_20px_rgba(168,156,224,0.08)] outline-none relative overflow-hidden" aria-selected="false">
+          <div class="absolute inset-0 bg-gradient-to-b from-[#A89CE0]/10 to-transparent opacity-0 group-aria-selected:opacity-100 transition-opacity duration-500"></div>
+          <div class="w-12 h-12 flex items-center justify-center text-[#8A8FA8] group-aria-selected:text-[#A89CE0] transition-all duration-300 mb-6 relative z-10">
+            <div class="absolute inset-0 bg-[#1C2040] rounded-full group-aria-selected:bg-[#7C6FCD]/20 transition-colors"></div>
+            <div class="absolute inset-0 bg-[#7C6FCD] blur-[12px] opacity-0 group-aria-selected:opacity-25 rounded-full transition-opacity duration-500"></div>
+            <iconify-icon icon="lucide:wind" class="text-2xl relative z-10"></iconify-icon>
+          </div>
+          <div class="relative z-10">
+            <h2 class="text-base font-medium text-[#EEF0FF] mb-1">
+              Ease anxiety
+            </h2>
+            <p class="text-[13px] text-[#8A8FA8] leading-relaxed group-aria-selected:text-[#B5B9D1] transition-colors">
+              Find steadier breath.
+            </p>
+          </div>
+        </button>
+
+        <!-- Tile 3: Stress Reset -->
+        <button class="goal-tile animate-tile delay-300 group text-left bg-[#14172B] rounded-[24px] p-5 flex flex-col transition-all duration-300 active:scale-[0.96] aria-selected:bg-[#1A1E36] aria-selected:shadow-[inset_0_0_0_1px_rgba(168,156,224,0.25),0_8px_20px_rgba(168,156,224,0.08)] outline-none relative overflow-hidden" aria-selected="false">
+          <div class="absolute inset-0 bg-gradient-to-b from-[#A89CE0]/10 to-transparent opacity-0 group-aria-selected:opacity-100 transition-opacity duration-500"></div>
+          <div class="w-12 h-12 flex items-center justify-center text-[#8A8FA8] group-aria-selected:text-[#A89CE0] transition-all duration-300 mb-6 relative z-10">
+            <div class="absolute inset-0 bg-[#1C2040] rounded-full group-aria-selected:bg-[#7C6FCD]/20 transition-colors"></div>
+            <div class="absolute inset-0 bg-[#7C6FCD] blur-[12px] opacity-0 group-aria-selected:opacity-25 rounded-full transition-opacity duration-500"></div>
+            <iconify-icon icon="lucide:leaf" class="text-2xl relative z-10"></iconify-icon>
+          </div>
+          <div class="relative z-10">
+            <h2 class="text-base font-medium text-[#EEF0FF] mb-1">
+              Reset stress
+            </h2>
+            <p class="text-[13px] text-[#8A8FA8] leading-relaxed group-aria-selected:text-[#B5B9D1] transition-colors">
+              Let the day settle.
+            </p>
+          </div>
+        </button>
+
+        <!-- Tile 4: General Wellness -->
+        <button class="goal-tile animate-tile delay-400 group text-left bg-[#14172B] rounded-[24px] p-5 flex flex-col transition-all duration-300 active:scale-[0.96] aria-selected:bg-[#1A1E36] aria-selected:shadow-[inset_0_0_0_1px_rgba(168,156,224,0.25),0_8px_20px_rgba(168,156,224,0.08)] outline-none relative overflow-hidden" aria-selected="false">
+          <div class="absolute inset-0 bg-gradient-to-b from-[#A89CE0]/10 to-transparent opacity-0 group-aria-selected:opacity-100 transition-opacity duration-500"></div>
+          <div class="w-12 h-12 flex items-center justify-center text-[#8A8FA8] group-aria-selected:text-[#A89CE0] transition-all duration-300 mb-6 relative z-10">
+            <div class="absolute inset-0 bg-[#1C2040] rounded-full group-aria-selected:bg-[#7C6FCD]/20 transition-colors"></div>
+            <div class="absolute inset-0 bg-[#7C6FCD] blur-[12px] opacity-0 group-aria-selected:opacity-25 rounded-full transition-opacity duration-500"></div>
+            <iconify-icon icon="lucide:sparkles" class="text-2xl relative z-10"></iconify-icon>
+          </div>
+          <div class="relative z-10">
+            <h2 class="text-base font-medium text-[#EEF0FF] mb-1">
+              Just exploring
+            </h2>
+            <p class="text-[13px] text-[#8A8FA8] leading-relaxed group-aria-selected:text-[#B5B9D1] transition-colors">
+              Start simple.
+            </p>
+          </div>
+        </button>
+      </div>
+
+      <!-- Bottom Area: Quiet CTA -->
+      <div class="px-6 pb-16 mt-auto">
+        <button id="continue-btn" class="w-full bg-[#1C2040] hover:bg-[#232743] text-[#EEF0FF] text-base font-medium py-4 rounded-[20px] transition-all duration-300 ease-out active:scale-[0.98] opacity-0 translate-y-4 pointer-events-none">
+          Continue
+        </button>
+      </div>
+    </div>
+
+    <!-- Interaction Script -->
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const tiles = document.querySelectorAll('.goal-tile');
+        const continueBtn = document.getElementById('continue-btn');
+        const screenContainer = document.getElementById('screen-container');
+
+        // Handle tile selection
+        tiles.forEach(tile => {
+          tile.addEventListener('click', () => {
+            // Reset all tiles
+            tiles.forEach(t => t.setAttribute('aria-selected', 'false'));
+
+            // Activate selected tile
+            tile.setAttribute('aria-selected', 'true');
+
+            // Reveal continue button gracefully
+            continueBtn.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
+            continueBtn.classList.add('opacity-100', 'translate-y-0', 'pointer-events-auto');
+          });
+        });
+
+        // Handle auto-advance curtain exit
+        continueBtn.addEventListener('click', () => {
+          screenContainer.classList.add('animate-curtain-exit');
+
+          // Mimicking the transition to Screen 4
+          setTimeout(() => {
+            console.log("Proceed to next onboarding screen...");
+          }, 600);
+        });
+      });
+    </script>
+  
+</body></html>

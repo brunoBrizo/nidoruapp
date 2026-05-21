@@ -219,7 +219,6 @@ export async function linkPostValueAccount(
     userId,
     nowIso,
   });
-  await mapLocalRecordsToUser(database, { localInstallId, userId });
 
   try {
     await input.syncLocalRecords({ localInstallId, userId });
@@ -228,6 +227,14 @@ export async function linkPostValueAccount(
       localInstallId,
       nowIso,
       syncStatus: "retry_pending",
+    });
+    await recordAccountLinkAttempt(database, {
+      localInstallId,
+      provider: input.provider,
+      stage: "sync_failed",
+      status: "retry_pending",
+      userId,
+      nowIso,
     });
 
     return {
@@ -238,6 +245,7 @@ export async function linkPostValueAccount(
     };
   }
 
+  await mapLocalRecordsToUser(database, { localInstallId, userId });
   await updateLocalAccountLinkSyncStatus(database, {
     localInstallId,
     nowIso,

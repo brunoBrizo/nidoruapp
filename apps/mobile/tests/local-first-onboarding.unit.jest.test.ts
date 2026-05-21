@@ -5,11 +5,15 @@ import {
   completeFirstSessionLocally,
   createLocalInstallId,
   getOrCreateLocalInstallIdentity,
+  hasCompletedOnboardingPersonalization,
   loadNotificationGateReadiness,
   loadPendingPostSessionReflection,
   markNotificationPermissionAccepted,
   markNotificationPermissionDeclined,
   markNotificationPermissionPrompted,
+  recordFirstBreathDemoEventLocally,
+  recordFirstSessionStartedLocally,
+  recordOnboardingStartedLocally,
   savePostSessionReflectionLocally,
   type LocalFirstOnboardingDatabase,
 } from "../src/onboarding/local-first-onboarding";
@@ -64,6 +68,130 @@ describe("local-first onboarding persistence", () => {
 
   it("builds install IDs in the allowlisted local format", () => {
     expect(createLocalInstallId(() => "ABC_123-xyz")).toBe("install_ABC_123-xyz");
+  });
+
+  it("detects whether the local install already completed onboarding personalization", async () => {
+    const completedDatabase = createMockDatabase({ status: "completed" });
+    const incompleteDatabase = createMockDatabase(null);
+
+    await expect(
+      hasCompletedOnboardingPersonalization(completedDatabase, {
+        localInstallId: "install_0123456789abcdef",
+      }),
+    ).resolves.toBe(true);
+    await expect(
+      hasCompletedOnboardingPersonalization(incompleteDatabase, {
+        localInstallId: "install_0123456789abcdef",
+      }),
+    ).resolves.toBe(false);
+    expect(completedDatabase.getFirstAsync).toHaveBeenCalledWith(
+      expect.stringContaining("FROM onboarding_responses"),
+      ["install_0123456789abcdef"],
+    );
+  });
+
+  it("queues onboarding start and first-breath events with privacy-empty payloads", async () => {
+    const database = createMockDatabase();
+
+    await recordOnboardingStartedLocally(database, {
+      eventId: "event_onboarding_start",
+      localInstallId: "install_0123456789abcdef",
+      startedAt: "2026-05-20T01:00:00.000Z",
+    });
+    await recordFirstBreathDemoEventLocally(database, {
+      elapsedSeconds: 0,
+      eventId: "event_first_breath_start",
+      eventType: "started",
+      localInstallId: "install_0123456789abcdef",
+      occurredAt: "2026-05-20T01:00:02.000Z",
+      queueEventId: "event_first_breath_started_queue",
+    });
+    await recordFirstBreathDemoEventLocally(database, {
+      elapsedSeconds: 30,
+      eventId: "event_first_breath_complete",
+      eventType: "completed",
+      localInstallId: "install_0123456789abcdef",
+      occurredAt: "2026-05-20T01:00:32.000Z",
+      queueEventId: "event_first_breath_completed_queue",
+    });
+
+    expect(database.runAsync).toHaveBeenNthCalledWith(
+      1,
+      expect.stringContaining("INSERT INTO local_event_queue"),
+      [
+        "event_onboarding_start",
+        "install_0123456789abcdef",
+        "onboarding_started",
+        "onboarding_response",
+        "install_0123456789abcdef",
+        "{}",
+        "2026-05-20T01:00:00.000Z",
+        "2026-05-20T01:00:00.000Z",
+      ],
+    );
+    expect(database.runAsync).toHaveBeenNthCalledWith(
+      2,
+      expect.stringContaining("INSERT INTO first_breath_demo_events"),
+      [
+        "event_first_breath_start",
+        "install_0123456789abcdef",
+        "started",
+        "2026-05-20T01:00:02.000Z",
+        0,
+      ],
+    );
+    expect(database.runAsync).toHaveBeenNthCalledWith(
+      3,
+      expect.stringContaining("INSERT INTO local_event_queue"),
+      [
+        "event_first_breath_started_queue",
+        "install_0123456789abcdef",
+        "first_breath_started",
+        "first_breath_demo_event",
+        "event_first_breath_start",
+        "{}",
+        "2026-05-20T01:00:02.000Z",
+        "2026-05-20T01:00:02.000Z",
+      ],
+    );
+    expect(database.runAsync).toHaveBeenLastCalledWith(
+      expect.stringContaining("INSERT INTO local_event_queue"),
+      [
+        "event_first_breath_completed_queue",
+        "install_0123456789abcdef",
+        "first_breath_completed",
+        "first_breath_demo_event",
+        "event_first_breath_complete",
+        "{}",
+        "2026-05-20T01:00:32.000Z",
+        "2026-05-20T01:00:32.000Z",
+      ],
+    );
+  });
+
+  it("queues first-session start before completion without sensitive session payloads", async () => {
+    const database = createMockDatabase();
+
+    await recordFirstSessionStartedLocally(database, {
+      eventId: "event_first_session_started",
+      localInstallId: "install_0123456789abcdef",
+      sessionId: "session_0123456789abcdef",
+      startedAt: "2026-05-20T01:01:00.000Z",
+    });
+
+    expect(database.runAsync).toHaveBeenCalledWith(
+      expect.stringContaining("INSERT INTO local_event_queue"),
+      [
+        "event_first_session_started",
+        "install_0123456789abcdef",
+        "first_session_started",
+        "first_session_record",
+        "session_0123456789abcdef",
+        "{}",
+        "2026-05-20T01:01:00.000Z",
+        "2026-05-20T01:01:00.000Z",
+      ],
+    );
   });
 
   it("persists first-session completion before queueing the completion event", async () => {

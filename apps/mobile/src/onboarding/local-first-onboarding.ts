@@ -80,6 +80,22 @@ type NotificationGateEligibilityRow = {
   readonly wind_down_minutes_after_midnight: number | null;
 };
 
+type LocalEventName =
+  | "onboarding_started"
+  | "onboarding_completed"
+  | "first_breath_started"
+  | "first_breath_completed"
+  | "first_session_started"
+  | "first_session_completed"
+  | "notification_permission_prompted"
+  | "notification_permission_accepted";
+
+type LocalEventRecordType =
+  | "onboarding_response"
+  | "first_breath_demo_event"
+  | "first_session_record"
+  | "notification_gate_state";
+
 export type NotificationGateReadiness = {
   readonly eligibility: NotificationGateEligibility;
   readonly lastOpenedAt: Date | null;
@@ -113,6 +129,28 @@ export type OnboardingPersonalizationInput = {
   readonly windDownMinutesAfterMidnight: number;
 };
 
+export type OnboardingStartedInput = {
+  readonly eventId?: string;
+  readonly localInstallId: string;
+  readonly startedAt: string;
+};
+
+export type FirstBreathDemoEventInput = {
+  readonly elapsedSeconds: number;
+  readonly eventId?: string;
+  readonly eventType: "started" | "completed";
+  readonly localInstallId: string;
+  readonly occurredAt: string;
+  readonly queueEventId?: string;
+};
+
+export type FirstSessionStartedInput = {
+  readonly eventId?: string;
+  readonly localInstallId: string;
+  readonly sessionId: string;
+  readonly startedAt: string;
+};
+
 export function createLocalInstallId(createRandomSegment = createDefaultRandomSegment): string {
   const randomSegment = createRandomSegment()
     .replace(/[^A-Za-z0-9_-]/g, "")
@@ -123,6 +161,78 @@ export function createLocalInstallId(createRandomSegment = createDefaultRandomSe
       : `${randomSegment}${"0".repeat(8 - randomSegment.length)}`;
 
   return localInstallIdSchema.parse(`install_${paddedSegment}`);
+}
+
+export async function recordOnboardingStartedLocally(
+  database: LocalFirstOnboardingDatabase,
+  input: OnboardingStartedInput,
+): Promise<void> {
+  const localInstallId = localInstallIdSchema.parse(input.localInstallId);
+
+  await insertLocalEventQueue({
+    database,
+    eventName: "onboarding_started",
+    localInstallId,
+    occurredAt: input.startedAt,
+    recordId: localInstallId,
+    recordType: "onboarding_response",
+    ...(input.eventId ? { eventId: input.eventId } : {}),
+  });
+}
+
+export async function recordFirstBreathDemoEventLocally(
+  database: LocalFirstOnboardingDatabase,
+  input: FirstBreathDemoEventInput,
+): Promise<void> {
+  const localInstallId = localInstallIdSchema.parse(input.localInstallId);
+  const elapsedSeconds = Math.max(0, Math.min(30, Math.trunc(input.elapsedSeconds)));
+  const eventId = input.eventId ?? createLocalEventId();
+
+  await database.runAsync(
+    `
+      INSERT INTO first_breath_demo_events (
+        event_id,
+        local_install_id,
+        event_type,
+        occurred_at,
+        elapsed_seconds
+      )
+      VALUES (?, ?, ?, ?, ?)
+      ON CONFLICT(event_id) DO NOTHING;
+    `,
+    [eventId, localInstallId, input.eventType, input.occurredAt, elapsedSeconds],
+  );
+
+  await insertLocalEventQueue({
+    database,
+    eventName: input.eventType === "started" ? "first_breath_started" : "first_breath_completed",
+    localInstallId,
+    occurredAt: input.occurredAt,
+    recordId: eventId,
+    recordType: "first_breath_demo_event",
+    ...(input.queueEventId ? { eventId: input.queueEventId } : {}),
+  });
+}
+
+export async function recordFirstSessionStartedLocally(
+  database: LocalFirstOnboardingDatabase,
+  input: FirstSessionStartedInput,
+): Promise<void> {
+  const localInstallId = localInstallIdSchema.parse(input.localInstallId);
+
+  if (!/^session_[A-Za-z0-9_-]{8,64}$/.test(input.sessionId)) {
+    throw new Error("Invalid first-session id.");
+  }
+
+  await insertLocalEventQueue({
+    database,
+    eventName: "first_session_started",
+    localInstallId,
+    occurredAt: input.startedAt,
+    recordId: input.sessionId,
+    recordType: "first_session_record",
+    ...(input.eventId ? { eventId: input.eventId } : {}),
+  });
 }
 
 export async function getOrCreateLocalInstallIdentity({
@@ -150,6 +260,25 @@ export async function getOrCreateLocalInstallIdentity({
   );
 
   return localInstallId;
+}
+
+export async function hasCompletedOnboardingPersonalization(
+  database: LocalFirstOnboardingDatabase,
+  input: { readonly localInstallId: string },
+): Promise<boolean> {
+  const parsedLocalInstallId = localInstallIdSchema.parse(input.localInstallId);
+  const row = await database.getFirstAsync<{ readonly status: string }>(
+    `
+      SELECT status
+      FROM onboarding_responses
+      WHERE local_install_id = ?
+        AND status = 'completed'
+      LIMIT 1;
+    `,
+    [parsedLocalInstallId],
+  );
+
+  return Boolean(row);
 }
 
 export async function loadNotificationGateReadiness({
@@ -812,6 +941,51 @@ async function insertNotificationPermissionEvent({
       "{}",
       nowIso,
       nowIso,
+    ],
+  );
+}
+
+async function insertLocalEventQueue({
+  database,
+  eventId,
+  eventName,
+  localInstallId,
+  occurredAt,
+  recordId,
+  recordType,
+}: {
+  readonly database: LocalFirstOnboardingDatabase;
+  readonly eventId?: string;
+  readonly eventName: LocalEventName;
+  readonly localInstallId: string;
+  readonly occurredAt: string;
+  readonly recordId: string;
+  readonly recordType: LocalEventRecordType;
+}): Promise<void> {
+  await database.runAsync(
+    `
+      INSERT INTO local_event_queue (
+        event_id,
+        local_install_id,
+        event_name,
+        record_type,
+        record_id,
+        payload_json,
+        created_at,
+        updated_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(event_id) DO NOTHING;
+    `,
+    [
+      eventId ?? createLocalEventId(),
+      localInstallId,
+      eventName,
+      recordType,
+      recordId,
+      "{}",
+      occurredAt,
+      occurredAt,
     ],
   );
 }

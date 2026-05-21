@@ -29,6 +29,7 @@ import { SafeAreaInsetsContext } from "react-native-safe-area-context";
 import {
   abandonFirstSessionLocally,
   completeFirstSessionLocally,
+  recordFirstSessionStartedLocally,
   getOrCreateLocalInstallIdentity,
   loadPendingPostSessionReflection,
   loadRecoverableFirstSessionDraft,
@@ -37,6 +38,7 @@ import {
   type LocalFirstOnboardingDatabase,
 } from "../onboarding/local-first-onboarding";
 import { useReduceMotionPreference } from "../motion/use-reduce-motion-enabled";
+import { captureAnalyticsEventDeferred } from "../observability/deferred-capture";
 import { openMigratedLocalDatabase } from "../storage/local-database";
 import {
   completeFirstSessionIfDue,
@@ -54,6 +56,11 @@ export type FirstSessionPersistence = {
   readonly persistCompletion?: (record: FirstSessionRecord) => Promise<void>;
   readonly persistDraft?: (record: RecoverableFirstSessionDraft) => Promise<void>;
   readonly persistReflection?: (reflection: PostSessionReflection) => Promise<void>;
+  readonly persistStarted?: (record: {
+    readonly localInstallId: string;
+    readonly sessionId: string;
+    readonly startedAt: string;
+  }) => Promise<void>;
 };
 
 export type FirstSessionScreenProps = FirstSessionPersistence & {
@@ -180,10 +187,17 @@ export function FirstSessionRouteScreen({
       durationSeconds={sessionConfig.durationSeconds}
       localInstallId={sessionConfig.localInstallId}
       persistAbandoned={(record) => abandonFirstSessionLocally(sessionConfig.database, record)}
-      persistCompletion={(record) => completeFirstSessionLocally(sessionConfig.database, record)}
+      persistCompletion={async (record) => {
+        await completeFirstSessionLocally(sessionConfig.database, record);
+        captureAnalyticsEventDeferred("first_session_completed");
+      }}
       persistDraft={(record) => saveFirstSessionDraftLocally(sessionConfig.database, record)}
       persistReflection={async (reflection) => {
         await savePostSessionReflectionLocally(sessionConfig.database, reflection);
+      }}
+      persistStarted={async (record) => {
+        await recordFirstSessionStartedLocally(sessionConfig.database, record);
+        captureAnalyticsEventDeferred("first_session_started");
       }}
       onRewardMomentComplete={() => {
         router.replace("/post-value");
@@ -209,6 +223,7 @@ export function FirstSessionScreen({
   persistCompletion = async () => undefined,
   persistDraft = async () => undefined,
   persistReflection = async () => undefined,
+  persistStarted = async () => undefined,
   planId,
   sessionId,
   startedAtMs = Date.now(),
@@ -245,6 +260,7 @@ export function FirstSessionScreen({
   const [hapticsEnabled, setHapticsEnabled] = useState(true);
   const [completionMode, setCompletionMode] = useState<CompletionMode>(initialCompletionMode);
   const isPersistingTerminalStateRef = useRef(false);
+  const hasPersistedSessionStartRef = useRef(Boolean(initialCompletionMode));
   const lastDraftPersistedAtMs = useRef<number | undefined>(undefined);
   const previousPhaseNameRef = useRef<FirstSessionPhaseName>(snapshot.phaseName);
   const orbScale = useSharedValue(getOrbScale(snapshot.phaseName, reduceMotionEnabled));
@@ -255,6 +271,19 @@ export function FirstSessionScreen({
   useEffect(() => {
     controllerRef.current = controller;
   }, [controller]);
+
+  useEffect(() => {
+    if (hasPersistedSessionStartRef.current) {
+      return;
+    }
+
+    hasPersistedSessionStartRef.current = true;
+    void persistStarted({
+      localInstallId,
+      sessionId,
+      startedAt: new Date(startedAtMs).toISOString(),
+    }).catch(() => undefined);
+  }, [localInstallId, persistStarted, sessionId, startedAtMs]);
 
   const refreshSnapshot = useCallback((observedAtMs = Date.now()) => {
     const nextSnapshot = getFirstSessionSnapshot(controllerRef.current, observedAtMs);

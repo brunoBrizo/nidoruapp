@@ -43,11 +43,14 @@ import {
 import {
   completeOnboardingPersonalizationLocally,
   getOrCreateLocalInstallIdentity,
+  recordFirstBreathDemoEventLocally,
+  recordOnboardingStartedLocally,
 } from "./local-first-onboarding";
 import type { LocalFirstOnboardingDatabase } from "./local-first-onboarding";
 import { OnboardingSplashScreen } from "./onboarding-splash-screen";
 import { PersonalizedPlanScreen } from "./personalized-plan-screen";
 import { useReduceMotionPreference } from "../motion/use-reduce-motion-enabled";
+import { captureAnalyticsEventDeferred } from "../observability/deferred-capture";
 import { openMigratedLocalDatabase } from "../storage/local-database";
 
 export const ONBOARDING_FIRST_BREATH_SPLASH_DELAY_MS = 1200;
@@ -75,6 +78,8 @@ export type OnboardingPersonalizationAnswers = {
 
 type OnboardingFlowScreenProps = {
   readonly firstBreathAutoAdvanceDelayMs?: number;
+  readonly persistFirstBreathDemoEvent?: (eventType: "started" | "completed") => Promise<void>;
+  readonly persistOnboardingStarted?: () => Promise<void>;
   readonly splashDurationMs?: number;
 };
 
@@ -196,12 +201,21 @@ const questionCopy = {
 
 export function OnboardingFlowScreen({
   firstBreathAutoAdvanceDelayMs = FIRST_BREATH_DEMO_AUTO_ADVANCE_DELAY_MS,
+  persistFirstBreathDemoEvent = persistFirstBreathDemoEventLocally,
+  persistOnboardingStarted = persistOnboardingStartedLocally,
   splashDurationMs = ONBOARDING_FIRST_BREATH_SPLASH_DELAY_MS,
 }: OnboardingFlowScreenProps) {
   const router = useRouter();
   const [step, setStep] = useState<OnboardingFlowStep>("splash");
+  const hasRecordedOnboardingStartRef = useRef(false);
+  const onboardingStartedPromiseRef = useRef<Promise<void> | undefined>(undefined);
 
   useEffect(() => {
+    if (!hasRecordedOnboardingStartRef.current) {
+      hasRecordedOnboardingStartRef.current = true;
+      onboardingStartedPromiseRef.current = persistOnboardingStarted().catch(() => undefined);
+    }
+
     if (step !== "splash") {
       return;
     }
@@ -213,11 +227,18 @@ export function OnboardingFlowScreen({
     return () => {
       clearTimeout(splashTimer);
     };
-  }, [splashDurationMs, step]);
+  }, [persistOnboardingStarted, splashDurationMs, step]);
 
   const handleFirstBreathComplete = useCallback(() => {
     setStep("personalization");
   }, []);
+  const handleFirstBreathEvent = useCallback(
+    async (eventType: "started" | "completed") => {
+      await onboardingStartedPromiseRef.current;
+      await persistFirstBreathDemoEvent(eventType);
+    },
+    [persistFirstBreathDemoEvent],
+  );
   const handleStartFirstSession = useCallback(
     (plan: PersonalizedOnboardingPlan) => {
       router.replace({
@@ -243,7 +264,9 @@ export function OnboardingFlowScreen({
   return (
     <FirstBreathDemoScreen
       autoAdvanceDelayMs={firstBreathAutoAdvanceDelayMs}
+      onBreathComplete={() => handleFirstBreathEvent("completed")}
       onComplete={handleFirstBreathComplete}
+      onStarted={() => handleFirstBreathEvent("started")}
     />
   );
 }
@@ -564,6 +587,44 @@ async function persistOnboardingAnswersLocally(
     ...answers,
     localInstallId,
   });
+  captureAnalyticsEventDeferred("onboarding_completed");
+}
+
+async function persistOnboardingStartedLocally(): Promise<void> {
+  const database = await openMigratedLocalDatabase();
+  const localDatabase: LocalFirstOnboardingDatabase = {
+    getFirstAsync: (source, params = []) => database.getFirstAsync(source, [...params]),
+    runAsync: (source, params = []) => database.runAsync(source, [...params]),
+  };
+  const localInstallId = await getOrCreateLocalInstallIdentity({ database: localDatabase });
+  const startedAt = new Date().toISOString();
+
+  await recordOnboardingStartedLocally(localDatabase, {
+    localInstallId,
+    startedAt,
+  });
+  captureAnalyticsEventDeferred("onboarding_started");
+}
+
+async function persistFirstBreathDemoEventLocally(
+  eventType: "started" | "completed",
+): Promise<void> {
+  const database = await openMigratedLocalDatabase();
+  const localDatabase: LocalFirstOnboardingDatabase = {
+    getFirstAsync: (source, params = []) => database.getFirstAsync(source, [...params]),
+    runAsync: (source, params = []) => database.runAsync(source, [...params]),
+  };
+  const localInstallId = await getOrCreateLocalInstallIdentity({ database: localDatabase });
+
+  await recordFirstBreathDemoEventLocally(localDatabase, {
+    elapsedSeconds: eventType === "started" ? 0 : 30,
+    eventType,
+    localInstallId,
+    occurredAt: new Date().toISOString(),
+  });
+  captureAnalyticsEventDeferred(
+    eventType === "started" ? "first_breath_started" : "first_breath_completed",
+  );
 }
 
 function validateDisplayName(

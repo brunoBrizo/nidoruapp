@@ -180,7 +180,7 @@ describe("post-value account linking and paywall eligibility", () => {
     );
   });
 
-  it("maps local records to the authenticated user before attempting sync", async () => {
+  it("syncs authorized records before mapping the server user id onto local records", async () => {
     const database = createMockDatabase([eligibleRow]);
     const syncLocalRecords = jest.fn(() => Promise.resolve());
 
@@ -234,9 +234,12 @@ describe("post-value account linking and paywall eligibility", () => {
       localInstallId: "install_0123456789abcdef",
       userId: "11111111-1111-4111-8111-111111111111",
     });
+    expect(syncLocalRecords.mock.invocationCallOrder[0]).toBeLessThan(
+      database.runAsync.mock.invocationCallOrder[1],
+    );
   });
 
-  it("keeps mapped records and marks sync retry pending when post-auth sync fails", async () => {
+  it("leaves local records unmapped and marks sync retry pending when post-auth sync fails", async () => {
     const database = createMockDatabase([eligibleRow]);
 
     await expect(
@@ -258,13 +261,28 @@ describe("post-value account linking and paywall eligibility", () => {
       userId: "11111111-1111-4111-8111-111111111111",
     });
     expect(database.runAsync).toHaveBeenLastCalledWith(
-      expect.stringContaining("UPDATE local_account_links"),
+      expect.stringContaining("INSERT INTO local_account_link_attempts"),
       [
+        "install_0123456789abcdef",
+        "11111111-1111-4111-8111-111111111111",
+        "apple",
+        "sync_failed",
         "retry_pending",
         "2026-05-20T01:06:00.000Z",
         "2026-05-20T01:06:00.000Z",
-        "install_0123456789abcdef",
       ],
+    );
+    expect(database.runAsync).not.toHaveBeenCalledWith(
+      expect.stringContaining("UPDATE onboarding_responses"),
+      expect.anything(),
+    );
+    expect(database.runAsync).not.toHaveBeenCalledWith(
+      expect.stringContaining("UPDATE first_session_records"),
+      expect.anything(),
+    );
+    expect(database.runAsync).not.toHaveBeenCalledWith(
+      expect.stringContaining("UPDATE post_session_reflections"),
+      expect.anything(),
     );
   });
 

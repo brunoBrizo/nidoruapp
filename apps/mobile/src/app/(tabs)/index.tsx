@@ -1,9 +1,10 @@
 import { useEffect, useState, type ComponentType } from "react";
 
 import { HomeScreen, type HomeScreenProps } from "../../home/home-screen";
+import { FirstLaunchOnboardingGate } from "../../onboarding/first-launch-onboarding-gate";
 
 export default function HomeRoute(props: HomeScreenProps) {
-  return (
+  const homeScreen = (
     <HomeScreen
       {...props}
       notificationGateController={
@@ -11,6 +12,12 @@ export default function HomeRoute(props: HomeScreenProps) {
       }
     />
   );
+
+  if (process.env.NODE_ENV === "test") {
+    return homeScreen;
+  }
+
+  return <FirstLaunchOnboardingGate>{homeScreen}</FirstLaunchOnboardingGate>;
 }
 
 function NotificationPermissionGateControllerLoader() {

@@ -36,9 +36,23 @@ export type AnalyticsEventName = (typeof approvedAnalyticsEventNames)[number];
 type AnalyticsEventProperties = Readonly<
   Partial<{
     app_environment: ReturnType<typeof getAppEnvironment>;
+    attempt_count: number;
     proof: boolean;
+    reason_class:
+      | "offline"
+      | "auth_denied"
+      | "server_error"
+      | "rate_limited"
+      | "validation_error"
+      | "unknown";
+    record_type:
+      | "local_install_link"
+      | "first_session_record"
+      | "post_session_reflection"
+      | "local_event_queue";
     release: string;
     source: "observability_proof";
+    sync_stage: "post_value_sync" | "analytics_event_flush";
   }>
 >;
 
@@ -67,6 +81,7 @@ const posthogOptions: PostHogOptions = {
   host: posthogHost,
   preloadFeatureFlags: false,
   sendFeatureFlagEvent: false,
+  setDefaultPersonProperties: false,
 };
 
 export const posthogClient = new PostHog(posthogApiKey, posthogOptions);
@@ -75,9 +90,35 @@ export function isPostHogConfigured() {
   return Boolean(posthogApiKey);
 }
 
+export function createPrivacySafeAnalyticsProperties(
+  properties: Readonly<Record<string, unknown>> = {},
+): AnalyticsEventProperties {
+  const safeProperties: Record<string, unknown> = {};
+  const allowlistedKeys = [
+    "app_environment",
+    "attempt_count",
+    "proof",
+    "reason_class",
+    "record_type",
+    "release",
+    "source",
+    "sync_stage",
+  ];
+
+  for (const key of allowlistedKeys) {
+    const value = properties[key];
+
+    if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
+      safeProperties[key] = value;
+    }
+  }
+
+  return safeProperties as AnalyticsEventProperties;
+}
+
 function captureExplicitEvent(
   eventName: AnalyticsEventName | typeof posthogProofEventName,
-  properties: AnalyticsEventProperties = {},
+  properties: Readonly<Record<string, unknown>> = {},
 ) {
   if (!isPostHogConfigured()) {
     return {
@@ -87,7 +128,7 @@ function captureExplicitEvent(
   }
 
   posthogClient.capture(eventName, {
-    ...properties,
+    ...createPrivacySafeAnalyticsProperties(properties),
     app_environment: getAppEnvironment(),
     release: sentryRelease,
   });
@@ -100,7 +141,7 @@ function captureExplicitEvent(
 
 export function captureAnalyticsEvent(
   eventName: AnalyticsEventName,
-  properties: AnalyticsEventProperties = {},
+  properties: Readonly<Record<string, unknown>> = {},
 ) {
   return captureExplicitEvent(eventName, properties);
 }

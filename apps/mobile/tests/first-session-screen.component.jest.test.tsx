@@ -112,6 +112,39 @@ describe("FirstSessionScreen", () => {
     jest.useRealTimers();
   });
 
+  it("does not wait for session-start event persistence before completing the local session", async () => {
+    jest.useFakeTimers();
+    jest.setSystemTime(baseProps.startedAtMs);
+    const persistStarted = jest.fn(
+      () =>
+        new Promise<void>(() => {
+          // Keep analytics/local event persistence unresolved to prove it is off the session path.
+        }),
+    );
+    const persistCompletion = jest.fn(() => Promise.resolve());
+
+    render(
+      <FirstSessionScreen
+        {...baseProps}
+        durationSeconds={1}
+        persistCompletion={persistCompletion}
+        persistStarted={persistStarted}
+      />,
+    );
+
+    await act(async () => {
+      jest.advanceTimersByTime(1000);
+      await Promise.resolve();
+    });
+
+    await waitFor(() => {
+      expect(persistCompletion).toHaveBeenCalledTimes(1);
+    });
+    expect(screen.getByText("How do you feel?")).toBeTruthy();
+
+    jest.useRealTimers();
+  });
+
   it("persists the selected reflection locally and reveals the reward transition", async () => {
     jest.useFakeTimers();
     jest.setSystemTime(baseProps.startedAtMs);

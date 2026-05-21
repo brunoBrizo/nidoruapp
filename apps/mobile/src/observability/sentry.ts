@@ -77,6 +77,25 @@ export function captureSentryProofError() {
   };
 }
 
+export function addSentryBreadcrumb(breadcrumb: {
+  readonly category: string;
+  readonly data?: Record<string, unknown>;
+  readonly level?: "debug" | "info" | "warning" | "error" | "fatal";
+  readonly message: string;
+}) {
+  if (!sentryInitialized) {
+    return {
+      status: "not_configured" as const,
+    };
+  }
+
+  Sentry.addBreadcrumb(breadcrumb);
+
+  return {
+    status: "queued" as const,
+  };
+}
+
 export function withSentryRoot<P extends Record<string, unknown>>(RootComponent: ComponentType<P>) {
   return sentryInitialized ? Sentry.wrap(RootComponent) : RootComponent;
 }

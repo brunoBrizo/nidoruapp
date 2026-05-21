@@ -1,5 +1,5 @@
 import { describe, expect, it, jest } from "@jest/globals";
-import { act, render, screen, within } from "@testing-library/react-native";
+import { act, render, screen, waitFor, within } from "@testing-library/react-native";
 import { AccessibilityInfo, StyleSheet } from "react-native";
 
 import { RESTING_BREATHING_ORB_TEST_IDS } from "../src/breathing/breathing-orb";
@@ -138,27 +138,73 @@ describe("FirstBreathDemoScreen", () => {
 
     jest.useRealTimers();
   });
+
+  it("does not wait for breath-complete event persistence before handing off", () => {
+    jest.useFakeTimers();
+    const onBreathComplete = jest.fn(
+      () =>
+        new Promise<void>(() => {
+          // Keep event persistence unresolved to prove it is not on the animation handoff path.
+        }),
+    );
+    const onComplete = jest.fn();
+
+    render(
+      <FirstBreathDemoScreen
+        autoAdvanceDelayMs={50}
+        disableHaptics
+        onBreathComplete={onBreathComplete}
+        onComplete={onComplete}
+      />,
+    );
+
+    advanceDemoByPhases(6);
+    expect(onBreathComplete).toHaveBeenCalledTimes(1);
+
+    act(() => {
+      jest.advanceTimersByTime(50 + FIRST_BREATH_DEMO_SCREEN_EXIT_MS);
+    });
+    expect(onComplete).toHaveBeenCalledTimes(1);
+
+    jest.useRealTimers();
+  });
 });
 
 describe("OnboardingFlowScreen", () => {
-  it("places the 30-second demo immediately after splash and before personalization", () => {
+  it("places the 30-second demo immediately after splash and before personalization", async () => {
     jest.useFakeTimers();
+    const persistFirstBreathDemoEvent = jest.fn(() => Promise.resolve());
+    const persistOnboardingStarted = jest.fn(() => Promise.resolve());
 
-    render(<OnboardingFlowScreen firstBreathAutoAdvanceDelayMs={50} splashDurationMs={10} />);
+    render(
+      <OnboardingFlowScreen
+        firstBreathAutoAdvanceDelayMs={50}
+        persistFirstBreathDemoEvent={persistFirstBreathDemoEvent}
+        persistOnboardingStarted={persistOnboardingStarted}
+        splashDurationMs={10}
+      />,
+    );
 
     expect(ONBOARDING_FIRST_BREATH_SPLASH_DELAY_MS).toBeLessThan(2000);
     expect(screen.getByTestId("onboarding-splash-screen")).toBeTruthy();
+    expect(persistOnboardingStarted).toHaveBeenCalledTimes(1);
 
     act(() => {
       jest.advanceTimersByTime(10);
     });
 
     expect(screen.getByText(FIRST_BREATH_DEMO_COPY.inhale)).toBeTruthy();
+    await waitFor(() => {
+      expect(persistFirstBreathDemoEvent).toHaveBeenCalledWith("started");
+    });
     expect(screen.queryByRole("button")).toBeNull();
     expect(screen.queryByRole("link")).toBeNull();
     expect(screen.queryByText(/account|paywall|permission|question|loading|skip/i)).toBeNull();
 
     advanceDemoByPhases(6);
+    await waitFor(() => {
+      expect(persistFirstBreathDemoEvent).toHaveBeenCalledWith("completed");
+    });
     act(() => {
       jest.advanceTimersByTime(50 + FIRST_BREATH_DEMO_SCREEN_EXIT_MS);
     });

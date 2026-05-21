@@ -3,7 +3,10 @@ import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 
 import { getOrCreateLocalInstallIdentity } from "../onboarding/local-first-onboarding";
+import { captureSyncFailureDeferred } from "../observability/deferred-capture";
+import { createPrivacySafeSyncFailureContext } from "../observability/sync-observability";
 import { openMigratedLocalDatabase } from "../storage/local-database";
+import { syncPostValueLocalRecords, type PostValueSyncDatabase } from "../sync/post-value-sync";
 import {
   linkPostValueAccount,
   loadPostRewardPaywallEligibility,
@@ -14,7 +17,10 @@ import {
   type PostValuePlanId,
 } from "./post-value-account-linking";
 import { PostValueAccountPaywallScreen } from "./post-value-account-paywall-screen";
-import { createPostValueSupabaseAuthenticator } from "./post-value-supabase-auth";
+import {
+  createPostValueSupabaseAuthenticator,
+  createPostValueSupabaseClient,
+} from "./post-value-supabase-auth";
 
 type RouteState =
   | { readonly status: "loading" }
@@ -23,6 +29,7 @@ type RouteState =
       readonly database: PostValueAccountDatabase;
       readonly localInstallId: string;
       readonly status: "ready";
+      readonly syncDatabase: PostValueSyncDatabase;
     };
 
 export function PostValueAccountPaywallRouteScreen() {
@@ -35,6 +42,11 @@ export function PostValueAccountPaywallRouteScreen() {
     async function loadRouteState() {
       const database = await openMigratedLocalDatabase();
       const localDatabase: PostValueAccountDatabase = {
+        getFirstAsync: (source, params = []) => database.getFirstAsync(source, [...params]),
+        runAsync: (source, params = []) => database.runAsync(source, [...params]),
+      };
+      const syncDatabase: PostValueSyncDatabase = {
+        getAllAsync: (source, params = []) => database.getAllAsync(source, [...params]),
         getFirstAsync: (source, params = []) => database.getFirstAsync(source, [...params]),
         runAsync: (source, params = []) => database.runAsync(source, [...params]),
       };
@@ -54,6 +66,7 @@ export function PostValueAccountPaywallRouteScreen() {
         database: localDatabase,
         localInstallId,
         status: "ready",
+        syncDatabase,
       });
 
       if (accessState.status === "blocked") {
@@ -62,13 +75,14 @@ export function PostValueAccountPaywallRouteScreen() {
       }
 
       const authenticate = createPostValueSupabaseAuthenticator();
+      const syncClient = createPostValueSupabaseClient();
 
-      if (authenticate) {
+      if (authenticate && syncClient) {
         void linkPostValueAccount(localDatabase, {
           authenticate,
           localInstallId,
           provider: "anonymous",
-          syncLocalRecords: async () => undefined,
+          syncLocalRecords: createPostValueSyncHandler(syncDatabase, syncClient),
         }).catch(() => undefined);
       }
     }
@@ -95,8 +109,9 @@ export function PostValueAccountPaywallRouteScreen() {
       }
 
       const authenticate = createPostValueSupabaseAuthenticator();
+      const syncClient = createPostValueSupabaseClient();
 
-      if (!authenticate) {
+      if (!authenticate || !syncClient) {
         throw new Error("Supabase public auth is not configured in this build.");
       }
 
@@ -104,7 +119,7 @@ export function PostValueAccountPaywallRouteScreen() {
         authenticate,
         localInstallId: routeState.localInstallId,
         provider,
-        syncLocalRecords: async () => undefined,
+        syncLocalRecords: createPostValueSyncHandler(routeState.syncDatabase, syncClient),
       });
 
       if (result.status !== "linked") {
@@ -147,6 +162,33 @@ export function PostValueAccountPaywallRouteScreen() {
       onStartTrial={handleStartTrial}
     />
   );
+}
+
+function createPostValueSyncHandler(
+  database: PostValueSyncDatabase,
+  client: Parameters<typeof syncPostValueLocalRecords>[0]["client"],
+) {
+  return async ({
+    localInstallId,
+    userId,
+  }: {
+    readonly localInstallId: string;
+    readonly userId: string;
+  }): Promise<void> => {
+    const result = await syncPostValueLocalRecords({
+      client,
+      database,
+      localInstallId,
+      observeFailure: (failure) => {
+        captureSyncFailureDeferred(createPrivacySafeSyncFailureContext(failure));
+      },
+      userId,
+    });
+
+    if (result.status !== "succeeded") {
+      throw new Error(`post_value_sync_${result.reason}`);
+    }
+  };
 }
 
 const styles = StyleSheet.create({

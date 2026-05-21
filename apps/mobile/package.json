@@ -28,7 +28,7 @@
     "@nidoru/i18n": "workspace:*",
     "@nidoru/ui-tokens": "workspace:*",
     "@sentry/react-native": "~7.2.0",
-    "@supabase/supabase-js": "^2.106.0",
+    "@supabase/auth-js": "2.106.0",
     "@tanstack/react-query": "^5.100.11",
     "expo": "~54.0.34",
     "expo-audio": "~1.1.1",

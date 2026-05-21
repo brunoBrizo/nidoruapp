@@ -108,7 +108,9 @@ export const FIRST_BREATH_DEMO_PHASES: readonly FirstBreathDemoPhase[] = [
 type FirstBreathDemoScreenProps = {
   readonly autoAdvanceDelayMs?: number;
   readonly disableHaptics?: boolean;
+  readonly onBreathComplete?: () => Promise<void> | void;
   readonly onComplete?: () => void;
+  readonly onStarted?: () => Promise<void> | void;
 };
 
 type PhaseLabelState = {
@@ -155,7 +157,9 @@ function getFirstBreathDemoPhaseAtIndex(phaseIndex: number): FirstBreathDemoPhas
 export function FirstBreathDemoScreen({
   autoAdvanceDelayMs = FIRST_BREATH_DEMO_AUTO_ADVANCE_DELAY_MS,
   disableHaptics = false,
+  onBreathComplete,
   onComplete,
+  onStarted,
 }: FirstBreathDemoScreenProps) {
   const reduceMotionPreference = useReduceMotionPreference();
   const reduceDecorativeMotion =
@@ -170,6 +174,7 @@ export function FirstBreathDemoScreen({
   const labelProgress = useRef(new Animated.Value(1)).current;
   const breathProgress = useRef(new Animated.Value(0)).current;
   const hasCompletedRef = useRef(false);
+  const hasStartedRef = useRef(false);
 
   const contentTranslateY = contentProgress.interpolate({
     extrapolate: "clamp",
@@ -198,6 +203,11 @@ export function FirstBreathDemoScreen({
   });
 
   useEffect(() => {
+    if (!hasStartedRef.current) {
+      hasStartedRef.current = true;
+      void onStarted?.();
+    }
+
     contentProgress.setValue(0);
     Animated.timing(contentProgress, {
       duration: reduceDecorativeMotion ? 0 : FIRST_BREATH_DEMO_CONTENT_ENTER_MS,
@@ -205,7 +215,7 @@ export function FirstBreathDemoScreen({
       toValue: 1,
       useNativeDriver: true,
     }).start();
-  }, [contentProgress, reduceDecorativeMotion]);
+  }, [contentProgress, onStarted, reduceDecorativeMotion]);
 
   useEffect(() => {
     if (isComplete) {
@@ -229,6 +239,7 @@ export function FirstBreathDemoScreen({
     const phaseTimer = setTimeout(() => {
       if (phaseIndex === FIRST_BREATH_DEMO_PHASES.length - 1) {
         hasCompletedRef.current = true;
+        void onBreathComplete?.();
         setIsComplete(true);
         return;
       }
@@ -239,7 +250,7 @@ export function FirstBreathDemoScreen({
     return () => {
       clearTimeout(phaseTimer);
     };
-  }, [breathProgress, disableHaptics, isComplete, phaseIndex]);
+  }, [breathProgress, disableHaptics, isComplete, onBreathComplete, phaseIndex]);
 
   useEffect(() => {
     if (previousCopyRef.current === currentCopy) {

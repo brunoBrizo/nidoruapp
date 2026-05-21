@@ -54,20 +54,24 @@ Repo and source-of-truth routing:
 UI/frontend work:
 
 - For any task that creates, changes, or reviews UI, screens, components, visual styling, layout, or interaction details, always check the UI impact before completion.
-- Use `frontend-design` as the primary skill for layout, hierarchy, visual language, and design-system direction.
-- Pair `make-interfaces-feel-better` with `frontend-design` when the task includes polish details: typography, spacing, surfaces, motion, hit areas, optical alignment, empty states, and interaction feel.
-- Add project-local `ui-ux-pro-max` when the task needs deeper UX/product-pattern reasoning, mobile flow structure, accessibility/touch checks, design systems, or cross-platform consistency.
-- Add `expo:building-native-ui` for Expo UI/navigation implementation, and add `vercel-react-native-skills` or `react-native-best-practices` when React Native performance, native components, lists, images, animations, or state subscriptions are involved.
+- For mobile UI/UX work, use project-local `ui-ux-pro-max` as the primary skill for mobile flow structure, layout, hierarchy, accessibility/touch checks, visual language, and cross-platform consistency.
+- Add `make-interfaces-feel-better` only for polish passes involving typography, spacing, surfaces, motion, hit areas, optical alignment, empty states, or interaction feel.
+- Use `frontend-design` only for web UI, landing-page, artifact, or broad visual-direction work where `ui-ux-pro-max` is not the narrower fit.
+- Add `expo:building-native-ui` for Expo UI/navigation implementation, and add `vercel-react-native-skills` for React Native component, navigation, animation, native dependency, or implementation-pattern work.
+- Add `react-native-best-practices` only for performance-sensitive React Native work: JS/render cost, lists, images, native memory, bundle size, FPS, TTI, jank, profiling, or state subscription performance.
 - Use `imagegen-frontend-mobile` only when the requested output is a mobile app concept image, screen render, flow mockup, or visual direction artifact. Do not use it for code implementation.
 - Verify the rendered UI when feasible: use Browser/Playwright for local web targets, Expo/Test Android/iOS simulator tooling for mobile targets, or state exactly what blocked visual verification.
 
 Security-sensitive work:
 
 - Apply the `Security-first defaults` section before coding whenever the change touches user input, auth, authorization, database access, local SQLite, storage, network calls, secrets, telemetry, CI/CD, dependency/configuration, or file operations.
-- Use `code-security` for secure implementation review and `owasp-security` for auth, API, access-control, injection, data exposure, logging, and insecure-design checks.
-- Add `supabase` and `supabase-postgres-best-practices` for Supabase, Postgres, RLS, SQL, migrations, and database performance. Include denied-access, cross-user, invalid-input, and policy-denied tests when those paths are affected.
-- Use `semgrep` only for planned static analysis after presenting target paths, rulesets, output directory, scan mode, and metrics/telemetry posture.
-- Use `ghost-scan-secrets` before commits/releases or when env/config/auth files changed; use `ghost-scan-deps` for dependency/CVE review; use `ghost-scan-code` for deeper code-path SAST.
+- Use `code-security` for secure implementation review.
+- Add `owasp-security` only for auth, API, access-control, injection, data exposure, logging, insecure-design, or other OWASP-class checks.
+- Add `supabase` for Supabase platform, Auth, RLS, Edge Functions, Storage, CLI, client, and migration work. Add `supabase-postgres-best-practices` only for SQL, schema, indexes, query plans, locks, migrations, or database performance.
+- Include denied-access, cross-user, invalid-input, and policy-denied tests when those paths are affected.
+- Use `semgrep` for planned static analysis after presenting target paths, rulesets, output directory, scan mode, and metrics/telemetry posture.
+- Use `ghost-scan-code` only when deeper SAST review is needed beyond Semgrep or when the user explicitly asks for Ghost Security code scanning. Do not run both `semgrep` and `ghost-scan-code` by default for the same check.
+- Use `ghost-scan-secrets` before commits/releases or when env/config/auth files changed; use `ghost-scan-deps` for dependency/CVE review.
 - Stop for explicit user approval before running tools that upload code, dependency inventory, lockfiles, secrets candidates, or scan results to external services.
 
 Expo, mobile runtime, and React Native routing:
@@ -82,7 +86,7 @@ Expo, mobile runtime, and React Native routing:
 
 Data, backend, hosting, and observability routing:
 
-- Supabase/Postgres: use project-local `supabase` first, then `supabase-postgres-best-practices` for schema, RLS, SQL, indexes, migrations, locks, query plans, or performance. Also apply `code-security` and `owasp-security` for exposed data or access-control paths.
+- Supabase/Postgres: use project-local `supabase` first for Supabase platform/Auth/RLS/client/CLI context. Add `supabase-postgres-best-practices` only for SQL, schema, indexes, migrations, locks, query plans, or performance. Also apply `code-security`, and add `owasp-security` only for exposed data, auth, API, access-control, injection, logging, or insecure-design paths.
 - Sentry: use `sentry:sentry` for inspecting Sentry issues/events and for observability workflow questions. For telemetry code changes, also apply the security defaults to avoid leaking sensitive session, account, device, or health-adjacent data.
 - Netlify/Cloudflare: use the narrowest hosting skill for the platform and task, such as config, deploy, functions, caching, image CDN, Workers, Durable Objects, or Wrangler. Verify current platform docs for deployment syntax or vendor behavior that may have changed.
 - OpenAI Developers: use OpenAI-specific skills only for OpenAI API, Agents SDK, ChatGPT app, troubleshooting, or API key setup work.
@@ -154,7 +158,7 @@ Web, frontend, and browser skills:
 - Browser automation: `browser:browser`, `chrome:Chrome`, `playwright`, `browser-use`
 - Core Web Vitals/performance: `core-web-vitals`, `performance`, `web-quality-audit`
 - Frontend app build/test: `build-web-apps:frontend-app-builder`, `build-web-apps:frontend-testing-debugging`
-- Frontend design and UI polish: `frontend-design`, `make-interfaces-feel-better`, `ui-ux-pro-max` (use together for UI work when relevant)
+- Frontend design and UI polish: `ui-ux-pro-max` for mobile UI/UX, `make-interfaces-feel-better` for polish passes, and `frontend-design` for web/artifact/broad visual-direction work
 - React/Next.js: `build-web-apps:react-best-practices`
 - shadcn: `build-web-apps:shadcn`
 - Stripe: `build-web-apps:stripe-best-practices`
@@ -169,7 +173,7 @@ Expo and mobile skills:
 - Expo builds, deployment, and CI/CD: `expo:expo-deployment`, `expo:expo-cicd-workflows`, `expo:expo-dev-client`, `expo:codex-expo-run-actions`
 - Expo modules and native UI bridges: `expo:expo-module`, `expo:expo-ui-jetpack-compose`, `expo:expo-ui-swift-ui`, `expo:use-dom`
 - Expo styling/upgrades: `expo:expo-tailwind-setup`, `expo:upgrading-expo`
-- React Native implementation/performance: `react-native-best-practices`, `vercel-react-native-skills` for components, lists, images, animations, state subscriptions, native dependencies, bundle size, memory, FPS, TTI, and jank investigations
+- React Native implementation/performance: `vercel-react-native-skills` for implementation patterns, components, navigation, animations, and native dependencies; `react-native-best-practices` only for performance-sensitive lists, images, state subscriptions, bundle size, memory, FPS, TTI, profiling, and jank investigations
 - Android QA/performance: `test-android-apps:android-emulator-qa`, `test-android-apps:android-performance`
 
 Growth, launch, App Store, and monetization skills:
@@ -190,7 +194,7 @@ iOS skills:
 
 Data, backend, hosting, and observability skills:
 
-- Supabase/Postgres: `supabase`, `supabase-postgres-best-practices`, `supabase:supabase`, `supabase:supabase-postgres-best-practices`, `build-web-apps:supabase-postgres-best-practices`
+- Supabase/Postgres: `supabase` for platform/Auth/RLS/client/CLI work; `supabase-postgres-best-practices` only for SQL/schema/index/migration/query-performance work. Use plugin variants only when the project-local skill is unavailable.
 - Sentry: `sentry:sentry`
 - Netlify: `netlify:netlify-ai-gateway`, `netlify:netlify-blobs`, `netlify:netlify-caching`, `netlify:netlify-cli-and-deploy`, `netlify:netlify-config`, `netlify:netlify-deploy`, `netlify:netlify-edge-functions`, `netlify:netlify-forms`, `netlify:netlify-frameworks`, `netlify:netlify-functions`, `netlify:netlify-identity`, `netlify:netlify-image-cdn`
 - Cloudflare: `cloudflare:agents-sdk`, `cloudflare:building-ai-agent-on-cloudflare`, `cloudflare:building-mcp-server-on-cloudflare`, `cloudflare:cloudflare`, `cloudflare:durable-objects`, `cloudflare:sandbox-sdk`, `cloudflare:web-perf`, `cloudflare:workers-best-practices`, `cloudflare:wrangler`
@@ -208,5 +212,5 @@ Repo, docs, and productivity skills:
 Security and agent workflow skills:
 
 - Secure coding and OWASP: `code-security`, `owasp-security`
-- Security scanning and triage: `semgrep`, `ghost-scan-code`, `ghost-scan-secrets`, `ghost-scan-deps`, `codex-security:security-scan`, `codex-security:threat-model`, `codex-security:finding-discovery`, `codex-security:attack-path-analysis`, `codex-security:validation`, `codex-security:fix-finding`
+- Security scanning and triage: `semgrep` for planned static analysis, `ghost-scan-code` only for deeper Ghost SAST, `ghost-scan-secrets` for credentials/secrets, `ghost-scan-deps` for dependency CVEs, and Codex Security skills for structured security workflows
 - Superpowers workflow: `superpowers:using-superpowers`, `superpowers:brainstorming`, `superpowers:writing-plans`, `superpowers:executing-plans`, `superpowers:test-driven-development`, `superpowers:systematic-debugging`, `superpowers:requesting-code-review`, `superpowers:receiving-code-review`, `superpowers:finishing-a-development-branch`, `superpowers:subagent-driven-development`, `superpowers:dispatching-parallel-agents`, `superpowers:using-git-worktrees`, `superpowers:writing-skills`

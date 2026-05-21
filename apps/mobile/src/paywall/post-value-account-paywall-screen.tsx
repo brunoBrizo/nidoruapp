@@ -378,7 +378,10 @@ function PlanButton({
           <Text selectable style={styles.planTitle}>
             {title}
           </Text>
-          <Text selectable style={[styles.planSubcopy, isSelected ? styles.planSubcopyAccent : null]}>
+          <Text
+            selectable
+            style={[styles.planSubcopy, isSelected ? styles.planSubcopyAccent : null]}
+          >
             {subcopy}
           </Text>
         </View>

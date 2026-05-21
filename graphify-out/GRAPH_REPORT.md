@@ -1,7 +1,7 @@
 # Graph Report - sleep-app  (2026-05-20)
 
 ## Corpus Check
-- 99 files · ~210,148 words
+- 99 files · ~212,640 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -40,14 +40,14 @@
 ## Surprising Connections (you probably didn't know these)
 - `getOnboardingPlanForGoal()` --calls--> `completeOnboardingPersonalizationLocally()`  [INFERRED]
   packages/domain/src/index.ts → apps/mobile/src/onboarding/local-first-onboarding.ts
-- `evaluateGate()` --calls--> `canPromptForNotificationPermission()`  [INFERRED]
-  apps/mobile/src/notifications/notification-permission-gate-controller.tsx → packages/domain/src/index.ts
-- `reconcileEveningReminderSchedule()` --calls--> `getNextEveningReminderDate()`  [INFERRED]
-  apps/mobile/src/notifications/notification-permission-service.ts → packages/domain/src/index.ts
+- `canPromptForNotificationPermission()` --calls--> `evaluateGate()`  [INFERRED]
+  packages/domain/src/index.ts → apps/mobile/src/notifications/notification-permission-gate-controller.tsx
+- `getNextEveningReminderDate()` --calls--> `reconcileEveningReminderSchedule()`  [INFERRED]
+  packages/domain/src/index.ts → apps/mobile/src/notifications/notification-permission-service.ts
 - `initializeSentry()` --calls--> `getAppEnvironment()`  [INFERRED]
   apps/mobile/src/observability/sentry.ts → apps/mobile/src/observability/environment.ts
-- `requestNotificationPermissionFromGate()` --calls--> `captureAnalyticsEvent()`  [INFERRED]
-  apps/mobile/src/notifications/notification-permission-service.ts → apps/mobile/src/observability/posthog.ts
+- `captureAnalyticsEvent()` --calls--> `requestNotificationPermissionFromGate()`  [INFERRED]
+  apps/mobile/src/observability/posthog.ts → apps/mobile/src/notifications/notification-permission-service.ts
 
 ## Communities
 

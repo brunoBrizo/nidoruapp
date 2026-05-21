@@ -4,24 +4,32 @@ import {
   type BreathTechniqueId,
   type OnboardingPlanId,
 } from "@nidoru/domain";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, type Href } from "expo-router";
 
 import { FirstSessionRouteScreen } from "../../../session/first-session-screen";
 
 export default function BreatheTechniqueAnchorScreen() {
   const params = useLocalSearchParams<{
     durationSeconds?: string;
+    firstLaunch?: string;
     planId?: string;
     technique?: string;
   }>();
   const techniqueId = parseTechniqueId(params.technique);
   const planId = parsePlanId(params.planId);
   const durationSeconds = parseDurationSeconds(params.durationSeconds);
+  const postRewardRoute = parseFirstLaunch(params.firstLaunch)
+    ? ({
+        params: { stage: "personalization" },
+        pathname: "/onboarding",
+      } satisfies Href)
+    : "/post-value";
 
   return (
     <FirstSessionRouteScreen
       {...(durationSeconds === undefined ? {} : { durationSeconds })}
       {...(planId === undefined ? {} : { planId })}
+      postRewardRoute={postRewardRoute}
       techniqueId={techniqueId}
     />
   );
@@ -49,4 +57,10 @@ function parseDurationSeconds(value: string | string[] | undefined): number | un
   return Number.isInteger(durationSeconds) && durationSeconds > 0 && durationSeconds <= 30 * 60
     ? durationSeconds
     : undefined;
+}
+
+function parseFirstLaunch(value: string | string[] | undefined): boolean {
+  const firstLaunch = Array.isArray(value) ? value[0] : value;
+
+  return firstLaunch === "1" || firstLaunch === "true";
 }

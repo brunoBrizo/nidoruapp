@@ -45,12 +45,12 @@ describe("OnboardingPersonalizationFlowScreen", () => {
   it("captures typed answers across the five-question flow without pre-plan gates", async () => {
     jest.useFakeTimers();
     const persistAnswers = jest.fn(() => Promise.resolve());
-    const startFirstSession = jest.fn();
+    const continueAfterPlan = jest.fn();
 
     render(
       <OnboardingPersonalizationFlowScreen
+        continueAfterPlan={continueAfterPlan}
         persistAnswers={persistAnswers}
-        startFirstSession={startFirstSession}
         screenExitMs={0}
         startedAt="2026-05-20T01:00:00.000Z"
       />,
@@ -78,20 +78,22 @@ describe("OnboardingPersonalizationFlowScreen", () => {
         windDownMinutesAfterMidnight: 21 * 60 + 30,
       });
     });
-    expect(screen.getByText("Riley, your first session is ready")).toBeTruthy();
+    expect(screen.getByText("Riley, your follow-up plan is ready")).toBeTruthy();
     expect(screen.getByText("Anxiety Relief")).toBeTruthy();
     expect(screen.getByText("Light guidance")).toBeTruthy();
     expect(screen.getByText("Wind-down around 9:30 PM")).toBeTruthy();
     expect(screen.getByText("Breathwork familiar")).toBeTruthy();
     expect(screen.getByText("Start gently")).toBeTruthy();
-    expect(screen.getByText("No account needed")).toBeTruthy();
+    expect(screen.getByText("Saved locally")).toBeTruthy();
+    expect(screen.getByText("Next session")).toBeTruthy();
+    expect(screen.queryByText("First session")).toBeNull();
     expect(screen.queryByText(forbiddenPlanGatePattern)).toBeNull();
 
-    fireEvent.press(screen.getByRole("button", { name: "Let’s start" }));
+    fireEvent.press(screen.getByRole("button", { name: "Continue" }));
     act(() => {
       jest.runOnlyPendingTimers();
     });
-    expect(startFirstSession).toHaveBeenCalledWith(
+    expect(continueAfterPlan).toHaveBeenCalledWith(
       expect.objectContaining({
         id: "anxiety_relief",
         firstSession: expect.objectContaining({
@@ -106,12 +108,12 @@ describe("OnboardingPersonalizationFlowScreen", () => {
   it("allows name skip and keeps the handoff copy non-personal", async () => {
     jest.useFakeTimers();
     const persistAnswers = jest.fn(() => Promise.resolve());
-    const startFirstSession = jest.fn();
+    const continueAfterPlan = jest.fn();
 
     render(
       <OnboardingPersonalizationFlowScreen
+        continueAfterPlan={continueAfterPlan}
         persistAnswers={persistAnswers}
-        startFirstSession={startFirstSession}
         screenExitMs={0}
         startedAt="2026-05-20T01:00:00.000Z"
       />,
@@ -135,7 +137,7 @@ describe("OnboardingPersonalizationFlowScreen", () => {
       });
     });
 
-    expect(screen.getByText("Your first session is ready")).toBeTruthy();
+    expect(screen.getByText("Your follow-up plan is ready")).toBeTruthy();
     expect(screen.getByText("Your plan")).toBeTruthy();
     expect(screen.queryByText(/Riley|Bruno|welcome back/i)).toBeNull();
 
@@ -148,8 +150,8 @@ describe("OnboardingPersonalizationFlowScreen", () => {
 
     render(
       <OnboardingPersonalizationFlowScreen
+        continueAfterPlan={jest.fn()}
         persistAnswers={persistAnswers}
-        startFirstSession={jest.fn()}
         screenExitMs={0}
         startedAt="2026-05-20T01:00:00.000Z"
       />,

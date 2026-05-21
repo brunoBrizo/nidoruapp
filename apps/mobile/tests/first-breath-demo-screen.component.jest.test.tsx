@@ -171,23 +171,67 @@ describe("FirstBreathDemoScreen", () => {
 });
 
 describe("OnboardingFlowScreen", () => {
+  it("resumes directly into personalization after the first session reflection is already saved", async () => {
+    const persistOnboardingStarted = jest.fn(() => Promise.resolve());
+    const startDefaultFirstSession = jest.fn();
+
+    render(
+      <OnboardingFlowScreen
+        loadInitialStep={() => Promise.resolve("personalization")}
+        persistOnboardingStarted={persistOnboardingStarted}
+        startDefaultFirstSession={startDefaultFirstSession}
+      />,
+    );
+
+    expect(screen.getByTestId("onboarding-splash-screen")).toBeTruthy();
+
+    await screen.findByTestId("onboarding-personalization-flow-entry");
+    expect(screen.getByRole("header", { name: "What brings you here?" })).toBeTruthy();
+    expect(persistOnboardingStarted).not.toHaveBeenCalled();
+    expect(startDefaultFirstSession).not.toHaveBeenCalled();
+  });
+
+  it("resumes recoverable first-session or reflection states before replaying onboarding", async () => {
+    const persistOnboardingStarted = jest.fn(() => Promise.resolve());
+    const startDefaultFirstSession = jest.fn();
+
+    render(
+      <OnboardingFlowScreen
+        loadInitialStep={() => Promise.resolve("first-session")}
+        persistOnboardingStarted={persistOnboardingStarted}
+        startDefaultFirstSession={startDefaultFirstSession}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(startDefaultFirstSession).toHaveBeenCalledTimes(1);
+    });
+    expect(screen.queryByTestId("onboarding-personalization-flow-entry")).toBeNull();
+    expect(persistOnboardingStarted).not.toHaveBeenCalled();
+  });
+
   it("places the 30-second demo immediately after splash and before personalization", async () => {
     jest.useFakeTimers();
     const persistFirstBreathDemoEvent = jest.fn(() => Promise.resolve());
     const persistOnboardingStarted = jest.fn(() => Promise.resolve());
+    const startDefaultFirstSession = jest.fn();
 
     render(
       <OnboardingFlowScreen
         firstBreathAutoAdvanceDelayMs={50}
+        loadInitialStep={() => Promise.resolve("splash")}
         persistFirstBreathDemoEvent={persistFirstBreathDemoEvent}
         persistOnboardingStarted={persistOnboardingStarted}
+        startDefaultFirstSession={startDefaultFirstSession}
         splashDurationMs={10}
       />,
     );
 
     expect(ONBOARDING_FIRST_BREATH_SPLASH_DELAY_MS).toBeLessThan(2000);
     expect(screen.getByTestId("onboarding-splash-screen")).toBeTruthy();
-    expect(persistOnboardingStarted).toHaveBeenCalledTimes(1);
+    await waitFor(() => {
+      expect(persistOnboardingStarted).toHaveBeenCalledTimes(1);
+    });
 
     act(() => {
       jest.advanceTimersByTime(10);
@@ -209,8 +253,9 @@ describe("OnboardingFlowScreen", () => {
       jest.advanceTimersByTime(50 + FIRST_BREATH_DEMO_SCREEN_EXIT_MS);
     });
 
-    expect(screen.getByTestId("onboarding-personalization-flow-entry")).toBeTruthy();
-    expect(screen.getByRole("header", { name: "What brings you here?" })).toBeTruthy();
+    expect(startDefaultFirstSession).toHaveBeenCalledTimes(1);
+    expect(screen.queryByTestId("onboarding-personalization-flow-entry")).toBeNull();
+    expect(screen.queryByRole("header", { name: "What brings you here?" })).toBeNull();
 
     jest.useRealTimers();
   });

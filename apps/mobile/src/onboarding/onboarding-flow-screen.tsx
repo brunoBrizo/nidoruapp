@@ -1,13 +1,16 @@
 import {
   breathworkFamiliarityOptions,
   createPersonalizedOnboardingPlan,
+  onboardingPlans,
   onboardingQuestionLimit,
   sleepBaselineOptions,
   windDownTimePresets,
 } from "@nidoru/domain";
 import type {
   BreathworkFamiliarity,
+  BreathTechniqueId,
   OnboardingGoal,
+  OnboardingPlanId,
   PersonalizedOnboardingPlan,
   SleepBaseline,
 } from "@nidoru/domain";
@@ -43,6 +46,7 @@ import {
 import {
   completeOnboardingPersonalizationLocally,
   getOrCreateLocalInstallIdentity,
+  loadFirstLaunchOnboardingResumeTarget,
   recordFirstBreathDemoEventLocally,
   recordOnboardingStartedLocally,
 } from "./local-first-onboarding";
@@ -57,8 +61,19 @@ export const ONBOARDING_FIRST_BREATH_SPLASH_DELAY_MS = 1200;
 export const ONBOARDING_PERSONALIZATION_QUESTION_COUNT = onboardingQuestionLimit;
 export const ONBOARDING_QUESTION_SCREEN_EXIT_MS = 600;
 export const ONBOARDING_DISPLAY_NAME_MAX_LENGTH = 40;
+export const FIRST_LAUNCH_DEFAULT_PLAN_ID = "sleep_focused" satisfies OnboardingPlanId;
+export const FIRST_LAUNCH_DEFAULT_FIRST_SESSION = {
+  durationSeconds: onboardingPlans[FIRST_LAUNCH_DEFAULT_PLAN_ID].firstSession.durationSeconds,
+  planId: FIRST_LAUNCH_DEFAULT_PLAN_ID,
+  techniqueId: onboardingPlans[FIRST_LAUNCH_DEFAULT_PLAN_ID].firstSession
+    .techniqueId as BreathTechniqueId,
+} as const;
 
-type OnboardingFlowStep = "splash" | "first-breath-demo" | "personalization";
+export type OnboardingFlowStep =
+  | "splash"
+  | "first-breath-demo"
+  | "first-session"
+  | "personalization";
 type OnboardingPersonalizationQuestionId =
   | "goal"
   | "sleep_baseline"
@@ -77,16 +92,20 @@ export type OnboardingPersonalizationAnswers = {
 };
 
 type OnboardingFlowScreenProps = {
+  readonly continueAfterPlan?: (plan: PersonalizedOnboardingPlan) => void;
   readonly firstBreathAutoAdvanceDelayMs?: number;
+  readonly initialStep?: OnboardingFlowStep;
+  readonly loadInitialStep?: () => Promise<OnboardingFlowStep>;
   readonly persistFirstBreathDemoEvent?: (eventType: "started" | "completed") => Promise<void>;
   readonly persistOnboardingStarted?: () => Promise<void>;
   readonly splashDurationMs?: number;
+  readonly startDefaultFirstSession?: () => void;
 };
 
 type OnboardingPersonalizationFlowScreenProps = {
+  readonly continueAfterPlan?: (plan: PersonalizedOnboardingPlan) => void;
   readonly persistAnswers?: (answers: OnboardingPersonalizationAnswers) => Promise<void>;
   readonly screenExitMs?: number;
-  readonly startFirstSession?: (plan: PersonalizedOnboardingPlan) => void;
   readonly startedAt?: string;
 };
 
@@ -200,24 +219,89 @@ const questionCopy = {
 >;
 
 export function OnboardingFlowScreen({
+  continueAfterPlan,
   firstBreathAutoAdvanceDelayMs = FIRST_BREATH_DEMO_AUTO_ADVANCE_DELAY_MS,
+  initialStep,
+  loadInitialStep = loadInitialOnboardingStepLocally,
   persistFirstBreathDemoEvent = persistFirstBreathDemoEventLocally,
   persistOnboardingStarted = persistOnboardingStartedLocally,
   splashDurationMs = ONBOARDING_FIRST_BREATH_SPLASH_DELAY_MS,
+  startDefaultFirstSession,
 }: OnboardingFlowScreenProps) {
   const router = useRouter();
-  const [step, setStep] = useState<OnboardingFlowStep>("splash");
+  const [step, setStep] = useState<OnboardingFlowStep | "checking">(initialStep ?? "checking");
   const hasRecordedOnboardingStartRef = useRef(false);
+  const hasResolvedInitialStepRef = useRef(Boolean(initialStep));
+  const hasStartedDefaultFirstSessionRef = useRef(false);
   const onboardingStartedPromiseRef = useRef<Promise<void> | undefined>(undefined);
 
+  const handleStartDefaultFirstSession = useCallback(() => {
+    if (startDefaultFirstSession) {
+      startDefaultFirstSession();
+      return;
+    }
+
+    router.replace({
+      params: {
+        durationSeconds: String(FIRST_LAUNCH_DEFAULT_FIRST_SESSION.durationSeconds),
+        firstLaunch: "1",
+        planId: FIRST_LAUNCH_DEFAULT_FIRST_SESSION.planId,
+        technique: FIRST_LAUNCH_DEFAULT_FIRST_SESSION.techniqueId,
+      },
+      pathname: "/breathe/[technique]",
+    } as Href);
+  }, [router, startDefaultFirstSession]);
+
+  const handleContinueAfterPlan = useCallback(
+    (plan: PersonalizedOnboardingPlan) => {
+      if (continueAfterPlan) {
+        continueAfterPlan(plan);
+        return;
+      }
+
+      router.replace("/post-value");
+    },
+    [continueAfterPlan, router],
+  );
+
   useEffect(() => {
+    if (hasResolvedInitialStepRef.current) {
+      return;
+    }
+
+    let isMounted = true;
+
+    loadInitialStep()
+      .then((nextStep) => {
+        if (!isMounted) {
+          return;
+        }
+
+        hasResolvedInitialStepRef.current = true;
+        setStep(nextStep);
+      })
+      .catch(() => {
+        if (!isMounted) {
+          return;
+        }
+
+        hasResolvedInitialStepRef.current = true;
+        setStep("splash");
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [loadInitialStep]);
+
+  useEffect(() => {
+    if (step !== "splash") {
+      return;
+    }
+
     if (!hasRecordedOnboardingStartRef.current) {
       hasRecordedOnboardingStartRef.current = true;
       onboardingStartedPromiseRef.current = persistOnboardingStarted().catch(() => undefined);
-    }
-
-    if (step !== "splash") {
-      return;
     }
 
     const splashTimer = setTimeout(() => {
@@ -229,8 +313,17 @@ export function OnboardingFlowScreen({
     };
   }, [persistOnboardingStarted, splashDurationMs, step]);
 
+  useEffect(() => {
+    if (step !== "first-session" || hasStartedDefaultFirstSessionRef.current) {
+      return;
+    }
+
+    hasStartedDefaultFirstSessionRef.current = true;
+    handleStartDefaultFirstSession();
+  }, [handleStartDefaultFirstSession, step]);
+
   const handleFirstBreathComplete = useCallback(() => {
-    setStep("personalization");
+    setStep("first-session");
   }, []);
   const handleFirstBreathEvent = useCallback(
     async (eventType: "started" | "completed") => {
@@ -239,26 +332,12 @@ export function OnboardingFlowScreen({
     },
     [persistFirstBreathDemoEvent],
   );
-  const handleStartFirstSession = useCallback(
-    (plan: PersonalizedOnboardingPlan) => {
-      router.replace({
-        pathname: "/breathe/[technique]",
-        params: {
-          durationSeconds: String(plan.firstSession.durationSeconds),
-          planId: plan.id,
-          technique: plan.firstSession.techniqueId,
-        },
-      } as Href);
-    },
-    [router],
-  );
-
-  if (step === "splash") {
+  if (step === "checking" || step === "splash" || step === "first-session") {
     return <OnboardingSplashScreen />;
   }
 
   if (step === "personalization") {
-    return <OnboardingPersonalizationFlowScreen startFirstSession={handleStartFirstSession} />;
+    return <OnboardingPersonalizationFlowScreen continueAfterPlan={handleContinueAfterPlan} />;
   }
 
   return (
@@ -272,9 +351,9 @@ export function OnboardingFlowScreen({
 }
 
 export function OnboardingPersonalizationFlowScreen({
+  continueAfterPlan = () => undefined,
   persistAnswers = persistOnboardingAnswersLocally,
   screenExitMs = ONBOARDING_QUESTION_SCREEN_EXIT_MS,
-  startFirstSession = () => undefined,
   startedAt: startedAtOverride,
 }: OnboardingPersonalizationFlowScreenProps) {
   const safeAreaInsets = useContext(SafeAreaInsetsContext) ?? {
@@ -411,9 +490,13 @@ export function OnboardingPersonalizationFlowScreen({
   if (personalizedPlan) {
     return (
       <PersonalizedPlanScreen
-        onStartFirstSession={startFirstSession}
+        ctaLabel="Continue"
+        localProofChipLabel="Saved locally"
+        onContinue={continueAfterPlan}
         plan={personalizedPlan}
         screenExitMs={screenExitMs}
+        sessionEyebrow="Next session"
+        statusLabel={getFollowUpPlanStatusLabel(personalizedPlan.greeting)}
       />
     );
   }
@@ -588,6 +671,28 @@ async function persistOnboardingAnswersLocally(
     localInstallId,
   });
   captureAnalyticsEventDeferred("onboarding_completed");
+}
+
+async function loadInitialOnboardingStepLocally(): Promise<OnboardingFlowStep> {
+  const database = await openMigratedLocalDatabase();
+  const localDatabase: LocalFirstOnboardingDatabase = {
+    getFirstAsync: (source, params = []) => database.getFirstAsync(source, [...params]),
+    runAsync: (source, params = []) => database.runAsync(source, [...params]),
+  };
+  const localInstallId = await getOrCreateLocalInstallIdentity({ database: localDatabase });
+  const resumeTarget = await loadFirstLaunchOnboardingResumeTarget(localDatabase, {
+    localInstallId,
+  });
+
+  if (resumeTarget === "first-session" || resumeTarget === "personalization") {
+    return resumeTarget;
+  }
+
+  return "splash";
+}
+
+function getFollowUpPlanStatusLabel(greeting: string): string {
+  return greeting.replace("first session", "follow-up plan");
 }
 
 async function persistOnboardingStartedLocally(): Promise<void> {

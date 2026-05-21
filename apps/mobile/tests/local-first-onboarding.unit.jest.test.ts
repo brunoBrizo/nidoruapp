@@ -6,6 +6,7 @@ import {
   createLocalInstallId,
   getOrCreateLocalInstallIdentity,
   hasCompletedOnboardingPersonalization,
+  loadFirstLaunchOnboardingResumeTarget,
   loadNotificationGateReadiness,
   loadPendingPostSessionReflection,
   markNotificationPermissionAccepted,
@@ -86,6 +87,69 @@ describe("local-first onboarding persistence", () => {
     ).resolves.toBe(false);
     expect(completedDatabase.getFirstAsync).toHaveBeenCalledWith(
       expect.stringContaining("FROM onboarding_responses"),
+      ["install_0123456789abcdef"],
+    );
+  });
+
+  it("resumes first launch at the correct local-first boundary", async () => {
+    const completedPersonalizationDatabase = createMockDatabase({
+      completed_onboarding_count: 1,
+      draft_session_count: 0,
+      pending_reflection_count: 0,
+      reflected_session_count: 0,
+    });
+    const pendingReflectionDatabase = createMockDatabase({
+      completed_onboarding_count: 0,
+      draft_session_count: 0,
+      pending_reflection_count: 1,
+      reflected_session_count: 0,
+    });
+    const draftSessionDatabase = createMockDatabase({
+      completed_onboarding_count: 0,
+      draft_session_count: 1,
+      pending_reflection_count: 0,
+      reflected_session_count: 0,
+    });
+    const reflectedSessionDatabase = createMockDatabase({
+      completed_onboarding_count: 0,
+      draft_session_count: 0,
+      pending_reflection_count: 0,
+      reflected_session_count: 1,
+    });
+    const freshInstallDatabase = createMockDatabase({
+      completed_onboarding_count: 0,
+      draft_session_count: 0,
+      pending_reflection_count: 0,
+      reflected_session_count: 0,
+    });
+
+    await expect(
+      loadFirstLaunchOnboardingResumeTarget(completedPersonalizationDatabase, {
+        localInstallId: "install_0123456789abcdef",
+      }),
+    ).resolves.toBe("home");
+    await expect(
+      loadFirstLaunchOnboardingResumeTarget(pendingReflectionDatabase, {
+        localInstallId: "install_0123456789abcdef",
+      }),
+    ).resolves.toBe("first-session");
+    await expect(
+      loadFirstLaunchOnboardingResumeTarget(draftSessionDatabase, {
+        localInstallId: "install_0123456789abcdef",
+      }),
+    ).resolves.toBe("first-session");
+    await expect(
+      loadFirstLaunchOnboardingResumeTarget(reflectedSessionDatabase, {
+        localInstallId: "install_0123456789abcdef",
+      }),
+    ).resolves.toBe("personalization");
+    await expect(
+      loadFirstLaunchOnboardingResumeTarget(freshInstallDatabase, {
+        localInstallId: "install_0123456789abcdef",
+      }),
+    ).resolves.toBe("splash");
+    expect(reflectedSessionDatabase.getFirstAsync).toHaveBeenCalledWith(
+      expect.stringContaining("reflected_session_count"),
       ["install_0123456789abcdef"],
     );
   });

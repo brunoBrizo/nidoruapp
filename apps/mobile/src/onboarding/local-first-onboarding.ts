@@ -80,6 +80,13 @@ type NotificationGateEligibilityRow = {
   readonly wind_down_minutes_after_midnight: number | null;
 };
 
+type FirstLaunchOnboardingResumeTargetRow = {
+  readonly completed_onboarding_count: number;
+  readonly draft_session_count: number;
+  readonly pending_reflection_count: number;
+  readonly reflected_session_count: number;
+};
+
 type LocalEventName =
   | "onboarding_started"
   | "onboarding_completed"
@@ -101,6 +108,12 @@ export type NotificationGateReadiness = {
   readonly lastOpenedAt: Date | null;
   readonly windDownMinutesAfterMidnight: number | null;
 };
+
+export type FirstLaunchOnboardingResumeTarget =
+  | "home"
+  | "first-session"
+  | "personalization"
+  | "splash";
 
 export type LoadNotificationGateReadinessInput = {
   readonly database: LocalFirstOnboardingDatabase;
@@ -279,6 +292,77 @@ export async function hasCompletedOnboardingPersonalization(
   );
 
   return Boolean(row);
+}
+
+export async function loadFirstLaunchOnboardingResumeTarget(
+  database: LocalFirstOnboardingDatabase,
+  input: { readonly localInstallId: string },
+): Promise<FirstLaunchOnboardingResumeTarget> {
+  const parsedLocalInstallId = localInstallIdSchema.parse(input.localInstallId);
+  const row = await database.getFirstAsync<FirstLaunchOnboardingResumeTargetRow>(
+    `
+      WITH install AS (
+        SELECT ? AS local_install_id
+      )
+      SELECT
+        (
+          SELECT COUNT(*)
+          FROM onboarding_responses
+          WHERE onboarding_responses.local_install_id = (SELECT local_install_id FROM install)
+            AND onboarding_responses.status = 'completed'
+        ) AS completed_onboarding_count,
+        (
+          SELECT COUNT(*)
+          FROM first_session_records
+          WHERE first_session_records.local_install_id = (SELECT local_install_id FROM install)
+            AND first_session_records.status = 'draft'
+            AND first_session_records.remaining_ms > 0
+        ) AS draft_session_count,
+        (
+          SELECT COUNT(*)
+          FROM first_session_records
+          WHERE first_session_records.local_install_id = (SELECT local_install_id FROM install)
+            AND first_session_records.status = 'completed'
+            AND first_session_records.completed_at IS NOT NULL
+            AND first_session_records.completion_persisted_at IS NOT NULL
+            AND NOT EXISTS (
+              SELECT 1
+              FROM post_session_reflections
+              WHERE post_session_reflections.session_id = first_session_records.session_id
+            )
+        ) AS pending_reflection_count,
+        (
+          SELECT COUNT(*)
+          FROM first_session_records
+          INNER JOIN post_session_reflections
+            ON post_session_reflections.session_id = first_session_records.session_id
+           AND post_session_reflections.local_install_id = first_session_records.local_install_id
+          WHERE first_session_records.local_install_id = (SELECT local_install_id FROM install)
+            AND first_session_records.status = 'completed'
+            AND first_session_records.completed_at IS NOT NULL
+            AND first_session_records.completion_persisted_at IS NOT NULL
+        ) AS reflected_session_count;
+    `,
+    [parsedLocalInstallId],
+  );
+
+  if (!row) {
+    return "splash";
+  }
+
+  if (row.completed_onboarding_count > 0) {
+    return "home";
+  }
+
+  if (row.pending_reflection_count > 0 || row.draft_session_count > 0) {
+    return "first-session";
+  }
+
+  if (row.reflected_session_count > 0) {
+    return "personalization";
+  }
+
+  return "splash";
 }
 
 export async function loadNotificationGateReadiness({

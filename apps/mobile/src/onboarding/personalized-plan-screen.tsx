@@ -1,6 +1,6 @@
 import type { PersonalizedOnboardingPlan, PersonalizedPlanAnswerRowId } from "@nidoru/domain";
 import { colors, motion, spacing, typography } from "@nidoru/ui-tokens";
-import { Leaf, Moon, ShieldCheck, UserRound, Wind } from "lucide-react-native";
+import { Leaf, Moon, ShieldCheck, Wind } from "lucide-react-native";
 import { useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { Animated, Easing, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaInsetsContext } from "react-native-safe-area-context";
@@ -10,9 +10,13 @@ import { useReduceMotionPreference } from "../motion/use-reduce-motion-enabled";
 export const PERSONALIZED_PLAN_SCREEN_EXIT_MS = motion.duration.screenExitMs;
 
 type PersonalizedPlanScreenProps = {
-  readonly onStartFirstSession: (plan: PersonalizedOnboardingPlan) => void;
+  readonly ctaLabel?: string;
+  readonly localProofChipLabel?: string;
+  readonly onContinue: (plan: PersonalizedOnboardingPlan) => void;
   readonly plan: PersonalizedOnboardingPlan;
   readonly screenExitMs?: number;
+  readonly sessionEyebrow?: string;
+  readonly statusLabel?: string;
 };
 
 const answerRowIcons = {
@@ -22,9 +26,13 @@ const answerRowIcons = {
 } as const satisfies Record<PersonalizedPlanAnswerRowId, typeof Moon>;
 
 export function PersonalizedPlanScreen({
-  onStartFirstSession,
+  ctaLabel = "Continue",
+  localProofChipLabel = "Saved locally",
+  onContinue,
   plan,
   screenExitMs = PERSONALIZED_PLAN_SCREEN_EXIT_MS,
+  sessionEyebrow = "Next session",
+  statusLabel = plan.greeting,
 }: PersonalizedPlanScreenProps) {
   const safeAreaInsets = useContext(SafeAreaInsetsContext) ?? {
     bottom: 0,
@@ -100,7 +108,7 @@ export function PersonalizedPlanScreen({
     outputRange: [0.22, 0.42],
   });
 
-  const startFirstSession = () => {
+  const continueWithPlan = () => {
     if (isExiting) {
       return;
     }
@@ -115,7 +123,7 @@ export function PersonalizedPlanScreen({
 
     setTimeout(
       () => {
-        onStartFirstSession(plan);
+        onContinue(plan);
       },
       reduceMotionEnabled ? 0 : screenExitMs,
     );
@@ -147,7 +155,7 @@ export function PersonalizedPlanScreen({
           <View style={styles.readyPill}>
             <View style={styles.readyDot} />
             <Text selectable style={styles.readyPillText}>
-              {plan.greeting}
+              {statusLabel}
             </Text>
           </View>
 
@@ -186,7 +194,7 @@ export function PersonalizedPlanScreen({
                 </View>
                 <View style={styles.sessionCopy}>
                   <Text selectable style={styles.sessionEyebrow}>
-                    First session
+                    {sessionEyebrow}
                   </Text>
                   <Text selectable style={styles.sessionTitle}>
                     {plan.firstSession.title}
@@ -207,8 +215,8 @@ export function PersonalizedPlanScreen({
                   label={plan.firstSession.guidanceLabel}
                 />
                 <PlanChip
-                  icon={<UserRound color={colors.dark.primaryGlow.value} size={14} />}
-                  label="No account needed"
+                  icon={<ShieldCheck color={colors.dark.primaryGlow.value} size={14} />}
+                  label={localProofChipLabel}
                 />
               </View>
             </View>
@@ -251,7 +259,7 @@ export function PersonalizedPlanScreen({
           <Pressable
             accessibilityRole="button"
             disabled={isExiting}
-            onPress={startFirstSession}
+            onPress={continueWithPlan}
             style={({ pressed }) => [
               styles.startButton,
               pressed && !isExiting ? styles.startButtonPressed : null,
@@ -259,7 +267,7 @@ export function PersonalizedPlanScreen({
             ]}
           >
             <Text selectable={false} style={styles.startButtonText}>
-              Let’s start
+              {ctaLabel}
             </Text>
           </Pressable>
         </View>

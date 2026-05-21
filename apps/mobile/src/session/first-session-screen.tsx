@@ -12,7 +12,7 @@ import type {
   RecoverableFirstSessionDraft,
 } from "@nidoru/validation";
 import * as Haptics from "expo-haptics";
-import { useRouter } from "expo-router";
+import { useRouter, type Href } from "expo-router";
 import { Bell, BellOff, CheckCircle, Pause, Play, Vibrate, VibrateOff } from "lucide-react-native";
 import { useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
@@ -79,6 +79,7 @@ export type FirstSessionScreenProps = FirstSessionPersistence & {
 type FirstSessionRouteScreenProps = {
   readonly durationSeconds?: number;
   readonly planId?: OnboardingPlanId;
+  readonly postRewardRoute?: Href;
   readonly techniqueId: BreathTechniqueId;
 };
 
@@ -98,6 +99,7 @@ const phaseLabels = {
 export function FirstSessionRouteScreen({
   durationSeconds,
   planId,
+  postRewardRoute = "/post-value",
   techniqueId,
 }: FirstSessionRouteScreenProps) {
   const router = useRouter();
@@ -200,7 +202,7 @@ export function FirstSessionRouteScreen({
         captureAnalyticsEventDeferred("first_session_started");
       }}
       onRewardMomentComplete={() => {
-        router.replace("/post-value");
+        router.replace(postRewardRoute);
       }}
       {...(sessionConfig.initialCompletionMode === undefined
         ? {}

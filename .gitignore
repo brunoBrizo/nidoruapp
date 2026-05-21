@@ -5,6 +5,10 @@ dist/
 build/
 node_modules/
 
+apps/mobile/.expo/
+apps/mobile/.gitignore
+apps/mobile/ios/
+
 .env
 .env.*
 !.env.example

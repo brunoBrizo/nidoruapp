@@ -18,10 +18,23 @@ jest.mock("../src/observability/sentry", () => ({
   sentryRelease: "test-release",
 }));
 
-import { createPrivacySafeAnalyticsProperties } from "../src/observability/posthog";
+import {
+  capturePostHogProofEvent,
+  createPrivacySafeAnalyticsProperties,
+  posthogClient,
+  posthogProofEventName,
+} from "../src/observability/posthog";
 import { createPrivacySafeSyncFailureContext } from "../src/observability/sync-observability";
 
 describe("privacy-safe observability", () => {
+  it("keeps PostHog uninitialized when the public API key is not configured", async () => {
+    expect(posthogClient).toBeNull();
+    await expect(capturePostHogProofEvent()).resolves.toEqual({
+      eventName: posthogProofEventName,
+      status: "not_configured",
+    });
+  });
+
   it("allowlists analytics properties and strips prohibited identifiers and user-entered values", () => {
     const properties = createPrivacySafeAnalyticsProperties({
       account_id: "user_123",

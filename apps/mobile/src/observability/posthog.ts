@@ -84,10 +84,10 @@ const posthogOptions: PostHogOptions = {
   setDefaultPersonProperties: false,
 };
 
-export const posthogClient = new PostHog(posthogApiKey, posthogOptions);
+export const posthogClient = posthogApiKey ? new PostHog(posthogApiKey, posthogOptions) : null;
 
 export function isPostHogConfigured() {
-  return Boolean(posthogApiKey);
+  return posthogClient !== null;
 }
 
 export function createPrivacySafeAnalyticsProperties(
@@ -120,7 +120,7 @@ function captureExplicitEvent(
   eventName: AnalyticsEventName | typeof posthogProofEventName,
   properties: Readonly<Record<string, unknown>> = {},
 ) {
-  if (!isPostHogConfigured()) {
+  if (!posthogClient) {
     return {
       status: "not_configured" as const,
       eventName,
@@ -159,7 +159,7 @@ export async function capturePostHogProofEvent() {
     source: "observability_proof",
   });
 
-  if (result.status === "queued") {
+  if (result.status === "queued" && posthogClient) {
     await posthogClient.flush();
   }
 

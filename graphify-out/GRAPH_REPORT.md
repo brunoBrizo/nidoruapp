@@ -1,11 +1,11 @@
-# Graph Report - sleep-app  (2026-05-20)
+# Graph Report - sleep-app  (2026-05-21)
 
 ## Corpus Check
-- 107 files · ~218,307 words
+- 108 files · ~199,893 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 315 nodes · 333 edges · 16 communities detected
+- 316 nodes · 332 edges · 16 communities detected
 - Extraction: 89% EXTRACTED · 11% INFERRED · 0% AMBIGUOUS · INFERRED: 36 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
@@ -35,9 +35,9 @@
 5. `linkPostValueAccount()` - 7 edges
 6. `evaluateGate()` - 7 edges
 7. `createLocalEventId()` - 7 edges
-8. `captureExplicitEvent()` - 6 edges
-9. `createPersonalizedOnboardingPlan()` - 5 edges
-10. `getNextEveningReminderDate()` - 5 edges
+8. `createPersonalizedOnboardingPlan()` - 5 edges
+9. `getNextEveningReminderDate()` - 5 edges
+10. `getAppEnvironment()` - 5 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `getOnboardingPlanForGoal()` --calls--> `completeOnboardingPersonalizationLocally()`  [INFERRED]
@@ -46,8 +46,8 @@
   packages/domain/src/index.ts → apps/mobile/src/notifications/notification-permission-gate-controller.tsx
 - `getNextEveningReminderDate()` --calls--> `reconcileEveningReminderSchedule()`  [INFERRED]
   packages/domain/src/index.ts → apps/mobile/src/notifications/notification-permission-service.ts
-- `upsertPostValueRecords()` --calls--> `fetch()`  [INFERRED]
-  apps/mobile/src/paywall/post-value-supabase-auth.ts → supabase/functions/foundation-health/index.ts
+- `fetch()` --calls--> `upsertPostValueRecords()`  [INFERRED]
+  supabase/functions/foundation-health/index.ts → apps/mobile/src/paywall/post-value-supabase-auth.ts
 - `createClient()` --calls--> `createPostValueSupabaseClient()`  [INFERRED]
   apps/mobile/tests/post-value-sync.unit.jest.test.ts → apps/mobile/src/paywall/post-value-supabase-auth.ts
 
@@ -66,8 +66,8 @@ Cohesion: 0.15
 Nodes (9): openMigratedLocalDatabase(), openDefaultLocalDatabase(), applyMigration(), runSqliteMigrations(), assertCondition(), assertRejects(), runSqlite(), SqliteCliDatabase (+1 more)
 
 ### Community 3 - "Community 3"
-Cohesion: 0.16
-Nodes (12): getAppEnvironment(), isNonProductionEnvironment(), isObservabilityProofModeEnabled(), capturePostHog(), captureSentry(), captureAnalyticsEvent(), captureExplicitEvent(), capturePostHogProofEvent() (+4 more)
+Cohesion: 0.15
+Nodes (11): getAppEnvironment(), isNonProductionEnvironment(), isObservabilityProofModeEnabled(), capturePostHog(), captureSentry(), captureAnalyticsEvent(), captureExplicitEvent(), capturePostHogProofEvent() (+3 more)
 
 ### Community 4 - "Community 4"
 Cohesion: 0.17
@@ -137,7 +137,7 @@ _Questions this graph is uniquely positioned to answer:_
 - **Why does `captureAnalyticsEvent()` connect `Community 3` to `Community 0`?**
   _High betweenness centrality (0.026) - this node is a cross-community bridge._
 - **Why does `openMigratedLocalDatabase()` connect `Community 2` to `Community 0`?**
-  _High betweenness centrality (0.024) - this node is a cross-community bridge._
+  _High betweenness centrality (0.023) - this node is a cross-community bridge._
 - **Are the 4 inferred relationships involving `requestNotificationPermissionFromGate()` (e.g. with `markNotificationPermissionPrompted()` and `captureAnalyticsEvent()`) actually correct?**
   _`requestNotificationPermissionFromGate()` has 4 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 2 inferred relationships involving `getFirstSessionSnapshot()` (e.g. with `pauseSession()` and `resumeSession()`) actually correct?**

@@ -8,6 +8,10 @@ type ObservabilityProviderProps = {
 };
 
 export function ObservabilityProvider({ children }: ObservabilityProviderProps) {
+  if (!posthogClient) {
+    return <>{children}</>;
+  }
+
   return (
     <PostHogProvider autocapture={false} client={posthogClient}>
       {children}

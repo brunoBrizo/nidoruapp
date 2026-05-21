@@ -40,6 +40,11 @@ The market gap is not "more sleep content." The gap is a simple, trustworthy nig
 - Morning reflection that becomes useful insight after repeated use.
 - Honest pricing that avoids billing backlash and subscription anxiety.
 
+The two core breathing jobs stay distinct:
+
+- Rescue Me is the emergency off switch: one tap into 4-7-8 breathing, with no choices or setup.
+- Coherent Breathing is regular practice: a 10-minute Daily Calm / HRV Training session for evening wind-down or daily resilience building.
+
 ## Current Product Bible Principle
 
 The complete product bible adds a stricter product filter:
@@ -57,7 +62,7 @@ Use this as the default tie-breaker for product decisions. Features that fail bo
    Audio, haptics, dimming, and one-tap starts matter more than rich navigation at night.
 
 3. Name breathing techniques by technique.
-   Use names like 4-7-8, box breathing, coherent breathing, and diaphragmatic breathing. Avoid vague labels like calm, sleep, or balanced as the primary taxonomy.
+   Use names like 4-7-8, box breathing, coherent breathing, and diaphragmatic breathing. Outcome labels such as Daily Calm or HRV Training can help users choose, but the technique name remains visible.
 
 4. Make streaks compassionate.
    Missed days should pause momentum, not punish the user. Celebrate returning.
@@ -66,7 +71,7 @@ Use this as the default tie-breaker for product decisions. Features that fail bo
    Downloads that fail are a known competitor complaint. Ambient sound and core breath cues should not depend on a perfect network connection.
 
 6. No account, paywall, or permissions before value.
-   Ask for account creation and paid conversion after the first completed session. Ask for notification permission on Day 3 after at least two completed sessions.
+   The first launch path starts with breathing and can complete a first full session before personalization. Ask for personalization, account creation, and paid conversion after the first completed session. Ask for notification permission on Day 3 after at least two completed sessions.
 
 7. No clinical overclaiming.
    The app can be science-informed without promising to treat insomnia, anxiety, or medical conditions.

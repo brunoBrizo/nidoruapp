@@ -28,6 +28,12 @@ describe("navigation reachability contract", () => {
       },
       { id: "sound-mixer", label: "Sound Mixer", routeTarget: "/sleep/sounds", tapsFromHome: 1 },
       { id: "breathe", label: "Breathe", routeTarget: "/breathe", tapsFromHome: 1 },
+      {
+        id: "daily-calm-hrv-training",
+        label: "Daily Calm / HRV Training",
+        routeTarget: "/breathe/coherent-breathing?durationSeconds=600",
+        tapsFromHome: 2,
+      },
       { id: "progress", label: "Progress", routeTarget: "/progress", tapsFromHome: 1 },
       {
         id: "profile-settings",

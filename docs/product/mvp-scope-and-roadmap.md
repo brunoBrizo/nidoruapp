@@ -36,7 +36,7 @@ Required behavior:
 
 - One tap from home, two taps maximum.
 - Fixed launch sequence: breathwork, body relaxation cue, ambient sound.
-- Breathwork duration: 3-5 minutes.
+- Breathwork duration: 3-5 minutes for starter wind-down, with a 10-minute Coherent Breathing / Daily Calm option for regular practice.
 - Body cue duration: about 2 minutes.
 - Ambient sound continues until timer or user stop.
 - Phone screen dims after breathwork completion.
@@ -58,7 +58,7 @@ Required behavior:
 - Launch techniques:
   - 4-7-8 breathing for sleep.
   - Box breathing for anxiety and calm.
-  - Coherent breathing, 5 seconds in and 5 seconds out.
+  - Coherent Breathing / Daily Calm, 5.5 seconds in and 5.5 seconds out, for 10-minute evening or daily practice.
   - Diaphragmatic breathing for stress.
 - Animation should be attractive enough to screen record.
 

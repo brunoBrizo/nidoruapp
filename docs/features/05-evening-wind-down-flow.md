@@ -17,7 +17,7 @@ Evening Wind-Down is the anchor nightly ritual. One tap from Home sequences brea
 
 - One tap preferred, two taps maximum from Home.
 - Fixed launch sequence:
-  - 3-5 minutes of breathwork.
+  - 3-5 minutes of starter breathwork, with Coherent Breathing / Daily Calm as a 10-minute regular-practice option.
   - About 2 minutes of body relaxation cue.
   - Ambient sound continues until timer or user stop.
 - Optional quick context check can ask tonight's goal and remember the last choice.
@@ -40,6 +40,7 @@ Evening Wind-Down is the anchor nightly ritual. One tap from Home sequences brea
 - Taps from Home to evening wind-down are one preferred, two maximum.
 - Wind-down can complete without looking at the screen after start.
 - Ambient audio keeps working with the phone locked.
+- Keep-awake or power-management locks release when timer playback ends.
 - Audio stop/fade/continue state is visible before screen dims.
 - Full wind-down run is recorded locally.
 - Breathwork completion is saved before transition, share prompts, or upsell.
@@ -63,6 +64,7 @@ Evening Wind-Down is the anchor nightly ritual. One tap from Home sequences brea
 - Local `wind_down_runs` record with routine ID, step completions, total duration, ambient sound choice, and stop/completion state.
 - Breath session record linked to wind-down run.
 - Ambient sound layer state linked to run.
+- Power-management state linked to active playback and released at timer end.
 - Sync is idempotent and never blocks the active flow.
 
 ## Analytics Events
@@ -80,6 +82,7 @@ Evening Wind-Down is the anchor nightly ritual. One tap from Home sequences brea
 - If brightness permission is unavailable, use app-level dimming.
 - If audio interruption occurs, show whether audio stopped, faded, or resumed.
 - If network is unavailable, use bundled sounds.
+- If timer playback ends, release keep-awake or power-management locks so the device can dim and lock naturally.
 - If app backgrounds after exercise, session completion remains saved.
 - If the user exits during body cue, save partial wind-down state without guilt.
 
@@ -88,6 +91,7 @@ Evening Wind-Down is the anchor nightly ritual. One tap from Home sequences brea
 - [ ] Add Wind-Down primary action from Home.
 - [ ] Build optional quick context check and remembered last choice.
 - [ ] Start 3-5 minute breathwork step.
+- [ ] Add Coherent Breathing / Daily Calm as a 10-minute regular-practice option.
 - [ ] Add body relaxation cue step.
 - [ ] Add 5-second transition card.
 - [ ] Hand off into ambient sound mode.
@@ -97,4 +101,5 @@ Evening Wind-Down is the anchor nightly ritual. One tap from Home sequences brea
 - [ ] Persist each step completion locally.
 - [ ] Persist final completion or stop reason locally.
 - [ ] Verify locked-screen audio continuation.
+- [ ] Verify keep-awake or power-management locks release after timer playback ends.
 - [ ] Verify flow can complete without extra screen interaction after start.

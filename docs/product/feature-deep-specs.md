@@ -21,12 +21,13 @@ Every feature below is described at implementation level: what it does, what it 
 **The animation mechanics in detail:**
 
 The orb is a multi-layered circle system:
-- **Layer 1 (core):** Solid filled circle, `Iris #7C6FCD`, radius 80px at rest
-- **Layer 2 (inner glow):** Semi-transparent layer, `rgba(124, 111, 205, 0.4)`, radius 90px at rest
-- **Layer 3 (outer ring):** Thin ring (2px stroke), `rgba(168, 156, 224, 0.3)`, radius 110px at rest
-- **Layer 4 (pulse ring):** Expands outward and fades on inhale phase only — creates a ripple like a heartbeat. Box-shadow `0 0 0 0 → 0 0 0 40px` with opacity `0.3 → 0` on each inhale
+- **Layer 1 (core):** Solid filled circle, `Iris #7C6FCD`, scale `1.0 → 1.12`
+- **Layer 2 (inner glow):** Soft glow layer, scale `1.0 → 1.18`
+- **Layer 3 (mid diffusion):** Middle diffusion layer, scale `1.0 → 1.25`, opacity `0.30 → 0.15`
+- **Layer 4 (outer glow):** Outer glow layer, scale `1.0 → 1.35`, opacity `0.15 → 0.08`
+- **Layer 5 (pulse ring):** Expands outward and fades on inhale phase only, scale `1.0 → 1.6`, opacity `0.5 → 0`
 
-On inhale: all layers scale up in sync (core to 110px, inner glow to 130px, outer ring to 150px). The scale factor varies per technique.
+On inhale: all five layers scale up in sync from the breath phase timer. The scale factor varies per layer to create depth while preserving one timing source.
 
 On hold (if applicable): orb stays at maximum size, pulsing gently at 50% of the breath rate (a subtle shimmer to communicate "stay here")
 
@@ -44,7 +45,7 @@ On exhale: all layers contract smoothly back to rest size. The exhale animation 
 |------|---------|-------------|---------|
 | 4-7-8 Sleep | 4s in / 7s hold / 8s out | The most viral technique[^10]; natural nervous system tranquilizer | Before bed |
 | Box Breathing | 4s in / 4s hold / 4s out / 4s hold | Military-grade anxiety control, used by Navy SEALs | Anxiety/stress |
-| Coherent Breathing | 5s in / 5s out | Optimizes heart rate variability, balancing | Daytime calm |
+| Coherent Breathing / Daily Calm | 5.5s in / 5.5s out | Regular 10-minute practice for HRV-oriented resilience | Evening Wind-Down, Daily Practice |
 | Physiological Sigh | 2s in / 1s in / 8s out | Double inhale + long exhale — fastest nervous system reset[^11] | Panic/acute stress |
 
 **What competitors get wrong:**
@@ -75,7 +76,7 @@ On exhale: all layers contract smoothly back to rest size. The exhale animation 
 "What's your goal tonight?"
 - Fall asleep faster (→ 4-7-8 breath + sleep story + sounds)
 - Calm racing thoughts (→ box breathing + body scan + sounds)
-- Wake up fewer times (→ coherent breathing + longer ambient audio)
+- Wake up fewer times (→ Coherent Breathing / Daily Calm + longer ambient audio)
 
 After the first time, the app remembers the last choice and skips this step — one tap goes directly to the session.
 
@@ -142,6 +143,7 @@ At the bottom, a persistent mixer strip:
 - Shows countdown in corner: "Fading in 28 min"
 - At 2 minutes before fade: volume begins a slow linear fade from current to 0%
 - Fade duration: 2 minutes (not sudden cut) — users who are light sleepers hate sudden audio stops
+- When audio stops, the player releases any keep-awake or power-management lock so the device can dim and lock naturally.
 
 **Offline behavior:** All 15 base sounds are bundled in the app install (~40MB total for 15 looping audio files). Zero network required. This is the most important technical decision for the sound mixer. Competitors require network playback — causing buffer pauses that wake users up. This is mentioned directly in user complaints about Calm.[^20]
 
@@ -188,7 +190,7 @@ How do you feel right now?
 
 One tap on a star rating. One tap on a mood. Then the suggestion appears:
 - Sleep ≤2 stars: "Try a 3-minute energizing breath to help wake up fully"
-- Sleep 3–4 stars: "Start with coherent breathing to balance your day"
+- Sleep 3–4 stars: "Start with Daily Calm breathing to balance your day"
 - Sleep 5 stars: "Great night! Optional: 2 minutes of focused breathing before work"
 
 The morning breathwork session is always 2–3 minutes maximum. This is a "starter" ritual — not a commitment.
@@ -225,14 +227,14 @@ Skipping is always allowed with zero friction. Never guilt a user about skipping
 
 ────────────────────────────────────────────
   Quick Actions
-  
+
   [Rescue Me]    [Sound Mixer]   [Free Breathe]
     Panic fix      Tonight's       Just the orb
                      sounds
 
 ────────────────────────────────────────────
   Your Sleep Streak
-  
+
   ████████░░  8 days    ⟳ Compassionate
 
 ────────────────────────────────────────────

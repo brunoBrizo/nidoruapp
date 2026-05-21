@@ -15,7 +15,7 @@ The breathing visual pacer is the core product animation: a multi-layer orb that
 
 ## MVP Scope
 
-- Multi-layer orb with core, inner glow, outer ring, and pulse ring.
+- Five-layer orb with core, inner glow, mid diffusion, outer glow, and pulse ring. [Animation Source Alignment](../engineering/animation-source-alignment.md) resolves layer-count conflicts.
 - Phase text: Inhale, Hold, Exhale.
 - Audio modes: none, gentle bell, soft whoosh, nature ambient under phase audio.
 - Haptics while active and screen-on:
@@ -24,7 +24,7 @@ The breathing visual pacer is the core product animation: a multi-layer orb that
 - Launch techniques from MVP roadmap:
   - 4-7-8 breathing for sleep.
   - Box breathing for anxiety and calm.
-  - Coherent breathing, 5 seconds in and 5 seconds out.
+  - Coherent Breathing / Daily Calm, 5.5 seconds in and 5.5 seconds out, as a regular 10-minute Evening Wind-Down or Daily Practice / HRV Training session.
   - Diaphragmatic breathing for stress.
 - Source note: [Feature Deep Specs](../product/feature-deep-specs.md) also defines Physiological Sigh for panic or acute stress. Preserve it in the technique catalog as a post-MVP or explicit replacement candidate before tickets are written.
 - Session completion persists before end screens, share prompts, animations, or upsells.
@@ -41,6 +41,7 @@ The breathing visual pacer is the core product animation: a multi-layer orb that
 
 - 4-7-8 session runs smoothly for 5 minutes on real iOS and Android devices.
 - Tap Start to first breath phase is less than 500 ms.
+- All five orb layers derive from the same breath phase timer.
 - Orb scale, phase text, audio cues, and phase state stay synchronized.
 - App wake returns to the correct current phase.
 - Audio cues remain the reliable locked-screen guidance layer.
@@ -64,7 +65,7 @@ The breathing visual pacer is the core product animation: a multi-layer orb that
 
 ## Data And Backend Needs
 
-- Local technique definitions include name, phase timings, labels, context, free or premium availability, and localization keys.
+- Local technique definitions include name, phase timings, labels, context, session role, free or premium availability, and localization keys.
 - Breath session local record includes technique, started at, completed at, duration, breath count estimate, and completion state.
 - Sync creates `breath_sessions` rows after auth exists.
 - Server state never becomes the source of truth for an in-progress breath session.
@@ -88,9 +89,10 @@ The breathing visual pacer is the core product animation: a multi-layer orb that
 ## Task Checklist
 
 - [ ] Define local technique catalog for MVP techniques.
+- [ ] Add Coherent Breathing / Daily Calm as a 5.5/5.5 regular-practice technique.
 - [ ] Add source note for Physiological Sigh conflict before ticket creation.
 - [ ] Build breath session controller with phase, phase start time, duration, cycle count, and total duration.
-- [ ] Build multi-layer orb visual.
+- [ ] Build five-layer orb visual from the animation source alignment.
 - [ ] Connect Reanimated shared values to phase progress.
 - [ ] Add phase label crossfade.
 - [ ] Add inhale pulse ring.

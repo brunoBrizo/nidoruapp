@@ -33,7 +33,7 @@ The app should win by combining a low-choice home screen, first-value breathing 
 | Calm's ambient backgrounds | Slow, non-demanding background life | Night gradients, subtle particles only after performance proof, and no attention-grabbing loops. |
 | Calm's 60-second Breathe Bubble | Zero-friction relief | Rescue Me and Free Breathe must be visible from Home and start without account, network, or paywall. |
 | Headspace emotional design | Rounded, spacious, safe UI language | Warm copy, readable whitespace, friendly typography, no sharp or urgent interaction style. |
-| Headspace breathe-before-register pattern | Demonstrate value before capture | First launch starts with a 30-second guided orb breath before questions, sign-in, permissions, or paywall. |
+| Headspace breathe-before-register pattern | Demonstrate value before capture | First launch starts with a 30-second guided orb breath and a short first full session before questions, sign-in, permissions, or paywall. |
 | Headspace progressive path | Make beginners feel guided | Use bounded next steps and later short foundations/challenges, not a huge course library. |
 | Breathwrk goal categories | Organize by user state | Breathe tab groups techniques by Sleep, Calm, Energy, and Focus while still showing technique names. |
 | Breathwrk customization | Create ownership | Let users control voice/audio/haptics/duration where it matters, without slowing the first session. |
@@ -63,12 +63,13 @@ Use the newer competitor report as the current onboarding decision:
 
 1. Splash stays short.
 2. First interaction is a 30-second breathing demonstration.
-3. Ask no more than five questions.
-4. Show a personalized plan screen.
-5. Start the first full session.
-6. Show paywall only after that session completes.
-7. Offer social login after value; no password creation on Day 1.
-8. Ask for notification permission on Day 3 after at least two completed sessions.
+3. Start a short first full session.
+4. Ask the post-session reflection.
+5. Ask no more than five personalization questions.
+6. Show a personalized plan screen.
+7. Show paywall only after the first full session reward moment.
+8. Offer social login after value; no password creation on Day 1.
+9. Ask for notification permission on Day 3 after at least two completed sessions.
 
 ### Home Screen
 
@@ -110,6 +111,7 @@ Pull Rescue Me into MVP. The report makes it a direct competitive response to Ca
 
 - New user can reach a breathing cue in under 60 seconds from first open.
 - First 30 seconds demonstrate breath before capture.
+- New user can complete the first full session before personalization.
 - Home has exactly one primary CTA.
 - Rescue Me starts from Home without network, account, or paywall.
 - Sound mixer can play bundled sounds with no audible loop click.

@@ -4,12 +4,12 @@ Phase: MVP
 
 ## Summary
 
-Onboarding must demonstrate value before capture. The first launch starts with a short local breath demo, then asks at most five purposeful questions, shows a simple prebuilt plan, starts the first full session, and only then offers account linking or paywall.
+Onboarding must demonstrate value before capture. The first launch starts with a short local breath demo, continues into a short first full session, asks for a quick reflection, and only then introduces personalization, account linking, or paywall surfaces.
 
 ## User Stories
 
 - As a first-time user, I want to breathe before creating an account so I can trust the app.
-- As a first-time user, I want the questions to feel short and useful.
+- As a first-time user, I want personalization to happen after I have already felt the app work.
 - As a returning user after first value, I want my first session saved even if account creation or sync fails.
 - As a privacy-sensitive user, I want to skip name entry and avoid permissions on first launch.
 
@@ -17,16 +17,16 @@ Onboarding must demonstrate value before capture. The first launch starts with a
 
 - Splash with dark night background, resting orb, app name, and no spinner.
 - First interaction is a 30-second orb breath demo.
-- No account, paywall, notification prompt, health permission, microphone permission, content library, or backend dependency before the first breath.
-- Ask up to five questions:
+- Start a short default first full session immediately after the demo.
+- Ask post-session reflection: Same, Better, Much better.
+- No account, paywall, notification prompt, health permission, microphone permission, content library, question flow, or backend dependency before the first full session.
+- After the first full session, ask up to five questions:
   - What brings you here?
   - How do you sleep most nights?
   - When do you usually wind down?
   - Have you tried breathwork before?
   - What should we call you? Optional.
 - Show one of four prebuilt plans: Sleep Focused, Anxiety Relief, Stress Reset, General Wellness.
-- Start the first full session immediately.
-- Ask post-session reflection: Same, Better, Much better.
 - Offer social login or anonymous-to-account linking after the first full session.
 - Ask notification permission on Day 3 after at least two completed sessions, not during onboarding.
 
@@ -46,7 +46,8 @@ Onboarding must demonstrate value before capture. The first launch starts with a
 - First breath and first full session work without network.
 - First session is saved locally before sync or account linking.
 - Total question count is five or fewer.
-- Every question changes plan, copy, timing, or first-session recommendation.
+- No personalization question appears before the first full session completes.
+- Every question changes plan, copy, timing, or later personalization.
 - Paywall and account prompts appear only after the reward moment.
 - If initialization is slow, onboarding uses a calm skeleton or goes straight to the local breath demo.
 
@@ -68,12 +69,14 @@ Onboarding must demonstrate value before capture. The first launch starts with a
 
 - Generate local install identity on first launch.
 - Store onboarding response locally:
+  - First session completion state.
+  - Post-session reflection.
   - Goal.
   - Sleep baseline.
   - Wind-down target.
   - Breathwork familiarity.
   - Optional display name.
-  - First recommended technique or plan.
+  - Follow-up recommended technique or plan.
 - Attempt Supabase anonymous auth only after first value or in a non-blocking background retry.
 - Map local records to `user_id` after auth succeeds.
 
@@ -101,6 +104,9 @@ Onboarding must demonstrate value before capture. The first launch starts with a
 - [ ] Build splash with app name and resting orb.
 - [ ] Build 30-second breath demo with no gates before it.
 - [ ] Persist onboarding start locally.
+- [ ] Start short default first full session immediately after the demo.
+- [ ] Persist first full session locally before sync.
+- [ ] Build post-session reflection.
 - [ ] Build goal question.
 - [ ] Build sleep baseline question.
 - [ ] Build wind-down time question.
@@ -108,10 +114,7 @@ Onboarding must demonstrate value before capture. The first launch starts with a
 - [ ] Build optional name question with visible skip.
 - [ ] Map answers to four prebuilt plans.
 - [ ] Build personalized plan screen with one primary CTA.
-- [ ] Start first full session from plan CTA.
-- [ ] Persist first full session locally before sync.
-- [ ] Build post-session reflection.
-- [ ] Add account-link prompt after reflection.
+- [ ] Add post-value account-link prompt after the first full session reward moment.
 - [ ] Ensure paywall can only appear after first full session completion.
 - [ ] Add Day 3 notification pre-permission gate after at least two sessions.
 - [ ] Verify first breath within 60 seconds on a development build.

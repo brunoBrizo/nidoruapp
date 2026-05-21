@@ -74,7 +74,7 @@ Only after this feels good should the team add account creation, subscriptions, 
 
 | Risk | Severity | Response |
 | --- | --- | --- |
-| First session takes too long | High | Start with a 30-second breath demo, then keep personalization to five purposeful questions or fewer. |
+| First session takes too long | High | Start with a 30-second breath demo, continue into a short first full session, then keep personalization to five purposeful questions or fewer. |
 | App becomes a content library | High | Keep home focused on one nightly action. |
 | Audio reliability disappoints users | High | Treat audio as a core acceptance gate. |
 | Subscription anxiety hurts reviews | High | Keep free tier useful and send renewal reminders. |

@@ -81,6 +81,7 @@ The goal is not to build user-facing product features. The goal is to make the w
 - Mobile app runs as an Expo development build, not Expo Go.
 - Web app exists for marketing/legal/support/admin foundation.
 - Shared packages are importable by mobile and web where appropriate.
+- Native audio proof covers background playback plus release of keep-awake or power-management locks when timer playback ends.
 - Development, staging, and production environment boundaries are documented and represented in config.
 - Local Supabase starts through Docker and can run migrations.
 - CI can run TypeScript, ESLint, unit tests, component tests, SQLite migration tests, Supabase migration validation, and i18n missing-key checks.
@@ -177,7 +178,7 @@ No broad autocapture is allowed on sensitive bedtime, sleep, billing, or support
 - If Supabase local services require Docker, run integration tests with Docker access.
 - If Sentry source-map upload is not configured, do not treat production release setup as complete.
 - If R2, RevenueCat, PostHog, Sentry, Resend, or Help Scout credentials are missing, local feature work can continue with documented development stand-ins, but staging/public launch cannot be considered ready.
-- If app audio, haptics, notifications, or lock-screen behavior only passes in simulator, treat proof as incomplete because device testing is required.
+- If app audio, haptics, notifications, background playback, keep-awake release, or lock-screen behavior only passes in simulator, treat proof as incomplete because device testing is required.
 
 ## Task Checklist
 
@@ -257,6 +258,7 @@ No broad autocapture is allowed on sensitive bedtime, sleep, billing, or support
 - [x] Create first mobile proof screen for fonts, tokens, and palette.
 - [ ] Verify development build can run on a real iOS device or simulator for non-device-specific checks.
 - [ ] Verify development build can run on a real Android device or emulator for non-device-specific checks.
+- [ ] Verify timer-ended audio releases keep-awake or power-management locks on device.
 - [ ] Verify Sentry captures a test error with release context.
 - [ ] Verify PostHog receives an explicit test event in non-production.
 - [x] Verify local Supabase starts through Docker.

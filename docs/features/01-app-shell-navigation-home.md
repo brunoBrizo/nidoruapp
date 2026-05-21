@@ -25,7 +25,7 @@ The app shell gives Nidoru its fixed five-tab structure and makes Home a "right 
   - 12 AM-5 AM: Rescue Me.
 - Quick actions are Rescue Me, Sounds, and Breathe.
 - Sleep tab contains Wind-Down Flow, Sound Mixer, and Sleep Stories when added.
-- Breathe tab groups techniques by Sleep, Calm, Energy, and Focus while still showing technique names.
+- Breathe tab groups techniques by Sleep, Calm, Energy, and Focus while still showing technique names, including Coherent Breathing / Daily Calm as the regular 10-minute HRV Training practice.
 - Progress tab contains streak calendar, weekly summary, mood history, and sleep trends.
 - Profile tab contains settings, subscription, notifications, sound preferences, support, and privacy controls.
 
@@ -98,6 +98,7 @@ Do not add broad Home autocapture.
 - [ ] Add persistent quick actions: Rescue Me, Sounds, Breathe.
 - [ ] Add sleep check-in or last-night summary slot.
 - [ ] Add quiet streak/progress strip.
+- [ ] Surface Coherent Breathing / Daily Calm in the Breathe tab as a regular practice, not as Rescue Me.
 - [ ] Add Profile entry points for settings, subscription, notifications, support, and privacy.
 - [ ] Implement tab active indicator motion using product timing.
 - [ ] Verify Home has no library, feed, upsell banner, red badge, or multiple primary CTAs.

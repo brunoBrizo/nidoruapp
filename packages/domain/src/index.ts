@@ -35,10 +35,10 @@ export const breathTechniques = {
   "coherent-breathing": {
     id: "coherent-breathing",
     name: "Coherent Breathing",
-    primaryContext: "Daytime calm and balance",
+    primaryContext: "Daily Calm / HRV Training",
     phases: [
-      { name: "inhale", durationMs: 5000 },
-      { name: "exhale", durationMs: 5000 },
+      { name: "inhale", durationMs: 5500 },
+      { name: "exhale", durationMs: 5500 },
     ],
   },
   "physiological-sigh": {

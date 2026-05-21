@@ -1,12 +1,12 @@
 # Graph Report - sleep-app  (2026-05-21)
 
 ## Corpus Check
-- 108 files · ~199,893 words
+- 112 files · ~219,146 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 316 nodes · 332 edges · 16 communities detected
-- Extraction: 89% EXTRACTED · 11% INFERRED · 0% AMBIGUOUS · INFERRED: 36 edges (avg confidence: 0.8)
+- 332 nodes · 344 edges · 18 communities detected
+- Extraction: 90% EXTRACTED · 10% INFERRED · 0% AMBIGUOUS · INFERRED: 36 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
@@ -24,8 +24,10 @@
 - [[_COMMUNITY_Community 11|Community 11]]
 - [[_COMMUNITY_Community 12|Community 12]]
 - [[_COMMUNITY_Community 13|Community 13]]
+- [[_COMMUNITY_Community 14|Community 14]]
 - [[_COMMUNITY_Community 15|Community 15]]
 - [[_COMMUNITY_Community 17|Community 17]]
+- [[_COMMUNITY_Community 19|Community 19]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `createPostValueSupabaseClient()` - 8 edges
@@ -37,7 +39,7 @@
 7. `createLocalEventId()` - 7 edges
 8. `createPersonalizedOnboardingPlan()` - 5 edges
 9. `getNextEveningReminderDate()` - 5 edges
-10. `getAppEnvironment()` - 5 edges
+10. `MainActivity` - 5 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `getOnboardingPlanForGoal()` --calls--> `completeOnboardingPersonalizationLocally()`  [INFERRED]
@@ -63,11 +65,11 @@ Nodes (12): fetch(), createPostValueSupabaseAuthenticator(), createPostValueSupa
 
 ### Community 2 - "Community 2"
 Cohesion: 0.15
-Nodes (9): openMigratedLocalDatabase(), openDefaultLocalDatabase(), applyMigration(), runSqliteMigrations(), assertCondition(), assertRejects(), runSqlite(), SqliteCliDatabase (+1 more)
+Nodes (11): getAppEnvironment(), isNonProductionEnvironment(), isObservabilityProofModeEnabled(), capturePostHog(), captureSentry(), captureAnalyticsEvent(), captureExplicitEvent(), capturePostHogProofEvent() (+3 more)
 
 ### Community 3 - "Community 3"
 Cohesion: 0.15
-Nodes (11): getAppEnvironment(), isNonProductionEnvironment(), isObservabilityProofModeEnabled(), capturePostHog(), captureSentry(), captureAnalyticsEvent(), captureExplicitEvent(), capturePostHogProofEvent() (+3 more)
+Nodes (9): openMigratedLocalDatabase(), openDefaultLocalDatabase(), applyMigration(), runSqliteMigrations(), assertCondition(), assertRejects(), runSqlite(), SqliteCliDatabase (+1 more)
 
 ### Community 4 - "Community 4"
 Cohesion: 0.17
@@ -90,54 +92,66 @@ Cohesion: 0.46
 Nodes (7): classifySyncError(), createSyncTableError(), getFailedRecordType(), parseUserId(), syncPostValueLocalRecords(), unwrapSyncCause(), upsertOrThrow()
 
 ### Community 9 - "Community 9"
+Cohesion: 0.29
+Nodes (1): MainApplication
+
+### Community 10 - "Community 10"
 Cohesion: 0.43
 Nodes (5): createLocalHomeState(), getLocalMinuteOfDay(), getPrimaryActionIdForMinute(), selectHomePrimaryAction(), createHomeOverview()
 
-### Community 10 - "Community 10"
+### Community 11 - "Community 11"
+Cohesion: 0.33
+Nodes (1): MainActivity
+
+### Community 12 - "Community 12"
 Cohesion: 0.7
 Nodes (4): BreatheTechniqueAnchorScreen(), parseDurationSeconds(), parsePlanId(), parseTechniqueId()
 
-### Community 11 - "Community 11"
+### Community 13 - "Community 13"
 Cohesion: 0.5
 Nodes (2): isDefaultPrevented(), onPress()
 
-### Community 12 - "Community 12"
+### Community 14 - "Community 14"
 Cohesion: 0.5
 Nodes (1): assertCondition()
 
-### Community 13 - "Community 13"
+### Community 15 - "Community 15"
 Cohesion: 1.0
 Nodes (2): getLocaleMessages(), normalizeLocale()
 
-### Community 15 - "Community 15"
+### Community 17 - "Community 17"
 Cohesion: 1.0
 Nodes (2): answerThroughBreathworkQuestion(), continueToNextQuestion()
 
-### Community 17 - "Community 17"
+### Community 19 - "Community 19"
 Cohesion: 1.0
 Nodes (2): captureAnalyticsEventDeferred(), captureSyncFailureDeferred()
 
 ## Knowledge Gaps
-- **Thin community `Community 11`** (5 nodes): `getTabIndicatorMotionConfig()`, `isDefaultPrevented()`, `onLongPress()`, `onPress()`, `app-tab-bar.tsx`
+- **Thin community `Community 9`** (7 nodes): `MainApplication.kt`, `getJSMainModuleName()`, `getPackages()`, `getUseDeveloperSupport()`, `MainApplication`, `.onConfigurationChanged()`, `.onCreate()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 12`** (4 nodes): `assertCondition()`, `assertEquals()`, `index.test.ts`, `index.test.ts`
+- **Thin community `Community 11`** (6 nodes): `MainActivity.kt`, `MainActivity`, `.createReactActivityDelegate()`, `.getMainComponentName()`, `.invokeDefaultOnBackPressed()`, `.onCreate()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 13`** (3 nodes): `getLocaleMessages()`, `normalizeLocale()`, `index.ts`
+- **Thin community `Community 13`** (5 nodes): `getTabIndicatorMotionConfig()`, `isDefaultPrevented()`, `onLongPress()`, `onPress()`, `app-tab-bar.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 15`** (3 nodes): `onboarding-personalization-flow.component.jest.test.tsx`, `answerThroughBreathworkQuestion()`, `continueToNextQuestion()`
+- **Thin community `Community 14`** (4 nodes): `assertCondition()`, `assertEquals()`, `index.test.ts`, `index.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 17`** (3 nodes): `deferred-capture.ts`, `captureAnalyticsEventDeferred()`, `captureSyncFailureDeferred()`
+- **Thin community `Community 15`** (3 nodes): `getLocaleMessages()`, `normalizeLocale()`, `index.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 17`** (3 nodes): `onboarding-personalization-flow.component.jest.test.tsx`, `answerThroughBreathworkQuestion()`, `continueToNextQuestion()`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 19`** (3 nodes): `deferred-capture.ts`, `captureAnalyticsEventDeferred()`, `captureSyncFailureDeferred()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `requestNotificationPermissionFromGate()` connect `Community 0` to `Community 3`?**
-  _High betweenness centrality (0.030) - this node is a cross-community bridge._
-- **Why does `captureAnalyticsEvent()` connect `Community 3` to `Community 0`?**
-  _High betweenness centrality (0.026) - this node is a cross-community bridge._
-- **Why does `openMigratedLocalDatabase()` connect `Community 2` to `Community 0`?**
-  _High betweenness centrality (0.023) - this node is a cross-community bridge._
+- **Why does `requestNotificationPermissionFromGate()` connect `Community 0` to `Community 2`?**
+  _High betweenness centrality (0.027) - this node is a cross-community bridge._
+- **Why does `captureAnalyticsEvent()` connect `Community 2` to `Community 0`?**
+  _High betweenness centrality (0.024) - this node is a cross-community bridge._
+- **Why does `openMigratedLocalDatabase()` connect `Community 3` to `Community 0`?**
+  _High betweenness centrality (0.021) - this node is a cross-community bridge._
 - **Are the 4 inferred relationships involving `requestNotificationPermissionFromGate()` (e.g. with `markNotificationPermissionPrompted()` and `captureAnalyticsEvent()`) actually correct?**
   _`requestNotificationPermissionFromGate()` has 4 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 2 inferred relationships involving `getFirstSessionSnapshot()` (e.g. with `pauseSession()` and `resumeSession()`) actually correct?**

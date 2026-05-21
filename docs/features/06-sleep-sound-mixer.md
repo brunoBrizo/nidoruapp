@@ -29,6 +29,7 @@ The sleep sound mixer lets users layer curated ambient sounds with independent v
 - Users can mix 2-3 layers with independent volume.
 - Sleep timer supports 20, 30, 45, 60, and infinity where product UI allows.
 - Timer fade-out lasts 2 minutes.
+- Timer-ended playback releases keep-awake or power-management locks so the device can dim and lock naturally.
 - Save up to 3 mixes.
 - Base sound pack works offline.
 
@@ -48,6 +49,7 @@ The sleep sound mixer lets users layer curated ambient sounds with independent v
 - All 15 bundled sounds loop without audible clicks.
 - Three-layer sound mix works with independent volume.
 - Sleep timer begins a 2-minute fade before the end.
+- Sleep timer releases keep-awake or power-management locks when playback ends.
 - Interface fades to fully dark after 30 seconds of no interaction while audio continues.
 - User always knows whether audio will stop, fade, or continue.
 
@@ -69,6 +71,7 @@ The sleep sound mixer lets users layer curated ambient sounds with independent v
 
 - Local sound asset catalog for bundled sounds.
 - Local saved mixes with sound IDs, volumes, and timer preference.
+- Playback state includes whether a keep-awake or power-management lock is active.
 - Supabase `sound_assets`, `sound_asset_translations`, and `sound_mixes` for metadata and sync.
 - Cloudflare R2 for remote story, premium, or large audio; default MVP sounds do not depend on R2 to play.
 - Entitlement can limit premium access, but active audio is never interrupted by entitlement checks.
@@ -87,6 +90,7 @@ The sleep sound mixer lets users layer curated ambient sounds with independent v
 - If audio is interrupted by call, alarm, headphone, or Bluetooth change, app resumes gracefully or shows clear stop state.
 - If entitlement fetch fails, do not interrupt active audio.
 - If fade-out starts while app is backgrounded, timer behavior remains consistent.
+- If timer playback ends while the app is backgrounded or locked, release keep-awake or power-management locks.
 
 ## Task Checklist
 
@@ -100,9 +104,11 @@ The sleep sound mixer lets users layer curated ambient sounds with independent v
 - [ ] Add 2-3 layer mixing.
 - [ ] Add sleep timer options.
 - [ ] Add 2-minute fade-out.
+- [ ] Release keep-awake or power-management locks after timer-ended playback.
 - [ ] Add idle UI fade to dark after 30 seconds.
 - [ ] Add saved mixes with max 3.
 - [ ] Persist mixes locally.
 - [ ] Sync saved mixes after auth exists.
 - [ ] Verify all 15 bundled sounds offline.
 - [ ] Verify locked-screen/background playback.
+- [ ] Verify timer-ended playback lets the device dim and lock naturally.

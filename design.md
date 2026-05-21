@@ -321,7 +321,24 @@ Generate a coherent high-fidelity mobile flow with these screens. Do not use the
 - Show orb with "Breathe in with us" and "And out" states.
 - No account, no paywall, no permissions, no questions.
 
-### 3. Personalization Questions
+### 3. First Full Session
+
+- Start immediately after the breath demo.
+- Use a short default session.
+- Full-screen breathing orb.
+- Minimal text.
+- Technique and duration visible but quiet.
+- Audio/haptic state visible without clutter.
+- No navigation bar while active.
+- No account, paywall, permissions, or questions.
+
+### 4. Post-Session Reflection
+
+- Ask "How do you feel?"
+- Use three options: Same, Better, Much better.
+- Keep the reward moment quiet and non-salesy.
+
+### 5. Personalization Questions
 
 Design one representative question screen and define the system for the rest.
 
@@ -340,22 +357,14 @@ Rules:
 - Use step count.
 - No unnecessary typing.
 
-### 4. Personalized Plan
+### 6. Personalized Plan
 
 - Show one plan mapped from answers.
 - One sentence explaining the plan.
 - One primary CTA: "Let's start."
 - No paywall.
 
-### 5. First Full Session
-
-- Full-screen breathing orb.
-- Minimal text.
-- Technique and duration visible but quiet.
-- Audio/haptic state visible without clutter.
-- No navigation bar while active.
-
-### 6. Home
+### 7. Home
 
 Design the Night or Evening version first.
 
@@ -370,7 +379,7 @@ Content order:
 
 Home must have exactly one primary CTA.
 
-### 7. Rescue Me
+### 8. Rescue Me
 
 - One tap from Home.
 - Immediate 4-7-8 breathing.
@@ -381,14 +390,14 @@ Home must have exactly one primary CTA.
 - No paywall.
 - Reassurance appears only after two breath cycles.
 
-### 8. Evening Wind-Down
+### 9. Evening Wind-Down
 
 - Starts from Home in one tap, two taps maximum.
 - Sequence: breathwork, short body relaxation cue, ambient sound.
 - The screen should dim after active breathwork.
 - The user should understand whether audio will stop, fade, or continue.
 
-### 9. Sound Mixer
+### 10. Sound Mixer
 
 - 2-column sound cards.
 - Active layers and volumes visible.
@@ -396,7 +405,7 @@ Home must have exactly one primary CTA.
 - Save Mix secondary.
 - Offline base sounds should feel available, not loading.
 
-### 10. Morning Check-In
+### 11. Morning Check-In
 
 - Single screen.
 - Sleep rating.
@@ -404,7 +413,7 @@ Home must have exactly one primary CTA.
 - Suggested short breath.
 - Skip for now.
 
-### 11. Progress
+### 12. Progress
 
 - Compassionate streak.
 - Weekly summary.
@@ -412,7 +421,7 @@ Home must have exactly one primary CTA.
 - Missed days are paused, not failed.
 - Use Inter for numeric metrics.
 
-### 12. Profile
+### 13. Profile
 
 - Settings.
 - Subscription.
@@ -475,7 +484,7 @@ Design a high-fidelity native mobile app for Nidoru, a sleep and breathwork ritu
 
 Design for an iPhone-sized mobile viewport around 390 x 844 with safe areas and one-handed use. Default to dark night mode. Use these colors: background #0D0F1A, secondary background #0F1230, surface #14172B, raised surface #1C2040, primary Iris #7C6FCD, glow Lavender #A89CE0, accent Moonstone #5EC4D4, morning Dusk Gold #E8C97A, text Cloud #EEF0FF, secondary text Mist #8A8FA8, tertiary Haze #4A4E6A, danger Ember #FF6B6B only for errors and Rescue Me. Do not use pure black, pure white, red badges, content overload, marketing copy, or multiple primary CTAs.
 
-Create a coherent screen set: Splash, 30-second first breath demo, one personalization question, personalized plan, first full breathing session, Home evening/night state, Rescue Me, Evening Wind-Down, Sound Mixer, Morning Check-In, Progress, and Profile. Home must show exactly one primary action card, then three quick actions: Rescue Me, Sounds, Breathe. Use five fixed bottom tabs: Home, Sleep, Breathe, Progress, Profile. The first launch flow must show breathing before account creation, paywall, notification permission, health permission, or any backend dependency.
+Create a coherent screen set: Splash, 30-second first breath demo, first full breathing session, post-session reflection, one personalization question, personalized plan, Home evening/night state, Rescue Me, Evening Wind-Down, Sound Mixer, Morning Check-In, Progress, and Profile. Home must show exactly one primary action card, then three quick actions: Rescue Me, Sounds, Breathe. Use five fixed bottom tabs: Home, Sleep, Breathe, Progress, Profile. The first launch flow must show breathing and allow the first full session before account creation, paywall, notification permission, health permission, questions, or any backend dependency.
 
 The core components are a layered breathing orb, glass primary action card, quick action chips, bottom tab bar, sound mixer cards with circular volume rings, timer selector, compassionate streak strip, and simple profile/settings rows. The breathing orb should have rest, inhale, hold, and exhale states. The sound mixer should feel tactile and personal, not technical. Progress should celebrate sessions and minutes without shame. Profile should make subscription, cancellation, privacy, notifications, and support easy to find.
 

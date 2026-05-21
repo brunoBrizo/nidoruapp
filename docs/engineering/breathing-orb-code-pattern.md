@@ -47,7 +47,7 @@ interface BreathTechnique {
 const TECHNIQUES: Record<string, BreathTechnique> = {
   '4-7-8':     { inhale: 4, holdIn: 7, exhale: 8,  holdOut: 0 },
   'box':       { inhale: 4, holdIn: 4, exhale: 4,  holdOut: 4 },
-  'coherent':  { inhale: 5, holdIn: 0, exhale: 5,  holdOut: 0 },
+  'coherent':  { inhale: 5.5, holdIn: 0, exhale: 5.5,  holdOut: 0 },
   'sigh':      { inhale: 2, holdIn: 0, exhale: 8,  holdOut: 0 },
   'custom':    { inhale: 4, holdIn: 0, exhale: 6,  holdOut: 0 },
 };

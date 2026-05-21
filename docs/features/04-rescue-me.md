@@ -4,7 +4,7 @@ Phase: MVP
 
 ## Summary
 
-Rescue Me is the zero-friction emergency breathwork path. One tap from Home starts immediate 4-7-8 breathing with no account, network call, paywall, sound choice, timer setting, or setup. It is the MVP version of 3 AM Recovery Mode and the direct competitive response to Calm's Breathe Bubble.
+Rescue Me is the zero-friction emergency breathwork path. One tap from Home starts immediate 4-7-8 breathing with no account, network call, paywall, sound choice, timer setting, technique selection, or setup. It is the MVP version of 3 AM Recovery Mode and the direct competitive response to Calm's Breathe Bubble.
 
 ## User Stories
 
@@ -18,6 +18,7 @@ Rescue Me is the zero-friction emergency breathwork path. One tap from Home star
 - Home quick action/card labeled "Rescue Me".
 - Uses `Ember #FF6B6B` only as a red accent for this emergency card.
 - Tap starts immediate full-screen 4-7-8 breathing.
+- Coherent Breathing / Daily Calm remains in the regular session library, not in Rescue Me.
 - Orb is visible before transition completes.
 - No text or instructions at launch; after 2 cycles, subtle reassurance can appear.
 - Fixed 5 rounds, approximately 3.5 minutes.
@@ -62,6 +63,7 @@ Rescue Me is the zero-friction emergency breathwork path. One tap from Home star
 - Local record includes `rescue_me` source or equivalent session context.
 - Sync can later create `breath_sessions` rows, but failure never blocks the feature.
 - No personalization is required.
+- No coherent-breathing timing, Daily Calm setup, or HRV Training copy appears in this flow.
 
 ## Analytics Events
 

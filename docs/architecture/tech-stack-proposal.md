@@ -183,6 +183,7 @@ Required behavior:
 - The app uses `setAudioModeAsync` with background playback enabled for sleep sessions.
 - Two to three simultaneous ambient layers can play with independent volume control.
 - Sleep timer fade-out runs for two minutes.
+- The player releases keep-awake or power-management locks when playback ends.
 - Audio interruption handling covers calls, alarms, headphones, Bluetooth changes, and app backgrounding.
 - Base sounds play from bundled local files without network access.
 - Sleep stories use progressive 3-minute chunks from R2.
@@ -222,6 +223,7 @@ Rules:
 - If system brightness control is unavailable, dim the app UI to the fully dark sleep surface.
 - Ask for brightness-related permission only after the user has experienced value.
 - Restore brightness state responsibly after the session ends or the app returns to normal mode.
+- Release any keep-awake or power-management lock after sleep timer playback ends so the OS can dim and lock naturally.
 
 ## Local Data And Offline Sync
 
@@ -621,6 +623,7 @@ No production data is used in local development.
 | Cached audio start | Less than 500 ms |
 | Streamed story first chunk start | Less than 2 seconds on normal LTE/Wi-Fi |
 | Breath pacer animation | No visible dropped-frame bursts during a 5-minute session |
+| Sleep timer power release | Keep-awake or power-management lock released when playback ends |
 | Morning check-in save | Local confirmation immediately |
 | Sync queue while online | Normal items synced within 5 minutes |
 | Lightweight Edge Function p95 | Under 500 ms after cold start is excluded |
@@ -675,16 +678,17 @@ Complete these before building broad app screens:
 5. Breath audio cues work with the screen locked.
 6. Haptic behavior is measured on real devices for active and locked states.
 7. Ambient audio plays in the background with a 2-minute timer fade-out.
-8. Three-layer sound mix works with independent volume.
-9. All 15 bundled sounds play offline and loop without audible clicks.
-10. Local session record persists before any Supabase auth requirement.
-11. Anonymous Supabase auth is created after first value or retried in the background.
-12. Synced Supabase user can create and read only their own check-ins.
-13. R2 story chunk downloads and resumes correctly.
-14. RevenueCat entitlement can be read and mirrored through a webhook.
-15. Local notifications are scheduled only after permission is granted.
-16. English, Spanish, and Portuguese strings render with no missing keys.
-17. Sentry captures a test error with release and source map.
+8. Sleep timer playback releases keep-awake or power-management locks when audio ends.
+9. Three-layer sound mix works with independent volume.
+10. All 15 bundled sounds play offline and loop without audible clicks.
+11. Local session record persists before any Supabase auth requirement.
+12. Anonymous Supabase auth is created after first value or retried in the background.
+13. Synced Supabase user can create and read only their own check-ins.
+14. R2 story chunk downloads and resumes correctly.
+15. RevenueCat entitlement can be read and mirrored through a webhook.
+16. Local notifications are scheduled only after permission is granted.
+17. English, Spanish, and Portuguese strings render with no missing keys.
+18. Sentry captures a test error with release and source map.
 
 ## Deliberately Not In The Starting Stack
 

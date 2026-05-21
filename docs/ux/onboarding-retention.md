@@ -21,7 +21,19 @@ Dark background, resting orb, app name. No spinner.
 
 The first interaction is a 30-second guided breath with the orb. No questions, no account, no permission, no paywall.
 
-### Screens 3-7: Personalization
+### Screen 3: First Full Session
+
+Start a short default first full session immediately after the breath demo. The user can complete this session without answering questions, creating an account, accepting permissions, or seeing a paywall.
+
+### Screen 4: Reflection
+
+Ask "How do you feel?" with three options:
+
+- Same.
+- Better.
+- Much better.
+
+### Screens 5-9: Personalization
 
 Ask no more than five questions:
 
@@ -31,19 +43,14 @@ Ask no more than five questions:
 - Breathwork familiarity.
 - Optional name.
 
-### Screen 8: Plan
+### Screen 10: Plan
 
 Show one prebuilt plan mapped to answers with one start button.
 
-### Screen 9: First Full Session
-
-Start the recommended session immediately.
-
-### Screen 10-11: Reflection, Account, Paywall
+### Screen 11: Account And Paywall
 
 After the first full session:
 
-- Ask "How do you feel?"
 - Offer account linking with social login.
 - Show paywall only after the reward moment if the current experiment includes paywall.
 
@@ -54,6 +61,7 @@ After the first full session:
 - No health permission prompt.
 - No microphone permission prompt.
 - No paywall.
+- No personalization survey before the first full session.
 - No tutorial carousel.
 - No content library browsing requirement.
 

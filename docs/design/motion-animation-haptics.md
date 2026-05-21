@@ -67,7 +67,7 @@ Rules:
 | --- | --- | --- |
 | 4-7-8 Sleep | 4s inhale / 7s hold / 8s exhale | Before bed, Rescue Me |
 | Box Breathing | 4s inhale / 4s hold / 4s exhale / 4s hold | Anxiety and stress |
-| Coherent Breathing | 5s inhale / 5s exhale | Daytime calm and balance |
+| Coherent Breathing / Daily Calm | 5.5s inhale / 5.5s exhale | 10-minute Evening Wind-Down or Daily Practice / HRV Training |
 | Physiological Sigh | 2s inhale / 1s second inhale / 8s exhale | Panic or acute stress |
 
 ## Implementation Rules

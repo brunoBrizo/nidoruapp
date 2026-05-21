@@ -31,13 +31,14 @@ The source blueprint mentions `expo-av` for audio. Current Expo documentation po
 Responsibilities:
 
 - Demonstrate a 30-second breath before data capture.
-- Capture goal type.
-- Capture sleep baseline.
-- Capture wind-down time.
-- Capture breathwork familiarity.
-- Capture optional name.
-- Select one recommended first session.
-- Avoid account, paywall, and permissions before first value.
+- Start a short default first full session before personalization.
+- Capture goal type after the first full session.
+- Capture sleep baseline after the first full session.
+- Capture wind-down time after the first full session.
+- Capture breathwork familiarity after the first full session.
+- Capture optional name after the first full session.
+- Select one follow-up plan after the first full session.
+- Avoid account, paywall, permissions, and backend dependency before the first full session.
 
 Data produced:
 
@@ -74,6 +75,7 @@ Responsibilities:
 - Sequence breathwork, body cue, and ambient sound.
 - Dim or simplify the screen after active guidance.
 - Continue audio when app is backgrounded.
+- Release keep-awake or power-management locks when playback ends.
 - Record the full routine.
 
 Data produced:
@@ -90,6 +92,7 @@ Responsibilities:
 - Play 1-3 sound layers.
 - Control per-layer volume.
 - Support timer and fade-out.
+- Release keep-awake or power-management locks when timer playback ends.
 - Cache core sounds offline.
 
 Data produced:
@@ -195,6 +198,7 @@ Acceptance criteria:
 
 - Background playback works with screen locked.
 - Fade-out works at timer end.
+- Keep-awake or power-management locks release when playback ends.
 - Multiple layers stay in sync enough for ambient use.
 - Offline sounds start without network.
 - Audio stop/fade/continue state is visible before the screen dims.

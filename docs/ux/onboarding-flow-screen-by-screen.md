@@ -7,15 +7,15 @@ Related docs:
 - Use [Feature Deep Specs](../product/feature-deep-specs.md) for the breath demo, plan, account, and paywall behavior.
 - Use [Technical Foundation](../architecture/technical-foundation.md) for local-first and auth timing requirements.
 
-The current onboarding decision comes from the product bible plus the newer [Competitor UI/UX Response Plan](../research/competitor-uiux-response-plan.md). It resolves the earlier flow by moving value even earlier: the user breathes before questions, account creation, permissions, or paywall.
+The current onboarding decision comes from the product bible plus the newer [Competitor UI/UX Response Plan](../research/competitor-uiux-response-plan.md). The user breathes and completes a first full session before questions, account creation, permissions, or paywall.
 
 ## Success Criteria
 
 - First breath cue appears within 60 seconds of first launch.
 - The first interaction demonstrates value before capture.
-- No account, paywall, notification prompt, or backend dependency appears before the first breath.
+- No account, paywall, notification prompt, question flow, or backend dependency appears before the first full session.
 - Total question count is five or fewer.
-- Every question directly improves the first plan or later personalization.
+- Every question directly improves the follow-up plan or later personalization.
 - Notification permission is requested on Day 3 after at least two completed sessions, not during onboarding.
 
 ## Flow
@@ -47,7 +47,28 @@ Rules:
 - No paywall.
 - No account creation.
 
-### Screens 3-7: Personalization Questions
+### Screen 3: First Full Session
+
+Start a short local first session immediately.
+
+Rules:
+
+- No personalization is required to begin.
+- Default duration is short enough to complete on Day 0.
+- Session state is saved locally before relying on sync.
+- If the app crashes near completion, the user's progress is not lost.
+
+### Screen 4: Post-Session Reflection
+
+Ask "How do you feel?" with three options:
+
+- Same.
+- Better.
+- Much better.
+
+Then show one short science sentence explaining why breathwork helps. Do not turn this into education mode.
+
+### Screens 5-9: Personalization Questions
 
 Ask up to five questions:
 
@@ -63,9 +84,9 @@ Rules:
 
 - Never more than three options per question unless the control is a time picker.
 - Show step count.
-- Do not ask anything that does not change the plan, copy, timing, or first session.
+- Do not ask anything that does not change the plan, copy, timing, or later personalization.
 
-### Screen 8: Personalized Plan
+### Screen 10: Personalized Plan
 
 Show one of four prebuilt plans mapped from answers:
 
@@ -80,26 +101,6 @@ The plan screen should feel specific without pretending to be AI-generated. It i
 - One primary CTA: "Let's start."
 - A progress cue that the first session is ready.
 - No paywall.
-
-### Screen 9: First Full Session
-
-Start the recommended session immediately.
-
-Rules:
-
-- Default duration is short enough to complete on Day 0.
-- Session state is saved locally before relying on sync.
-- If the app crashes near completion, the user's progress is not lost.
-
-### Screen 10: Post-Session Reflection
-
-Ask "How do you feel?" with three options:
-
-- Same.
-- Better.
-- Much better.
-
-Then show one short science sentence explaining why breathwork helps. Do not turn this into education mode.
 
 ### Screen 11: Paywall Or Account
 

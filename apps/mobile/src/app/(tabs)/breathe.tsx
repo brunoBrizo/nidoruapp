@@ -3,10 +3,12 @@ import { breathTechniques } from "@nidoru/domain";
 import { TabEntryScreen } from "../../shell/tab-entry-screen";
 
 export default function BreatheTabScreen() {
+  const dailyCalmDescription = `${breathTechniques["coherent-breathing"].primaryContext} · 10 min · 5.5s in / 5.5s out`;
+
   return (
     <TabEntryScreen
       title="Breathe"
-      description="Technique anchors grouped by state, with full sessions added later."
+      description="Regular breathing practices grouped by state."
       sections={[
         {
           title: "Sleep",
@@ -22,9 +24,9 @@ export default function BreatheTabScreen() {
           title: "Calm",
           entries: [
             {
-              label: breathTechniques["coherent-breathing"].name,
-              description: breathTechniques["coherent-breathing"].primaryContext,
-              href: "/breathe/coherent-breathing",
+              label: `${breathTechniques["coherent-breathing"].name} / Daily Calm`,
+              description: dailyCalmDescription,
+              href: "/breathe/coherent-breathing?durationSeconds=600",
             },
             {
               label: breathTechniques["physiological-sigh"].name,

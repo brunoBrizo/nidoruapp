@@ -7,6 +7,7 @@ Source:
 - [Feature Deep Specs](../product/feature-deep-specs.md)
 - [Motion, Animation, And Haptics](motion-animation-haptics.md)
 - [Tech Stack Decision Record](../architecture/tech-stack-proposal.md)
+- [Animation Source Alignment](../engineering/animation-source-alignment.md)
 
 ## Product Role
 
@@ -16,10 +17,11 @@ The breathing orb is the visual center of the product. It must be good enough to
 
 | Layer | Rest State | Active Behavior |
 | --- | --- | --- |
-| Core | Solid `Iris #7C6FCD`, radius 80 px | Scales to 110 px on inhale. |
-| Inner glow | `rgba(124, 111, 205, 0.4)`, radius 90 px | Scales to 130 px on inhale. |
-| Outer ring | 2 px stroke `rgba(168, 156, 224, 0.3)`, radius 110 px | Scales to 150 px on inhale. |
-| Pulse ring | Starts at orb edge | Expands outward and fades on inhale only. |
+| Layer 1: Core | Solid `Iris #7C6FCD`, scale 1.0 | Scales to 1.12 on inhale. |
+| Layer 2: Inner glow | Soft Iris glow, scale 1.0 | Scales to 1.18 on inhale. |
+| Layer 3: Mid diffusion | Lavender diffusion, opacity 0.30, scale 1.0 | Scales to 1.25 and fades toward 0.15 on inhale. |
+| Layer 4: Outer glow | Outer Lavender glow, opacity 0.15, scale 1.0 | Scales to 1.35 and fades toward 0.08 on inhale. |
+| Layer 5: Pulse ring | Starts at orb edge, opacity 0.5, scale 1.0 | Expands to 1.6 and fades to 0 on inhale only. |
 
 ## Phase Behavior
 
@@ -78,15 +80,16 @@ Required pattern:
 - SVG ring stroke and orb scale derive from shared values.
 - JS timers do not drive every animation frame.
 - Completion is persisted before end screens, share prompts, or upsell.
+- Animation Source Alignment is the conflict resolver for layer count, timing gaps, haptic categories, and implementation details.
 
 The uploaded file does not include source-provided Reanimated code. This pattern is the architecture decision derived from the product bible and the tech stack record.
 
 ## Acceptance Criteria
 
 - 4-7-8 session runs smoothly for 5 minutes on real iOS and Android devices.
+- The five visual layers derive from the same breath phase timer.
 - Orb remains visually synced with phase text.
 - Audio cues remain phase-synced.
 - App wake returns to the correct phase.
 - Rescue Me can show the orb immediately without waiting on network, auth, analytics, or payment state.
 - The visual remains consistent with the Midnight Indigo palette.
-

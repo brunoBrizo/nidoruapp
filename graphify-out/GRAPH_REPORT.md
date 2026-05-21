@@ -1,12 +1,12 @@
 # Graph Report - sleep-app  (2026-05-21)
 
 ## Corpus Check
-- 111 files · ~211,054 words
+- 112 files · ~211,498 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 324 nodes · 339 edges · 17 communities detected
-- Extraction: 89% EXTRACTED · 11% INFERRED · 0% AMBIGUOUS · INFERRED: 36 edges (avg confidence: 0.8)
+- 325 nodes · 341 edges · 17 communities detected
+- Extraction: 89% EXTRACTED · 11% INFERRED · 0% AMBIGUOUS · INFERRED: 37 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
@@ -36,9 +36,9 @@
 5. `linkPostValueAccount()` - 7 edges
 6. `evaluateGate()` - 7 edges
 7. `createLocalEventId()` - 7 edges
-8. `createPersonalizedOnboardingPlan()` - 5 edges
-9. `getNextEveningReminderDate()` - 5 edges
-10. `BreatheTechniqueAnchorScreen()` - 5 edges
+8. `runSqliteMigrations()` - 6 edges
+9. `createPersonalizedOnboardingPlan()` - 5 edges
+10. `getNextEveningReminderDate()` - 5 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `getOnboardingPlanForGoal()` --calls--> `completeOnboardingPersonalizationLocally()`  [INFERRED]
@@ -64,11 +64,11 @@ Nodes (12): fetch(), createPostValueSupabaseAuthenticator(), createPostValueSupa
 
 ### Community 2 - "Community 2"
 Cohesion: 0.15
-Nodes (11): getAppEnvironment(), isNonProductionEnvironment(), isObservabilityProofModeEnabled(), capturePostHog(), captureSentry(), captureAnalyticsEvent(), captureExplicitEvent(), capturePostHogProofEvent() (+3 more)
+Nodes (10): openAndMigrateLocalDatabase(), openMigratedLocalDatabase(), openDefaultLocalDatabase(), applyMigration(), runSqliteMigrations(), assertCondition(), assertRejects(), runSqlite() (+2 more)
 
 ### Community 3 - "Community 3"
 Cohesion: 0.15
-Nodes (9): openMigratedLocalDatabase(), openDefaultLocalDatabase(), applyMigration(), runSqliteMigrations(), assertCondition(), assertRejects(), runSqlite(), SqliteCliDatabase (+1 more)
+Nodes (11): getAppEnvironment(), isNonProductionEnvironment(), isObservabilityProofModeEnabled(), capturePostHog(), captureSentry(), captureAnalyticsEvent(), captureExplicitEvent(), capturePostHogProofEvent() (+3 more)
 
 ### Community 4 - "Community 4"
 Cohesion: 0.17
@@ -139,12 +139,12 @@ Nodes (2): captureAnalyticsEventDeferred(), captureSyncFailureDeferred()
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `requestNotificationPermissionFromGate()` connect `Community 0` to `Community 2`?**
+- **Why does `requestNotificationPermissionFromGate()` connect `Community 0` to `Community 3`?**
   _High betweenness centrality (0.029) - this node is a cross-community bridge._
-- **Why does `captureAnalyticsEvent()` connect `Community 2` to `Community 0`?**
+- **Why does `captureAnalyticsEvent()` connect `Community 3` to `Community 0`?**
   _High betweenness centrality (0.025) - this node is a cross-community bridge._
-- **Why does `openMigratedLocalDatabase()` connect `Community 3` to `Community 0`?**
-  _High betweenness centrality (0.023) - this node is a cross-community bridge._
+- **Why does `openMigratedLocalDatabase()` connect `Community 2` to `Community 0`?**
+  _High betweenness centrality (0.024) - this node is a cross-community bridge._
 - **Are the 4 inferred relationships involving `requestNotificationPermissionFromGate()` (e.g. with `markNotificationPermissionPrompted()` and `captureAnalyticsEvent()`) actually correct?**
   _`requestNotificationPermissionFromGate()` has 4 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 2 inferred relationships involving `getFirstSessionSnapshot()` (e.g. with `pauseSession()` and `resumeSession()`) actually correct?**

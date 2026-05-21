@@ -10,6 +10,7 @@ import { OnboardingSplashScreen } from "./onboarding-splash-screen";
 import { openMigratedLocalDatabase } from "../storage/local-database";
 
 type FirstLaunchOnboardingGateBaseProps = {
+  readonly allowIncompleteOnboarding?: boolean;
   readonly children: ReactNode;
   readonly loadShouldStartOnboarding?: () => Promise<boolean>;
   readonly replaceRoute: (route: "/onboarding") => void;
@@ -17,11 +18,18 @@ type FirstLaunchOnboardingGateBaseProps = {
 
 type GateState = "checking" | "home" | "redirecting";
 
-export function FirstLaunchOnboardingGate({ children }: { readonly children: ReactNode }) {
+export function FirstLaunchOnboardingGate({
+  allowIncompleteOnboarding = false,
+  children,
+}: {
+  readonly allowIncompleteOnboarding?: boolean;
+  readonly children: ReactNode;
+}) {
   const router = useRouter();
 
   return (
     <FirstLaunchOnboardingGateBase
+      allowIncompleteOnboarding={allowIncompleteOnboarding}
       replaceRoute={(route) => {
         router.replace(route);
       }}
@@ -32,6 +40,7 @@ export function FirstLaunchOnboardingGate({ children }: { readonly children: Rea
 }
 
 export function FirstLaunchOnboardingGateBase({
+  allowIncompleteOnboarding = false,
   children,
   loadShouldStartOnboarding = shouldStartFirstLaunchOnboarding,
   replaceRoute,
@@ -39,9 +48,15 @@ export function FirstLaunchOnboardingGateBase({
   const [gateState, setGateState] = useState<GateState>("checking");
 
   useEffect(() => {
+    if (allowIncompleteOnboarding) {
+      return;
+    }
+
     let isMounted = true;
 
     async function resolveGate() {
+      setGateState("checking");
+
       try {
         const shouldStartOnboarding = await loadShouldStartOnboarding();
 
@@ -71,9 +86,9 @@ export function FirstLaunchOnboardingGateBase({
     return () => {
       isMounted = false;
     };
-  }, [loadShouldStartOnboarding, replaceRoute]);
+  }, [allowIncompleteOnboarding, loadShouldStartOnboarding, replaceRoute]);
 
-  if (gateState !== "home") {
+  if (!allowIncompleteOnboarding && gateState !== "home") {
     return <OnboardingSplashScreen />;
   }
 

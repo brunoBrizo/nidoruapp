@@ -38,4 +38,24 @@ describe("FirstLaunchOnboardingGate", () => {
     await screen.findByText("Home content");
     expect(screen.queryByTestId("onboarding-splash-screen")).toBeNull();
   });
+
+  it("allows the first-launch session route without querying completion", () => {
+    const loadShouldStartOnboarding = jest.fn<() => Promise<boolean>>();
+    const replaceRoute = jest.fn();
+
+    render(
+      <FirstLaunchOnboardingGateBase
+        allowIncompleteOnboarding
+        loadShouldStartOnboarding={loadShouldStartOnboarding}
+        replaceRoute={replaceRoute}
+      >
+        <Text>First session content</Text>
+      </FirstLaunchOnboardingGateBase>,
+    );
+
+    expect(screen.getByText("First session content")).toBeTruthy();
+    expect(screen.queryByTestId("onboarding-splash-screen")).toBeNull();
+    expect(loadShouldStartOnboarding).not.toHaveBeenCalled();
+    expect(replaceRoute).not.toHaveBeenCalled();
+  });
 });

@@ -68,7 +68,13 @@ describe("FirstSessionScreen", () => {
   it("persists completion locally before showing the reflection overlay", async () => {
     jest.useFakeTimers();
     jest.setSystemTime(baseProps.startedAtMs);
-    const persistCompletion = jest.fn(() => Promise.resolve());
+    let resolveCompletion: (() => void) | undefined;
+    const persistCompletion = jest.fn(
+      () =>
+        new Promise<void>((resolve) => {
+          resolveCompletion = resolve;
+        }),
+    );
 
     render(
       <FirstSessionScreen
@@ -93,10 +99,80 @@ describe("FirstSessionScreen", () => {
         }),
       );
     });
+    expect(screen.queryByText("How do you feel?")).toBeNull();
+
+    await act(async () => {
+      resolveCompletion?.();
+      await Promise.resolve();
+    });
+
     expect(screen.getByText("How do you feel?")).toBeTruthy();
     expect(screen.queryByText(forbiddenActiveSessionGatePattern)).toBeNull();
 
     jest.useRealTimers();
+  });
+
+  it("persists the selected reflection locally and reveals the reward transition", async () => {
+    jest.useFakeTimers();
+    jest.setSystemTime(baseProps.startedAtMs);
+    const persistReflection = jest.fn(() => Promise.resolve());
+
+    render(
+      <FirstSessionScreen
+        {...baseProps}
+        durationSeconds={1}
+        persistCompletion={() => Promise.resolve()}
+        persistReflection={persistReflection}
+      />,
+    );
+
+    await act(async () => {
+      jest.advanceTimersByTime(1000);
+      await Promise.resolve();
+    });
+
+    await screen.findByText("How do you feel?");
+    expect(screen.getByText("Same")).toBeTruthy();
+    expect(screen.getByText("Better")).toBeTruthy();
+    expect(screen.getByText("Much better")).toBeTruthy();
+    expect(
+      screen.queryByText("Deep breathing shifts your nervous system into rest mode."),
+    ).toBeNull();
+    expect(screen.queryByRole("button", { name: "Continue" })).toBeNull();
+
+    fireEvent.press(screen.getByRole("button", { name: "Better" }));
+
+    await waitFor(() => {
+      expect(persistReflection).toHaveBeenCalledWith({
+        feeling: "better",
+        localInstallId: "install_0123456789abcdef",
+        reflectedAt: "2026-05-20T01:00:01.000Z",
+        sessionId: "session_0123456789abcdef",
+      });
+    });
+    expect(
+      screen.getByText("Deep breathing shifts your nervous system into rest mode."),
+    ).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Continue" })).toBeTruthy();
+    expect(screen.queryByText(forbiddenActiveSessionGatePattern)).toBeNull();
+
+    jest.useRealTimers();
+  });
+
+  it("can resume directly into the reflection state after completion was saved before a crash", () => {
+    const persistCompletion = jest.fn(() => Promise.resolve());
+
+    render(
+      <FirstSessionScreen
+        {...baseProps}
+        initialCompletionMode="completed"
+        persistCompletion={persistCompletion}
+      />,
+    );
+
+    expect(screen.getByText("First session complete")).toBeTruthy();
+    expect(screen.getByText("How do you feel?")).toBeTruthy();
+    expect(persistCompletion).not.toHaveBeenCalled();
   });
 
   it("records an abandoned partial session when ending from the pause overlay", async () => {
@@ -122,8 +198,8 @@ describe("FirstSessionScreen", () => {
         }),
       );
     });
-    expect(screen.getByText("How do you feel?")).toBeTruthy();
-    expect(screen.getByText("Even a short pause can help your body settle.")).toBeTruthy();
+    expect(screen.queryByText("How do you feel?")).toBeNull();
+    expect(screen.queryByText("Even a short pause can help your body settle.")).toBeNull();
 
     jest.useRealTimers();
   });

@@ -8,17 +8,21 @@ import { colors, motion, spacing, typography } from "@nidoru/ui-tokens";
 import type {
   AbandonedFirstSessionRecord,
   FirstSessionRecord,
+  PostSessionReflection,
   RecoverableFirstSessionDraft,
 } from "@nidoru/validation";
 import * as Haptics from "expo-haptics";
-import { Bell, BellOff, Pause, Play, Vibrate, VibrateOff } from "lucide-react-native";
+import { useRouter } from "expo-router";
+import { Bell, BellOff, CheckCircle, Pause, Play, Vibrate, VibrateOff } from "lucide-react-native";
 import { useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, {
   Easing,
   useAnimatedStyle,
   useSharedValue,
+  withDelay,
   withTiming,
+  type SharedValue,
 } from "react-native-reanimated";
 import { SafeAreaInsetsContext } from "react-native-safe-area-context";
 
@@ -26,8 +30,10 @@ import {
   abandonFirstSessionLocally,
   completeFirstSessionLocally,
   getOrCreateLocalInstallIdentity,
+  loadPendingPostSessionReflection,
   loadRecoverableFirstSessionDraft,
   saveFirstSessionDraftLocally,
+  savePostSessionReflectionLocally,
   type LocalFirstOnboardingDatabase,
 } from "../onboarding/local-first-onboarding";
 import { useReduceMotionPreference } from "../motion/use-reduce-motion-enabled";
@@ -47,12 +53,15 @@ export type FirstSessionPersistence = {
   readonly persistAbandoned?: (record: AbandonedFirstSessionRecord) => Promise<void>;
   readonly persistCompletion?: (record: FirstSessionRecord) => Promise<void>;
   readonly persistDraft?: (record: RecoverableFirstSessionDraft) => Promise<void>;
+  readonly persistReflection?: (reflection: PostSessionReflection) => Promise<void>;
 };
 
 export type FirstSessionScreenProps = FirstSessionPersistence & {
   readonly disableHaptics?: boolean;
   readonly durationSeconds?: number;
+  readonly initialCompletionMode?: CompletionMode;
   readonly localInstallId: string;
+  readonly onRewardMomentComplete?: () => void;
   readonly planId: OnboardingPlanId;
   readonly sessionId: string;
   readonly startedAtMs?: number;
@@ -84,13 +93,16 @@ export function FirstSessionRouteScreen({
   planId,
   techniqueId,
 }: FirstSessionRouteScreenProps) {
+  const router = useRouter();
   const [sessionConfig, setSessionConfig] = useState<{
     readonly database: LocalFirstOnboardingDatabase;
     readonly durationSeconds: number;
+    readonly initialCompletionMode?: CompletionMode;
     readonly localInstallId: string;
     readonly planId: OnboardingPlanId;
     readonly sessionId: string;
     readonly startedAtMs: number;
+    readonly techniqueId: BreathTechniqueId;
   }>();
   const fallbackPlan = getPlanForTechnique(techniqueId);
 
@@ -104,17 +116,31 @@ export function FirstSessionRouteScreen({
         runAsync: (source, params = []) => database.runAsync(source, [...params]),
       };
       const localInstallId = await getOrCreateLocalInstallIdentity({ database: localDatabase });
-      const recoverableDraft = await loadRecoverableFirstSessionDraft(localDatabase, {
+      const pendingReflection = await loadPendingPostSessionReflection(localDatabase, {
         localInstallId,
       });
+      const recoverableDraft = pendingReflection
+        ? null
+        : await loadRecoverableFirstSessionDraft(localDatabase, {
+            localInstallId,
+          });
       const nowMs = Date.now();
-      const selectedPlanId = planId ?? recoverableDraft?.planId ?? fallbackPlan.id;
+      const selectedPlanId =
+        planId ?? pendingReflection?.planId ?? recoverableDraft?.planId ?? fallbackPlan.id;
+      const selectedTechniqueId =
+        pendingReflection?.techniqueId ?? recoverableDraft?.techniqueId ?? techniqueId;
       const selectedDurationSeconds =
         durationSeconds ??
+        pendingReflection?.durationSeconds ??
         recoverableDraft?.durationSeconds ??
         fallbackPlan.firstSession.durationSeconds;
-      const sessionId = recoverableDraft?.sessionId ?? createFirstSessionId();
-      const startedAtMs = recoverableDraft ? nowMs - recoverableDraft.elapsedDurationMs : nowMs;
+      const sessionId =
+        pendingReflection?.sessionId ?? recoverableDraft?.sessionId ?? createFirstSessionId();
+      const startedAtMs = pendingReflection
+        ? Date.parse(pendingReflection.startedAt)
+        : recoverableDraft
+          ? nowMs - recoverableDraft.elapsedDurationMs
+          : nowMs;
 
       if (!isMounted) {
         return;
@@ -123,10 +149,12 @@ export function FirstSessionRouteScreen({
       setSessionConfig({
         database: localDatabase,
         durationSeconds: selectedDurationSeconds,
+        ...(pendingReflection ? { initialCompletionMode: "completed" } : {}),
         localInstallId,
         planId: selectedPlanId,
         sessionId,
         startedAtMs,
+        techniqueId: selectedTechniqueId,
       });
     }
 
@@ -154,10 +182,19 @@ export function FirstSessionRouteScreen({
       persistAbandoned={(record) => abandonFirstSessionLocally(sessionConfig.database, record)}
       persistCompletion={(record) => completeFirstSessionLocally(sessionConfig.database, record)}
       persistDraft={(record) => saveFirstSessionDraftLocally(sessionConfig.database, record)}
+      persistReflection={async (reflection) => {
+        await savePostSessionReflectionLocally(sessionConfig.database, reflection);
+      }}
+      onRewardMomentComplete={() => {
+        router.replace("/post-value");
+      }}
+      {...(sessionConfig.initialCompletionMode === undefined
+        ? {}
+        : { initialCompletionMode: sessionConfig.initialCompletionMode })}
       planId={sessionConfig.planId}
       sessionId={sessionConfig.sessionId}
       startedAtMs={sessionConfig.startedAtMs}
-      techniqueId={techniqueId}
+      techniqueId={sessionConfig.techniqueId}
     />
   );
 }
@@ -165,10 +202,13 @@ export function FirstSessionRouteScreen({
 export function FirstSessionScreen({
   disableHaptics = false,
   durationSeconds,
+  initialCompletionMode,
   localInstallId,
+  onRewardMomentComplete = () => undefined,
   persistAbandoned = async () => undefined,
   persistCompletion = async () => undefined,
   persistDraft = async () => undefined,
+  persistReflection = async () => undefined,
   planId,
   sessionId,
   startedAtMs = Date.now(),
@@ -203,7 +243,7 @@ export function FirstSessionScreen({
   );
   const [audioMode, setAudioMode] = useState<"bell" | "none">("bell");
   const [hapticsEnabled, setHapticsEnabled] = useState(true);
-  const [completionMode, setCompletionMode] = useState<CompletionMode>();
+  const [completionMode, setCompletionMode] = useState<CompletionMode>(initialCompletionMode);
   const isPersistingTerminalStateRef = useRef(false);
   const lastDraftPersistedAtMs = useRef<number | undefined>(undefined);
   const previousPhaseNameRef = useRef<FirstSessionPhaseName>(snapshot.phaseName);
@@ -488,7 +528,17 @@ export function FirstSessionScreen({
         />
       ) : null}
 
-      {completionMode ? <ReflectionOverlay mode={completionMode} /> : null}
+      {completionMode === "completed" ? (
+        <ReflectionOverlay
+          disableHaptics={disableHaptics}
+          hapticsEnabled={hapticsEnabled}
+          localInstallId={localInstallId}
+          onRewardMomentComplete={onRewardMomentComplete}
+          persistReflection={persistReflection}
+          reduceMotionEnabled={reduceMotionEnabled}
+          sessionId={sessionId}
+        />
+      ) : null}
     </View>
   );
 }
@@ -559,37 +609,213 @@ function PauseOverlay({
   );
 }
 
-function ReflectionOverlay({ mode }: { readonly mode: Exclude<CompletionMode, undefined> }) {
-  const isAbandoned = mode === "abandoned";
+const reflectionOptions = [
+  { label: "Same", value: "same" },
+  { label: "Better", value: "better" },
+  { label: "Much better", value: "much_better" },
+] as const satisfies readonly {
+  readonly label: string;
+  readonly value: PostSessionReflection["feeling"];
+}[];
+
+function ReflectionOverlay({
+  disableHaptics,
+  hapticsEnabled,
+  localInstallId,
+  onRewardMomentComplete,
+  persistReflection,
+  reduceMotionEnabled,
+  sessionId,
+}: {
+  readonly disableHaptics: boolean;
+  readonly hapticsEnabled: boolean;
+  readonly localInstallId: string;
+  readonly onRewardMomentComplete: () => void;
+  readonly persistReflection: (reflection: PostSessionReflection) => Promise<void>;
+  readonly reduceMotionEnabled: boolean;
+  readonly sessionId: string;
+}) {
+  const [selectedFeeling, setSelectedFeeling] = useState<PostSessionReflection["feeling"]>();
+  const [reflectionError, setReflectionError] = useState<string | undefined>();
+  const overlayProgress = useSharedValue(0);
+  const eyebrowProgress = useSharedValue(0);
+  const titleProgress = useSharedValue(0);
+  const optionsProgress = useSharedValue(0);
+  const rewardProgress = useSharedValue(0);
+
+  useEffect(() => {
+    const contentDuration = reduceMotionEnabled ? 0 : 800;
+
+    overlayProgress.value = withTiming(1, {
+      duration: reduceMotionEnabled ? 0 : 1200,
+      easing: Easing.out(Easing.ease),
+    });
+    eyebrowProgress.value = withDelay(
+      reduceMotionEnabled ? 0 : 300,
+      withTiming(1, { duration: contentDuration, easing: Easing.out(Easing.ease) }),
+    );
+    titleProgress.value = withDelay(
+      reduceMotionEnabled ? 0 : 450,
+      withTiming(1, { duration: contentDuration, easing: Easing.out(Easing.ease) }),
+    );
+    optionsProgress.value = withDelay(
+      reduceMotionEnabled ? 0 : 600,
+      withTiming(1, { duration: contentDuration, easing: Easing.out(Easing.ease) }),
+    );
+  }, [eyebrowProgress, optionsProgress, overlayProgress, reduceMotionEnabled, titleProgress]);
+
+  useEffect(() => {
+    rewardProgress.value = withTiming(selectedFeeling ? 1 : 0, {
+      duration: reduceMotionEnabled ? 0 : 500,
+      easing: Easing.out(Easing.ease),
+    });
+  }, [reduceMotionEnabled, rewardProgress, selectedFeeling]);
+
+  const overlayAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: overlayProgress.value,
+    transform: [{ scale: reduceMotionEnabled ? 1 : 0.95 + overlayProgress.value * 0.05 }],
+  }));
+  const eyebrowAnimatedStyle = useFadeUpAnimatedStyle(eyebrowProgress, reduceMotionEnabled);
+  const titleAnimatedStyle = useFadeUpAnimatedStyle(titleProgress, reduceMotionEnabled);
+  const optionsAnimatedStyle = useFadeUpAnimatedStyle(optionsProgress, reduceMotionEnabled);
+  const scienceAnimatedStyle = useFadeUpAnimatedStyle(rewardProgress, reduceMotionEnabled);
+  const continueAnimatedStyle = useFadeUpAnimatedStyle(rewardProgress, reduceMotionEnabled);
+
+  const selectFeeling = (feeling: PostSessionReflection["feeling"]) => {
+    setSelectedFeeling(feeling);
+    setReflectionError(undefined);
+
+    if (!disableHaptics && hapticsEnabled) {
+      void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => undefined);
+    }
+
+    void persistReflection({
+      feeling,
+      localInstallId,
+      reflectedAt: new Date().toISOString(),
+      sessionId,
+    }).catch(() => {
+      setReflectionError("We couldn’t save this locally yet. Try again.");
+    });
+  };
 
   return (
-    <View style={styles.overlay} testID="first-session-reflection-overlay">
-      <View pointerEvents="none" style={styles.overlayGlow} />
-      <Text accessibilityRole="header" selectable style={styles.reflectionTitle}>
-        How do you feel?
-      </Text>
-      <View style={styles.reflectionButtons}>
-        <ReflectionButton label="Same" />
-        <ReflectionButton label={isAbandoned ? "A little better" : "Better"} />
-        <ReflectionButton label={isAbandoned ? "Better" : "Much better"} />
+    <Animated.View
+      style={[styles.reflectionOverlay, overlayAnimatedStyle]}
+      testID="first-session-reflection-overlay"
+    >
+      <View pointerEvents="none" style={styles.reflectionAmbientGlow} />
+      <View style={styles.reflectionContent}>
+        <Animated.View style={[styles.reflectionEyebrowRow, eyebrowAnimatedStyle]}>
+          <CheckCircle
+            color={colors.dark.primaryGlow.value}
+            fill={colors.dark.primaryGlow.value}
+            size={16}
+            strokeWidth={0}
+          />
+          <Text selectable style={styles.reflectionEyebrow}>
+            First session complete
+          </Text>
+        </Animated.View>
+
+        <Animated.Text
+          accessibilityRole="header"
+          selectable
+          style={[styles.reflectionTitle, titleAnimatedStyle]}
+        >
+          How do you feel?
+        </Animated.Text>
+
+        <Animated.View style={[styles.reflectionButtons, optionsAnimatedStyle]}>
+          {reflectionOptions.map((option) => (
+            <ReflectionButton
+              key={option.value}
+              isSelected={selectedFeeling === option.value}
+              label={option.label}
+              onPress={() => {
+                selectFeeling(option.value);
+              }}
+            />
+          ))}
+        </Animated.View>
+
+        {selectedFeeling ? (
+          <Animated.Text selectable style={[styles.reflectionCopy, scienceAnimatedStyle]}>
+            Deep breathing shifts your nervous system into rest mode.
+          </Animated.Text>
+        ) : null}
+
+        {reflectionError ? (
+          <Text accessibilityRole="alert" selectable style={styles.reflectionError}>
+            {reflectionError}
+          </Text>
+        ) : null}
       </View>
-      <Text selectable style={styles.reflectionCopy}>
-        {isAbandoned
-          ? "Even a short pause can help your body settle."
-          : "Deep breathing shifts your nervous system into rest mode."}
-      </Text>
-    </View>
+
+      {selectedFeeling ? (
+        <Animated.View style={[styles.rewardActionWrap, continueAnimatedStyle]}>
+          <Pressable
+            accessibilityRole="button"
+            onPress={onRewardMomentComplete}
+            style={({ pressed }) => [
+              styles.rewardContinueButton,
+              pressed ? styles.controlPressed : null,
+            ]}
+          >
+            <Text selectable={false} style={styles.rewardContinueText}>
+              Continue
+            </Text>
+          </Pressable>
+        </Animated.View>
+      ) : null}
+    </Animated.View>
   );
 }
 
-function ReflectionButton({ label }: { readonly label: string }) {
+function ReflectionButton({
+  isSelected,
+  label,
+  onPress,
+}: {
+  readonly isSelected: boolean;
+  readonly label: string;
+  readonly onPress: () => void;
+}) {
   return (
-    <Pressable accessibilityRole="button" style={styles.reflectionButton}>
+    <Pressable
+      accessibilityRole="button"
+      accessibilityState={{ selected: isSelected }}
+      onPress={onPress}
+      style={({ pressed }) => [
+        styles.reflectionButton,
+        isSelected ? styles.reflectionButtonSelected : null,
+        pressed ? styles.controlPressed : null,
+      ]}
+    >
       <Text selectable={false} style={styles.reflectionButtonText}>
         {label}
       </Text>
+      <View
+        style={[styles.reflectionCheckCircle, isSelected ? styles.reflectionCheckSelected : null]}
+      >
+        {isSelected ? (
+          <CheckCircle
+            color={colors.dark.primaryGlow.value}
+            fill={colors.dark.primaryGlow.value}
+            size={24}
+            strokeWidth={0}
+          />
+        ) : null}
+      </View>
     </Pressable>
   );
+}
+
+function useFadeUpAnimatedStyle(progress: SharedValue<number>, reduceMotionEnabled: boolean) {
+  return useAnimatedStyle(() => ({
+    opacity: progress.value,
+    transform: [{ translateY: reduceMotionEnabled ? 0 : 16 - progress.value * 16 }],
+  }));
 }
 
 function ControlButton({
@@ -862,40 +1088,132 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: 150,
   },
+  reflectionAmbientGlow: {
+    backgroundColor: "rgba(124, 111, 205, 0.18)",
+    borderRadius: 140,
+    height: 280,
+    position: "absolute",
+    width: 280,
+  },
   reflectionButton: {
     alignItems: "center",
     backgroundColor: colors.dark.surface.value,
     borderColor: colors.dark.divider.value,
-    borderRadius: 20,
+    borderRadius: 16,
     borderWidth: 1,
-    justifyContent: "center",
-    minHeight: 54,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    minHeight: 56,
+    paddingHorizontal: 20,
     width: "100%",
   },
   reflectionButtons: {
-    gap: 12,
-    marginBottom: spacing.lg,
-    maxWidth: 280,
+    gap: 14,
+    marginBottom: spacing.md,
+    maxWidth: 320,
     width: "100%",
+  },
+  reflectionButtonSelected: {
+    backgroundColor: colors.dark.surfaceRaised.value,
+    borderColor: "rgba(124, 111, 205, 0.48)",
+    boxShadow: "0 0 14px rgba(124, 111, 205, 0.18)",
   },
   reflectionButtonText: {
     color: colors.dark.textPrimary.value,
     fontFamily: typography.mobileFontFamily.primary.semiBold,
     fontSize: 16,
   },
+  reflectionCheckCircle: {
+    alignItems: "center",
+    borderColor: "#2A2E50",
+    borderRadius: 12,
+    borderWidth: 1.5,
+    height: 24,
+    justifyContent: "center",
+    width: 24,
+  },
+  reflectionCheckSelected: {
+    borderColor: "transparent",
+    boxShadow: "0 0 10px rgba(168, 156, 224, 0.42)",
+  },
+  reflectionContent: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: spacing.md,
+    position: "relative",
+    transform: [{ translateY: -28 }],
+    width: "100%",
+  },
   reflectionCopy: {
-    color: colors.dark.textSecondary.value,
+    color: "#A4AAC4",
     fontFamily: typography.mobileFontFamily.primary.regular,
     fontSize: 14,
     lineHeight: 21,
     maxWidth: 290,
     textAlign: "center",
   },
+  reflectionError: {
+    color: colors.dark.danger.value,
+    fontFamily: typography.mobileFontFamily.primary.semiBold,
+    fontSize: 13,
+    lineHeight: 18,
+    marginTop: spacing.sm,
+    maxWidth: 300,
+    textAlign: "center",
+  },
+  reflectionEyebrow: {
+    color: "#A4AAC4",
+    fontFamily: typography.mobileFontFamily.primary.semiBold,
+    fontSize: 13,
+  },
+  reflectionEyebrowRow: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: spacing.xs,
+    marginBottom: 12,
+  },
+  reflectionOverlay: {
+    alignItems: "center",
+    backgroundColor: colors.dark.background.value,
+    bottom: 0,
+    justifyContent: "center",
+    left: 0,
+    overflow: "hidden",
+    position: "absolute",
+    right: 0,
+    top: 0,
+  },
   reflectionTitle: {
     color: colors.dark.textPrimary.value,
     fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 24,
+    fontSize: 28,
+    letterSpacing: 0,
     marginBottom: spacing.lg,
+    textAlign: "center",
+  },
+  rewardActionWrap: {
+    alignItems: "center",
+    bottom: 32,
+    left: 0,
+    paddingHorizontal: 24,
+    position: "absolute",
+    right: 0,
+  },
+  rewardContinueButton: {
+    alignItems: "center",
+    backgroundColor: colors.dark.surfaceRaised.value,
+    borderColor: colors.dark.surfaceRaised.value,
+    borderRadius: 16,
+    borderWidth: 1,
+    height: 56,
+    justifyContent: "center",
+    maxWidth: 342,
+    width: "100%",
+  },
+  rewardContinueText: {
+    color: colors.dark.textPrimary.value,
+    fontFamily: typography.mobileFontFamily.primary.semiBold,
+    fontSize: 16,
   },
   screen: {
     backgroundColor: colors.dark.background.value,

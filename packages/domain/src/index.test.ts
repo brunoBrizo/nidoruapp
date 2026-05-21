@@ -6,8 +6,12 @@ import {
   canShowPaywall,
   canStartDeferredAnonymousAuth,
   createPersonalizedOnboardingPlan,
+  eveningReminderNotificationContent,
+  eveningReminderWindow,
   firstBreathDemo,
+  getNextEveningReminderDate,
   getOnboardingPlanForGoal,
+  hasOpenedInReminderSuppressionWindow,
   initialInsightRuleTypes,
   launchSoundIds,
   onboardingGoalOptions,
@@ -209,6 +213,7 @@ assertEquals(
     daysSinceFirstActiveDay: 3,
     completedSessionCount: 2,
     permissionState: "not_shown",
+    systemPermissionState: "undetermined",
   }),
   false,
 );
@@ -218,6 +223,7 @@ assertEquals(
     daysSinceFirstActiveDay: 1,
     completedSessionCount: 2,
     permissionState: "not_shown",
+    systemPermissionState: "undetermined",
   }),
   false,
 );
@@ -227,6 +233,76 @@ assertEquals(
     daysSinceFirstActiveDay: 2,
     completedSessionCount: 2,
     permissionState: "not_shown",
+    systemPermissionState: "undetermined",
   }),
   true,
+);
+assertEquals(
+  canPromptForNotificationPermission({
+    isInOnboarding: false,
+    daysSinceFirstActiveDay: 2,
+    completedSessionCount: 1,
+    permissionState: "not_shown",
+    systemPermissionState: "undetermined",
+  }),
+  false,
+);
+assertEquals(
+  canPromptForNotificationPermission({
+    isInOnboarding: false,
+    daysSinceFirstActiveDay: 2,
+    completedSessionCount: 2,
+    permissionState: "declined",
+    systemPermissionState: "undetermined",
+  }),
+  false,
+);
+assertEquals(
+  canPromptForNotificationPermission({
+    isInOnboarding: false,
+    daysSinceFirstActiveDay: 2,
+    completedSessionCount: 2,
+    permissionState: "not_shown",
+    systemPermissionState: "granted",
+  }),
+  false,
+);
+
+const dayThreeMorning = new Date(2026, 0, 3, 8, 0);
+const openedThatMorning = new Date(2026, 0, 3, 8, 5);
+const nextReminderAfterOpen = getNextEveningReminderDate({
+  lastOpenedAt: openedThatMorning,
+  now: dayThreeMorning,
+  windDownMinutesAfterMidnight: 20 * 60 + 30,
+});
+
+assertEquals(
+  hasOpenedInReminderSuppressionWindow({
+    lastOpenedAt: openedThatMorning,
+    now: dayThreeMorning,
+  }),
+  true,
+);
+assertEquals(nextReminderAfterOpen.getDate(), 4);
+assertEquals(nextReminderAfterOpen.getHours(), 20);
+assertEquals(nextReminderAfterOpen.getMinutes(), 30);
+assertEquals(
+  getNextEveningReminderDate({
+    lastOpenedAt: null,
+    now: new Date(2026, 0, 3, 6, 30),
+    windDownMinutesAfterMidnight: 5 * 60,
+  }).getHours(),
+  eveningReminderWindow.earliestMinuteOfDay / 60,
+);
+assertEquals(
+  getNextEveningReminderDate({
+    lastOpenedAt: null,
+    now: new Date(2026, 0, 3, 6, 30),
+    windDownMinutesAfterMidnight: 23 * 60,
+  }).getHours(),
+  Math.floor(eveningReminderWindow.latestMinuteOfDay / 60),
+);
+assertEquals(
+  /sleep|session|streak|sale|discount|badge/i.test(eveningReminderNotificationContent.body),
+  false,
 );

@@ -30,8 +30,9 @@ export const getHomeContentEntranceMotionConfig = (reduceMotionEnabled: boolean)
   translateY: reduceMotionEnabled ? 0 : 12,
 });
 
-type HomeScreenProps = {
+export type HomeScreenProps = {
   readonly hasMorningCheckIn?: boolean;
+  readonly notificationGateController?: ReactNode;
   readonly now?: Date;
 };
 
@@ -94,155 +95,165 @@ function HomeEntrancePolish({ children }: { readonly children: ReactNode }) {
   );
 }
 
-export function HomeScreen({ hasMorningCheckIn = true, now = new Date() }: HomeScreenProps) {
+export function HomeScreen({
+  hasMorningCheckIn = true,
+  notificationGateController = null,
+  now = new Date(),
+}: HomeScreenProps) {
   const homeState = createHomeOverview({ hasMorningCheckIn, now });
   const primaryAction = homeState.primaryAction;
   const summarySlot = homeState.summarySlot;
   const rhythm = homeState.rhythm;
 
   return (
-    <ScrollView
-      style={styles.screen}
-      contentContainerStyle={styles.content}
-      contentInsetAdjustmentBehavior="automatic"
-    >
-      <View style={styles.header}>
-        <View style={styles.greetingCopy}>
-          <Text accessibilityRole="header" selectable style={styles.greeting}>
-            Good evening, Bruno
-          </Text>
-          <Text selectable style={styles.subtitle}>
-            Tonight’s wind-down is ready
-          </Text>
-        </View>
-        <View accessibilityLabel={`Current rhythm, ${rhythm.streakText}`} style={styles.streakChip}>
-          <Moon color={colors.dark.primary.value} size={16} strokeWidth={1.6} />
-          <Text selectable style={styles.streakText}>
-            {rhythm.streakText}
-          </Text>
-        </View>
-      </View>
-
-      <View
-        style={[styles.primaryCard, primaryAction.isDistressUrgent && styles.distressPrimaryCard]}
+    <>
+      <ScrollView
+        style={styles.screen}
+        contentContainerStyle={styles.content}
+        contentInsetAdjustmentBehavior="automatic"
       >
-        <View
-          pointerEvents="none"
-          style={[styles.orbGlow, primaryAction.isDistressUrgent && styles.distressOrbGlow]}
-        />
-        <View style={styles.primaryCopy}>
-          <Text accessibilityRole="header" selectable style={styles.primaryTitle}>
-            {primaryAction.label}
-          </Text>
-          <Text selectable style={styles.primarySubtitle}>
-            {primaryAction.subtitle}
-          </Text>
+        <View style={styles.header}>
+          <View style={styles.greetingCopy}>
+            <Text accessibilityRole="header" selectable style={styles.greeting}>
+              Good evening, Bruno
+            </Text>
+            <Text selectable style={styles.subtitle}>
+              Tonight’s wind-down is ready
+            </Text>
+          </View>
+          <View
+            accessibilityLabel={`Current rhythm, ${rhythm.streakText}`}
+            style={styles.streakChip}
+          >
+            <Moon color={colors.dark.primary.value} size={16} strokeWidth={1.6} />
+            <Text selectable style={styles.streakText}>
+              {rhythm.streakText}
+            </Text>
+          </View>
         </View>
 
-        <RestingBreathingOrb testID="home-resting-breathing-orb" />
-
-        <Link asChild href={primaryAction.routeTarget}>
-          <Pressable
-            accessibilityHint={`Opens the ${primaryAction.label} anchor.`}
-            accessibilityRole="link"
-            style={({ pressed }) => [styles.primaryButton, pressed && styles.pressed]}
-          >
-            <Text style={styles.primaryButtonText}>{primaryAction.ctaText}</Text>
-          </Pressable>
-        </Link>
-      </View>
-
-      <View style={styles.quickActionGrid}>
-        {homeState.quickActions.map((action) => {
-          const Icon = quickActionIcons[action.id];
-
-          return (
-            <Link asChild href={action.routeTarget} key={action.id}>
-              <Pressable
-                accessibilityHint={action.accessibilityHint}
-                accessibilityLabel={`${action.label} quick action`}
-                accessibilityRole="link"
-                style={({ pressed }) => [styles.quickAction, pressed && styles.pressed]}
-              >
-                <Icon color={homeColors.inactiveTab} size={21} strokeWidth={1.7} />
-                <View style={styles.quickActionCopy}>
-                  <Text style={styles.quickActionLabel}>{action.label}</Text>
-                  <Text style={styles.quickActionSubtitle}>{action.subtitle}</Text>
-                </View>
-              </Pressable>
-            </Link>
-          );
-        })}
-      </View>
-
-      <HomeEntrancePolish>
-        <View style={styles.lastNightCard}>
-          <View style={styles.cardRow}>
-            <Text
-              accessibilityRole={summarySlot.kind === "check-in" ? "header" : undefined}
-              selectable
-              style={styles.cardEyebrow}
-            >
-              {summarySlot.title}
+        <View
+          style={[styles.primaryCard, primaryAction.isDistressUrgent && styles.distressPrimaryCard]}
+        >
+          <View
+            pointerEvents="none"
+            style={[styles.orbGlow, primaryAction.isDistressUrgent && styles.distressOrbGlow]}
+          />
+          <View style={styles.primaryCopy}>
+            <Text accessibilityRole="header" selectable style={styles.primaryTitle}>
+              {primaryAction.label}
             </Text>
-            {summarySlot.kind === "last-night" ? (
-              <Text
-                accessibilityLabel={summarySlot.ratingAccessibilityLabel}
-                selectable
-                style={styles.scorePill}
-              >
-                {summarySlot.ratingText}
-              </Text>
-            ) : null}
-          </View>
-          <View style={styles.lastNightCopy}>
-            <Text selectable style={styles.lastNightTitle}>
-              {summarySlot.summary}
-            </Text>
-            <Text selectable style={styles.lastNightBody}>
-              {summarySlot.suggestion}
+            <Text selectable style={styles.primarySubtitle}>
+              {primaryAction.subtitle}
             </Text>
           </View>
-          <Link asChild href={summarySlot.routeTarget}>
+
+          <RestingBreathingOrb testID="home-resting-breathing-orb" />
+
+          <Link asChild href={primaryAction.routeTarget}>
             <Pressable
-              accessibilityHint={
-                summarySlot.kind === "check-in" ? summarySlot.accessibilityHint : undefined
-              }
+              accessibilityHint={`Opens the ${primaryAction.label} anchor.`}
               accessibilityRole="link"
-              style={({ pressed }) => [styles.insightLink, pressed && styles.insightLinkPressed]}
+              style={({ pressed }) => [styles.primaryButton, pressed && styles.pressed]}
             >
-              <Text style={styles.insightText}>{summarySlot.actionLabel}</Text>
-              <ArrowRight color={colors.dark.primary.value} size={15} strokeWidth={1.8} />
+              <Text style={styles.primaryButtonText}>{primaryAction.ctaText}</Text>
             </Pressable>
           </Link>
         </View>
 
-        <View style={styles.rhythmSection}>
-          <View style={styles.cardRow}>
-            <Text selectable style={styles.rhythmTitle}>
-              {rhythm.title}
-            </Text>
-            <Text selectable style={styles.rhythmMeta}>
-              {rhythm.meta}
-            </Text>
-          </View>
-          <View
-            accessibilityLabel={rhythm.accessibilityLabel}
-            accessibilityRole="image"
-            style={styles.rhythmStrip}
-          >
-            {rhythm.segments.map((segment) => (
-              <View key={segment.id} style={getRhythmSegmentStyles(segment)}>
-                {segment.today ? <View style={styles.todayDot} /> : null}
-              </View>
-            ))}
-          </View>
-          <Text selectable style={styles.rhythmCopy}>
-            {rhythm.compassionateCopy}
-          </Text>
+        <View style={styles.quickActionGrid}>
+          {homeState.quickActions.map((action) => {
+            const Icon = quickActionIcons[action.id];
+
+            return (
+              <Link asChild href={action.routeTarget} key={action.id}>
+                <Pressable
+                  accessibilityHint={action.accessibilityHint}
+                  accessibilityLabel={`${action.label} quick action`}
+                  accessibilityRole="link"
+                  style={({ pressed }) => [styles.quickAction, pressed && styles.pressed]}
+                >
+                  <Icon color={homeColors.inactiveTab} size={21} strokeWidth={1.7} />
+                  <View style={styles.quickActionCopy}>
+                    <Text style={styles.quickActionLabel}>{action.label}</Text>
+                    <Text style={styles.quickActionSubtitle}>{action.subtitle}</Text>
+                  </View>
+                </Pressable>
+              </Link>
+            );
+          })}
         </View>
-      </HomeEntrancePolish>
-    </ScrollView>
+
+        <HomeEntrancePolish>
+          <View style={styles.lastNightCard}>
+            <View style={styles.cardRow}>
+              <Text
+                accessibilityRole={summarySlot.kind === "check-in" ? "header" : undefined}
+                selectable
+                style={styles.cardEyebrow}
+              >
+                {summarySlot.title}
+              </Text>
+              {summarySlot.kind === "last-night" ? (
+                <Text
+                  accessibilityLabel={summarySlot.ratingAccessibilityLabel}
+                  selectable
+                  style={styles.scorePill}
+                >
+                  {summarySlot.ratingText}
+                </Text>
+              ) : null}
+            </View>
+            <View style={styles.lastNightCopy}>
+              <Text selectable style={styles.lastNightTitle}>
+                {summarySlot.summary}
+              </Text>
+              <Text selectable style={styles.lastNightBody}>
+                {summarySlot.suggestion}
+              </Text>
+            </View>
+            <Link asChild href={summarySlot.routeTarget}>
+              <Pressable
+                accessibilityHint={
+                  summarySlot.kind === "check-in" ? summarySlot.accessibilityHint : undefined
+                }
+                accessibilityRole="link"
+                style={({ pressed }) => [styles.insightLink, pressed && styles.insightLinkPressed]}
+              >
+                <Text style={styles.insightText}>{summarySlot.actionLabel}</Text>
+                <ArrowRight color={colors.dark.primary.value} size={15} strokeWidth={1.8} />
+              </Pressable>
+            </Link>
+          </View>
+
+          <View style={styles.rhythmSection}>
+            <View style={styles.cardRow}>
+              <Text selectable style={styles.rhythmTitle}>
+                {rhythm.title}
+              </Text>
+              <Text selectable style={styles.rhythmMeta}>
+                {rhythm.meta}
+              </Text>
+            </View>
+            <View
+              accessibilityLabel={rhythm.accessibilityLabel}
+              accessibilityRole="image"
+              style={styles.rhythmStrip}
+            >
+              {rhythm.segments.map((segment) => (
+                <View key={segment.id} style={getRhythmSegmentStyles(segment)}>
+                  {segment.today ? <View style={styles.todayDot} /> : null}
+                </View>
+              ))}
+            </View>
+            <Text selectable style={styles.rhythmCopy}>
+              {rhythm.compassionateCopy}
+            </Text>
+          </View>
+        </HomeEntrancePolish>
+      </ScrollView>
+      {notificationGateController}
+    </>
   );
 }
 

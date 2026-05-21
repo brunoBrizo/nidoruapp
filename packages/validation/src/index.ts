@@ -5,6 +5,7 @@ import {
   onboardingGoalOptions,
   onboardingPlanIds,
   type NotificationPermissionState,
+  type SystemNotificationPermissionState,
 } from "@nidoru/domain";
 import { z } from "zod";
 
@@ -35,6 +36,11 @@ export const notificationPermissionStateSchema = z.enum([
   "declined",
   "accepted",
 ] satisfies readonly NotificationPermissionState[]);
+export const systemNotificationPermissionStateSchema = z.enum([
+  "undetermined",
+  "granted",
+  "denied",
+] satisfies readonly SystemNotificationPermissionState[]);
 
 const localRecordIdSchema = (prefix: string) =>
   z.string().regex(new RegExp(`^${prefix}_[A-Za-z0-9_-]{8,64}$`));
@@ -181,6 +187,7 @@ export const notificationGateEligibilitySchema = z.object({
   daysSinceFirstActiveDay: z.number().int().min(0),
   completedSessionCount: z.number().int().min(0),
   permissionState: notificationPermissionStateSchema,
+  systemPermissionState: systemNotificationPermissionStateSchema,
 });
 
 export const soundMixLayerSchema = z.object({

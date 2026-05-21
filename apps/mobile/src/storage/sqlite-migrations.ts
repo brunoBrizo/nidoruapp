@@ -164,6 +164,50 @@ export const sqliteMigrations = [
         ON first_session_records (local_install_id, status, updated_at);
     `,
   },
+  {
+    id: "0004_post_value_account_linking_paywall",
+    sql: `
+      ALTER TABLE onboarding_responses
+        ADD COLUMN user_id TEXT CHECK (user_id IS NULL OR length(user_id) = 36);
+
+      ALTER TABLE first_session_records
+        ADD COLUMN user_id TEXT CHECK (user_id IS NULL OR length(user_id) = 36);
+
+      ALTER TABLE post_session_reflections
+        ADD COLUMN user_id TEXT CHECK (user_id IS NULL OR length(user_id) = 36);
+
+      CREATE TABLE local_account_links (
+        local_install_id TEXT PRIMARY KEY NOT NULL REFERENCES local_install_identity(local_install_id) ON DELETE CASCADE,
+        user_id TEXT NOT NULL CHECK (length(user_id) = 36),
+        provider TEXT NOT NULL CHECK (provider IN ('anonymous', 'apple', 'google')),
+        linked_at TEXT NOT NULL,
+        sync_status TEXT NOT NULL CHECK (sync_status IN ('pending', 'succeeded', 'retry_pending')),
+        last_sync_attempt_at TEXT,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+      );
+
+      CREATE TABLE local_account_link_attempts (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        local_install_id TEXT NOT NULL REFERENCES local_install_identity(local_install_id) ON DELETE CASCADE,
+        user_id TEXT CHECK (user_id IS NULL OR length(user_id) = 36),
+        provider TEXT NOT NULL CHECK (provider IN ('anonymous', 'apple', 'google')),
+        stage TEXT NOT NULL CHECK (stage IN ('auth_failed', 'sync_failed')),
+        status TEXT NOT NULL CHECK (status IN ('retry_pending', 'resolved')),
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+      );
+
+      CREATE INDEX first_session_records_user_idx
+        ON first_session_records (user_id, completed_at);
+
+      CREATE INDEX post_session_reflections_user_idx
+        ON post_session_reflections (user_id, reflected_at);
+
+      CREATE INDEX local_account_link_attempts_retry_idx
+        ON local_account_link_attempts (status, created_at);
+    `,
+  },
 ] as const satisfies readonly SQLiteMigration[];
 
 export async function runSqliteMigrations(

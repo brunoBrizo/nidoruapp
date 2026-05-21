@@ -57,6 +57,7 @@ const notificationGateEligibility = notificationGateEligibilitySchema.parse({
   daysSinceFirstActiveDay: 2,
   completedSessionCount: 2,
   permissionState: "not_shown",
+  systemPermissionState: "undetermined",
 });
 const morningCheckIn = morningCheckInSchema.parse({
   localInstallId,

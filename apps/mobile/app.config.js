@@ -41,6 +41,7 @@ const config = {
     "expo-sqlite",
     "expo-secure-store",
     "expo-localization",
+    "expo-notifications",
     "expo-font",
     ["@sentry/react-native/expo", sentryPluginOptions],
   ],

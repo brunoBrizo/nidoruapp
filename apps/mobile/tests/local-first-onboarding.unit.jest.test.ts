@@ -5,10 +5,16 @@ import {
   completeFirstSessionLocally,
   createLocalInstallId,
   getOrCreateLocalInstallIdentity,
+  loadNotificationGateReadiness,
+  loadPendingPostSessionReflection,
+  markNotificationPermissionAccepted,
+  markNotificationPermissionDeclined,
+  markNotificationPermissionPrompted,
+  savePostSessionReflectionLocally,
   type LocalFirstOnboardingDatabase,
 } from "../src/onboarding/local-first-onboarding";
 
-function createMockDatabase(firstRow: { local_install_id: string } | null = null) {
+function createMockDatabase(firstRow: Record<string, unknown> | null = null) {
   const database: LocalFirstOnboardingDatabase & {
     readonly runAsync: jest.MockedFunction<LocalFirstOnboardingDatabase["runAsync"]>;
     readonly getFirstAsync: jest.MockedFunction<LocalFirstOnboardingDatabase["getFirstAsync"]>;
@@ -60,7 +66,7 @@ describe("local-first onboarding persistence", () => {
     expect(createLocalInstallId(() => "ABC_123-xyz")).toBe("install_ABC_123-xyz");
   });
 
-  it("persists first-session completion before post-value gates or sync can run", async () => {
+  it("persists first-session completion before queueing the completion event", async () => {
     const database = createMockDatabase();
 
     await completeFirstSessionLocally(database, {
@@ -90,6 +96,109 @@ describe("local-first onboarding persistence", () => {
         24,
         "2026-05-18T02:07:01.000Z",
       ],
+    );
+    expect(database.runAsync).toHaveBeenLastCalledWith(
+      expect.stringContaining("INSERT INTO local_event_queue"),
+      [
+        expect.stringMatching(/^event_[A-Za-z0-9_-]{8,64}$/),
+        "install_0123456789abcdef",
+        "first_session_completed",
+        "first_session_record",
+        "session_0123456789abcdef",
+        "{}",
+        "2026-05-18T02:07:01.000Z",
+        "2026-05-18T02:07:01.000Z",
+      ],
+    );
+  });
+
+  it("rejects a post-session reflection until a completed first-session record exists", async () => {
+    const database = createMockDatabase();
+
+    await expect(
+      savePostSessionReflectionLocally(database, {
+        feeling: "better",
+        localInstallId: "install_0123456789abcdef",
+        reflectedAt: "2026-05-18T02:08:00.000Z",
+        sessionId: "session_0123456789abcdef",
+      }),
+    ).rejects.toThrow(/completed first-session record/i);
+
+    expect(database.runAsync).not.toHaveBeenCalled();
+  });
+
+  it("validates and persists one allowlisted post-session reflection locally", async () => {
+    const database = createMockDatabase({
+      local_install_id: "install_0123456789abcdef",
+      session_id: "session_0123456789abcdef",
+    });
+
+    await expect(
+      savePostSessionReflectionLocally(database, {
+        feeling: "fixed_everything",
+        localInstallId: "install_0123456789abcdef",
+        reflectedAt: "2026-05-18T02:08:00.000Z",
+        sessionId: "session_0123456789abcdef",
+      }),
+    ).rejects.toThrow();
+    expect(database.runAsync).not.toHaveBeenCalled();
+
+    await savePostSessionReflectionLocally(database, {
+      feeling: "better",
+      localInstallId: "install_0123456789abcdef",
+      reflectedAt: "2026-05-18T02:08:00.000Z",
+      sessionId: "session_0123456789abcdef",
+    });
+
+    expect(database.getFirstAsync).toHaveBeenLastCalledWith(
+      expect.stringContaining("status = 'completed'"),
+      ["session_0123456789abcdef", "install_0123456789abcdef"],
+    );
+    expect(database.runAsync).toHaveBeenCalledWith(
+      expect.stringContaining("INSERT INTO post_session_reflections"),
+      [
+        expect.stringMatching(/^reflection_[A-Za-z0-9_-]{8,64}$/),
+        "install_0123456789abcdef",
+        "session_0123456789abcdef",
+        "2026-05-18T02:08:00.000Z",
+        "better",
+      ],
+    );
+  });
+
+  it("loads a completed first session that still needs post-session reflection after a crash", async () => {
+    const database = createMockDatabase({
+      completed_at: "2026-05-18T02:07:00.000Z",
+      completed_breath_cycles: 24,
+      completion_persisted_at: "2026-05-18T02:07:01.000Z",
+      duration_seconds: 240,
+      local_install_id: "install_0123456789abcdef",
+      plan_id: "general_wellness",
+      session_id: "session_0123456789abcdef",
+      started_at: "2026-05-18T02:03:00.000Z",
+      status: "completed",
+      technique_id: "coherent-breathing",
+    });
+
+    await expect(
+      loadPendingPostSessionReflection(database, {
+        localInstallId: "install_0123456789abcdef",
+      }),
+    ).resolves.toEqual({
+      completedAt: "2026-05-18T02:07:00.000Z",
+      completedBreathCycles: 24,
+      completionPersistedAt: "2026-05-18T02:07:01.000Z",
+      durationSeconds: 240,
+      localInstallId: "install_0123456789abcdef",
+      planId: "general_wellness",
+      sessionId: "session_0123456789abcdef",
+      startedAt: "2026-05-18T02:03:00.000Z",
+      status: "completed",
+      techniqueId: "coherent-breathing",
+    });
+    expect(database.getFirstAsync).toHaveBeenCalledWith(
+      expect.stringContaining("post_session_reflections"),
+      ["install_0123456789abcdef"],
     );
   });
 
@@ -186,5 +295,106 @@ describe("local-first onboarding persistence", () => {
     ).rejects.toThrow();
 
     expect(database.runAsync).toHaveBeenCalledTimes(2);
+  });
+
+  it("loads Day 3 notification gate readiness from local-only state", async () => {
+    const database = createMockDatabase({
+      completed_session_count: 2,
+      first_active_at: "2026-05-18T12:00:00.000Z",
+      last_seen_at: "2026-05-20T10:00:00.000Z",
+      permission_state: null,
+      wind_down_minutes_after_midnight: 20 * 60 + 30,
+    });
+
+    await expect(
+      loadNotificationGateReadiness({
+        database,
+        isInOnboarding: false,
+        localInstallId: "install_0123456789abcdef",
+        now: new Date("2026-05-20T12:00:00.000Z"),
+        systemPermissionState: "undetermined",
+      }),
+    ).resolves.toMatchObject({
+      eligibility: {
+        completedSessionCount: 2,
+        daysSinceFirstActiveDay: 2,
+        isInOnboarding: false,
+        localInstallId: "install_0123456789abcdef",
+        permissionState: "not_shown",
+        systemPermissionState: "undetermined",
+      },
+      windDownMinutesAfterMidnight: 20 * 60 + 30,
+    });
+    expect(database.getFirstAsync).toHaveBeenCalledWith(
+      expect.stringContaining("notification_gate_state"),
+      ["install_0123456789abcdef"],
+    );
+  });
+
+  it("records notification prompted before acceptance events", async () => {
+    const database = createMockDatabase();
+
+    await markNotificationPermissionPrompted({
+      database,
+      eventId: "event_prompted123",
+      localInstallId: "install_0123456789abcdef",
+      now: new Date("2026-05-20T12:00:00.000Z"),
+    });
+    await markNotificationPermissionAccepted({
+      database,
+      eventId: "event_accepted123",
+      localInstallId: "install_0123456789abcdef",
+      now: new Date("2026-05-20T12:00:01.000Z"),
+    });
+
+    expect(database.runAsync).toHaveBeenNthCalledWith(
+      1,
+      expect.stringContaining("permission_state"),
+      expect.arrayContaining(["shown", "2026-05-20T12:00:00.000Z"]),
+    );
+    expect(database.runAsync).toHaveBeenNthCalledWith(
+      2,
+      expect.stringContaining("local_event_queue"),
+      [
+        "event_prompted123",
+        "install_0123456789abcdef",
+        "notification_permission_prompted",
+        "notification_gate_state",
+        "install_0123456789abcdef",
+        "{}",
+        "2026-05-20T12:00:00.000Z",
+        "2026-05-20T12:00:00.000Z",
+      ],
+    );
+    expect(database.runAsync).toHaveBeenNthCalledWith(
+      4,
+      expect.stringContaining("local_event_queue"),
+      [
+        "event_accepted123",
+        "install_0123456789abcdef",
+        "notification_permission_accepted",
+        "notification_gate_state",
+        "install_0123456789abcdef",
+        "{}",
+        "2026-05-20T12:00:01.000Z",
+        "2026-05-20T12:00:01.000Z",
+      ],
+    );
+  });
+
+  it("records notification pre-permission decline without queueing an OS-prompt event", async () => {
+    const database = createMockDatabase();
+
+    await markNotificationPermissionDeclined({
+      database,
+      localInstallId: "install_0123456789abcdef",
+      now: new Date("2026-05-20T12:00:00.000Z"),
+    });
+
+    expect(database.runAsync).toHaveBeenCalledTimes(1);
+    expect(database.runAsync).toHaveBeenCalledWith(
+      expect.stringContaining("declined_at"),
+      expect.arrayContaining(["declined", "2026-05-20T12:00:00.000Z"]),
+    );
   });
 });

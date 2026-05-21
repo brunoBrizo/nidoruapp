@@ -40,6 +40,7 @@ function RootLayout() {
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="onboarding" />
+        <Stack.Screen name="post-value" />
         <Stack.Screen name="observability-proof" />
       </Stack>
       <StatusBar style="light" />

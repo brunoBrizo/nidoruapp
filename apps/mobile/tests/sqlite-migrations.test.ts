@@ -109,6 +109,8 @@ Deno.test("applies local SQLite migrations from an empty database", async () => 
     assertEquals(
       foundationTables.map((row) => row.name),
       [
+        "local_account_link_attempts",
+        "local_account_links",
         "local_database_metadata",
         "local_event_queue",
         "local_install_identity",

@@ -425,6 +425,7 @@ export const firstBreathDemo = {
 } as const;
 
 export type NotificationPermissionState = "not_shown" | "shown" | "declined" | "accepted";
+export type SystemNotificationPermissionState = "undetermined" | "granted" | "denied";
 
 export type FirstValueCompletionGate = {
   readonly hasCompletedFirstFullSession: boolean;
@@ -443,7 +444,27 @@ export type NotificationPermissionGate = {
   readonly daysSinceFirstActiveDay: number;
   readonly completedSessionCount: number;
   readonly permissionState: NotificationPermissionState;
+  readonly systemPermissionState: SystemNotificationPermissionState;
 };
+
+export type EveningReminderScheduleInput = {
+  readonly now: Date;
+  readonly lastOpenedAt: Date | null;
+  readonly windDownMinutesAfterMidnight?: number | null;
+};
+
+export const eveningReminderNotificationContent = {
+  title: "Your wind-down is ready.",
+  body: "A quiet evening reminder is here when you want it.",
+} as const;
+
+export const eveningReminderWindow = {
+  earliestMinuteOfDay: 19 * 60,
+  latestMinuteOfDay: 21 * 60 + 30,
+  defaultMinuteOfDay: 20 * 60 + 30,
+  suppressionStartMinuteOfDay: 7 * 60,
+  suppressionEndMinuteOfDay: 22 * 60,
+} as const;
 
 export function canShowAccountPrompt({ hasCompletedFirstFullSession }: FirstValueCompletionGate) {
   return hasCompletedFirstFullSession;
@@ -465,11 +486,73 @@ export function canPromptForNotificationPermission({
   daysSinceFirstActiveDay,
   isInOnboarding,
   permissionState,
+  systemPermissionState,
 }: NotificationPermissionGate) {
   return (
     !isInOnboarding &&
     daysSinceFirstActiveDay >= 2 &&
     completedSessionCount >= 2 &&
-    permissionState === "not_shown"
+    permissionState === "not_shown" &&
+    systemPermissionState === "undetermined"
+  );
+}
+
+export function clampEveningReminderMinuteOfDay(minutesAfterMidnight: number) {
+  return Math.min(
+    eveningReminderWindow.latestMinuteOfDay,
+    Math.max(eveningReminderWindow.earliestMinuteOfDay, minutesAfterMidnight),
+  );
+}
+
+export function hasOpenedInReminderSuppressionWindow({
+  lastOpenedAt,
+  now,
+}: Pick<EveningReminderScheduleInput, "lastOpenedAt" | "now">) {
+  if (!lastOpenedAt || !isSameLocalCalendarDay(lastOpenedAt, now)) {
+    return false;
+  }
+
+  const openedMinuteOfDay = getLocalMinuteOfDay(lastOpenedAt);
+
+  return (
+    openedMinuteOfDay >= eveningReminderWindow.suppressionStartMinuteOfDay &&
+    openedMinuteOfDay <= eveningReminderWindow.suppressionEndMinuteOfDay
+  );
+}
+
+export function getNextEveningReminderDate({
+  lastOpenedAt,
+  now,
+  windDownMinutesAfterMidnight,
+}: EveningReminderScheduleInput) {
+  const reminderMinuteOfDay = clampEveningReminderMinuteOfDay(
+    windDownMinutesAfterMidnight ?? eveningReminderWindow.defaultMinuteOfDay,
+  );
+  const candidate = createLocalDateAtMinuteOfDay(now, reminderMinuteOfDay);
+
+  if (candidate <= now || hasOpenedInReminderSuppressionWindow({ lastOpenedAt, now })) {
+    candidate.setDate(candidate.getDate() + 1);
+  }
+
+  return candidate;
+}
+
+function createLocalDateAtMinuteOfDay(baseDate: Date, minuteOfDay: number) {
+  const scheduledAt = new Date(baseDate);
+
+  scheduledAt.setHours(Math.floor(minuteOfDay / 60), minuteOfDay % 60, 0, 0);
+
+  return scheduledAt;
+}
+
+function getLocalMinuteOfDay(date: Date) {
+  return date.getHours() * 60 + date.getMinutes();
+}
+
+function isSameLocalCalendarDay(left: Date, right: Date) {
+  return (
+    left.getFullYear() === right.getFullYear() &&
+    left.getMonth() === right.getMonth() &&
+    left.getDate() === right.getDate()
   );
 }

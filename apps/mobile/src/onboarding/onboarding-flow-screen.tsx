@@ -200,7 +200,7 @@ const questionCopy = {
   },
   goal: {
     eyebrow: "1 of 5",
-    subtitle: "We’ll shape your first session around this.",
+    subtitle: "We’ll shape your follow-up plan around this.",
     title: "What brings you here?",
   },
   sleep_baseline: {
@@ -516,6 +516,7 @@ export function OnboardingPersonalizationFlowScreen({
         contentInsetAdjustmentBehavior="automatic"
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
+        testID="onboarding-personalization-scroll"
       >
         <Animated.View
           style={[
@@ -528,6 +529,7 @@ export function OnboardingPersonalizationFlowScreen({
         >
           <QuestionHeader
             currentQuestionIndex={currentQuestionIndex}
+            isOpeningQuestion={currentQuestionId === "goal"}
             subtitle={currentCopy.subtitle}
             title={currentCopy.title}
           />
@@ -810,10 +812,12 @@ async function submitSkippedName({
 
 function QuestionHeader({
   currentQuestionIndex,
+  isOpeningQuestion,
   subtitle,
   title,
 }: {
   readonly currentQuestionIndex: number;
+  readonly isOpeningQuestion: boolean;
   readonly subtitle: string;
   readonly title: string;
 }) {
@@ -842,7 +846,11 @@ function QuestionHeader({
           {currentQuestionIndex + 1} of {ONBOARDING_PERSONALIZATION_QUESTION_COUNT}
         </Text>
       </View>
-      <Text accessibilityRole="header" selectable style={styles.title}>
+      <Text
+        accessibilityRole="header"
+        selectable
+        style={[styles.title, isOpeningQuestion && styles.openingTitle]}
+      >
         {title}
       </Text>
       <Text selectable style={styles.subtitle}>
@@ -1177,7 +1185,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     backgroundColor: colors.dark.background.value,
     flexGrow: 1,
-    paddingHorizontal: 14,
+    paddingHorizontal: 24,
   },
   questionScreen: {
     flex: 1,
@@ -1224,6 +1232,10 @@ const styles = StyleSheet.create({
     letterSpacing: 0,
     lineHeight: 30,
     marginBottom: 12,
+  },
+  openingTitle: {
+    fontSize: 28,
+    lineHeight: 34,
   },
   subtitle: {
     color: colors.dark.textSecondary.value,

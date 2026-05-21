@@ -2725,7 +2725,7 @@
       "label": "nameError()",
       "file_type": "code",
       "source_file": "apps/mobile/src/onboarding/onboarding-flow-screen.tsx",
-      "source_location": "L1145",
+      "source_location": "L1153",
       "id": "onboarding_flow_screen_nameerror",
       "community": 21,
       "norm_label": "nameerror()"
@@ -6621,7 +6621,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/onboarding/onboarding-flow-screen.tsx",
-      "source_location": "L1145",
+      "source_location": "L1153",
       "weight": 1.0,
       "_src": "apps_mobile_src_onboarding_onboarding_flow_screen_tsx",
       "_tgt": "onboarding_flow_screen_nameerror",

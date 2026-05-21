@@ -1,6 +1,6 @@
 import { describe, expect, it, jest } from "@jest/globals";
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react-native";
-import { AccessibilityInfo } from "react-native";
+import { AccessibilityInfo, StyleSheet } from "react-native";
 
 import {
   ONBOARDING_PERSONALIZATION_QUESTION_COUNT,
@@ -58,6 +58,16 @@ describe("OnboardingPersonalizationFlowScreen", () => {
 
     expect(ONBOARDING_PERSONALIZATION_QUESTION_COUNT).toBe(5);
     expect(screen.getByText("1 of 5")).toBeTruthy();
+    expect(screen.getByText("We’ll shape your follow-up plan around this.")).toBeTruthy();
+    expect(screen.queryByText("We’ll shape your first session around this.")).toBeNull();
+    expect(StyleSheet.flatten(screen.getByText("What brings you here?").props.style)).toEqual(
+      expect.objectContaining({ fontSize: 28 }),
+    );
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("onboarding-personalization-scroll").props.contentContainerStyle,
+      ),
+    ).toEqual(expect.objectContaining({ paddingHorizontal: 24 }));
     expect(screen.queryByText(forbiddenPrePlanGatePattern)).toBeNull();
 
     answerThroughBreathworkQuestion();

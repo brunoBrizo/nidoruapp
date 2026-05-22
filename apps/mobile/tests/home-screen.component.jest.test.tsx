@@ -1,6 +1,6 @@
 import { describe, expect, it, jest } from "@jest/globals";
 import { render, screen, within } from "@testing-library/react-native";
-import { AccessibilityInfo } from "react-native";
+import { AccessibilityInfo, StyleSheet } from "react-native";
 
 import { RESTING_BREATHING_ORB_TEST_IDS } from "../src/breathing/breathing-orb";
 import { AppTabBar } from "../src/navigation/app-tab-bar";
@@ -69,8 +69,17 @@ describe("HomeScreen", () => {
     expect(screen.getByRole("header", { name: "Good evening, Bruno" })).toBeTruthy();
     expect(screen.getByText("Tonight’s wind-down is ready")).toBeTruthy();
     expect(screen.getByText("8 days")).toBeTruthy();
-    expect(screen.getByText("Wind-Down Flow")).toBeTruthy();
-    expect(screen.getByText("4-7-8 breathing and 20 min sounds")).toBeTruthy();
+    expect(screen.getByText("Evening Wind-Down")).toBeTruthy();
+    expect(screen.getByText("4-7-8 breathing · 20 min sounds")).toBeTruthy();
+    expect(screen.getByTestId("home-primary-card")).toBeTruthy();
+    expect(screen.getByTestId("home-primary-card-fade")).toBeTruthy();
+    expect(StyleSheet.flatten(screen.getByTestId("home-primary-button-frame").props.style)).toEqual(
+      expect.objectContaining({
+        backgroundColor: "rgba(124, 111, 205, 0.88)",
+        borderRadius: 16,
+        minHeight: 48,
+      }),
+    );
     expect(
       within(
         screen.getByTestId("home-resting-breathing-orb", {
@@ -116,8 +125,8 @@ describe("HomeScreen", () => {
     ["00:00", localDateAt(0), "Rescue Me", "Immediate 4-7-8 relief"],
     ["05:00", localDateAt(5), "Morning Breathwork", "3 min energizing breath"],
     ["12:00", localDateAt(12), "Midday Reset", "Box breathing for stress"],
-    ["17:00", localDateAt(17), "Evening Prep", "Transition out of the day"],
-    ["20:00", localDateAt(20), "Wind-Down Flow", "4-7-8 breathing and 20 min sounds"],
+    ["17:00", localDateAt(17), "Evening Wind-Down", "4-7-8 breathing · 20 min sounds"],
+    ["20:00", localDateAt(20), "Evening Wind-Down", "4-7-8 breathing · 20 min sounds"],
   ])(
     "renders only the %s local-time primary action",
     (_timeLabel, now, expectedLabel, expectedSubtitle) => {
@@ -148,6 +157,24 @@ describe("HomeScreen", () => {
 
     expect(screen.getByText("A steady week, with room to rest.")).toBeTruthy();
     expect(screen.queryByText(/red badge|reset|failed|lost|broken|missed/i)).toBeNull();
+  });
+
+  it("matches the compact home.png quick action card structure", () => {
+    render(<HomeScreen now={localDateAt(20)} />);
+
+    const quickActionCards = ["rescue-me", "sounds", "breathe"].map((actionId) =>
+      screen.getByTestId(`home-quick-action-card-${actionId}`),
+    );
+
+    expect(quickActionCards.map((action) => StyleSheet.flatten(action.props.style))).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          backgroundColor: "rgba(20, 23, 43, 0.5)",
+          borderRadius: 16,
+          minHeight: 80,
+        }),
+      ]),
+    );
   });
 
   it("omits prohibited Home surfaces", () => {

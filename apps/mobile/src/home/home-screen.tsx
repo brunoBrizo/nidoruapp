@@ -6,6 +6,7 @@ import { Animated, Easing, Pressable, ScrollView, StyleSheet, Text, View } from 
 
 import { RestingBreathingOrb } from "../breathing/breathing-orb";
 import { useReduceMotionPreference } from "../motion/use-reduce-motion-enabled";
+import { CardFade } from "../surfaces/card-fade";
 import { type HomeQuickActionId } from "./home-actions";
 import { createHomeOverview, type HomeRhythmSegment } from "./home-state";
 
@@ -134,11 +135,9 @@ export function HomeScreen({
 
         <View
           style={[styles.primaryCard, primaryAction.isDistressUrgent && styles.distressPrimaryCard]}
+          testID="home-primary-card"
         >
-          <View
-            pointerEvents="none"
-            style={[styles.orbGlow, primaryAction.isDistressUrgent && styles.distressOrbGlow]}
-          />
+          <CardFade testID="home-primary-card-fade" variant="home-primary" />
           <View style={styles.primaryCopy}>
             <Text accessibilityRole="header" selectable style={styles.primaryTitle}>
               {primaryAction.label}
@@ -148,15 +147,17 @@ export function HomeScreen({
             </Text>
           </View>
 
-          <RestingBreathingOrb testID="home-resting-breathing-orb" />
+          <RestingBreathingOrb style={styles.primaryOrb} testID="home-resting-breathing-orb" />
 
           <Link asChild href={primaryAction.routeTarget}>
             <Pressable
               accessibilityHint={`Opens the ${primaryAction.label} anchor.`}
               accessibilityRole="link"
-              style={({ pressed }) => [styles.primaryButton, pressed && styles.pressed]}
+              style={({ pressed }) => [styles.primaryButtonPressable, pressed && styles.pressed]}
             >
-              <Text style={styles.primaryButtonText}>{primaryAction.ctaText}</Text>
+              <View style={styles.primaryButtonFrame} testID="home-primary-button-frame">
+                <Text style={styles.primaryButtonText}>{primaryAction.ctaText}</Text>
+              </View>
             </Pressable>
           </Link>
         </View>
@@ -171,12 +172,14 @@ export function HomeScreen({
                   accessibilityHint={action.accessibilityHint}
                   accessibilityLabel={`${action.label} quick action`}
                   accessibilityRole="link"
-                  style={({ pressed }) => [styles.quickAction, pressed && styles.pressed]}
+                  style={({ pressed }) => [styles.quickActionPressable, pressed && styles.pressed]}
                 >
-                  <Icon color={homeColors.inactiveTab} size={21} strokeWidth={1.7} />
-                  <View style={styles.quickActionCopy}>
-                    <Text style={styles.quickActionLabel}>{action.label}</Text>
-                    <Text style={styles.quickActionSubtitle}>{action.subtitle}</Text>
+                  <View style={styles.quickAction} testID={`home-quick-action-card-${action.id}`}>
+                    <Icon color={homeColors.inactiveTab} size={20} strokeWidth={1.7} />
+                    <View style={styles.quickActionCopy}>
+                      <Text style={styles.quickActionLabel}>{action.label}</Text>
+                      <Text style={styles.quickActionSubtitle}>{action.subtitle}</Text>
+                    </View>
                   </View>
                 </Pressable>
               </Link>
@@ -218,10 +221,12 @@ export function HomeScreen({
                   summarySlot.kind === "check-in" ? summarySlot.accessibilityHint : undefined
                 }
                 accessibilityRole="link"
-                style={({ pressed }) => [styles.insightLink, pressed && styles.insightLinkPressed]}
+                style={({ pressed }) => [styles.insightPressable, pressed && styles.pressed]}
               >
-                <Text style={styles.insightText}>{summarySlot.actionLabel}</Text>
-                <ArrowRight color={colors.dark.primary.value} size={15} strokeWidth={1.8} />
+                <View style={styles.insightLink}>
+                  <Text style={styles.insightText}>{summarySlot.actionLabel}</Text>
+                  <ArrowRight color={colors.dark.primary.value} size={15} strokeWidth={1.8} />
+                </View>
               </Pressable>
             </Link>
           </View>
@@ -263,10 +268,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    gap: spacing.sm,
-    paddingBottom: spacing.bottomNavigationHeight + spacing.xl,
-    paddingHorizontal: spacing.screenPadding,
-    paddingTop: spacing.xl,
+    gap: 14,
+    paddingBottom: spacing.bottomNavigationHeight + spacing.md,
+    paddingHorizontal: 30,
+    paddingTop: 4,
   },
   header: {
     alignItems: "flex-start",
@@ -310,31 +315,21 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   primaryCard: {
-    backgroundColor: homeColors.cardGlass,
+    backgroundColor: "rgba(20, 23, 43, 0.5)",
     borderColor: homeColors.borderSilk,
     borderRadius: 24,
     borderWidth: 1,
     boxShadow: "inset 0 1px 0 rgba(238, 240, 255, 0.1), 0 8px 32px rgba(124, 111, 205, 0.25)",
-    gap: 18,
+    gap: 10,
+    height: 255,
     overflow: "hidden",
-    padding: spacing.sm,
+    paddingBottom: spacing.sm,
+    paddingHorizontal: spacing.sm,
+    paddingTop: 28,
   },
   distressPrimaryCard: {
     backgroundColor: "rgba(13, 15, 26, 0.82)",
     boxShadow: "inset 0 1px 0 rgba(238, 240, 255, 0.08), 0 8px 28px rgba(124, 111, 205, 0.16)",
-  },
-  orbGlow: {
-    backgroundColor: "rgba(124, 111, 205, 0.18)",
-    borderRadius: 96,
-    height: 192,
-    left: "50%",
-    position: "absolute",
-    top: 46,
-    transform: [{ translateX: -96 }],
-    width: 192,
-  },
-  distressOrbGlow: {
-    backgroundColor: "rgba(124, 111, 205, 0.1)",
   },
   primaryCopy: {
     alignItems: "center",
@@ -354,15 +349,23 @@ const styles = StyleSheet.create({
     fontSize: typography.scale.body.size,
     lineHeight: 21,
   },
-  primaryButton: {
+  primaryOrb: {
+    height: 104,
+    transform: [{ scale: 0.88 }],
+    zIndex: 1,
+  },
+  primaryButtonPressable: {
+    marginTop: "auto",
+    transform: [{ scale: 1 }],
+    zIndex: 1,
+  },
+  primaryButtonFrame: {
     alignItems: "center",
     backgroundColor: "rgba(124, 111, 205, 0.88)",
     borderRadius: 16,
     boxShadow: "inset 0 1px 0 rgba(255, 255, 255, 0.15)",
     justifyContent: "center",
     minHeight: 48,
-    transform: [{ scale: 1 }],
-    zIndex: 1,
   },
   pressed: {
     transform: [{ scale: 0.96 }],
@@ -375,17 +378,20 @@ const styles = StyleSheet.create({
   },
   quickActionGrid: {
     flexDirection: "row",
-    gap: 10,
+    gap: 12,
+  },
+  quickActionPressable: {
+    flex: 1,
+    transform: [{ scale: 1 }],
   },
   quickAction: {
     alignItems: "center",
-    backgroundColor: homeColors.cardGlass,
-    borderColor: homeColors.borderSilk,
+    backgroundColor: "rgba(20, 23, 43, 0.5)",
+    borderColor: "rgba(238, 240, 255, 0.03)",
     borderRadius: 16,
     borderWidth: 1,
     boxShadow: "inset 0 1px 0 rgba(238, 240, 255, 0.08)",
-    flex: 1,
-    gap: 7,
+    gap: 6,
     justifyContent: "center",
     minHeight: 80,
     paddingHorizontal: 6,
@@ -419,7 +425,7 @@ const styles = StyleSheet.create({
     borderRadius: radii.card,
     borderWidth: 1,
     boxShadow: "inset 0 1px 0 rgba(238, 240, 255, 0.08)",
-    gap: 12,
+    gap: 9,
     padding: spacing.sm,
   },
   cardRow: {
@@ -462,16 +468,15 @@ const styles = StyleSheet.create({
     fontSize: typography.scale.body.size,
     lineHeight: 20,
   },
-  insightLink: {
-    alignItems: "center",
+  insightPressable: {
     alignSelf: "flex-start",
-    flexDirection: "row",
-    gap: 6,
-    minHeight: 40,
     transform: [{ scale: 1 }],
   },
-  insightLinkPressed: {
-    transform: [{ scale: 0.96 }],
+  insightLink: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 6,
+    minHeight: 24,
   },
   insightText: {
     color: colors.dark.primary.value,

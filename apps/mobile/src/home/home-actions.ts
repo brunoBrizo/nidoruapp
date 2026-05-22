@@ -130,8 +130,8 @@ export const homePrimaryActions = {
   },
   "evening-prep": {
     id: "evening-prep",
-    label: "Evening Prep",
-    subtitle: "Transition out of the day",
+    label: "Evening Wind-Down",
+    subtitle: "4-7-8 breathing · 20 min sounds",
     ctaText: "Start now",
     routeTarget: "/breathe/evening-prep",
     iconIntent: "sunset",
@@ -139,8 +139,8 @@ export const homePrimaryActions = {
   },
   "wind-down-flow": {
     id: "wind-down-flow",
-    label: "Wind-Down Flow",
-    subtitle: "4-7-8 breathing and 20 min sounds",
+    label: "Evening Wind-Down",
+    subtitle: "4-7-8 breathing · 20 min sounds",
     ctaText: "Start now",
     routeTarget: "/sleep/wind-down",
     iconIntent: "moon",

@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 import { render, screen, within } from "@testing-library/react-native";
-import { AccessibilityInfo } from "react-native";
+import { AccessibilityInfo, StyleSheet } from "react-native";
 
 import { AppTabBar } from "../src/navigation/app-tab-bar";
 
@@ -77,5 +77,22 @@ describe("AppTabBar", () => {
 
     expect(screen.queryByRole("tab", { name: "Home tab" })).toBeNull();
     expect(screen.queryByText("Breathe")).toBeNull();
+  });
+
+  it("matches the home.png tab shell frame and active indicator", () => {
+    renderTabBar();
+
+    expect(StyleSheet.flatten(screen.getByTestId("app-tab-bar").props.style)).toEqual(
+      expect.objectContaining({
+        backgroundColor: "rgba(13, 15, 26, 0.9)",
+        minHeight: 84,
+      }),
+    );
+    expect(StyleSheet.flatten(screen.getByTestId("tab-active-indicator").props.style)).toEqual(
+      expect.objectContaining({
+        height: 4,
+        width: 42,
+      }),
+    );
   });
 });

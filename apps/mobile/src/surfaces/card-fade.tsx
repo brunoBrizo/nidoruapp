@@ -32,7 +32,7 @@ type CardFadeConfig = {
   readonly wash?: LinearFade;
 };
 
-export type CardFadeVariant = "personalized-plan" | "profile" | "sleep-primary";
+export type CardFadeVariant = "home-primary" | "personalized-plan" | "profile" | "sleep-primary";
 
 type CardFadeProps = {
   readonly testID: string;
@@ -43,6 +43,54 @@ const primaryColor = colors.dark.primary.value;
 const primaryGlowColor = colors.dark.primaryGlow.value;
 
 const cardFadeVariants: Record<CardFadeVariant, CardFadeConfig> = {
+  "home-primary": {
+    viewBox: "0 0 325 255",
+    wash: {
+      axis: "vertical",
+      x: 0,
+      y: 0,
+      width: 325,
+      height: 255,
+      stops: [
+        { offset: "0", color: colors.dark.surface.value, opacity: "0.7" },
+        { offset: "0.58", color: colors.dark.surface.value, opacity: "0.54" },
+        { offset: "1", color: colors.dark.background.value, opacity: "0.18" },
+      ],
+    },
+    corner: {
+      cx: 145,
+      cy: 138,
+      r: 132,
+      stops: [
+        { offset: "0", color: primaryGlowColor, opacity: "0.28" },
+        { offset: "0.28", color: primaryColor, opacity: "0.18" },
+        { offset: "0.58", color: primaryColor, opacity: "0.075" },
+        { offset: "1", color: primaryColor, opacity: "0" },
+      ],
+    },
+    topEdge: {
+      x: 16,
+      y: 0.4,
+      width: 293,
+      height: 1.3,
+      stops: [
+        { offset: "0", color: primaryGlowColor, opacity: "0" },
+        { offset: "0.52", color: primaryGlowColor, opacity: "0.05" },
+        { offset: "1", color: primaryGlowColor, opacity: "0.1" },
+      ],
+    },
+    rightEdge: {
+      x: 323.6,
+      y: 20,
+      width: 1.2,
+      height: 184,
+      stops: [
+        { offset: "0", color: primaryGlowColor, opacity: "0.08" },
+        { offset: "0.58", color: primaryGlowColor, opacity: "0.035" },
+        { offset: "1", color: primaryGlowColor, opacity: "0" },
+      ],
+    },
+  },
   "personalized-plan": {
     viewBox: "0 0 309 224",
     wash: {
@@ -263,5 +311,6 @@ function renderStops(id: string, stops: readonly FadeStop[]) {
 const styles = StyleSheet.create({
   layer: {
     ...StyleSheet.absoluteFillObject,
+    zIndex: 0,
   },
 });

@@ -24,7 +24,7 @@ const iconByTabId: Record<AppShellTabId, LucideIcon> = {
 };
 
 const inactiveTabColor = "#A0A5C0";
-const activeIndicatorWidth = 22;
+const activeIndicatorWidth = 42;
 
 export const TAB_ACTIVE_INDICATOR_MOTION = {
   durationMs: 250,
@@ -106,7 +106,7 @@ export function AppTabBar({ state, descriptors, navigation }: AppTabBarProps) {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} testID="app-tab-bar">
       <View
         onLayout={(event) => {
           setSurfaceWidth(event.nativeEvent.layout.width);
@@ -181,10 +181,11 @@ export function AppTabBar({ state, descriptors, navigation }: AppTabBarProps) {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "rgba(13, 15, 26, 0.92)",
+    backgroundColor: "rgba(13, 15, 26, 0.9)",
     borderTopColor: colors.dark.surfaceRaised.value,
     borderTopWidth: 1,
     boxShadow: "0 -12px 32px rgba(13, 15, 26, 0.72)",
+    minHeight: 84,
     paddingBottom: spacing.xs,
     paddingHorizontal: spacing.xs,
     paddingTop: 10,
@@ -209,7 +210,7 @@ const styles = StyleSheet.create({
   activeIndicator: {
     backgroundColor: colors.dark.primary.value,
     borderRadius: 9999,
-    height: 3,
+    height: 4,
     position: "absolute",
     top: 0,
     width: activeIndicatorWidth,

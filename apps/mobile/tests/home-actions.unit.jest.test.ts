@@ -59,10 +59,10 @@ describe("home actions contract", () => {
     ["11:59", localDateAt(11, 59), "Morning Breathwork", false],
     ["12:00", localDateAt(12, 0), "Midday Reset", false],
     ["16:59", localDateAt(16, 59), "Midday Reset", false],
-    ["17:00", localDateAt(17, 0), "Evening Prep", false],
-    ["19:59", localDateAt(19, 59), "Evening Prep", false],
-    ["20:00", localDateAt(20, 0), "Wind-Down Flow", false],
-    ["23:59", localDateAt(23, 59), "Wind-Down Flow", false],
+    ["17:00", localDateAt(17, 0), "Evening Wind-Down", false],
+    ["19:59", localDateAt(19, 59), "Evening Wind-Down", false],
+    ["20:00", localDateAt(20, 0), "Evening Wind-Down", false],
+    ["23:59", localDateAt(23, 59), "Evening Wind-Down", false],
   ])(
     "selects the %s local-time primary action",
     (_timeLabel, now, expectedLabel, expectedUrgency) => {
@@ -77,7 +77,7 @@ describe("home actions contract", () => {
   it("builds a local-only Home state model from current time", () => {
     const homeState = createLocalHomeState({ now: localDateAt(20) });
 
-    expect(homeState.primaryAction.label).toBe("Wind-Down Flow");
+    expect(homeState.primaryAction.label).toBe("Evening Wind-Down");
     expect(homeState.tabs).toBe(appShellTabs);
     expect(homeState.quickActions).toBe(homeQuickActions);
   });

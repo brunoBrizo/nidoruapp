@@ -76,6 +76,7 @@ describe("HomeScreen", () => {
     expect(screen.getByTestId("home-primary-card-fade")).toBeTruthy();
     expect(StyleSheet.flatten(screen.getByTestId("home-primary-card").props.style)).toEqual(
       expect.objectContaining({
+        height: 280,
         paddingBottom: 24,
       }),
     );

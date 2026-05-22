@@ -338,7 +338,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     boxShadow: "inset 0 1px 0 rgba(238, 240, 255, 0.1), 0 8px 32px rgba(124, 111, 205, 0.25)",
     gap: 10,
-    height: 255,
+    height: 280,
     overflow: "hidden",
     paddingBottom: 24,
     paddingHorizontal: spacing.sm,

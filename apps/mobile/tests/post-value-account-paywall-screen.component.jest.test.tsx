@@ -46,7 +46,7 @@ describe("PostValueAccountPaywallScreen", () => {
     expect(screen.getByText("Finish the first session reward first.")).toBeTruthy();
   });
 
-  it("matches the post-value account and paywall copy with session proof", () => {
+  it("matches the post-value account screen with session proof before plans are requested", () => {
     render(<PostValueAccountPaywallScreen accessState={eligibleAccessState} />);
 
     expect(screen.getByText("First session complete")).toBeTruthy();
@@ -57,10 +57,28 @@ describe("PostValueAccountPaywallScreen", () => {
     expect(screen.getByText("Save tonight’s progress")).toBeTruthy();
     expect(screen.getByRole("button", { name: "Continue with Apple" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Continue with Google" })).toBeTruthy();
-    expect(screen.getByText("Try 14 days of Nidoru Premium")).toBeTruthy();
     expect(screen.getByRole("button", { name: "See plans" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Continue with free" })).toBeTruthy();
+    expect(screen.queryByText("Try 14 days of Nidoru Premium")).toBeNull();
+    expect(screen.queryByRole("button", { name: "Annual" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Monthly" })).toBeNull();
+    expect(screen.queryByText("14 days free. Then $39.99/year unless canceled.")).toBeNull();
     expect(screen.queryByRole("button", { name: "Restore purchase" })).toBeNull();
+  });
+
+  it("reveals the premium plan selector after See plans is pressed", () => {
+    render(<PostValueAccountPaywallScreen accessState={eligibleAccessState} />);
+
+    fireEvent.press(screen.getByRole("button", { name: "See plans" }));
+
+    expect(screen.getByText("Try 14 days of Nidoru Premium")).toBeTruthy();
+    expect(screen.getByText("Build on the routine that helped tonight.")).toBeTruthy();
+    expect(screen.getByText("Unlimited sleep sessions and breath techniques")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Annual" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Monthly" })).toBeTruthy();
+    expect(screen.getByText("14 days free. Then $39.99/year unless canceled.")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Start 14-day free trial" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Restore purchase" })).toBeTruthy();
   });
 
   it("supports account linking, plan selection, restore, trial, and continue-free paths", async () => {
@@ -84,12 +102,12 @@ describe("PostValueAccountPaywallScreen", () => {
       expect(onLinkAccount).toHaveBeenCalledWith("apple");
     });
 
-    fireEvent.press(screen.getByRole("button", { name: "Monthly" }));
-    expect(screen.getByText("$7.99")).toBeTruthy();
-
     fireEvent.press(screen.getByRole("button", { name: "See plans" }));
     expect(screen.getByRole("button", { name: "Start 14-day free trial" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Restore purchase" })).toBeTruthy();
+
+    fireEvent.press(screen.getByRole("button", { name: "Monthly" }));
+    expect(screen.getByText("$7.99")).toBeTruthy();
 
     fireEvent.press(screen.getByRole("button", { name: "Start 14-day free trial" }));
     fireEvent.press(screen.getByRole("button", { name: "Restore purchase" }));

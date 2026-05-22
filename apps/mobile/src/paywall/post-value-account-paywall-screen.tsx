@@ -1,4 +1,5 @@
 import { colors, spacing, typography } from "@nidoru/ui-tokens";
+import { StatusBar } from "expo-status-bar";
 import { CheckCircle, ShieldCheck } from "lucide-react-native";
 import { useCallback, useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -34,6 +35,7 @@ export function PostValueAccountPaywallScreen({
   const [plansPresented, setPlansPresented] = useState(false);
   const [pendingAction, setPendingAction] = useState<string | undefined>();
   const [actionMessage, setActionMessage] = useState<string | undefined>();
+  const shouldShowPlanSelection = accessState.canShowPaywall && plansPresented;
 
   const handleAccountLinkPress = useCallback(
     (provider: Exclude<PostValueAuthProvider, "anonymous">) => {
@@ -89,66 +91,74 @@ export function PostValueAccountPaywallScreen({
 
   return (
     <View style={styles.screen}>
+      <StatusBar hidden />
       <View pointerEvents="none" style={styles.ambientGlow} />
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        contentInsetAdjustmentBehavior="automatic"
+        contentContainerStyle={[
+          styles.scrollContent,
+          shouldShowPlanSelection ? styles.planScrollContent : styles.accountScrollContent,
+        ]}
+        contentInsetAdjustmentBehavior="never"
         style={styles.scrollView}
       >
-        <View style={styles.proofLabelRow}>
-          <CheckCircle color="#5EC4D4" fill="#5EC4D4" size={16} strokeWidth={0} />
-          <Text selectable style={styles.proofLabelText}>
-            First session complete
-          </Text>
-        </View>
+        {!shouldShowPlanSelection ? (
+          <>
+            <View style={styles.proofLabelRow}>
+              <CheckCircle color="#0D0F1A" fill="#5EC4D4" size={14} strokeWidth={3} />
+              <Text selectable style={styles.proofLabelText}>
+                First session complete
+              </Text>
+            </View>
 
-        <Text accessibilityRole="header" selectable style={styles.headline}>
-          Keep tonight’s calm going
-        </Text>
-        <Text selectable style={styles.subcopy}>
-          Tonight’s session is saved on this phone. Link an account to protect your progress and
-          restore it later.
-        </Text>
-
-        <View style={styles.proofCard}>
-          <ProofMetric label="Session" value={accessState.proof.durationLabel} />
-          <View style={styles.proofDivider} />
-          <ProofMetric label="Breaths" value={`${accessState.proof.breathCount}`} />
-          <View style={styles.proofDivider} />
-          <ProofMetric accent label="Streak" value={`${accessState.proof.streakCount}`} />
-        </View>
-
-        <View style={styles.accountSection}>
-          <Text selectable style={styles.sectionKicker}>
-            Save tonight’s progress
-          </Text>
-          <AccountButton
-            disabled={pendingAction === "apple"}
-            label="Continue with Apple"
-            mark="apple"
-            onPress={() => {
-              handleAccountLinkPress("apple");
-            }}
-          />
-          <AccountButton
-            disabled={pendingAction === "google"}
-            label="Continue with Google"
-            mark="google"
-            onPress={() => {
-              handleAccountLinkPress("google");
-            }}
-          />
-          <Text selectable style={styles.trustLine}>
-            Used for progress sync, purchase restore, and data controls.
-          </Text>
-          {actionMessage ? (
-            <Text accessibilityRole="alert" selectable style={styles.actionMessage}>
-              {actionMessage}
+            <Text accessibilityRole="header" selectable style={styles.headline}>
+              Keep tonight’s calm going
             </Text>
-          ) : null}
-        </View>
+            <Text selectable style={styles.subcopy}>
+              Tonight’s session is saved on this phone. Link an account to protect your progress and
+              restore it later.
+            </Text>
 
-        {accessState.canShowPaywall ? (
+            <View style={styles.proofCard}>
+              <ProofMetric label="Session" value={accessState.proof.durationLabel} />
+              <View style={styles.proofDivider} />
+              <ProofMetric label="Breaths" value={`${accessState.proof.breathCount}`} />
+              <View style={styles.proofDivider} />
+              <ProofMetric accent label="Streak" value={`${accessState.proof.streakCount}`} />
+            </View>
+
+            <View style={styles.accountSection}>
+              <Text selectable style={styles.sectionKicker}>
+                Save tonight’s progress
+              </Text>
+              <AccountButton
+                disabled={pendingAction === "apple"}
+                label="Continue with Apple"
+                mark="apple"
+                onPress={() => {
+                  handleAccountLinkPress("apple");
+                }}
+              />
+              <AccountButton
+                disabled={pendingAction === "google"}
+                label="Continue with Google"
+                mark="google"
+                onPress={() => {
+                  handleAccountLinkPress("google");
+                }}
+              />
+              <Text selectable style={styles.trustLine}>
+                Used for progress sync, purchase restore, and data controls.
+              </Text>
+              {actionMessage ? (
+                <Text accessibilityRole="alert" selectable style={styles.actionMessage}>
+                  {actionMessage}
+                </Text>
+              ) : null}
+            </View>
+          </>
+        ) : null}
+
+        {shouldShowPlanSelection ? (
           <View style={styles.premiumSection}>
             <Text accessibilityRole="header" selectable style={styles.premiumTitle}>
               Try 14 days of Nidoru Premium
@@ -322,7 +332,7 @@ function AccountButton({
       ]}
     >
       <Text selectable={false} style={mark === "apple" ? styles.appleMark : styles.googleMark}>
-        {mark === "apple" ? "A" : "G"}
+        {mark === "apple" ? "" : "G"}
       </Text>
       <Text selectable={false} style={styles.accountButtonText}>
         {label}
@@ -413,6 +423,9 @@ const styles = StyleSheet.create({
     fontFamily: typography.mobileFontFamily.primary.semiBold,
     fontSize: 15,
   },
+  accountScrollContent: {
+    paddingTop: 62,
+  },
   accountSection: {
     gap: 12,
     marginBottom: 96,
@@ -438,7 +451,7 @@ const styles = StyleSheet.create({
   },
   appleMark: {
     color: "#EEF0FF",
-    fontSize: 20,
+    fontSize: 18,
   },
   benefitList: {
     gap: 14,
@@ -530,6 +543,9 @@ const styles = StyleSheet.create({
     fontFamily: typography.mobileFontFamily.data.regular,
     fontSize: 11,
     fontWeight: "700",
+  },
+  planScrollContent: {
+    paddingTop: 64,
   },
   planButton: {
     alignItems: "center",
@@ -700,7 +716,6 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: 360,
     paddingHorizontal: 20,
-    paddingTop: 48,
   },
   scrollView: {
     flex: 1,

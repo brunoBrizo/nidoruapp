@@ -58,4 +58,27 @@ describe("BreatheTechniqueAnchorScreen", () => {
       undefined,
     );
   });
+
+  it("falls back through the typed route policy for post-MVP techniques and invalid durations", () => {
+    mockUseLocalSearchParams.mockReturnValue({
+      durationSeconds: "1801",
+      technique: "physiological-sigh",
+    });
+
+    render(<BreatheTechniqueAnchorScreen />);
+
+    expect(FirstSessionRouteScreen).toHaveBeenLastCalledWith(
+      expect.not.objectContaining({
+        durationSeconds: expect.any(Number),
+      }),
+      undefined,
+    );
+    expect(FirstSessionRouteScreen).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        postRewardRoute: "/post-value",
+        techniqueId: "4-7-8-sleep",
+      }),
+      undefined,
+    );
+  });
 });

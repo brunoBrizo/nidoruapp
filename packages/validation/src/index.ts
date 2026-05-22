@@ -1,7 +1,11 @@
 import {
+  breathAudioCueModeIds,
+  breathPhaseNames,
+  breathSessionDurationBounds,
   breathTechniqueIds,
   breathworkFamiliarityOptions,
   launchSoundIds,
+  mvpBreathTechniqueIds,
   onboardingGoalOptions,
   onboardingPlanIds,
   type NotificationPermissionState,
@@ -12,7 +16,16 @@ import { z } from "zod";
 export const localInstallIdSchema = z.string().regex(/^install_[A-Za-z0-9_-]{8,64}$/);
 export const isoDateTimeSchema = z.string().datetime({ offset: true });
 export const breathTechniqueIdSchema = z.enum(breathTechniqueIds);
+export const mvpBreathTechniqueIdSchema = z.enum(mvpBreathTechniqueIds);
 export const launchSoundIdSchema = z.enum(launchSoundIds);
+export const breathSessionPhaseNameSchema = z.enum(breathPhaseNames);
+export const breathPhaseDurationMsSchema = z.number().int().positive().max(60_000);
+export const audioCueModeIdSchema = z.enum(breathAudioCueModeIds);
+export const breathSessionDurationSecondsSchema = z
+  .number()
+  .int()
+  .min(breathSessionDurationBounds.minSeconds)
+  .max(breathSessionDurationBounds.maxSeconds);
 export const onboardingGoalSchema = z.enum(
   onboardingGoalOptions.map((option) => option.value) as [
     (typeof onboardingGoalOptions)[number]["value"],
@@ -28,7 +41,6 @@ export const breathworkFamiliaritySchema = z.enum(
 );
 export const onboardingStatusSchema = z.enum(["draft", "completed"]);
 export const firstSessionStatusSchema = z.enum(["draft", "completed", "abandoned"]);
-export const breathSessionPhaseNameSchema = z.enum(["inhale", "hold", "second-inhale", "exhale"]);
 export const postSessionFeelingSchema = z.enum(["same", "better", "much_better"]);
 export const notificationPermissionStateSchema = z.enum([
   "not_shown",
@@ -119,11 +131,7 @@ export const firstSessionRecordSchema = z
     techniqueId: breathTechniqueIdSchema,
     startedAt: isoDateTimeSchema,
     completedAt: isoDateTimeSchema.optional(),
-    durationSeconds: z
-      .number()
-      .int()
-      .positive()
-      .max(60 * 30),
+    durationSeconds: breathSessionDurationSecondsSchema,
     completedBreathCycles: z.number().int().min(0).optional(),
     completionPersistedAt: isoDateTimeSchema.optional(),
   })
@@ -156,11 +164,7 @@ export const recoverableFirstSessionDraftSchema = z.object({
   planId: onboardingPlanIdSchema,
   techniqueId: breathTechniqueIdSchema,
   startedAt: isoDateTimeSchema,
-  durationSeconds: z
-    .number()
-    .int()
-    .positive()
-    .max(60 * 30),
+  durationSeconds: breathSessionDurationSecondsSchema,
   completedBreathCycles: z.number().int().min(0),
   elapsedDurationMs: z.number().int().min(0),
   remainingDurationMs: z.number().int().min(1),

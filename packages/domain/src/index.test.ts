@@ -1,4 +1,7 @@
 import {
+  breathAudioCueModeIds,
+  breathAudioCueModes,
+  breathSessionDurationBounds,
   breathTechniques,
   breathworkFamiliarityOptions,
   canPromptForNotificationPermission,
@@ -14,12 +17,14 @@ import {
   hasOpenedInReminderSuppressionWindow,
   initialInsightRuleTypes,
   launchSoundIds,
+  mvpBreathTechniqueIds,
   onboardingGoalOptions,
   onboardingPlanIds,
   onboardingPlans,
   onboardingQuestionLimit,
   onboardingQuestions,
   onboardingQuestionIds,
+  postMvpBreathTechniqueIds,
   sleepBaselineOptions,
   streakRules,
   windDownTimePresets,
@@ -40,16 +45,221 @@ function assertCondition(condition: boolean, message: string): void {
 const rescueTechnique = breathTechniques["4-7-8-sleep"];
 const rescueInhaleMs: 4000 = rescueTechnique.phases[0].durationMs;
 const firstLaunchSound: "light-rain" = launchSoundIds[0];
+const firstMvpTechnique: "4-7-8-sleep" = mvpBreathTechniqueIds[0];
+const firstPostMvpTechnique: "physiological-sigh" = postMvpBreathTechniqueIds[0];
+const noAudioCueMode: "none" = breathAudioCueModeIds[0];
 const missedDayPauses: true = streakRules.missedDayPausesStreak;
 const firstInsightRule: "bedtime_correlation" = initialInsightRuleTypes[0];
 const firstOnboardingQuestion: "goal" = onboardingQuestionIds[0];
 
 void rescueInhaleMs;
 void firstLaunchSound;
+void firstMvpTechnique;
+void firstPostMvpTechnique;
+void noAudioCueMode;
 void missedDayPauses;
 void firstInsightRule;
 void firstOnboardingQuestion;
 
+assertEquals(mvpBreathTechniqueIds, [
+  "4-7-8-sleep",
+  "box-breathing",
+  "coherent-breathing",
+  "diaphragmatic-breathing",
+]);
+assertEquals(postMvpBreathTechniqueIds, ["physiological-sigh"]);
+assertEquals(
+  mvpBreathTechniqueIds.map((techniqueId) => {
+    const technique = breathTechniques[techniqueId];
+
+    return {
+      id: technique.id,
+      displayName: technique.displayName,
+      defaultDurationSeconds: technique.defaultDurationSeconds,
+      availability: technique.availability,
+      catalogStatus: technique.catalogStatus,
+      primaryContext: technique.primaryContext,
+      sessionRoles: technique.sessionRoles,
+      startupRequirements: technique.startupRequirements,
+      localizationKeys: technique.localizationKeys,
+    };
+  }),
+  [
+    {
+      id: "4-7-8-sleep",
+      displayName: "4-7-8 Sleep",
+      defaultDurationSeconds: 300,
+      availability: "free",
+      catalogStatus: "mvp",
+      primaryContext: "Before bed, Rescue Me",
+      sessionRoles: ["sleep", "rescue_me"],
+      startupRequirements: {
+        auth: false,
+        network: false,
+        payment: false,
+        remoteConfig: false,
+      },
+      localizationKeys: {
+        name: "breath.techniques.4-7-8-sleep.name",
+        description: "breath.techniques.4-7-8-sleep.description",
+        primaryContext: "breath.techniques.4-7-8-sleep.primaryContext",
+        phaseLabels: {
+          inhale: "breath.phaseInhale",
+          hold: "breath.phaseHold",
+          exhale: "breath.phaseExhale",
+        },
+      },
+    },
+    {
+      id: "box-breathing",
+      displayName: "Box Breathing",
+      defaultDurationSeconds: 300,
+      availability: "free",
+      catalogStatus: "mvp",
+      primaryContext: "Anxiety and stress",
+      sessionRoles: ["anxiety_calm", "focus"],
+      startupRequirements: {
+        auth: false,
+        network: false,
+        payment: false,
+        remoteConfig: false,
+      },
+      localizationKeys: {
+        name: "breath.techniques.box-breathing.name",
+        description: "breath.techniques.box-breathing.description",
+        primaryContext: "breath.techniques.box-breathing.primaryContext",
+        phaseLabels: {
+          inhale: "breath.phaseInhale",
+          hold: "breath.phaseHold",
+          exhale: "breath.phaseExhale",
+        },
+      },
+    },
+    {
+      id: "coherent-breathing",
+      displayName: "Coherent Breathing",
+      defaultDurationSeconds: 600,
+      availability: "free",
+      catalogStatus: "mvp",
+      primaryContext: "Daily Calm / HRV Training",
+      sessionRoles: ["regular_practice", "evening_wind_down", "daily_practice_hrv"],
+      startupRequirements: {
+        auth: false,
+        network: false,
+        payment: false,
+        remoteConfig: false,
+      },
+      localizationKeys: {
+        name: "breath.techniques.coherent-breathing.name",
+        description: "breath.techniques.coherent-breathing.description",
+        primaryContext: "breath.techniques.coherent-breathing.primaryContext",
+        phaseLabels: {
+          inhale: "breath.phaseInhale",
+          exhale: "breath.phaseExhale",
+        },
+      },
+    },
+    {
+      id: "diaphragmatic-breathing",
+      displayName: "Diaphragmatic Breathing",
+      defaultDurationSeconds: 300,
+      availability: "free",
+      catalogStatus: "mvp",
+      primaryContext: "Stress relief",
+      sessionRoles: ["stress_reset"],
+      startupRequirements: {
+        auth: false,
+        network: false,
+        payment: false,
+        remoteConfig: false,
+      },
+      localizationKeys: {
+        name: "breath.techniques.diaphragmatic-breathing.name",
+        description: "breath.techniques.diaphragmatic-breathing.description",
+        primaryContext: "breath.techniques.diaphragmatic-breathing.primaryContext",
+        phaseLabels: {
+          inhale: "breath.phaseInhale",
+          exhale: "breath.phaseExhale",
+        },
+      },
+    },
+  ],
+);
+assertEquals(
+  mvpBreathTechniqueIds.map((techniqueId) => [techniqueId, breathTechniques[techniqueId].phases]),
+  [
+    [
+      "4-7-8-sleep",
+      [
+        { name: "inhale", durationMs: 4000 },
+        { name: "hold", durationMs: 7000 },
+        { name: "exhale", durationMs: 8000 },
+      ],
+    ],
+    [
+      "box-breathing",
+      [
+        { name: "inhale", durationMs: 4000 },
+        { name: "hold", durationMs: 4000 },
+        { name: "exhale", durationMs: 4000 },
+        { name: "hold", durationMs: 4000 },
+      ],
+    ],
+    [
+      "coherent-breathing",
+      [
+        { name: "inhale", durationMs: 5500 },
+        { name: "exhale", durationMs: 5500 },
+      ],
+    ],
+    [
+      "diaphragmatic-breathing",
+      [
+        { name: "inhale", durationMs: 4000 },
+        { name: "exhale", durationMs: 6000 },
+      ],
+    ],
+  ],
+);
+assertEquals(breathTechniques["physiological-sigh"].catalogStatus, "post_mvp");
+assertEquals(
+  breathTechniques["physiological-sigh"].replacementCandidateFor,
+  "diaphragmatic-breathing",
+);
+assertCondition(
+  breathTechniques["physiological-sigh"].conflictNote.includes("Feature Deep Specs"),
+  "Physiological Sigh conflict must stay explicit in catalog metadata.",
+);
+assertEquals(breathSessionDurationBounds, {
+  minSeconds: 1,
+  maxSeconds: 1800,
+});
+assertEquals(breathAudioCueModeIds, ["none", "gentle-bell", "soft-whoosh", "nature-ambient"]);
+assertEquals(
+  breathAudioCueModeIds.map((modeId) => breathAudioCueModes[modeId]),
+  [
+    {
+      id: "none",
+      localizationKey: "breath.audioCueModes.none.label",
+      requiresNetwork: false,
+    },
+    {
+      id: "gentle-bell",
+      localizationKey: "breath.audioCueModes.gentleBell.label",
+      requiresNetwork: false,
+    },
+    {
+      id: "soft-whoosh",
+      localizationKey: "breath.audioCueModes.softWhoosh.label",
+      requiresNetwork: false,
+    },
+    {
+      id: "nature-ambient",
+      localizationKey: "breath.audioCueModes.natureAmbient.label",
+      requiresNetwork: false,
+    },
+  ],
+);
 assertEquals(onboardingQuestionIds, [
   "goal",
   "sleep_baseline",
@@ -185,6 +395,7 @@ assertEquals(onboardingPlans.general_wellness.firstSession, {
   title: "4 min guided breathing",
   guidanceLevel: "gentle",
 });
+assertEquals(onboardingPlans.stress_reset.firstSession.techniqueId, "diaphragmatic-breathing");
 
 assertEquals(canShowAccountPrompt({ hasCompletedFirstFullSession: false }), false);
 assertEquals(canShowAccountPrompt({ hasCompletedFirstFullSession: true }), true);

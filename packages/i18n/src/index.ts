@@ -15,6 +15,47 @@ const en = {
     phaseHold: "Hold",
     phaseSecondInhale: "Inhale again",
     phaseExhale: "Exhale",
+    techniques: {
+      "4-7-8-sleep": {
+        name: "4-7-8 Sleep",
+        description: "A bedtime and Rescue Me cadence with a long exhale.",
+        primaryContext: "Before bed and Rescue Me",
+      },
+      "box-breathing": {
+        name: "Box Breathing",
+        description: "A steady square cadence for anxiety, calm, and focus.",
+        primaryContext: "Anxiety and stress",
+      },
+      "coherent-breathing": {
+        name: "Coherent Breathing",
+        description: "A 5.5-second inhale and exhale practice for Daily Calm HRV training.",
+        primaryContext: "Daily Calm / HRV Training",
+      },
+      "diaphragmatic-breathing": {
+        name: "Diaphragmatic Breathing",
+        description: "A simple belly-breathing cadence for stress relief.",
+        primaryContext: "Stress relief",
+      },
+      "physiological-sigh": {
+        name: "Physiological Sigh",
+        description: "A double-inhale reset kept as a post-MVP replacement candidate.",
+        primaryContext: "Panic or acute stress",
+      },
+    },
+    audioCueModes: {
+      none: {
+        label: "None",
+      },
+      gentleBell: {
+        label: "Gentle bell",
+      },
+      softWhoosh: {
+        label: "Soft whoosh",
+      },
+      natureAmbient: {
+        label: "Nature ambient",
+      },
+    },
   },
   session: {
     firstValueTitle: "Let's wind down",
@@ -61,6 +102,47 @@ const es = {
     phaseHold: "Sosten",
     phaseSecondInhale: "Inhala otra vez",
     phaseExhale: "Exhala",
+    techniques: {
+      "4-7-8-sleep": {
+        name: "4-7-8 Sueno",
+        description: "Una cadencia para dormir y ayuda inmediata con exhalacion larga.",
+        primaryContext: "Antes de dormir y Ayudame ahora",
+      },
+      "box-breathing": {
+        name: "Respiracion en caja",
+        description: "Una cadencia cuadrada para ansiedad, calma y foco.",
+        primaryContext: "Ansiedad y estres",
+      },
+      "coherent-breathing": {
+        name: "Respiracion coherente",
+        description: "Una practica de 5.5 segundos para inhalar y exhalar en Daily Calm y HRV.",
+        primaryContext: "Daily Calm / Entrenamiento HRV",
+      },
+      "diaphragmatic-breathing": {
+        name: "Respiracion diafragmatica",
+        description: "Una respiracion abdominal simple para aliviar el estres.",
+        primaryContext: "Alivio del estres",
+      },
+      "physiological-sigh": {
+        name: "Suspiro fisiologico",
+        description: "Un reset de doble inhalacion conservado como candidato post-MVP.",
+        primaryContext: "Panico o estres agudo",
+      },
+    },
+    audioCueModes: {
+      none: {
+        label: "Ninguno",
+      },
+      gentleBell: {
+        label: "Campana suave",
+      },
+      softWhoosh: {
+        label: "Soplo suave",
+      },
+      natureAmbient: {
+        label: "Ambiente natural",
+      },
+    },
   },
   session: {
     firstValueTitle: "Vamos a bajar el ritmo",
@@ -99,6 +181,47 @@ const ptBR = {
     phaseHold: "Segure",
     phaseSecondInhale: "Inspire de novo",
     phaseExhale: "Expire",
+    techniques: {
+      "4-7-8-sleep": {
+        name: "Sono 4-7-8",
+        description: "Uma cadencia para dormir e ajuda imediata com expiracao longa.",
+        primaryContext: "Antes de dormir e Me ajuda agora",
+      },
+      "box-breathing": {
+        name: "Respiracao em caixa",
+        description: "Uma cadencia quadrada para ansiedade, calma e foco.",
+        primaryContext: "Ansiedade e estresse",
+      },
+      "coherent-breathing": {
+        name: "Respiracao coerente",
+        description: "Uma pratica de 5.5 segundos para inspirar e expirar em Daily Calm e HRV.",
+        primaryContext: "Daily Calm / Treino HRV",
+      },
+      "diaphragmatic-breathing": {
+        name: "Respiracao diafragmatica",
+        description: "Uma respiracao abdominal simples para aliviar o estresse.",
+        primaryContext: "Alivio do estresse",
+      },
+      "physiological-sigh": {
+        name: "Suspiro fisiologico",
+        description: "Um reset de dupla inspiracao mantido como candidato pos-MVP.",
+        primaryContext: "Panico ou estresse agudo",
+      },
+    },
+    audioCueModes: {
+      none: {
+        label: "Nenhum",
+      },
+      gentleBell: {
+        label: "Sino suave",
+      },
+      softWhoosh: {
+        label: "Sopro suave",
+      },
+      natureAmbient: {
+        label: "Ambiente natural",
+      },
+    },
   },
   session: {
     firstValueTitle: "Vamos desacelerar",

@@ -1,8 +1,14 @@
 import {
+  audioCueModeIdSchema,
+  breathPhaseDurationMsSchema,
+  breathSessionDurationSecondsSchema,
+  breathSessionPhaseNameSchema,
+  breathTechniqueIdSchema,
   firstSessionRecordSchema,
   localInstallIdSchema,
   localInstallIdentitySchema,
   morningCheckInSchema,
+  mvpBreathTechniqueIdSchema,
   notificationGateEligibilitySchema,
   onboardingResponseSchema,
   postSessionReflectionSchema,
@@ -73,6 +79,62 @@ void postSessionReflection;
 void notificationGateEligibility;
 void morningCheckIn;
 
+assertCondition(
+  breathTechniqueIdSchema.safeParse("physiological-sigh").success,
+  "Known post-MVP technique ids must remain deliberate catalog entries.",
+);
+assertCondition(
+  !mvpBreathTechniqueIdSchema.safeParse("physiological-sigh").success,
+  "Post-MVP technique ids must not validate as MVP launch techniques.",
+);
+assertCondition(
+  mvpBreathTechniqueIdSchema.safeParse("diaphragmatic-breathing").success,
+  "Diaphragmatic breathing must validate as an MVP launch technique.",
+);
+assertCondition(
+  !breathTechniqueIdSchema.safeParse("unknown-technique").success,
+  "Unknown technique ids must be rejected.",
+);
+assertCondition(
+  breathSessionPhaseNameSchema.safeParse("second-inhale").success,
+  "Second inhale must stay allowlisted for the post-MVP physiological sigh candidate.",
+);
+assertCondition(
+  !breathSessionPhaseNameSchema.safeParse("pause").success,
+  "Unknown phase names must be rejected.",
+);
+assertCondition(
+  breathPhaseDurationMsSchema.safeParse(5500).success,
+  "Phase durations must support Coherent Breathing's 5.5 second cadence.",
+);
+assertCondition(
+  !breathPhaseDurationMsSchema.safeParse(0).success,
+  "Phase durations must reject zero-length phases.",
+);
+assertCondition(
+  !breathPhaseDurationMsSchema.safeParse(60_001).success,
+  "Phase durations must reject implausibly long phases.",
+);
+assertCondition(
+  audioCueModeIdSchema.safeParse("gentle-bell").success,
+  "Gentle bell must validate as an audio cue mode.",
+);
+assertCondition(
+  !audioCueModeIdSchema.safeParse("voice-coach").success,
+  "Unknown audio cue modes must be rejected.",
+);
+assertCondition(
+  breathSessionDurationSecondsSchema.safeParse(600).success,
+  "Ten-minute Coherent Breathing sessions must validate.",
+);
+assertCondition(
+  !breathSessionDurationSecondsSchema.safeParse(0).success,
+  "Session duration must reject zero seconds.",
+);
+assertCondition(
+  !breathSessionDurationSecondsSchema.safeParse(1801).success,
+  "Session duration must stay inside the launch route bounds.",
+);
 assertCondition(
   !onboardingResponseSchema.safeParse({ ...onboardingResponse, goal: "oversharing" }).success,
   "Onboarding goal must be allowlisted.",

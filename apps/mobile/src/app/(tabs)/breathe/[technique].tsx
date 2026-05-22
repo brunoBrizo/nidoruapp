@@ -1,9 +1,5 @@
-import {
-  breathTechniqueIds,
-  onboardingPlanIds,
-  type BreathTechniqueId,
-  type OnboardingPlanId,
-} from "@nidoru/domain";
+import { onboardingPlanIds, type BreathTechniqueId, type OnboardingPlanId } from "@nidoru/domain";
+import { breathSessionDurationSecondsSchema, mvpBreathTechniqueIdSchema } from "@nidoru/validation";
 import { useLocalSearchParams, type Href } from "expo-router";
 
 import { FirstSessionRouteScreen } from "../../../session/first-session-screen";
@@ -37,10 +33,9 @@ export default function BreatheTechniqueAnchorScreen() {
 
 function parseTechniqueId(value: string | string[] | undefined): BreathTechniqueId {
   const techniqueId = Array.isArray(value) ? value[0] : value;
+  const parsedTechniqueId = mvpBreathTechniqueIdSchema.safeParse(techniqueId);
 
-  return breathTechniqueIds.includes(techniqueId as BreathTechniqueId)
-    ? (techniqueId as BreathTechniqueId)
-    : "4-7-8-sleep";
+  return parsedTechniqueId.success ? parsedTechniqueId.data : "4-7-8-sleep";
 }
 
 function parsePlanId(value: string | string[] | undefined): OnboardingPlanId | undefined {
@@ -53,10 +48,9 @@ function parsePlanId(value: string | string[] | undefined): OnboardingPlanId | u
 
 function parseDurationSeconds(value: string | string[] | undefined): number | undefined {
   const durationSeconds = Number(Array.isArray(value) ? value[0] : value);
+  const parsedDurationSeconds = breathSessionDurationSecondsSchema.safeParse(durationSeconds);
 
-  return Number.isInteger(durationSeconds) && durationSeconds > 0 && durationSeconds <= 30 * 60
-    ? durationSeconds
-    : undefined;
+  return parsedDurationSeconds.success ? parsedDurationSeconds.data : undefined;
 }
 
 function parseFirstLaunch(value: string | string[] | undefined): boolean {

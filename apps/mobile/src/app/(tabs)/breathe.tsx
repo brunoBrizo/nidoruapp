@@ -29,9 +29,9 @@ export default function BreatheTabScreen() {
               href: "/breathe/coherent-breathing?durationSeconds=600",
             },
             {
-              label: breathTechniques["physiological-sigh"].name,
-              description: breathTechniques["physiological-sigh"].primaryContext,
-              href: "/breathe/physiological-sigh",
+              label: breathTechniques["diaphragmatic-breathing"].name,
+              description: breathTechniques["diaphragmatic-breathing"].primaryContext,
+              href: "/breathe/diaphragmatic-breathing",
             },
           ],
         },

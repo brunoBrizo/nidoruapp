@@ -1,12 +1,112 @@
+export const breathPhaseNames = ["inhale", "hold", "second-inhale", "exhale"] as const;
+
+export type BreathPhaseName = (typeof breathPhaseNames)[number];
+
 type BreathPhase = {
-  readonly name: "inhale" | "hold" | "second-inhale" | "exhale";
+  readonly name: BreathPhaseName;
   readonly durationMs: number;
 };
 
-type BreathTechnique = {
-  readonly id: string;
+export const mvpBreathTechniqueIds = [
+  "4-7-8-sleep",
+  "box-breathing",
+  "coherent-breathing",
+  "diaphragmatic-breathing",
+] as const;
+
+export const postMvpBreathTechniqueIds = ["physiological-sigh"] as const;
+
+export const breathTechniqueIds = [...mvpBreathTechniqueIds, ...postMvpBreathTechniqueIds] as const;
+
+export type MvpBreathTechniqueId = (typeof mvpBreathTechniqueIds)[number];
+export type PostMvpBreathTechniqueId = (typeof postMvpBreathTechniqueIds)[number];
+export type BreathTechniqueId = (typeof breathTechniqueIds)[number];
+
+export const breathSessionDurationBounds = {
+  minSeconds: 1,
+  maxSeconds: 30 * 60,
+} as const;
+
+export const breathAudioCueModeIds = [
+  "none",
+  "gentle-bell",
+  "soft-whoosh",
+  "nature-ambient",
+] as const;
+
+export type BreathAudioCueModeId = (typeof breathAudioCueModeIds)[number];
+
+export const breathAudioCueModes = {
+  none: {
+    id: "none",
+    localizationKey: "breath.audioCueModes.none.label",
+    requiresNetwork: false,
+  },
+  "gentle-bell": {
+    id: "gentle-bell",
+    localizationKey: "breath.audioCueModes.gentleBell.label",
+    requiresNetwork: false,
+  },
+  "soft-whoosh": {
+    id: "soft-whoosh",
+    localizationKey: "breath.audioCueModes.softWhoosh.label",
+    requiresNetwork: false,
+  },
+  "nature-ambient": {
+    id: "nature-ambient",
+    localizationKey: "breath.audioCueModes.natureAmbient.label",
+    requiresNetwork: false,
+  },
+} as const satisfies Record<
+  BreathAudioCueModeId,
+  {
+    readonly id: BreathAudioCueModeId;
+    readonly localizationKey: string;
+    readonly requiresNetwork: false;
+  }
+>;
+
+type BreathTechniqueAvailability = "free" | "premium";
+type BreathTechniqueCatalogStatus = "mvp" | "post_mvp";
+type BreathTechniqueSessionRole =
+  | "acute_stress_candidate"
+  | "anxiety_calm"
+  | "daily_practice_hrv"
+  | "evening_wind_down"
+  | "focus"
+  | "regular_practice"
+  | "rescue_me"
+  | "sleep"
+  | "stress_reset";
+
+type BreathTechniqueLocalizationKeys = {
   readonly name: string;
+  readonly description: string;
   readonly primaryContext: string;
+  readonly phaseLabels: Partial<Record<BreathPhaseName, string>>;
+};
+
+const localOnlyStartupRequirements = {
+  auth: false,
+  network: false,
+  payment: false,
+  remoteConfig: false,
+} as const;
+
+type BreathTechnique = {
+  readonly id: BreathTechniqueId;
+  readonly name: string;
+  readonly displayName: string;
+  readonly description: string;
+  readonly primaryContext: string;
+  readonly defaultDurationSeconds: number;
+  readonly availability: BreathTechniqueAvailability;
+  readonly catalogStatus: BreathTechniqueCatalogStatus;
+  readonly sessionRoles: readonly BreathTechniqueSessionRole[];
+  readonly startupRequirements: typeof localOnlyStartupRequirements;
+  readonly localizationKeys: BreathTechniqueLocalizationKeys;
+  readonly replacementCandidateFor?: MvpBreathTechniqueId;
+  readonly conflictNote?: string;
   readonly phases: readonly BreathPhase[];
 };
 
@@ -14,7 +114,24 @@ export const breathTechniques = {
   "4-7-8-sleep": {
     id: "4-7-8-sleep",
     name: "4-7-8 Sleep",
+    displayName: "4-7-8 Sleep",
+    description: "A bedtime and Rescue Me cadence with a long exhale.",
     primaryContext: "Before bed, Rescue Me",
+    defaultDurationSeconds: 300,
+    availability: "free",
+    catalogStatus: "mvp",
+    sessionRoles: ["sleep", "rescue_me"],
+    startupRequirements: localOnlyStartupRequirements,
+    localizationKeys: {
+      name: "breath.techniques.4-7-8-sleep.name",
+      description: "breath.techniques.4-7-8-sleep.description",
+      primaryContext: "breath.techniques.4-7-8-sleep.primaryContext",
+      phaseLabels: {
+        inhale: "breath.phaseInhale",
+        hold: "breath.phaseHold",
+        exhale: "breath.phaseExhale",
+      },
+    },
     phases: [
       { name: "inhale", durationMs: 4000 },
       { name: "hold", durationMs: 7000 },
@@ -24,7 +141,24 @@ export const breathTechniques = {
   "box-breathing": {
     id: "box-breathing",
     name: "Box Breathing",
+    displayName: "Box Breathing",
+    description: "A steady square cadence for anxiety, calm, and focus.",
     primaryContext: "Anxiety and stress",
+    defaultDurationSeconds: 300,
+    availability: "free",
+    catalogStatus: "mvp",
+    sessionRoles: ["anxiety_calm", "focus"],
+    startupRequirements: localOnlyStartupRequirements,
+    localizationKeys: {
+      name: "breath.techniques.box-breathing.name",
+      description: "breath.techniques.box-breathing.description",
+      primaryContext: "breath.techniques.box-breathing.primaryContext",
+      phaseLabels: {
+        inhale: "breath.phaseInhale",
+        hold: "breath.phaseHold",
+        exhale: "breath.phaseExhale",
+      },
+    },
     phases: [
       { name: "inhale", durationMs: 4000 },
       { name: "hold", durationMs: 4000 },
@@ -35,16 +169,77 @@ export const breathTechniques = {
   "coherent-breathing": {
     id: "coherent-breathing",
     name: "Coherent Breathing",
+    displayName: "Coherent Breathing",
+    description: "A 5.5-second inhale and exhale practice for Daily Calm HRV training.",
     primaryContext: "Daily Calm / HRV Training",
+    defaultDurationSeconds: 600,
+    availability: "free",
+    catalogStatus: "mvp",
+    sessionRoles: ["regular_practice", "evening_wind_down", "daily_practice_hrv"],
+    startupRequirements: localOnlyStartupRequirements,
+    localizationKeys: {
+      name: "breath.techniques.coherent-breathing.name",
+      description: "breath.techniques.coherent-breathing.description",
+      primaryContext: "breath.techniques.coherent-breathing.primaryContext",
+      phaseLabels: {
+        inhale: "breath.phaseInhale",
+        exhale: "breath.phaseExhale",
+      },
+    },
     phases: [
       { name: "inhale", durationMs: 5500 },
       { name: "exhale", durationMs: 5500 },
     ],
   },
+  "diaphragmatic-breathing": {
+    id: "diaphragmatic-breathing",
+    name: "Diaphragmatic Breathing",
+    displayName: "Diaphragmatic Breathing",
+    description: "A simple belly-breathing cadence for stress relief.",
+    primaryContext: "Stress relief",
+    defaultDurationSeconds: 300,
+    availability: "free",
+    catalogStatus: "mvp",
+    sessionRoles: ["stress_reset"],
+    startupRequirements: localOnlyStartupRequirements,
+    localizationKeys: {
+      name: "breath.techniques.diaphragmatic-breathing.name",
+      description: "breath.techniques.diaphragmatic-breathing.description",
+      primaryContext: "breath.techniques.diaphragmatic-breathing.primaryContext",
+      phaseLabels: {
+        inhale: "breath.phaseInhale",
+        exhale: "breath.phaseExhale",
+      },
+    },
+    phases: [
+      { name: "inhale", durationMs: 4000 },
+      { name: "exhale", durationMs: 6000 },
+    ],
+  },
   "physiological-sigh": {
     id: "physiological-sigh",
     name: "Physiological Sigh",
+    displayName: "Physiological Sigh",
+    description: "A double-inhale reset kept as a post-MVP replacement candidate.",
     primaryContext: "Panic or acute stress",
+    defaultDurationSeconds: 180,
+    availability: "free",
+    catalogStatus: "post_mvp",
+    sessionRoles: ["acute_stress_candidate"],
+    startupRequirements: localOnlyStartupRequirements,
+    replacementCandidateFor: "diaphragmatic-breathing",
+    conflictNote:
+      "Feature Deep Specs names Physiological Sigh, while Feature 03 and the MVP roadmap name Diaphragmatic Breathing for launch stress coverage.",
+    localizationKeys: {
+      name: "breath.techniques.physiological-sigh.name",
+      description: "breath.techniques.physiological-sigh.description",
+      primaryContext: "breath.techniques.physiological-sigh.primaryContext",
+      phaseLabels: {
+        inhale: "breath.phaseInhale",
+        "second-inhale": "breath.phaseSecondInhale",
+        exhale: "breath.phaseExhale",
+      },
+    },
     phases: [
       { name: "inhale", durationMs: 2000 },
       { name: "second-inhale", durationMs: 1000 },
@@ -52,11 +247,6 @@ export const breathTechniques = {
     ],
   },
 } as const satisfies Record<string, BreathTechnique>;
-
-export const breathTechniqueIds = Object.keys(breathTechniques) as [
-  keyof typeof breathTechniques,
-  ...(keyof typeof breathTechniques)[],
-];
 
 export const launchSoundIds = [
   "light-rain",
@@ -95,7 +285,6 @@ export const initialInsightRuleTypes = [
   "session_duration_effect",
 ] as const;
 
-export type BreathTechniqueId = (typeof breathTechniqueIds)[number];
 export type LaunchSoundId = (typeof launchSoundIds)[number];
 export type InitialInsightRuleType = (typeof initialInsightRuleTypes)[number];
 
@@ -293,11 +482,11 @@ export const onboardingPlans = {
   stress_reset: {
     id: "stress_reset",
     label: "Stress Reset",
-    summary: "A fast reset that starts with a physiological sigh.",
+    summary: "A steady diaphragmatic session for stress relief.",
     firstSession: {
-      techniqueId: "physiological-sigh",
-      durationSeconds: 180,
-      title: "3 min guided breathing",
+      techniqueId: "diaphragmatic-breathing",
+      durationSeconds: 240,
+      title: "4 min guided breathing",
       guidanceLevel: "gentle",
     },
   },

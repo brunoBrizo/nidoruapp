@@ -100,7 +100,8 @@ describe("tab entry shells", () => {
     expect(screen.getByRole("link", { name: "4-7-8 Sleep" })).toBeTruthy();
     expect(screen.getByRole("link", { name: "Coherent Breathing / Daily Calm" })).toBeTruthy();
     expect(screen.getByRole("link", { name: "Box Breathing" })).toBeTruthy();
-    expect(screen.getByRole("link", { name: "Physiological Sigh" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Diaphragmatic Breathing" })).toBeTruthy();
+    expect(screen.queryByRole("link", { name: "Physiological Sigh" })).toBeNull();
   });
 
   it("surfaces Daily Calm as a regular Breathe-tab HRV practice", () => {

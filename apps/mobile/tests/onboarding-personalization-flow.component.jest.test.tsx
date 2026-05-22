@@ -94,7 +94,8 @@ describe("OnboardingPersonalizationFlowScreen", () => {
     expect(screen.getByText("Wind-down around 9:30 PM")).toBeTruthy();
     expect(screen.getByText("Breathwork familiar")).toBeTruthy();
     expect(screen.getByText("Start gently")).toBeTruthy();
-    expect(screen.getByText("Saved locally")).toBeTruthy();
+    expect(screen.getByText("No account needed")).toBeTruthy();
+    expect(screen.queryByText("Saved locally")).toBeNull();
     expect(screen.getByText("Next session")).toBeTruthy();
     expect(screen.queryByText("First session")).toBeNull();
     expect(screen.queryByText(forbiddenPlanGatePattern)).toBeNull();

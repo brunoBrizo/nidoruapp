@@ -9,6 +9,7 @@ type FadeStop = {
 };
 
 type LinearFade = {
+  readonly axis?: "horizontal" | "vertical";
   readonly height: number;
   readonly stops: readonly FadeStop[];
   readonly width: number;
@@ -31,7 +32,7 @@ type CardFadeConfig = {
   readonly wash?: LinearFade;
 };
 
-export type CardFadeVariant = "profile" | "sleep-primary";
+export type CardFadeVariant = "personalized-plan" | "profile" | "sleep-primary";
 
 type CardFadeProps = {
   readonly testID: string;
@@ -42,6 +43,54 @@ const primaryColor = colors.dark.primary.value;
 const primaryGlowColor = colors.dark.primaryGlow.value;
 
 const cardFadeVariants: Record<CardFadeVariant, CardFadeConfig> = {
+  "personalized-plan": {
+    viewBox: "0 0 309 224",
+    wash: {
+      axis: "vertical",
+      x: 0,
+      y: 0,
+      width: 309,
+      height: 224,
+      stops: [
+        { offset: "0", color: colors.dark.surfaceRaised.value, opacity: "1" },
+        { offset: "0.52", color: colors.dark.surfaceRaised.value, opacity: "0.78" },
+        { offset: "1", color: colors.dark.surface.value, opacity: "0.74" },
+      ],
+    },
+    corner: {
+      cx: 46,
+      cy: 48,
+      r: 146,
+      stops: [
+        { offset: "0", color: primaryGlowColor, opacity: "0.22" },
+        { offset: "0.3", color: primaryColor, opacity: "0.14" },
+        { offset: "0.7", color: primaryColor, opacity: "0.055" },
+        { offset: "1", color: primaryColor, opacity: "0" },
+      ],
+    },
+    topEdge: {
+      x: 34,
+      y: 0.3,
+      width: 275,
+      height: 1.4,
+      stops: [
+        { offset: "0", color: primaryGlowColor, opacity: "0" },
+        { offset: "0.44", color: primaryGlowColor, opacity: "0.08" },
+        { offset: "1", color: primaryGlowColor, opacity: "0.14" },
+      ],
+    },
+    rightEdge: {
+      x: 307.8,
+      y: 22,
+      width: 1.2,
+      height: 170,
+      stops: [
+        { offset: "0", color: primaryGlowColor, opacity: "0.1" },
+        { offset: "0.58", color: primaryGlowColor, opacity: "0.045" },
+        { offset: "1", color: primaryGlowColor, opacity: "0" },
+      ],
+    },
+  },
   profile: {
     viewBox: "0 0 362 134",
     wash: {
@@ -138,7 +187,13 @@ export function CardFade({ testID, variant }: CardFadeProps) {
       <Svg height="100%" preserveAspectRatio="none" viewBox={config.viewBox} width="100%">
         <Defs>
           {config.wash ? (
-            <LinearGradient id={washId} x1="0" x2="1" y1="0" y2="0">
+            <LinearGradient
+              id={washId}
+              x1="0"
+              x2={config.wash.axis === "vertical" ? "0" : "1"}
+              y1="0"
+              y2={config.wash.axis === "vertical" ? "1" : "0"}
+            >
               {renderStops(washId, config.wash.stops)}
             </LinearGradient>
           ) : null}

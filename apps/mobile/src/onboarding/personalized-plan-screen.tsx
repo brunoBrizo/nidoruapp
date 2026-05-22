@@ -1,11 +1,20 @@
 import type { PersonalizedOnboardingPlan, PersonalizedPlanAnswerRowId } from "@nidoru/domain";
 import { colors, motion, spacing, typography } from "@nidoru/ui-tokens";
-import { Leaf, Moon, ShieldCheck, Wind } from "lucide-react-native";
+import {
+  AudioLines,
+  CircleUserRound,
+  Clock3,
+  Leaf,
+  ListChecks,
+  Moon,
+  Wind,
+} from "lucide-react-native";
 import { useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { Animated, Easing, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaInsetsContext } from "react-native-safe-area-context";
 
 import { useReduceMotionPreference } from "../motion/use-reduce-motion-enabled";
+import { CardFade } from "../surfaces/card-fade";
 
 export const PERSONALIZED_PLAN_SCREEN_EXIT_MS = motion.duration.screenExitMs;
 
@@ -27,7 +36,7 @@ const answerRowIcons = {
 
 export function PersonalizedPlanScreen({
   ctaLabel = "Continue",
-  localProofChipLabel = "Saved locally",
+  localProofChipLabel = "No account needed",
   onContinue,
   plan,
   screenExitMs = PERSONALIZED_PLAN_SCREEN_EXIT_MS,
@@ -146,7 +155,7 @@ export function PersonalizedPlanScreen({
             styles.scrollContent,
             {
               paddingBottom: spacing.lg,
-              paddingTop: Math.max(safeAreaInsets.top + 18, 44),
+              paddingTop: Math.max(safeAreaInsets.top - 8, 44),
             },
           ]}
           contentInsetAdjustmentBehavior="automatic"
@@ -168,8 +177,8 @@ export function PersonalizedPlanScreen({
             </Text>
           </View>
 
-          <View style={styles.planCard}>
-            <View pointerEvents="none" style={styles.cardOrbWash} />
+          <View style={styles.planCard} testID="personalized-plan-card">
+            <CardFade testID="personalized-plan-card-fade" variant="personalized-plan" />
             <View style={styles.planCardContent}>
               <View style={styles.sessionHeaderRow}>
                 <View style={styles.planOrb}>
@@ -207,24 +216,24 @@ export function PersonalizedPlanScreen({
 
               <View style={styles.chipRow}>
                 <PlanChip
-                  icon={<Moon color={colors.dark.primaryGlow.value} size={14} />}
+                  icon={<Clock3 color={colors.dark.primaryGlow.value} size={14} />}
                   label={`${Math.round(plan.firstSession.durationSeconds / 60)} min`}
                 />
                 <PlanChip
-                  icon={<Wind color={colors.dark.primaryGlow.value} size={14} />}
+                  icon={<AudioLines color={colors.dark.primaryGlow.value} size={14} />}
                   label={plan.firstSession.guidanceLabel}
                 />
                 <PlanChip
-                  icon={<ShieldCheck color={colors.dark.primaryGlow.value} size={14} />}
+                  icon={<CircleUserRound color={colors.dark.primaryGlow.value} size={14} />}
                   label={localProofChipLabel}
                 />
               </View>
             </View>
           </View>
 
-          <View style={styles.answerCard}>
+          <View style={styles.answerCard} testID="personalized-plan-answer-card">
             <View style={styles.answerHeader}>
-              <ShieldCheck color={colors.dark.primary.value} size={16} />
+              <ListChecks color={colors.dark.primary.value} size={16} />
               <Text selectable style={styles.answerHeaderText}>
                 Based on your answers
               </Text>
@@ -260,6 +269,7 @@ export function PersonalizedPlanScreen({
             accessibilityRole="button"
             disabled={isExiting}
             onPress={continueWithPlan}
+            testID="personalized-plan-cta"
             style={({ pressed }) => [
               styles.startButton,
               pressed && !isExiting ? styles.startButtonPressed : null,
@@ -297,7 +307,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    justifyContent: "center",
+    justifyContent: "flex-start",
     paddingHorizontal: 18,
   },
   readyPill: {
@@ -348,7 +358,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   planCard: {
-    backgroundColor: colors.dark.surfaceRaised.value,
+    backgroundColor: colors.dark.surface.value,
     borderColor: "rgba(124, 111, 205, 0.24)",
     borderCurve: "continuous",
     borderRadius: 28,
@@ -356,31 +366,22 @@ const styles = StyleSheet.create({
     boxShadow: "0 16px 40px rgba(0, 0, 0, 0.4)",
     minHeight: 224,
     overflow: "hidden",
-    padding: 22,
-  },
-  cardOrbWash: {
-    backgroundColor: "rgba(124, 111, 205, 0.16)",
-    borderRadius: 80,
-    height: 160,
-    left: -14,
-    position: "absolute",
-    top: -18,
-    width: 160,
+    padding: 24,
   },
   planCardContent: {
-    gap: 26,
+    gap: 24,
     zIndex: 1,
   },
   sessionHeaderRow: {
     flexDirection: "row",
-    gap: 18,
+    gap: 16,
   },
   planOrb: {
     alignItems: "center",
-    height: 50,
+    height: 48,
     justifyContent: "center",
     marginTop: 1,
-    width: 50,
+    width: 48,
   },
   planOrbGlow: {
     backgroundColor: "rgba(168, 156, 224, 0.25)",
@@ -441,8 +442,8 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     borderWidth: 1,
     flexDirection: "row",
-    gap: 7,
-    minHeight: 34,
+    gap: 6,
+    minHeight: 30,
     paddingHorizontal: 12,
   },
   chipText: {

@@ -488,10 +488,12 @@ export function OnboardingPersonalizationFlowScreen({
   }, [answers.displayName, answers.goal, currentQuestionId, isSubmitting]);
 
   if (personalizedPlan) {
+    // The PNG reference was pre-session; these labels keep the same layout while reflecting
+    // that personalization now happens after the first full-session reward moment.
     return (
       <PersonalizedPlanScreen
         ctaLabel="Continue"
-        localProofChipLabel="Saved locally"
+        localProofChipLabel="No account needed"
         onContinue={continueAfterPlan}
         plan={personalizedPlan}
         screenExitMs={screenExitMs}

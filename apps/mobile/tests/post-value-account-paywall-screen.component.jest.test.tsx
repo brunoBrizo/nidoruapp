@@ -49,6 +49,7 @@ describe("PostValueAccountPaywallScreen", () => {
   it("matches the post-value account screen with session proof before plans are requested", () => {
     render(<PostValueAccountPaywallScreen accessState={eligibleAccessState} />);
 
+    expect(screen.getByTestId("post-value-paywall-top-fade")).toBeTruthy();
     expect(screen.getByText("First session complete")).toBeTruthy();
     expect(screen.getByText("Keep tonight’s calm going")).toBeTruthy();
     expect(screen.getByText("4 min")).toBeTruthy();

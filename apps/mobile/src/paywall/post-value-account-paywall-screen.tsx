@@ -3,6 +3,7 @@ import { StatusBar } from "expo-status-bar";
 import { CheckCircle, ShieldCheck } from "lucide-react-native";
 import { useCallback, useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import Svg, { Defs, RadialGradient, Rect, Stop } from "react-native-svg";
 
 import type {
   PostRewardPaywallEligibility,
@@ -92,7 +93,7 @@ export function PostValueAccountPaywallScreen({
   return (
     <View style={styles.screen}>
       <StatusBar hidden />
-      <View pointerEvents="none" style={styles.ambientGlow} />
+      <PaywallTopFade />
       <ScrollView
         contentContainerStyle={[
           styles.scrollContent,
@@ -261,6 +262,32 @@ export function PostValueAccountPaywallScreen({
           </Pressable>
         ) : null}
       </View>
+    </View>
+  );
+}
+
+function PaywallTopFade() {
+  return (
+    <View pointerEvents="none" style={styles.topFadeLayer} testID="post-value-paywall-top-fade">
+      <Svg height="100%" preserveAspectRatio="none" viewBox="0 0 390 760" width="100%">
+        <Defs>
+          <RadialGradient
+            cx="184"
+            cy="-20"
+            fx="184"
+            fy="-20"
+            gradientUnits="userSpaceOnUse"
+            id="post-value-top-fade"
+            r="360"
+          >
+            <Stop offset="0" stopColor="#A89CE0" stopOpacity="0.13" />
+            <Stop offset="0.24" stopColor="#7C6FCD" stopOpacity="0.07" />
+            <Stop offset="0.56" stopColor="#1C2040" stopOpacity="0.035" />
+            <Stop offset="1" stopColor="#0D0F1A" stopOpacity="0" />
+          </RadialGradient>
+        </Defs>
+        <Rect fill="url(#post-value-top-fade)" height="760" width="390" x="0" y="0" />
+      </Svg>
     </View>
   );
 }
@@ -436,15 +463,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 18,
     textAlign: "center",
-  },
-  ambientGlow: {
-    backgroundColor: "rgba(124, 111, 205, 0.13)",
-    borderRadius: 180,
-    height: 360,
-    left: -45,
-    position: "absolute",
-    top: -100,
-    width: 360,
   },
   appleButton: {
     backgroundColor: "#1C2040",
@@ -757,5 +775,8 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     marginTop: 2,
     textAlign: "center",
+  },
+  topFadeLayer: {
+    ...StyleSheet.absoluteFillObject,
   },
 });

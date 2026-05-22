@@ -220,6 +220,16 @@ describe("FirstSessionScreen", () => {
     jest.useRealTimers();
   });
 
+  it("renders the active orb with all source-aligned visual layers", () => {
+    render(<FirstSessionScreen {...baseProps} />);
+
+    expect(screen.getByTestId("first-session-orb-core")).toBeTruthy();
+    expect(screen.getByTestId("first-session-orb-inner-glow")).toBeTruthy();
+    expect(screen.getByTestId("first-session-orb-mid-diffusion")).toBeTruthy();
+    expect(screen.getByTestId("first-session-orb-outer-ring")).toBeTruthy();
+    expect(screen.getByTestId("first-session-orb-pulse-ring")).toBeTruthy();
+  });
+
   it("renders Reduce Motion with a core breath guide, no decorative pulse layer, and accessible controls", async () => {
     (
       AccessibilityInfo.isReduceMotionEnabled as jest.MockedFunction<
@@ -235,6 +245,7 @@ describe("FirstSessionScreen", () => {
 
     expect(screen.queryByTestId("first-session-orb-outer-ring")).toBeNull();
     expect(screen.getByTestId("first-session-orb-inner-glow")).toBeTruthy();
+    expect(screen.getByTestId("first-session-orb-mid-diffusion")).toBeTruthy();
     expect(screen.getByTestId("first-session-orb-core")).toBeTruthy();
     expect(screen.getByLabelText("Inhale breathing phase")).toBeTruthy();
     expect(screen.getByLabelText("Time remaining 4 minutes")).toBeTruthy();

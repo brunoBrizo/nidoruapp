@@ -136,6 +136,22 @@ const defaultTickIntervalMs = 1000;
 const draftPersistIntervalMs = 15000;
 const finalDraftWindowMs = 10000;
 
+const orbLayerScales = {
+  core: 1.12,
+  innerGlow: 1.18,
+  midDiffusion: 1.25,
+  outerGlow: 1.35,
+  pulseRing: 1.6,
+} as const;
+
+const orbLayerOpacities = {
+  midDiffusionActive: 0.15,
+  midDiffusionRest: 0.3,
+  outerGlowActive: 0.08,
+  outerGlowRest: 0.15,
+  pulseRingActive: 0.5,
+} as const;
+
 const phaseLabels = {
   exhale: "Exhale",
   hold: "Hold",
@@ -384,7 +400,13 @@ export function BreathSessionScreen({
   const lastDraftPersistedAtMs = useRef<number | undefined>(undefined);
   const previousPhaseNameRef = useRef<FirstSessionPhaseName>(snapshot.phaseName);
   const currentAppStateRef = useRef<AppStateStatus>(getInitialHapticAppState());
-  const orbScale = useSharedValue(getOrbScale(snapshot.phaseName, reduceMotionEnabled));
+  const initialLayerTargets = getOrbLayerTargets(snapshot.phaseName, reduceMotionEnabled);
+  const coreScale = useSharedValue(initialLayerTargets.coreScale);
+  const innerGlowScale = useSharedValue(initialLayerTargets.innerGlowScale);
+  const midDiffusionOpacity = useSharedValue(initialLayerTargets.midDiffusionOpacity);
+  const midDiffusionScale = useSharedValue(initialLayerTargets.midDiffusionScale);
+  const outerGlowOpacity = useSharedValue(initialLayerTargets.outerGlowOpacity);
+  const outerGlowScale = useSharedValue(initialLayerTargets.outerGlowScale);
   const pulseScale = useSharedValue(1);
   const pulseOpacity = useSharedValue(0);
   const labelOpacity = useSharedValue(1);
@@ -514,15 +536,36 @@ export function BreathSessionScreen({
       duration: reduceMotionEnabled ? 0 : motion.duration.phaseLabelCrossfadeLeadMs,
       easing: Easing.in(Easing.ease),
     });
-    orbScale.value = withTiming(getOrbScale(snapshot.phaseName, reduceMotionEnabled), {
+    const layerTargets = getOrbLayerTargets(snapshot.phaseName, reduceMotionEnabled);
+    coreScale.value = withTiming(layerTargets.coreScale, {
+      duration: animationDurationMs,
+      easing: Easing.inOut(Easing.ease),
+    });
+    innerGlowScale.value = withTiming(layerTargets.innerGlowScale, {
+      duration: animationDurationMs,
+      easing: Easing.inOut(Easing.ease),
+    });
+    midDiffusionScale.value = withTiming(layerTargets.midDiffusionScale, {
+      duration: animationDurationMs,
+      easing: Easing.inOut(Easing.ease),
+    });
+    midDiffusionOpacity.value = withTiming(layerTargets.midDiffusionOpacity, {
+      duration: animationDurationMs,
+      easing: Easing.inOut(Easing.ease),
+    });
+    outerGlowScale.value = withTiming(layerTargets.outerGlowScale, {
+      duration: animationDurationMs,
+      easing: Easing.inOut(Easing.ease),
+    });
+    outerGlowOpacity.value = withTiming(layerTargets.outerGlowOpacity, {
       duration: animationDurationMs,
       easing: Easing.inOut(Easing.ease),
     });
 
     if (snapshot.phaseName === "inhale" && !reduceMotionEnabled) {
       pulseScale.value = 1;
-      pulseOpacity.value = 0.6;
-      pulseScale.value = withTiming(1.8, {
+      pulseOpacity.value = orbLayerOpacities.pulseRingActive;
+      pulseScale.value = withTiming(orbLayerScales.pulseRing, {
         duration: snapshot.phaseDurationMs,
         easing: Easing.inOut(Easing.ease),
       });
@@ -534,8 +577,13 @@ export function BreathSessionScreen({
       pulseOpacity.value = withTiming(0, { duration: 150 });
     }
   }, [
+    coreScale,
+    innerGlowScale,
     labelOpacity,
-    orbScale,
+    midDiffusionOpacity,
+    midDiffusionScale,
+    outerGlowOpacity,
+    outerGlowScale,
     pulseOpacity,
     pulseScale,
     reduceMotionEnabled,
@@ -670,8 +718,19 @@ export function BreathSessionScreen({
     source,
   ]);
 
-  const orbAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: orbScale.value }],
+  const coreAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: coreScale.value }],
+  }));
+  const innerGlowAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: innerGlowScale.value }],
+  }));
+  const midDiffusionAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: midDiffusionOpacity.value,
+    transform: [{ scale: midDiffusionScale.value }],
+  }));
+  const outerGlowAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: outerGlowOpacity.value,
+    transform: [{ scale: outerGlowScale.value }],
   }));
   const pulseAnimatedStyle = useAnimatedStyle(() => ({
     opacity: pulseOpacity.value,
@@ -755,16 +814,26 @@ export function BreathSessionScreen({
           accessibilityHint="Guides the current breath phase."
           accessibilityLabel={`${phaseLabels[snapshot.phaseName]} breathing phase`}
           accessibilityRole="image"
-          style={[styles.orbStage, isPaused ? styles.orbStagePaused : null, orbAnimatedStyle]}
+          style={[styles.orbStage, isPaused ? styles.orbStagePaused : null]}
           testID="first-session-orb"
         >
           {reduceMotionEnabled ? null : (
-            <View style={styles.outerRing} testID="first-session-orb-outer-ring" />
+            <Animated.View
+              style={[styles.outerRing, outerGlowAnimatedStyle]}
+              testID="first-session-orb-outer-ring"
+            />
           )}
-          <View style={styles.innerGlow} testID="first-session-orb-inner-glow" />
-          <View style={styles.core} testID="first-session-orb-core">
+          <Animated.View
+            style={[styles.innerGlow, innerGlowAnimatedStyle]}
+            testID="first-session-orb-inner-glow"
+          />
+          <Animated.View
+            style={[styles.midDiffusion, midDiffusionAnimatedStyle]}
+            testID="first-session-orb-mid-diffusion"
+          />
+          <Animated.View style={[styles.core, coreAnimatedStyle]} testID="first-session-orb-core">
             <View style={styles.coreAtmosphere} />
-          </View>
+          </Animated.View>
           {reduceMotionEnabled ? null : (
             <Animated.View
               pointerEvents="none"
@@ -1371,14 +1440,29 @@ function getPlanForTechnique(techniqueId: BreathTechniqueId) {
   );
 }
 
-function getOrbScale(phaseName: FirstSessionPhaseName, reduceMotionEnabled: boolean) {
-  const activeScale = reduceMotionEnabled ? motion.breathingOrb.inhaleScale : 1.45;
+function getOrbLayerTargets(phaseName: FirstSessionPhaseName, reduceMotionEnabled: boolean) {
+  const isExpandingPhase = isExpandingBreathPhase(phaseName);
+  const coreScale = isExpandingPhase ? orbLayerScales.core : motion.breathingOrb.restScale;
 
-  if (isExpandingBreathPhase(phaseName)) {
-    return activeScale;
-  }
-
-  return 1;
+  return {
+    coreScale,
+    innerGlowScale:
+      isExpandingPhase && !reduceMotionEnabled
+        ? orbLayerScales.innerGlow
+        : motion.breathingOrb.restScale,
+    midDiffusionOpacity:
+      isExpandingPhase && !reduceMotionEnabled
+        ? orbLayerOpacities.midDiffusionActive
+        : orbLayerOpacities.midDiffusionRest,
+    midDiffusionScale:
+      isExpandingPhase && !reduceMotionEnabled
+        ? orbLayerScales.midDiffusion
+        : motion.breathingOrb.restScale,
+    outerGlowOpacity: isExpandingPhase
+      ? orbLayerOpacities.outerGlowActive
+      : orbLayerOpacities.outerGlowRest,
+    outerGlowScale: isExpandingPhase ? orbLayerScales.outerGlow : motion.breathingOrb.restScale,
+  };
 }
 
 function isExpandingBreathPhase(phaseName: FirstSessionPhaseName) {
@@ -1586,6 +1670,14 @@ const styles = StyleSheet.create({
     height: 200,
     position: "absolute",
     width: 200,
+  },
+  midDiffusion: {
+    backgroundColor: "rgba(168, 156, 224, 0.3)",
+    borderRadius: 110,
+    boxShadow: "0 0 32px rgba(168, 156, 224, 0.22)",
+    height: 220,
+    position: "absolute",
+    width: 220,
   },
   orbSection: {
     alignItems: "center",

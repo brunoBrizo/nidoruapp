@@ -100,7 +100,7 @@ describe("OnboardingPersonalizationFlowScreen", () => {
     expect(screen.queryByText("First session")).toBeNull();
     expect(screen.queryByText(forbiddenPlanGatePattern)).toBeNull();
 
-    fireEvent.press(screen.getByRole("button", { name: "Continue" }));
+    fireEvent.press(screen.getByRole("button", { name: "Let’s start" }));
     act(() => {
       jest.runOnlyPendingTimers();
     });

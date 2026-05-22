@@ -25,7 +25,7 @@ describe("PersonalizedPlanScreen", () => {
 
     render(
       <PersonalizedPlanScreen
-        ctaLabel="Continue"
+        ctaLabel="Let’s start"
         onContinue={continueWithPlan}
         plan={referencePlan}
         screenExitMs={0}
@@ -70,7 +70,7 @@ describe("PersonalizedPlanScreen", () => {
       }),
     );
 
-    fireEvent.press(screen.getByRole("button", { name: "Continue" }));
+    fireEvent.press(screen.getByRole("button", { name: "Let’s start" }));
     act(() => {
       jest.runOnlyPendingTimers();
     });

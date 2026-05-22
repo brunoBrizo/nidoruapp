@@ -492,7 +492,7 @@ export function OnboardingPersonalizationFlowScreen({
     // that personalization now happens after the first full-session reward moment.
     return (
       <PersonalizedPlanScreen
-        ctaLabel="Continue"
+        ctaLabel="Let’s start"
         localProofChipLabel="No account needed"
         onContinue={continueAfterPlan}
         plan={personalizedPlan}

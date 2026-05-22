@@ -145,6 +145,89 @@ describe("FirstSessionScreen", () => {
     jest.useRealTimers();
   });
 
+  it("persists generic breath-session start before first-session analytics", async () => {
+    const persistBreathSessionStarted = jest.fn(() => Promise.resolve());
+    const persistStarted = jest.fn(() => Promise.resolve());
+
+    render(
+      <FirstSessionScreen
+        {...baseProps}
+        persistBreathSessionStarted={persistBreathSessionStarted}
+        persistStarted={persistStarted}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(persistBreathSessionStarted).toHaveBeenCalledWith(
+        expect.objectContaining({
+          audioCueModeId: "gentle-bell",
+          currentPhaseName: "inhale",
+          durationSeconds: 240,
+          localInstallId: "install_0123456789abcdef",
+          sessionId: "session_0123456789abcdef",
+          source: "first_session",
+          status: "started",
+          techniqueId: "4-7-8-sleep",
+        }),
+      );
+    });
+    expect(persistStarted).toHaveBeenCalledTimes(1);
+    expect(persistBreathSessionStarted.mock.invocationCallOrder[0]).toBeLessThan(
+      persistStarted.mock.invocationCallOrder[0] ?? Number.MAX_SAFE_INTEGER,
+    );
+  });
+
+  it("waits for generic breath-session completion persistence before showing reflection", async () => {
+    jest.useFakeTimers();
+    jest.setSystemTime(baseProps.startedAtMs);
+    let resolveBreathSessionCompletion: (() => void) | undefined;
+    const persistBreathSessionCompletion = jest.fn(
+      () =>
+        new Promise<void>((resolve) => {
+          resolveBreathSessionCompletion = resolve;
+        }),
+    );
+
+    render(
+      <FirstSessionScreen
+        {...baseProps}
+        durationSeconds={1}
+        persistBreathSessionCompletion={persistBreathSessionCompletion}
+        persistCompletion={() => Promise.resolve()}
+      />,
+    );
+
+    await act(async () => {
+      jest.advanceTimersByTime(1000);
+      await Promise.resolve();
+    });
+
+    await waitFor(() => {
+      expect(persistBreathSessionCompletion).toHaveBeenCalledWith(
+        expect.objectContaining({
+          audioCueModeId: "gentle-bell",
+          completedAt: "2026-05-20T01:00:01.000Z",
+          completionPersistedAt: "2026-05-20T01:00:01.000Z",
+          currentPhaseName: "inhale",
+          elapsedDurationMs: 1000,
+          remainingDurationMs: 0,
+          source: "first_session",
+          status: "completed",
+        }),
+      );
+    });
+    expect(screen.queryByText("How do you feel?")).toBeNull();
+
+    await act(async () => {
+      resolveBreathSessionCompletion?.();
+      await Promise.resolve();
+    });
+
+    expect(screen.getByText("How do you feel?")).toBeTruthy();
+
+    jest.useRealTimers();
+  });
+
   it("persists the selected reflection locally and reveals the reward transition", async () => {
     jest.useFakeTimers();
     jest.setSystemTime(baseProps.startedAtMs);

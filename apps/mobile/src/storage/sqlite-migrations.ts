@@ -208,6 +208,126 @@ export const sqliteMigrations = [
         ON local_account_link_attempts (status, created_at);
     `,
   },
+  {
+    id: "0005_generic_breath_session_persistence",
+    sql: `
+      CREATE TABLE breath_session_records (
+        session_id TEXT PRIMARY KEY NOT NULL,
+        local_install_id TEXT NOT NULL REFERENCES local_install_identity(local_install_id) ON DELETE CASCADE,
+        source TEXT NOT NULL CHECK (source IN ('breathe_tab', 'first_session', 'morning_check_in', 'rescue_me')),
+        plan_id TEXT CHECK (plan_id IS NULL OR plan_id IN ('sleep_focused', 'anxiety_relief', 'stress_reset', 'general_wellness')),
+        technique_id TEXT NOT NULL CHECK (technique_id IN ('4-7-8-sleep', 'box-breathing', 'coherent-breathing', 'diaphragmatic-breathing', 'physiological-sigh')),
+        audio_cue_mode_id TEXT CHECK (audio_cue_mode_id IS NULL OR audio_cue_mode_id IN ('none', 'gentle-bell', 'soft-whoosh', 'nature-ambient')),
+        status TEXT NOT NULL CHECK (status IN ('started', 'draft', 'completed', 'abandoned')),
+        started_at TEXT NOT NULL,
+        completed_at TEXT,
+        duration_seconds INTEGER NOT NULL CHECK (duration_seconds > 0 AND duration_seconds <= 1800),
+        completed_breath_cycles INTEGER NOT NULL DEFAULT 0 CHECK (completed_breath_cycles >= 0),
+        completion_persisted_at TEXT,
+        elapsed_ms INTEGER NOT NULL DEFAULT 0 CHECK (elapsed_ms >= 0),
+        remaining_ms INTEGER NOT NULL DEFAULT 0 CHECK (remaining_ms >= 0),
+        current_phase TEXT CHECK (
+          current_phase IS NULL OR current_phase IN ('inhale', 'hold', 'second-inhale', 'exhale')
+        ),
+        abandoned_at TEXT,
+        stop_reason TEXT CHECK (
+          stop_reason IS NULL OR stop_reason IN ('app_backgrounded', 'interrupted', 'unknown', 'user_ended')
+        ),
+        updated_at TEXT NOT NULL,
+        CHECK (substr(session_id, 1, 8) = 'session_'),
+        CHECK (length(session_id) BETWEEN 16 AND 72),
+        CHECK (elapsed_ms <= duration_seconds * 1000),
+        CHECK (remaining_ms <= duration_seconds * 1000),
+        CHECK (elapsed_ms + remaining_ms <= duration_seconds * 1000),
+        CHECK (status != 'completed' OR (
+          completed_at IS NOT NULL
+          AND completion_persisted_at IS NOT NULL
+          AND remaining_ms = 0
+        )),
+        CHECK (status != 'abandoned' OR abandoned_at IS NOT NULL),
+        CHECK (status != 'abandoned' OR stop_reason IS NOT NULL)
+      );
+
+      CREATE INDEX breath_session_records_install_status_idx
+        ON breath_session_records (local_install_id, status, started_at);
+
+      CREATE INDEX breath_session_records_recovery_idx
+        ON breath_session_records (local_install_id, status, remaining_ms, updated_at);
+
+      CREATE INDEX breath_session_records_completion_resume_idx
+        ON breath_session_records (local_install_id, status, completed_at);
+
+      CREATE TABLE local_event_queue_next (
+        event_id TEXT PRIMARY KEY NOT NULL,
+        local_install_id TEXT NOT NULL REFERENCES local_install_identity(local_install_id) ON DELETE CASCADE,
+        event_name TEXT NOT NULL CHECK (
+          event_name IN (
+            'onboarding_started',
+            'onboarding_completed',
+            'first_breath_started',
+            'first_breath_completed',
+            'first_session_started',
+            'first_session_completed',
+            'breath_session_started',
+            'breath_session_completed',
+            'notification_permission_prompted',
+            'notification_permission_accepted'
+          )
+        ),
+        record_type TEXT NOT NULL CHECK (
+          record_type IN (
+            'onboarding_response',
+            'first_breath_demo_event',
+            'first_session_record',
+            'breath_session_record',
+            'post_session_reflection',
+            'notification_gate_state'
+          )
+        ),
+        record_id TEXT NOT NULL,
+        payload_json TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'processing', 'succeeded', 'failed')),
+        attempt_count INTEGER NOT NULL DEFAULT 0 CHECK (attempt_count >= 0),
+        next_attempt_at TEXT,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+      );
+
+      INSERT INTO local_event_queue_next (
+        event_id,
+        local_install_id,
+        event_name,
+        record_type,
+        record_id,
+        payload_json,
+        status,
+        attempt_count,
+        next_attempt_at,
+        created_at,
+        updated_at
+      )
+      SELECT
+        event_id,
+        local_install_id,
+        event_name,
+        record_type,
+        record_id,
+        payload_json,
+        status,
+        attempt_count,
+        next_attempt_at,
+        created_at,
+        updated_at
+      FROM local_event_queue;
+
+      DROP TABLE local_event_queue;
+
+      ALTER TABLE local_event_queue_next RENAME TO local_event_queue;
+
+      CREATE INDEX local_event_queue_status_idx
+        ON local_event_queue (status, next_attempt_at, created_at);
+    `,
+  },
 ] as const satisfies readonly SQLiteMigration[];
 
 export async function runSqliteMigrations(

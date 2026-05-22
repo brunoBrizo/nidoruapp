@@ -280,6 +280,228 @@ Deno.test("supports Feature 02 local-first onboarding and first-session records"
   }
 });
 
+Deno.test(
+  "supports generic breath-session records with strict local-only constraints",
+  async () => {
+    const { database, cleanup } = await createDatabase();
+
+    try {
+      await runSqliteMigrations(database);
+      await database.execAsync(`
+      INSERT INTO local_install_identity (local_install_id, created_at, last_seen_at)
+      VALUES ('install_0123456789abcdef', '2026-05-21T01:00:00.000Z', '2026-05-21T01:00:00.000Z');
+
+      INSERT INTO breath_session_records (
+        session_id,
+        local_install_id,
+        source,
+        plan_id,
+        technique_id,
+        audio_cue_mode_id,
+        status,
+        started_at,
+        completed_at,
+        duration_seconds,
+        completed_breath_cycles,
+        completion_persisted_at,
+        elapsed_ms,
+        remaining_ms,
+        current_phase,
+        abandoned_at,
+        stop_reason,
+        updated_at
+      )
+      VALUES (
+        'session_generic123456',
+        'install_0123456789abcdef',
+        'breathe_tab',
+        NULL,
+        'coherent-breathing',
+        'gentle-bell',
+        'draft',
+        '2026-05-21T01:00:00.000Z',
+        NULL,
+        300,
+        10,
+        NULL,
+        120000,
+        180000,
+        'exhale',
+        NULL,
+        NULL,
+        '2026-05-21T01:02:00.000Z'
+      );
+
+      INSERT INTO local_event_queue (
+        event_id,
+        local_install_id,
+        event_name,
+        record_type,
+        record_id,
+        payload_json,
+        created_at,
+        updated_at
+      )
+      VALUES (
+        'event_breath_started',
+        'install_0123456789abcdef',
+        'breath_session_started',
+        'breath_session_record',
+        'session_generic123456',
+        '{}',
+        '2026-05-21T01:00:00.000Z',
+        '2026-05-21T01:00:00.000Z'
+      );
+    `);
+
+      const sessionRows = await database.getAllAsync<{
+        local_install_id: string;
+        payload_json: string;
+        source: string;
+        status: string;
+        technique_id: string;
+      }>(`
+      SELECT
+        breath_session_records.local_install_id,
+        local_event_queue.payload_json,
+        breath_session_records.source,
+        breath_session_records.status,
+        breath_session_records.technique_id
+      FROM breath_session_records
+      INNER JOIN local_event_queue
+        ON local_event_queue.record_id = breath_session_records.session_id
+      WHERE breath_session_records.session_id = 'session_generic123456';
+    `);
+      const indexRows = await database.getAllAsync<{ name: string }>(`
+      SELECT name
+      FROM sqlite_master
+      WHERE type = 'index'
+        AND tbl_name = 'breath_session_records'
+      ORDER BY name;
+    `);
+
+      assertEquals(sessionRows, [
+        {
+          local_install_id: "install_0123456789abcdef",
+          payload_json: "{}",
+          source: "breathe_tab",
+          status: "draft",
+          technique_id: "coherent-breathing",
+        },
+      ]);
+      assertEquals(
+        indexRows.map((row) => row.name),
+        [
+          "breath_session_records_completion_resume_idx",
+          "breath_session_records_install_status_idx",
+          "breath_session_records_recovery_idx",
+          "sqlite_autoindex_breath_session_records_1",
+        ],
+      );
+
+      await assertRejects(
+        () =>
+          database.execAsync(`
+          INSERT INTO breath_session_records (
+            session_id,
+            local_install_id,
+            source,
+            technique_id,
+            status,
+            started_at,
+            duration_seconds,
+            elapsed_ms,
+            remaining_ms,
+            current_phase,
+            updated_at
+          )
+          VALUES (
+            'session_invalidtech',
+            'install_0123456789abcdef',
+            'breathe_tab',
+            'unvalidated-breath',
+            'draft',
+            '2026-05-21T01:00:00.000Z',
+            300,
+            0,
+            300000,
+            'inhale',
+            '2026-05-21T01:00:00.000Z'
+          );
+        `),
+        /CHECK constraint failed/,
+      );
+      await assertRejects(
+        () =>
+          database.execAsync(`
+          INSERT INTO breath_session_records (
+            session_id,
+            local_install_id,
+            source,
+            technique_id,
+            status,
+            started_at,
+            duration_seconds,
+            elapsed_ms,
+            remaining_ms,
+            current_phase,
+            updated_at
+          )
+          VALUES (
+            'session_invalidphase',
+            'install_0123456789abcdef',
+            'breathe_tab',
+            'coherent-breathing',
+            'draft',
+            '2026-05-21T01:00:00.000Z',
+            300,
+            0,
+            300000,
+            'sleepy',
+            '2026-05-21T01:00:00.000Z'
+          );
+        `),
+        /CHECK constraint failed/,
+      );
+      await assertRejects(
+        () =>
+          database.execAsync(`
+          PRAGMA foreign_keys = ON;
+          INSERT INTO breath_session_records (
+            session_id,
+            local_install_id,
+            source,
+            technique_id,
+            status,
+            started_at,
+            duration_seconds,
+            elapsed_ms,
+            remaining_ms,
+            current_phase,
+            updated_at
+          )
+          VALUES (
+            'session_missinginstall',
+            'install_missing123456',
+            'breathe_tab',
+            'coherent-breathing',
+            'draft',
+            '2026-05-21T01:00:00.000Z',
+            300,
+            0,
+            300000,
+            'inhale',
+            '2026-05-21T01:00:00.000Z'
+          );
+        `),
+        /FOREIGN KEY constraint failed/,
+      );
+    } finally {
+      await cleanup();
+    }
+  },
+);
+
 Deno.test("does not reapply migrations that already ran", async () => {
   const { database, cleanup } = await createDatabase();
 

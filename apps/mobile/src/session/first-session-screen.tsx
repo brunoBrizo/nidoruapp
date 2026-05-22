@@ -1,14 +1,19 @@
 import {
   breathTechniques,
   onboardingPlans,
+  type BreathAudioCueModeId,
   type BreathTechniqueId,
   type OnboardingPlanId,
 } from "@nidoru/domain";
 import { colors, motion, spacing, typography } from "@nidoru/ui-tokens";
 import type {
   AbandonedFirstSessionRecord,
+  AbandonedBreathSessionRecord,
+  BreathSessionStartedRecord,
+  CompletedBreathSessionRecord,
   FirstSessionRecord,
   PostSessionReflection,
+  RecoverableBreathSessionDraft,
   RecoverableFirstSessionDraft,
 } from "@nidoru/validation";
 import * as Haptics from "expo-haptics";
@@ -41,6 +46,12 @@ import { useReduceMotionPreference } from "../motion/use-reduce-motion-enabled";
 import { captureAnalyticsEventDeferred } from "../observability/deferred-capture";
 import { openMigratedLocalDatabase } from "../storage/local-database";
 import {
+  abandonBreathSessionLocally,
+  completeBreathSessionLocally,
+  recordBreathSessionStartedLocally,
+  saveBreathSessionDraftLocally,
+} from "./breath-session-local-persistence";
+import {
   completeFirstSessionIfDue,
   createFirstSessionController,
   createFirstSessionDraftFromSnapshot,
@@ -53,6 +64,10 @@ import {
 
 export type FirstSessionPersistence = {
   readonly persistAbandoned?: (record: AbandonedFirstSessionRecord) => Promise<void>;
+  readonly persistBreathSessionAbandoned?: (record: AbandonedBreathSessionRecord) => Promise<void>;
+  readonly persistBreathSessionCompletion?: (record: CompletedBreathSessionRecord) => Promise<void>;
+  readonly persistBreathSessionDraft?: (record: RecoverableBreathSessionDraft) => Promise<void>;
+  readonly persistBreathSessionStarted?: (record: BreathSessionStartedRecord) => Promise<void>;
   readonly persistCompletion?: (record: FirstSessionRecord) => Promise<void>;
   readonly persistDraft?: (record: RecoverableFirstSessionDraft) => Promise<void>;
   readonly persistReflection?: (reflection: PostSessionReflection) => Promise<void>;
@@ -84,6 +99,7 @@ type FirstSessionRouteScreenProps = {
 };
 
 type CompletionMode = "completed" | "abandoned" | undefined;
+type FirstSessionAudioMode = "bell" | "none";
 
 const defaultTickIntervalMs = 1000;
 const draftPersistIntervalMs = 15000;
@@ -95,6 +111,10 @@ const phaseLabels = {
   inhale: "Inhale",
   "second-inhale": "Sip in",
 } as const satisfies Record<FirstSessionPhaseName, string>;
+
+function getAudioCueModeId(audioMode: FirstSessionAudioMode): BreathAudioCueModeId {
+  return audioMode === "bell" ? "gentle-bell" : "none";
+}
 
 export function FirstSessionRouteScreen({
   durationSeconds,
@@ -189,6 +209,20 @@ export function FirstSessionRouteScreen({
       durationSeconds={sessionConfig.durationSeconds}
       localInstallId={sessionConfig.localInstallId}
       persistAbandoned={(record) => abandonFirstSessionLocally(sessionConfig.database, record)}
+      persistBreathSessionAbandoned={(record) =>
+        abandonBreathSessionLocally(sessionConfig.database, record)
+      }
+      persistBreathSessionCompletion={async (record) => {
+        await completeBreathSessionLocally(sessionConfig.database, record);
+        captureAnalyticsEventDeferred("breath_session_completed");
+      }}
+      persistBreathSessionDraft={(record) =>
+        saveBreathSessionDraftLocally(sessionConfig.database, record)
+      }
+      persistBreathSessionStarted={async (record) => {
+        await recordBreathSessionStartedLocally(sessionConfig.database, record);
+        captureAnalyticsEventDeferred("breath_session_started");
+      }}
       persistCompletion={async (record) => {
         await completeFirstSessionLocally(sessionConfig.database, record);
         captureAnalyticsEventDeferred("first_session_completed");
@@ -222,6 +256,10 @@ export function FirstSessionScreen({
   localInstallId,
   onRewardMomentComplete = () => undefined,
   persistAbandoned = async () => undefined,
+  persistBreathSessionAbandoned = async () => undefined,
+  persistBreathSessionCompletion = async () => undefined,
+  persistBreathSessionDraft = async () => undefined,
+  persistBreathSessionStarted = async () => undefined,
   persistCompletion = async () => undefined,
   persistDraft = async () => undefined,
   persistReflection = async () => undefined,
@@ -258,7 +296,7 @@ export function FirstSessionScreen({
   const [snapshot, setSnapshot] = useState(() =>
     getFirstSessionSnapshot(controllerRef.current, startedAtMs),
   );
-  const [audioMode, setAudioMode] = useState<"bell" | "none">("bell");
+  const [audioMode, setAudioMode] = useState<FirstSessionAudioMode>("bell");
   const [hapticsEnabled, setHapticsEnabled] = useState(true);
   const [completionMode, setCompletionMode] = useState<CompletionMode>(initialCompletionMode);
   const isPersistingTerminalStateRef = useRef(false);
@@ -280,12 +318,40 @@ export function FirstSessionScreen({
     }
 
     hasPersistedSessionStartRef.current = true;
-    void persistStarted({
+    const startedAt = new Date(startedAtMs).toISOString();
+
+    void persistBreathSessionStarted({
+      audioCueModeId: getAudioCueModeId(audioMode),
+      currentPhaseName: snapshot.phaseName,
+      durationSeconds: sessionDurationSeconds,
       localInstallId,
+      planId,
       sessionId,
-      startedAt: new Date(startedAtMs).toISOString(),
-    }).catch(() => undefined);
-  }, [localInstallId, persistStarted, sessionId, startedAtMs]);
+      source: "first_session",
+      startedAt,
+      status: "started",
+      techniqueId,
+    })
+      .then(() =>
+        persistStarted({
+          localInstallId,
+          sessionId,
+          startedAt,
+        }),
+      )
+      .catch(() => undefined);
+  }, [
+    audioMode,
+    localInstallId,
+    persistBreathSessionStarted,
+    persistStarted,
+    planId,
+    sessionDurationSeconds,
+    sessionId,
+    snapshot.phaseName,
+    startedAtMs,
+    techniqueId,
+  ]);
 
   const refreshSnapshot = useCallback((observedAtMs = Date.now()) => {
     const nextSnapshot = getFirstSessionSnapshot(controllerRef.current, observedAtMs);
@@ -386,10 +452,17 @@ export function FirstSessionScreen({
     }
 
     lastDraftPersistedAtMs.current = snapshot.observedAtMs;
-    void persistDraft(createFirstSessionDraftFromSnapshot(controllerRef.current, snapshot)).catch(
-      () => undefined,
-    );
-  }, [completionMode, persistDraft, snapshot]);
+    const firstSessionDraft = createFirstSessionDraftFromSnapshot(controllerRef.current, snapshot);
+
+    void Promise.all([
+      persistBreathSessionDraft({
+        ...firstSessionDraft,
+        audioCueModeId: getAudioCueModeId(audioMode),
+        source: "first_session",
+      }),
+      persistDraft(firstSessionDraft),
+    ]).catch(() => undefined);
+  }, [audioMode, completionMode, persistBreathSessionDraft, persistDraft, snapshot]);
 
   useEffect(() => {
     if (snapshot.status !== "completed" || completionMode || isPersistingTerminalStateRef.current) {
@@ -402,15 +475,39 @@ export function FirstSessionScreen({
       return;
     }
 
+    const { completedAt, completionPersistedAt } = completedRecord;
+
+    if (!completedAt || !completionPersistedAt) {
+      return;
+    }
+
     isPersistingTerminalStateRef.current = true;
-    void persistCompletion(completedRecord)
+    void persistBreathSessionCompletion({
+      audioCueModeId: getAudioCueModeId(audioMode),
+      completedAt,
+      completedBreathCycles: completedRecord.completedBreathCycles ?? 0,
+      completionPersistedAt,
+      currentPhaseName: snapshot.phaseName,
+      durationSeconds: completedRecord.durationSeconds,
+      elapsedDurationMs: snapshot.elapsedDurationMs,
+      localInstallId: completedRecord.localInstallId,
+      ...(completedRecord.planId === undefined ? {} : { planId: completedRecord.planId }),
+      remainingDurationMs: snapshot.remainingDurationMs,
+      sessionId: completedRecord.sessionId,
+      source: "first_session",
+      startedAt: completedRecord.startedAt,
+      status: "completed",
+      techniqueId: completedRecord.techniqueId,
+      updatedAt: completionPersistedAt,
+    })
+      .then(() => persistCompletion(completedRecord))
       .then(() => {
         setCompletionMode("completed");
       })
       .finally(() => {
         isPersistingTerminalStateRef.current = false;
       });
-  }, [completionMode, persistCompletion, snapshot]);
+  }, [audioMode, completionMode, persistBreathSessionCompletion, persistCompletion, snapshot]);
 
   const orbAnimatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: orbScale.value }],
@@ -443,7 +540,15 @@ export function FirstSessionScreen({
     const abandonedRecord = endFirstSessionEarly(controllerRef.current, Date.now());
 
     isPersistingTerminalStateRef.current = true;
-    void persistAbandoned(abandonedRecord)
+    void Promise.all([
+      persistBreathSessionAbandoned({
+        ...abandonedRecord,
+        audioCueModeId: getAudioCueModeId(audioMode),
+        source: "first_session",
+        stopReason: "user_ended",
+      }),
+      persistAbandoned(abandonedRecord),
+    ])
       .then(() => {
         setCompletionMode("abandoned");
       })

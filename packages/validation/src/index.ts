@@ -41,6 +41,19 @@ export const breathworkFamiliaritySchema = z.enum(
 );
 export const onboardingStatusSchema = z.enum(["draft", "completed"]);
 export const firstSessionStatusSchema = z.enum(["draft", "completed", "abandoned"]);
+export const breathSessionSourceSchema = z.enum([
+  "breathe_tab",
+  "first_session",
+  "morning_check_in",
+  "rescue_me",
+]);
+export const breathSessionStatusSchema = z.enum(["started", "draft", "completed", "abandoned"]);
+export const breathSessionStopReasonSchema = z.enum([
+  "app_backgrounded",
+  "interrupted",
+  "unknown",
+  "user_ended",
+]);
 export const postSessionFeelingSchema = z.enum(["same", "better", "much_better"]);
 export const notificationPermissionStateSchema = z.enum([
   "not_shown",
@@ -178,6 +191,110 @@ export const abandonedFirstSessionRecordSchema = recoverableFirstSessionDraftSch
   status: z.literal("abandoned"),
 });
 
+const breathSessionProgressFields = {
+  completedBreathCycles: z.number().int().min(0),
+  currentPhaseName: breathSessionPhaseNameSchema,
+  elapsedDurationMs: z.number().int().min(0),
+  remainingDurationMs: z.number().int().min(0),
+} as const;
+
+const breathSessionBaseRecordSchema = z.object({
+  audioCueModeId: audioCueModeIdSchema.optional(),
+  durationSeconds: breathSessionDurationSecondsSchema,
+  localInstallId: localInstallIdSchema,
+  planId: onboardingPlanIdSchema.optional(),
+  sessionId: localRecordIdSchema("session"),
+  source: breathSessionSourceSchema,
+  startedAt: isoDateTimeSchema,
+  techniqueId: breathTechniqueIdSchema,
+});
+
+function refineBreathSessionProgress(
+  value: {
+    readonly durationSeconds: number;
+    readonly elapsedDurationMs?: number;
+    readonly remainingDurationMs?: number;
+  },
+  context: z.RefinementCtx,
+): void {
+  if (value.elapsedDurationMs === undefined || value.remainingDurationMs === undefined) {
+    return;
+  }
+
+  const durationMs = value.durationSeconds * 1000;
+
+  if (value.elapsedDurationMs > durationMs) {
+    context.addIssue({
+      code: "custom",
+      message: "elapsedDurationMs cannot exceed the session duration",
+      path: ["elapsedDurationMs"],
+    });
+  }
+
+  if (value.remainingDurationMs > durationMs) {
+    context.addIssue({
+      code: "custom",
+      message: "remainingDurationMs cannot exceed the session duration",
+      path: ["remainingDurationMs"],
+    });
+  }
+
+  if (value.elapsedDurationMs + value.remainingDurationMs > durationMs) {
+    context.addIssue({
+      code: "custom",
+      message: "elapsedDurationMs and remainingDurationMs cannot exceed the session duration",
+      path: ["remainingDurationMs"],
+    });
+  }
+}
+
+export const breathSessionStartedRecordSchema = breathSessionBaseRecordSchema
+  .extend({
+    currentPhaseName: breathSessionPhaseNameSchema,
+    eventId: localRecordIdSchema("event").optional(),
+    status: z.literal("started"),
+  })
+  .superRefine(refineBreathSessionProgress);
+
+export const recoverableBreathSessionDraftSchema = breathSessionBaseRecordSchema
+  .extend({
+    ...breathSessionProgressFields,
+    status: z.enum(["started", "draft"]),
+    updatedAt: isoDateTimeSchema,
+  })
+  .superRefine(refineBreathSessionProgress);
+
+export const completedBreathSessionRecordSchema = breathSessionBaseRecordSchema
+  .extend({
+    ...breathSessionProgressFields,
+    completedAt: isoDateTimeSchema,
+    completionPersistedAt: isoDateTimeSchema,
+    eventId: localRecordIdSchema("event").optional(),
+    status: z.literal("completed"),
+    updatedAt: isoDateTimeSchema.optional(),
+  })
+  .superRefine((value, context) => {
+    refineBreathSessionProgress(value, context);
+
+    if (value.remainingDurationMs !== 0) {
+      context.addIssue({
+        code: "custom",
+        message: "remainingDurationMs must be 0 for completed breath sessions",
+        path: ["remainingDurationMs"],
+      });
+    }
+  });
+
+export const abandonedBreathSessionRecordSchema = breathSessionBaseRecordSchema
+  .extend({
+    ...breathSessionProgressFields,
+    abandonedAt: isoDateTimeSchema,
+    status: z.literal("abandoned"),
+    stopReason: breathSessionStopReasonSchema,
+    updatedAt: isoDateTimeSchema,
+  })
+  .superRefine(refineBreathSessionProgress);
+
 export const postSessionReflectionSchema = z.object({
   localInstallId: localInstallIdSchema,
   sessionId: localRecordIdSchema("session"),
@@ -212,6 +329,10 @@ export type OnboardingResponse = z.infer<typeof onboardingResponseSchema>;
 export type FirstSessionRecord = z.infer<typeof firstSessionRecordSchema>;
 export type RecoverableFirstSessionDraft = z.infer<typeof recoverableFirstSessionDraftSchema>;
 export type AbandonedFirstSessionRecord = z.infer<typeof abandonedFirstSessionRecordSchema>;
+export type BreathSessionStartedRecord = z.infer<typeof breathSessionStartedRecordSchema>;
+export type RecoverableBreathSessionDraft = z.infer<typeof recoverableBreathSessionDraftSchema>;
+export type CompletedBreathSessionRecord = z.infer<typeof completedBreathSessionRecordSchema>;
+export type AbandonedBreathSessionRecord = z.infer<typeof abandonedBreathSessionRecordSchema>;
 export type PostSessionReflection = z.infer<typeof postSessionReflectionSchema>;
 export type NotificationGateEligibility = z.infer<typeof notificationGateEligibilitySchema>;
 export type SoundMixLayer = z.infer<typeof soundMixLayerSchema>;

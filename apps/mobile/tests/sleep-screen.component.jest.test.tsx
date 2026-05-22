@@ -11,6 +11,7 @@ describe("SleepTabScreen", () => {
     expect(screen.getByText("Settle into tonight.")).toBeTruthy();
 
     expect(screen.getByText("Evening Wind-Down")).toBeTruthy();
+    expect(screen.getByTestId("sleep-primary-card-fade")).toBeTruthy();
     expect(screen.getByText("4-7-8 breath · body relax · sleep sounds")).toBeTruthy();
     expect(screen.getByRole("link", { name: "Start wind-down" })).toHaveProp(
       "accessibilityHint",

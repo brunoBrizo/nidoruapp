@@ -14,6 +14,8 @@ import {
 } from "lucide-react-native";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
+import { CardFade } from "../surfaces/card-fade";
+
 type MixerLayer = {
   readonly label: string;
   readonly volume: 70 | 55 | 35;
@@ -60,7 +62,7 @@ export function SleepScreen() {
       </View>
 
       <View style={styles.primaryCard}>
-        <View pointerEvents="none" style={styles.primaryCardSheen} />
+        <CardFade testID="sleep-primary-card-fade" variant="sleep-primary" />
         <View style={styles.primaryCopy}>
           <Text selectable style={styles.primaryTitle}>
             Evening Wind-Down
@@ -71,10 +73,7 @@ export function SleepScreen() {
         </View>
 
         <Link asChild href={sleepRoutes.windDown}>
-          <Pressable
-            accessibilityHint="Opens the Evening Wind-Down flow."
-            accessibilityRole="link"
-          >
+          <Pressable accessibilityHint="Opens the Evening Wind-Down flow." accessibilityRole="link">
             {({ pressed }) => (
               <View style={[styles.primaryButton, pressed ? styles.pressed : null]}>
                 <View style={styles.primaryButtonContent}>
@@ -220,8 +219,7 @@ const sleepColors = {
   cardBorder: "rgba(30, 34, 54, 0.72)",
   cardInset: "inset 0 1px 0 rgba(238, 240, 255, 0.05)",
   cardShadow: "inset 0 1px 0 rgba(238, 240, 255, 0.04), 0 12px 28px rgba(0, 0, 0, 0.18)",
-  elevatedCardShadow:
-    "inset 0 1px 0 rgba(238, 240, 255, 0.06), 0 8px 32px rgba(15, 18, 48, 0.6)",
+  elevatedCardShadow: "inset 0 1px 0 rgba(238, 240, 255, 0.06), 0 8px 32px rgba(15, 18, 48, 0.6)",
 } as const;
 
 const styles = StyleSheet.create({
@@ -263,14 +261,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.sm,
     paddingTop: 18,
     position: "relative",
-  },
-  primaryCardSheen: {
-    backgroundColor: "rgba(168, 156, 224, 0.045)",
-    bottom: 0,
-    position: "absolute",
-    right: 0,
-    top: 0,
-    width: 126,
   },
   primaryCopy: {
     gap: 4,

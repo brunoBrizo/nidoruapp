@@ -12,7 +12,8 @@ import {
   type LucideIcon,
 } from "lucide-react-native";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import Svg, { Circle, Defs, LinearGradient, RadialGradient, Rect, Stop } from "react-native-svg";
+
+import { CardFade } from "../surfaces/card-fade";
 
 type ProfileRow = {
   readonly title: string;
@@ -86,7 +87,7 @@ export function ProfileScreen() {
         >
           {({ pressed }) => (
             <View style={[styles.profileCard, pressed ? styles.cardPressed : null]}>
-              <ProfileCardFade />
+              <CardFade testID="profile-card-fade" variant="profile" />
               <View style={styles.profileTopRow}>
                 <View style={styles.avatar}>
                   <Text selectable style={styles.avatarInitial}>
@@ -160,49 +161,6 @@ export function ProfileScreen() {
         ))}
       </View>
     </ScrollView>
-  );
-}
-
-function ProfileCardFade() {
-  return (
-    <View pointerEvents="none" style={styles.profileFadeLayer} testID="profile-card-fade">
-      <Svg height="100%" preserveAspectRatio="none" viewBox="0 0 362 134" width="100%">
-        <Defs>
-          <LinearGradient id="profile-wash" x1="0" x2="1" y1="0" y2="0">
-            <Stop offset="0" stopColor={colors.dark.primary.value} stopOpacity="0" />
-            <Stop offset="0.48" stopColor={colors.dark.primary.value} stopOpacity="0.035" />
-            <Stop offset="1" stopColor={colors.dark.primaryGlow.value} stopOpacity="0.11" />
-          </LinearGradient>
-          <LinearGradient id="profile-top-edge" x1="0" x2="1" y1="0" y2="0">
-            <Stop offset="0" stopColor={colors.dark.primaryGlow.value} stopOpacity="0" />
-            <Stop offset="0.58" stopColor={colors.dark.primaryGlow.value} stopOpacity="0.08" />
-            <Stop offset="1" stopColor={colors.dark.primaryGlow.value} stopOpacity="0.18" />
-          </LinearGradient>
-          <LinearGradient id="profile-right-edge" x1="0" x2="0" y1="0" y2="1">
-            <Stop offset="0" stopColor={colors.dark.primaryGlow.value} stopOpacity="0.18" />
-            <Stop offset="0.62" stopColor={colors.dark.primaryGlow.value} stopOpacity="0.06" />
-            <Stop offset="1" stopColor={colors.dark.primaryGlow.value} stopOpacity="0" />
-          </LinearGradient>
-          <RadialGradient
-            cx="362"
-            cy="0"
-            fx="362"
-            fy="0"
-            gradientUnits="userSpaceOnUse"
-            id="profile-corner-fade"
-            r="132"
-          >
-            <Stop offset="0" stopColor={colors.dark.primaryGlow.value} stopOpacity="0.16" />
-            <Stop offset="0.44" stopColor={colors.dark.primary.value} stopOpacity="0.095" />
-            <Stop offset="1" stopColor={colors.dark.primary.value} stopOpacity="0" />
-          </RadialGradient>
-        </Defs>
-        <Rect fill="url(#profile-wash)" height="134" width="268" x="94" y="0" />
-        <Circle cx="362" cy="0" fill="url(#profile-corner-fade)" r="132" />
-        <Rect fill="url(#profile-top-edge)" height="1.4" width="260" x="102" y="0.3" />
-        <Rect fill="url(#profile-right-edge)" height="92" width="1.4" x="360.3" y="0" />
-      </Svg>
-    </View>
   );
 }
 
@@ -295,9 +253,6 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     padding: spacing.sm,
     transform: [{ scale: 1 }],
-  },
-  profileFadeLayer: {
-    ...StyleSheet.absoluteFillObject,
   },
   profileTopRow: {
     alignItems: "center",

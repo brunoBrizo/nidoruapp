@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 
 import {
   getOrCreateLocalInstallIdentity,
@@ -46,6 +46,11 @@ export function FirstLaunchOnboardingGateBase({
   replaceRoute,
 }: FirstLaunchOnboardingGateBaseProps) {
   const [gateState, setGateState] = useState<GateState>("checking");
+  const replaceRouteRef = useRef(replaceRoute);
+
+  useEffect(() => {
+    replaceRouteRef.current = replaceRoute;
+  }, [replaceRoute]);
 
   useEffect(() => {
     if (allowIncompleteOnboarding) {
@@ -66,7 +71,7 @@ export function FirstLaunchOnboardingGateBase({
 
         if (shouldStartOnboarding) {
           setGateState("redirecting");
-          replaceRoute("/onboarding");
+          replaceRouteRef.current("/onboarding");
           return;
         }
 
@@ -77,7 +82,7 @@ export function FirstLaunchOnboardingGateBase({
         }
 
         setGateState("redirecting");
-        replaceRoute("/onboarding");
+        replaceRouteRef.current("/onboarding");
       }
     }
 
@@ -86,7 +91,7 @@ export function FirstLaunchOnboardingGateBase({
     return () => {
       isMounted = false;
     };
-  }, [allowIncompleteOnboarding, loadShouldStartOnboarding, replaceRoute]);
+  }, [allowIncompleteOnboarding, loadShouldStartOnboarding]);
 
   if (!allowIncompleteOnboarding && gateState !== "home") {
     return <OnboardingSplashScreen />;

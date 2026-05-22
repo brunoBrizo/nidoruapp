@@ -25,6 +25,36 @@ describe("FirstLaunchOnboardingGate", () => {
     });
   });
 
+  it("does not re-check onboarding when only the route replacement callback changes", async () => {
+    const loadShouldStartOnboarding = jest.fn<() => Promise<boolean>>(() => Promise.resolve(false));
+    const firstReplaceRoute = jest.fn();
+
+    const { rerender } = render(
+      <FirstLaunchOnboardingGateBase
+        loadShouldStartOnboarding={loadShouldStartOnboarding}
+        replaceRoute={firstReplaceRoute}
+      >
+        <Text>Home content</Text>
+      </FirstLaunchOnboardingGateBase>,
+    );
+
+    await screen.findByText("Home content");
+
+    rerender(
+      <FirstLaunchOnboardingGateBase
+        loadShouldStartOnboarding={loadShouldStartOnboarding}
+        replaceRoute={jest.fn()}
+      >
+        <Text>Home content</Text>
+      </FirstLaunchOnboardingGateBase>,
+    );
+
+    await waitFor(() => {
+      expect(loadShouldStartOnboarding).toHaveBeenCalledTimes(1);
+    });
+    expect(screen.queryByTestId("onboarding-splash-screen")).toBeNull();
+  });
+
   it("renders Home after local onboarding completion is already recorded", async () => {
     render(
       <FirstLaunchOnboardingGateBase

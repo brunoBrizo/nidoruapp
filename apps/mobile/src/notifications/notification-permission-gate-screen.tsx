@@ -1,9 +1,10 @@
 import { messages, type LocaleMessages } from "@nidoru/i18n";
 import { colors, radii, spacing, typography } from "@nidoru/ui-tokens";
+import { StatusBar } from "expo-status-bar";
 import { Bell, Moon, ShieldCheck, type LucideIcon } from "lucide-react-native";
 import { useEffect, useRef, useState } from "react";
-import { Animated, Easing, Pressable, StyleSheet, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Animated, Easing, Modal, Pressable, StyleSheet, Text, View } from "react-native";
+import Svg, { Defs, LinearGradient, RadialGradient, Rect, Stop } from "react-native-svg";
 
 import { useReduceMotionPreference } from "../motion/use-reduce-motion-enabled";
 
@@ -101,13 +102,14 @@ export function NotificationPermissionGateScreen({
     });
   };
 
-  return (
-    <SafeAreaView
+  const gate = (
+    <View
       accessibilityLabel={copy.contextLabel}
       style={styles.screen}
       testID="notification-permission-gate"
     >
-      <View pointerEvents="none" style={styles.ambientOrb} />
+      <StatusBar hidden />
+      <NotificationGateAmbientFade />
       <Animated.View
         style={[
           styles.content,
@@ -117,7 +119,7 @@ export function NotificationPermissionGateScreen({
           },
         ]}
       >
-        <View style={styles.main}>
+        <View style={styles.main} testID="notification-gate-main-content">
           <Text style={styles.contextLabel}>{copy.contextLabel}</Text>
           <Text accessibilityRole="header" style={styles.headline}>
             {headlineParts.first}
@@ -137,7 +139,8 @@ export function NotificationPermissionGateScreen({
           </View>
         </View>
 
-        <View style={styles.actions}>
+        <View style={styles.actions} testID="notification-gate-actions">
+          <NotificationGateActionFade />
           <Pressable
             accessibilityHint="Shows the system notification permission prompt."
             accessibilityRole="button"
@@ -171,7 +174,13 @@ export function NotificationPermissionGateScreen({
           <Text style={styles.helper}>{copy.helper}</Text>
         </View>
       </Animated.View>
-    </SafeAreaView>
+    </View>
+  );
+
+  return (
+    <Modal animationType="none" presentationStyle="fullScreen" visible>
+      {gate}
+    </Modal>
   );
 }
 
@@ -191,6 +200,53 @@ function splitHeadline(headline: string) {
   };
 }
 
+function NotificationGateAmbientFade() {
+  return (
+    <View
+      pointerEvents="none"
+      style={styles.ambientFadeLayer}
+      testID="notification-gate-ambient-fade"
+    >
+      <Svg height="100%" preserveAspectRatio="none" viewBox="0 0 390 844" width="100%">
+        <Defs>
+          <RadialGradient
+            cx="195"
+            cy="148"
+            fx="195"
+            fy="148"
+            gradientUnits="userSpaceOnUse"
+            id="notification-gate-top-glow"
+            r="285"
+          >
+            <Stop offset="0" stopColor={colors.dark.primary.value} stopOpacity="0.1" />
+            <Stop offset="0.42" stopColor={colors.dark.primary.value} stopOpacity="0.055" />
+            <Stop offset="0.76" stopColor={colors.dark.primary.value} stopOpacity="0.016" />
+            <Stop offset="1" stopColor={colors.dark.primary.value} stopOpacity="0" />
+          </RadialGradient>
+        </Defs>
+        <Rect fill="url(#notification-gate-top-glow)" height="844" width="390" x="0" y="0" />
+      </Svg>
+    </View>
+  );
+}
+
+function NotificationGateActionFade() {
+  return (
+    <View pointerEvents="none" style={styles.actionFadeLayer}>
+      <Svg height="100%" preserveAspectRatio="none" viewBox="0 0 390 260" width="100%">
+        <Defs>
+          <LinearGradient id="notification-gate-action-fade" x1="0" x2="0" y1="0" y2="1">
+            <Stop offset="0" stopColor={colors.dark.background.value} stopOpacity="0" />
+            <Stop offset="0.18" stopColor={colors.dark.background.value} stopOpacity="1" />
+            <Stop offset="1" stopColor={colors.dark.background.value} stopOpacity="1" />
+          </LinearGradient>
+        </Defs>
+        <Rect fill="url(#notification-gate-action-fade)" height="260" width="390" x="0" y="0" />
+      </Svg>
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   screen: {
     ...StyleSheet.absoluteFillObject,
@@ -198,26 +254,20 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     zIndex: 20,
   },
-  ambientOrb: {
-    backgroundColor: colors.dark.primary.value,
-    borderRadius: 190,
-    height: 380,
-    left: -16,
-    opacity: 0.12,
+  ambientFadeLayer: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  actionFadeLayer: {
+    ...StyleSheet.absoluteFillObject,
     position: "absolute",
-    shadowColor: colors.dark.primaryGlow.value,
-    shadowOpacity: 0.3,
-    shadowRadius: 90,
-    top: -48,
-    width: 380,
   },
   content: {
     flex: 1,
   },
   main: {
     flex: 1,
-    paddingHorizontal: spacing.screenPadding,
-    paddingTop: spacing.xl,
+    paddingHorizontal: spacing.md,
+    paddingTop: 64,
   },
   contextLabel: {
     color: colors.dark.primaryGlow.value,
@@ -234,24 +284,23 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     letterSpacing: 0,
     lineHeight: 34,
-    marginBottom: 14,
+    marginBottom: 12,
   },
   body: {
     color: colors.dark.textSecondary.value,
     fontFamily: typography.mobileFontFamily.primary.regular,
     fontSize: 16,
     fontWeight: "400",
-    lineHeight: 25,
+    lineHeight: 26,
     marginBottom: 40,
   },
   bulletStack: {
     gap: 20,
   },
   bulletRow: {
-    alignItems: "center",
+    alignItems: "flex-start",
     flexDirection: "row",
     gap: 16,
-    minHeight: 40,
   },
   iconCircle: {
     alignItems: "center",
@@ -261,6 +310,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     height: 32,
     justifyContent: "center",
+    marginTop: 2,
     width: 32,
   },
   bulletLabel: {
@@ -270,11 +320,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     lineHeight: 22,
+    paddingTop: 4,
   },
   actions: {
     backgroundColor: colors.dark.background.value,
-    paddingBottom: spacing.lg,
-    paddingHorizontal: spacing.sm,
+    paddingBottom: 112,
+    paddingHorizontal: spacing.screenPadding,
     paddingTop: spacing.sm,
   },
   primaryButton: {
@@ -285,9 +336,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginBottom: 8,
     minHeight: 44,
-    shadowColor: colors.dark.primary.value,
-    shadowOpacity: 0.18,
-    shadowRadius: 16,
+    position: "relative",
+    boxShadow: "0 4px 16px rgba(124, 111, 205, 0.12)",
     transform: [{ scale: 1 }],
   },
   primaryButtonPressed: {

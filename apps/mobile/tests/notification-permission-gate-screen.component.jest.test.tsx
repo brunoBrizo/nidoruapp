@@ -1,6 +1,6 @@
 import { describe, expect, it, jest } from "@jest/globals";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react-native";
-import { AccessibilityInfo, StyleSheet } from "react-native";
+import { AccessibilityInfo, Modal, StyleSheet } from "react-native";
 
 import {
   NOTIFICATION_GATE_MOTION,
@@ -38,6 +38,13 @@ describe("NotificationPermissionGateScreen", () => {
   it("keeps touch targets and visual styling aligned with the reference", () => {
     render(<NotificationPermissionGateScreen onAccept={jest.fn()} onDecline={jest.fn()} />);
 
+    const mainStyle = StyleSheet.flatten(
+      screen.getByTestId("notification-gate-main-content").props.style,
+    );
+    const actionsStyle = StyleSheet.flatten(
+      screen.getByTestId("notification-gate-actions").props.style,
+    );
+    const modal = screen.UNSAFE_getByType(Modal);
     const acceptStyle = resolvePressableStyle(
       screen.getByTestId("notification-gate-accept").props.style,
     );
@@ -45,6 +52,17 @@ describe("NotificationPermissionGateScreen", () => {
       screen.getByTestId("notification-gate-decline").props.style,
     );
 
+    expect(screen.getByTestId("notification-gate-ambient-fade")).toBeTruthy();
+    expect(modal.props.visible).toBe(true);
+    expect(mainStyle).toMatchObject({
+      paddingHorizontal: 24,
+      paddingTop: 64,
+    });
+    expect(actionsStyle).toMatchObject({
+      paddingBottom: 112,
+      paddingHorizontal: 20,
+      paddingTop: 16,
+    });
     expect(StyleSheet.flatten(acceptStyle)).toMatchObject({
       backgroundColor: "#7C6FCD",
       borderRadius: 16,
@@ -55,6 +73,28 @@ describe("NotificationPermissionGateScreen", () => {
       height: 48,
       minHeight: 44,
     });
+  });
+
+  it("routes the primary CTA to the OS prompt path without invoking decline", async () => {
+    const accept = jest.fn(() => Promise.resolve());
+    const decline = jest.fn(() => Promise.resolve());
+    const dismissed = jest.fn();
+
+    render(
+      <NotificationPermissionGateScreen
+        onAccept={accept}
+        onDecline={decline}
+        onDismiss={dismissed}
+      />,
+    );
+
+    fireEvent.press(screen.getByTestId("notification-gate-accept"));
+
+    await waitFor(() => {
+      expect(accept).toHaveBeenCalledTimes(1);
+    });
+    expect(decline).not.toHaveBeenCalled();
+    expect(dismissed).toHaveBeenCalledTimes(1);
   });
 
   it("routes accept and decline separately so decline never invokes the OS prompt path", async () => {

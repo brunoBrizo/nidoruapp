@@ -1,11 +1,11 @@
 # Graph Report - sleep-app  (2026-05-22)
 
 ## Corpus Check
-- 123 files · ~227,738 words
+- 123 files · ~227,951 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 362 nodes · 389 edges · 18 communities detected
+- 363 nodes · 390 edges · 18 communities detected
 - Extraction: 87% EXTRACTED · 13% INFERRED · 0% AMBIGUOUS · INFERRED: 49 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
@@ -64,12 +64,12 @@ Cohesion: 0.13
 Nodes (18): clamp(), completeBreathSessionIfDue(), createBreathSessionController(), endBreathSessionEarly(), getBreathSessionSnapshot(), getCycleDurationMs(), getPhaseAtElapsedMs(), pauseBreathSession() (+10 more)
 
 ### Community 2 - "Community 2"
-Cohesion: 0.14
-Nodes (12): fetch(), createPostValueSupabaseAuthenticator(), createPostValueSupabaseClient(), createPostValueSyncHttpError(), createSupabaseHeaders(), createSupabaseServiceUrl(), createSupabaseStorageKey(), isAllowedPostValueSyncTarget() (+4 more)
-
-### Community 3 - "Community 3"
 Cohesion: 0.15
 Nodes (10): openAndMigrateLocalDatabase(), openMigratedLocalDatabase(), openDefaultLocalDatabase(), applyMigration(), runSqliteMigrations(), assertCondition(), assertRejects(), runSqlite() (+2 more)
+
+### Community 3 - "Community 3"
+Cohesion: 0.14
+Nodes (12): fetch(), createPostValueSupabaseAuthenticator(), createPostValueSupabaseClient(), createPostValueSyncHttpError(), createSupabaseHeaders(), createSupabaseServiceUrl(), createSupabaseStorageKey(), isAllowedPostValueSyncTarget() (+4 more)
 
 ### Community 4 - "Community 4"
 Cohesion: 0.15
@@ -84,12 +84,12 @@ Cohesion: 0.29
 Nodes (12): createBlockedEligibility(), formatDurationLabel(), getEligibleReason(), isPostSessionFeeling(), linkPostValueAccount(), loadPostRewardPaywallEligibility(), mapLocalRecordsToUser(), parseUserId() (+4 more)
 
 ### Community 7 - "Community 7"
-Cohesion: 0.35
-Nodes (10): abandonBreathSessionLocally(), completeBreathSessionLocally(), createLocalEventId(), insertBreathSessionEventQueue(), loadPendingBreathSessionCompletion(), loadRecoverableBreathSessionDraft(), parseSourceFilterInput(), recordBreathSessionStartedLocally() (+2 more)
+Cohesion: 0.24
+Nodes (6): getHomeContentEntranceMotionConfig(), HomeEntrancePolish(), NotificationPermissionGateScreen(), splitHeadline(), useReduceMotionEnabled(), useReduceMotionPreference()
 
 ### Community 8 - "Community 8"
-Cohesion: 0.27
-Nodes (6): getHomeContentEntranceMotionConfig(), HomeEntrancePolish(), NotificationPermissionGateScreen(), splitHeadline(), useReduceMotionEnabled(), useReduceMotionPreference()
+Cohesion: 0.35
+Nodes (10): abandonBreathSessionLocally(), completeBreathSessionLocally(), createLocalEventId(), insertBreathSessionEventQueue(), loadPendingBreathSessionCompletion(), loadRecoverableBreathSessionDraft(), parseSourceFilterInput(), recordBreathSessionStartedLocally() (+2 more)
 
 ### Community 9 - "Community 9"
 Cohesion: 0.25
@@ -146,7 +146,7 @@ _Questions this graph is uniquely positioned to answer:_
   _High betweenness centrality (0.023) - this node is a cross-community bridge._
 - **Why does `captureAnalyticsEvent()` connect `Community 4` to `Community 0`?**
   _High betweenness centrality (0.020) - this node is a cross-community bridge._
-- **Why does `openMigratedLocalDatabase()` connect `Community 3` to `Community 0`?**
+- **Why does `openMigratedLocalDatabase()` connect `Community 2` to `Community 0`?**
   _High betweenness centrality (0.019) - this node is a cross-community bridge._
 - **Are the 3 inferred relationships involving `getBreathSessionSnapshot()` (e.g. with `pauseSession()` and `resumeSession()`) actually correct?**
   _`getBreathSessionSnapshot()` has 3 INFERRED edges - model-reasoned connections that need verification._

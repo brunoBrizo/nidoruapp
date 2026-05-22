@@ -18,7 +18,8 @@ import type {
 } from "@nidoru/validation";
 import * as Haptics from "expo-haptics";
 import { useRouter, type Href } from "expo-router";
-import { Bell, BellOff, CheckCircle, Pause, Play, Vibrate, VibrateOff } from "lucide-react-native";
+import { StatusBar } from "expo-status-bar";
+import { Bell, BellOff, CheckCircle, Pause, Vibrate, VibrateOff } from "lucide-react-native";
 import { useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, {
@@ -48,21 +49,27 @@ import { openMigratedLocalDatabase } from "../storage/local-database";
 import {
   abandonBreathSessionLocally,
   completeBreathSessionLocally,
+  loadPendingBreathSessionCompletion,
+  loadRecoverableBreathSessionDraft,
   recordBreathSessionStartedLocally,
   saveBreathSessionDraftLocally,
 } from "./breath-session-local-persistence";
 import {
-  completeFirstSessionIfDue,
-  createFirstSessionController,
-  createFirstSessionDraftFromSnapshot,
-  endFirstSessionEarly,
-  getFirstSessionSnapshot,
-  pauseFirstSession,
-  resumeFirstSession,
+  completeBreathSessionIfDue,
+  createBreathSessionController,
+  endBreathSessionEarly,
+  getBreathSessionSnapshot,
+  pauseBreathSession,
+  resumeBreathSession,
+  type BreathSessionController,
+  type BreathSessionSnapshot,
+  type BreathSessionSource,
+} from "./breath-session-runtime";
+import {
   type FirstSessionPhaseName,
 } from "./first-session-runtime";
 
-export type FirstSessionPersistence = {
+export type BreathSessionPersistence = {
   readonly persistAbandoned?: (record: AbandonedFirstSessionRecord) => Promise<void>;
   readonly persistBreathSessionAbandoned?: (record: AbandonedBreathSessionRecord) => Promise<void>;
   readonly persistBreathSessionCompletion?: (record: CompletedBreathSessionRecord) => Promise<void>;
@@ -78,25 +85,39 @@ export type FirstSessionPersistence = {
   }) => Promise<void>;
 };
 
-export type FirstSessionScreenProps = FirstSessionPersistence & {
+export type FirstSessionPersistence = BreathSessionPersistence;
+
+export type BreathSessionScreenProps = BreathSessionPersistence & {
+  readonly completionEyebrow?: string;
   readonly disableHaptics?: boolean;
   readonly durationSeconds?: number;
   readonly initialCompletionMode?: CompletionMode;
   readonly localInstallId: string;
   readonly onRewardMomentComplete?: () => void;
-  readonly planId: OnboardingPlanId;
+  readonly planId?: OnboardingPlanId;
   readonly sessionId: string;
+  readonly source: BreathSessionSource;
   readonly startedAtMs?: number;
   readonly techniqueId: BreathTechniqueId;
   readonly tickIntervalMs?: number;
 };
 
-type FirstSessionRouteScreenProps = {
+export type FirstSessionScreenProps = Omit<
+  BreathSessionScreenProps,
+  "completionEyebrow" | "planId" | "source"
+> & {
+  readonly planId: OnboardingPlanId;
+};
+
+type BreathSessionRouteScreenProps = {
   readonly durationSeconds?: number;
   readonly planId?: OnboardingPlanId;
   readonly postRewardRoute?: Href;
+  readonly source: BreathSessionSource;
   readonly techniqueId: BreathTechniqueId;
 };
+
+type FirstSessionRouteScreenProps = Omit<BreathSessionRouteScreenProps, "source">;
 
 type CompletionMode = "completed" | "abandoned" | undefined;
 type FirstSessionAudioMode = "bell" | "none";
@@ -116,19 +137,20 @@ function getAudioCueModeId(audioMode: FirstSessionAudioMode): BreathAudioCueMode
   return audioMode === "bell" ? "gentle-bell" : "none";
 }
 
-export function FirstSessionRouteScreen({
+export function BreathSessionRouteScreen({
   durationSeconds,
   planId,
   postRewardRoute = "/post-value",
+  source,
   techniqueId,
-}: FirstSessionRouteScreenProps) {
+}: BreathSessionRouteScreenProps) {
   const router = useRouter();
   const [sessionConfig, setSessionConfig] = useState<{
     readonly database: LocalFirstOnboardingDatabase;
     readonly durationSeconds: number;
     readonly initialCompletionMode?: CompletionMode;
     readonly localInstallId: string;
-    readonly planId: OnboardingPlanId;
+    readonly planId?: OnboardingPlanId;
     readonly sessionId: string;
     readonly startedAtMs: number;
     readonly techniqueId: BreathTechniqueId;
@@ -145,28 +167,43 @@ export function FirstSessionRouteScreen({
         runAsync: (source, params = []) => database.runAsync(source, [...params]),
       };
       const localInstallId = await getOrCreateLocalInstallIdentity({ database: localDatabase });
-      const pendingReflection = await loadPendingPostSessionReflection(localDatabase, {
-        localInstallId,
-      });
-      const recoverableDraft = pendingReflection
+      const pendingCompletion =
+        source === "first_session"
+          ? await loadPendingPostSessionReflection(localDatabase, {
+              localInstallId,
+            })
+          : await loadPendingBreathSessionCompletion(localDatabase, {
+              localInstallId,
+              source,
+            });
+      const recoverableDraft = pendingCompletion
         ? null
-        : await loadRecoverableFirstSessionDraft(localDatabase, {
-            localInstallId,
-          });
+        : source === "first_session"
+          ? await loadRecoverableFirstSessionDraft(localDatabase, {
+              localInstallId,
+            })
+          : await loadRecoverableBreathSessionDraft(localDatabase, {
+              localInstallId,
+              source,
+            });
       const nowMs = Date.now();
       const selectedPlanId =
-        planId ?? pendingReflection?.planId ?? recoverableDraft?.planId ?? fallbackPlan.id;
+        planId ??
+        pendingCompletion?.planId ??
+        recoverableDraft?.planId ??
+        (source === "first_session" ? fallbackPlan.id : undefined);
       const selectedTechniqueId =
-        pendingReflection?.techniqueId ?? recoverableDraft?.techniqueId ?? techniqueId;
+        pendingCompletion?.techniqueId ?? recoverableDraft?.techniqueId ?? techniqueId;
       const selectedDurationSeconds =
         durationSeconds ??
-        pendingReflection?.durationSeconds ??
+        pendingCompletion?.durationSeconds ??
         recoverableDraft?.durationSeconds ??
-        fallbackPlan.firstSession.durationSeconds;
+        (selectedPlanId ? onboardingPlans[selectedPlanId].firstSession.durationSeconds : undefined) ??
+        breathTechniques[selectedTechniqueId].defaultDurationSeconds;
       const sessionId =
-        pendingReflection?.sessionId ?? recoverableDraft?.sessionId ?? createFirstSessionId();
-      const startedAtMs = pendingReflection
-        ? Date.parse(pendingReflection.startedAt)
+        pendingCompletion?.sessionId ?? recoverableDraft?.sessionId ?? createFirstSessionId();
+      const startedAtMs = pendingCompletion
+        ? Date.parse(pendingCompletion.startedAt)
         : recoverableDraft
           ? nowMs - recoverableDraft.elapsedDurationMs
           : nowMs;
@@ -178,9 +215,9 @@ export function FirstSessionRouteScreen({
       setSessionConfig({
         database: localDatabase,
         durationSeconds: selectedDurationSeconds,
-        ...(pendingReflection ? { initialCompletionMode: "completed" } : {}),
+        ...(pendingCompletion ? { initialCompletionMode: "completed" } : {}),
         localInstallId,
-        planId: selectedPlanId,
+        ...(selectedPlanId === undefined ? {} : { planId: selectedPlanId }),
         sessionId,
         startedAtMs,
         techniqueId: selectedTechniqueId,
@@ -197,6 +234,7 @@ export function FirstSessionRouteScreen({
     fallbackPlan.firstSession.durationSeconds,
     fallbackPlan.id,
     planId,
+    source,
     techniqueId,
   ]);
 
@@ -205,7 +243,8 @@ export function FirstSessionRouteScreen({
   }
 
   return (
-    <FirstSessionScreen
+    <BreathSessionScreen
+      completionEyebrow={source === "first_session" ? "First session complete" : "Session complete"}
       durationSeconds={sessionConfig.durationSeconds}
       localInstallId={sessionConfig.localInstallId}
       persistAbandoned={(record) => abandonFirstSessionLocally(sessionConfig.database, record)}
@@ -241,15 +280,25 @@ export function FirstSessionRouteScreen({
       {...(sessionConfig.initialCompletionMode === undefined
         ? {}
         : { initialCompletionMode: sessionConfig.initialCompletionMode })}
-      planId={sessionConfig.planId}
+      {...(sessionConfig.planId === undefined ? {} : { planId: sessionConfig.planId })}
       sessionId={sessionConfig.sessionId}
+      source={source}
       startedAtMs={sessionConfig.startedAtMs}
       techniqueId={sessionConfig.techniqueId}
     />
   );
 }
 
-export function FirstSessionScreen({
+export function FirstSessionRouteScreen(props: FirstSessionRouteScreenProps) {
+  return <BreathSessionRouteScreen {...props} source="first_session" />;
+}
+
+export function FirstSessionScreen(props: FirstSessionScreenProps) {
+  return <BreathSessionScreen {...props} completionEyebrow="First session complete" source="first_session" />;
+}
+
+export function BreathSessionScreen({
+  completionEyebrow = "Session complete",
   disableHaptics = false,
   durationSeconds,
   initialCompletionMode,
@@ -266,10 +315,11 @@ export function FirstSessionScreen({
   persistStarted = async () => undefined,
   planId,
   sessionId,
+  source,
   startedAtMs = Date.now(),
   techniqueId,
   tickIntervalMs = defaultTickIntervalMs,
-}: FirstSessionScreenProps) {
+}: BreathSessionScreenProps) {
   const safeAreaInsets = useContext(SafeAreaInsetsContext) ?? {
     bottom: 0,
     left: 0,
@@ -277,16 +327,18 @@ export function FirstSessionScreen({
     top: 0,
   };
   const technique = breathTechniques[techniqueId];
-  const plan = onboardingPlans[planId];
-  const sessionDurationSeconds = durationSeconds ?? plan.firstSession.durationSeconds;
+  const plan = planId ? onboardingPlans[planId] : undefined;
+  const sessionDurationSeconds =
+    durationSeconds ?? plan?.firstSession.durationSeconds ?? technique.defaultDurationSeconds;
   const reduceMotionPreference = useReduceMotionPreference();
   const reduceMotionEnabled =
     reduceMotionPreference.isResolved && reduceMotionPreference.reduceMotionEnabled;
   const controllerRef = useRef(
-    createFirstSessionController({
+    createBreathSessionController({
       localInstallId,
-      planId,
+      ...(planId === undefined ? {} : { planId }),
       sessionId,
+      source,
       startedAtMs,
       techniqueId,
       totalDurationSeconds: sessionDurationSeconds,
@@ -294,7 +346,7 @@ export function FirstSessionScreen({
   );
   const [controller, setController] = useState(controllerRef.current);
   const [snapshot, setSnapshot] = useState(() =>
-    getFirstSessionSnapshot(controllerRef.current, startedAtMs),
+    getBreathSessionSnapshot(controllerRef.current, startedAtMs),
   );
   const [audioMode, setAudioMode] = useState<FirstSessionAudioMode>("bell");
   const [hapticsEnabled, setHapticsEnabled] = useState(true);
@@ -325,19 +377,21 @@ export function FirstSessionScreen({
       currentPhaseName: snapshot.phaseName,
       durationSeconds: sessionDurationSeconds,
       localInstallId,
-      planId,
+      ...(planId === undefined ? {} : { planId }),
       sessionId,
-      source: "first_session",
+      source,
       startedAt,
       status: "started",
       techniqueId,
     })
       .then(() =>
-        persistStarted({
-          localInstallId,
-          sessionId,
-          startedAt,
-        }),
+        source === "first_session"
+          ? persistStarted({
+              localInstallId,
+              sessionId,
+              startedAt,
+            })
+          : undefined,
       )
       .catch(() => undefined);
   }, [
@@ -348,13 +402,14 @@ export function FirstSessionScreen({
     planId,
     sessionDurationSeconds,
     sessionId,
+    source,
     snapshot.phaseName,
     startedAtMs,
     techniqueId,
   ]);
 
   const refreshSnapshot = useCallback((observedAtMs = Date.now()) => {
-    const nextSnapshot = getFirstSessionSnapshot(controllerRef.current, observedAtMs);
+    const nextSnapshot = getBreathSessionSnapshot(controllerRef.current, observedAtMs);
     setSnapshot(nextSnapshot);
     return nextSnapshot;
   }, []);
@@ -452,16 +507,19 @@ export function FirstSessionScreen({
     }
 
     lastDraftPersistedAtMs.current = snapshot.observedAtMs;
-    const firstSessionDraft = createFirstSessionDraftFromSnapshot(controllerRef.current, snapshot);
+    const breathSessionDraft = createBreathSessionDraftFromSnapshot(
+      controllerRef.current,
+      snapshot,
+      audioMode,
+    );
+    const firstSessionDraft = createFirstSessionDraftRecord(controllerRef.current, snapshot);
+    const persistDrafts = [persistBreathSessionDraft(breathSessionDraft)];
 
-    void Promise.all([
-      persistBreathSessionDraft({
-        ...firstSessionDraft,
-        audioCueModeId: getAudioCueModeId(audioMode),
-        source: "first_session",
-      }),
-      persistDraft(firstSessionDraft),
-    ]).catch(() => undefined);
+    if (firstSessionDraft) {
+      persistDrafts.push(persistDraft(firstSessionDraft));
+    }
+
+    void Promise.all(persistDrafts).catch(() => undefined);
   }, [audioMode, completionMode, persistBreathSessionDraft, persistDraft, snapshot]);
 
   useEffect(() => {
@@ -469,7 +527,10 @@ export function FirstSessionScreen({
       return;
     }
 
-    const completedRecord = completeFirstSessionIfDue(controllerRef.current, snapshot.observedAtMs);
+    const completedRecord = completeBreathSessionIfDue(controllerRef.current, snapshot.observedAtMs);
+    const firstSessionRecord = completedRecord
+      ? createFirstSessionCompletionRecord(completedRecord)
+      : undefined;
 
     if (!completedRecord) {
       return;
@@ -494,20 +555,20 @@ export function FirstSessionScreen({
       ...(completedRecord.planId === undefined ? {} : { planId: completedRecord.planId }),
       remainingDurationMs: snapshot.remainingDurationMs,
       sessionId: completedRecord.sessionId,
-      source: "first_session",
+      source,
       startedAt: completedRecord.startedAt,
       status: "completed",
       techniqueId: completedRecord.techniqueId,
       updatedAt: completionPersistedAt,
     })
-      .then(() => persistCompletion(completedRecord))
+      .then(() => (firstSessionRecord ? persistCompletion(firstSessionRecord) : undefined))
       .then(() => {
         setCompletionMode("completed");
       })
       .finally(() => {
         isPersistingTerminalStateRef.current = false;
       });
-  }, [audioMode, completionMode, persistBreathSessionCompletion, persistCompletion, snapshot]);
+  }, [audioMode, completionMode, persistBreathSessionCompletion, persistCompletion, snapshot, source]);
 
   const orbAnimatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: orbScale.value }],
@@ -521,15 +582,15 @@ export function FirstSessionScreen({
   }));
 
   const pauseSession = () => {
-    const paused = pauseFirstSession(controllerRef.current, Date.now());
+    const paused = pauseBreathSession(controllerRef.current, Date.now());
     setController(paused);
-    setSnapshot(getFirstSessionSnapshot(paused, Date.now()));
+    setSnapshot(getBreathSessionSnapshot(paused, Date.now()));
   };
 
   const resumeSession = () => {
-    const resumed = resumeFirstSession(controllerRef.current, Date.now());
+    const resumed = resumeBreathSession(controllerRef.current, Date.now());
     setController(resumed);
-    setSnapshot(getFirstSessionSnapshot(resumed, Date.now()));
+    setSnapshot(getBreathSessionSnapshot(resumed, Date.now()));
   };
 
   const endSessionEarly = () => {
@@ -537,18 +598,23 @@ export function FirstSessionScreen({
       return;
     }
 
-    const abandonedRecord = endFirstSessionEarly(controllerRef.current, Date.now());
+    const abandonedRecord = endBreathSessionEarly(controllerRef.current, Date.now());
+    const firstSessionAbandonedRecord = createFirstSessionAbandonedRecord(abandonedRecord);
 
     isPersistingTerminalStateRef.current = true;
-    void Promise.all([
+    const persistTerminalState = [
       persistBreathSessionAbandoned({
         ...abandonedRecord,
         audioCueModeId: getAudioCueModeId(audioMode),
-        source: "first_session",
         stopReason: "user_ended",
       }),
-      persistAbandoned(abandonedRecord),
-    ])
+    ];
+
+    if (firstSessionAbandonedRecord) {
+      persistTerminalState.push(persistAbandoned(firstSessionAbandonedRecord));
+    }
+
+    void Promise.all(persistTerminalState)
       .then(() => {
         setCompletionMode("abandoned");
       })
@@ -572,8 +638,8 @@ export function FirstSessionScreen({
       ]}
       testID="first-session-screen"
     >
+      <StatusBar hidden />
       <View pointerEvents="none" style={styles.backgroundGlow} />
-      <View pointerEvents="none" style={styles.lowerGlow} />
 
       <View style={styles.header}>
         <Text accessibilityRole="header" selectable style={styles.title}>
@@ -666,6 +732,7 @@ export function FirstSessionScreen({
 
       {completionMode === "completed" ? (
         <ReflectionOverlay
+          completionEyebrow={completionEyebrow}
           disableHaptics={disableHaptics}
           hapticsEnabled={hapticsEnabled}
           localInstallId={localInstallId}
@@ -726,7 +793,6 @@ function PauseOverlay({
           onPress={onResume}
           style={({ pressed }) => [styles.continueButton, pressed ? styles.controlPressed : null]}
         >
-          <Play color={colors.dark.textPrimary.value} size={16} strokeWidth={1.6} />
           <Text selectable={false} style={styles.continueButtonText}>
             Continue
           </Text>
@@ -755,6 +821,7 @@ const reflectionOptions = [
 }[];
 
 function ReflectionOverlay({
+  completionEyebrow,
   disableHaptics,
   hapticsEnabled,
   localInstallId,
@@ -763,6 +830,7 @@ function ReflectionOverlay({
   reduceMotionEnabled,
   sessionId,
 }: {
+  readonly completionEyebrow: string;
   readonly disableHaptics: boolean;
   readonly hapticsEnabled: boolean;
   readonly localInstallId: string;
@@ -850,7 +918,7 @@ function ReflectionOverlay({
             strokeWidth={0}
           />
           <Text selectable style={styles.reflectionEyebrow}>
-            First session complete
+            {completionEyebrow}
           </Text>
         </Animated.View>
 
@@ -990,6 +1058,121 @@ function ControlButton({
   );
 }
 
+function createBreathSessionDraftFromSnapshot(
+  controller: BreathSessionController,
+  snapshot: BreathSessionSnapshot,
+  audioMode: FirstSessionAudioMode,
+): RecoverableBreathSessionDraft {
+  return {
+    audioCueModeId: getAudioCueModeId(audioMode),
+    completedBreathCycles: snapshot.completedBreathCycles,
+    currentPhaseName: snapshot.phaseName,
+    durationSeconds: controller.totalDurationSeconds,
+    elapsedDurationMs: snapshot.elapsedDurationMs,
+    localInstallId: controller.localInstallId,
+    ...(controller.planId === undefined ? {} : { planId: controller.planId }),
+    remainingDurationMs: snapshot.remainingDurationMs,
+    sessionId: controller.sessionId,
+    source: controller.source,
+    startedAt: new Date(controller.startedAtMs).toISOString(),
+    status: "draft",
+    techniqueId: controller.techniqueId,
+    updatedAt: new Date(snapshot.observedAtMs).toISOString(),
+  };
+}
+
+function createFirstSessionDraftRecord(
+  controller: BreathSessionController,
+  snapshot: BreathSessionSnapshot,
+): RecoverableFirstSessionDraft | undefined {
+  if (controller.source !== "first_session" || controller.planId === undefined) {
+    return undefined;
+  }
+
+  return {
+    completedBreathCycles: snapshot.completedBreathCycles,
+    currentPhaseName: snapshot.phaseName,
+    durationSeconds: controller.totalDurationSeconds,
+    elapsedDurationMs: snapshot.elapsedDurationMs,
+    localInstallId: controller.localInstallId,
+    planId: controller.planId,
+    remainingDurationMs: snapshot.remainingDurationMs,
+    sessionId: controller.sessionId,
+    startedAt: new Date(controller.startedAtMs).toISOString(),
+    status: "draft",
+    techniqueId: controller.techniqueId,
+    updatedAt: new Date(snapshot.observedAtMs).toISOString(),
+  };
+}
+
+function createFirstSessionCompletionRecord(record: {
+  readonly completedAt: string;
+  readonly completedBreathCycles: number;
+  readonly completionPersistedAt: string;
+  readonly durationSeconds: number;
+  readonly localInstallId: string;
+  readonly planId?: OnboardingPlanId;
+  readonly sessionId: string;
+  readonly source: BreathSessionSource;
+  readonly startedAt: string;
+  readonly status: "completed";
+  readonly techniqueId: BreathTechniqueId;
+}): FirstSessionRecord | undefined {
+  if (record.source !== "first_session" || record.planId === undefined) {
+    return undefined;
+  }
+
+  return {
+    completedAt: record.completedAt,
+    completedBreathCycles: record.completedBreathCycles,
+    completionPersistedAt: record.completionPersistedAt,
+    durationSeconds: record.durationSeconds,
+    localInstallId: record.localInstallId,
+    planId: record.planId,
+    sessionId: record.sessionId,
+    startedAt: record.startedAt,
+    status: record.status,
+    techniqueId: record.techniqueId,
+  };
+}
+
+function createFirstSessionAbandonedRecord(record: {
+  readonly abandonedAt: string;
+  readonly completedBreathCycles: number;
+  readonly currentPhaseName: FirstSessionPhaseName;
+  readonly durationSeconds: number;
+  readonly elapsedDurationMs: number;
+  readonly localInstallId: string;
+  readonly planId?: OnboardingPlanId;
+  readonly remainingDurationMs: number;
+  readonly sessionId: string;
+  readonly source: BreathSessionSource;
+  readonly startedAt: string;
+  readonly status: "abandoned";
+  readonly techniqueId: BreathTechniqueId;
+  readonly updatedAt: string;
+}): AbandonedFirstSessionRecord | undefined {
+  if (record.source !== "first_session" || record.planId === undefined) {
+    return undefined;
+  }
+
+  return {
+    abandonedAt: record.abandonedAt,
+    completedBreathCycles: record.completedBreathCycles,
+    currentPhaseName: record.currentPhaseName,
+    durationSeconds: record.durationSeconds,
+    elapsedDurationMs: record.elapsedDurationMs,
+    localInstallId: record.localInstallId,
+    planId: record.planId,
+    remainingDurationMs: record.remainingDurationMs,
+    sessionId: record.sessionId,
+    startedAt: record.startedAt,
+    status: record.status,
+    techniqueId: record.techniqueId,
+    updatedAt: record.updatedAt,
+  };
+}
+
 function getPlanForTechnique(techniqueId: BreathTechniqueId) {
   return (
     Object.values(onboardingPlans).find((plan) => plan.firstSession.techniqueId === techniqueId) ??
@@ -1119,15 +1302,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: 200,
   },
-  lowerGlow: {
-    backgroundColor: "rgba(124, 111, 205, 0.11)",
-    borderRadius: 150,
-    bottom: -110,
-    height: 300,
-    left: 45,
-    position: "absolute",
-    width: 300,
-  },
   orbSection: {
     alignItems: "center",
     flex: 1,
@@ -1155,7 +1329,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     alignItems: "center",
-    backgroundColor: "rgba(13, 15, 26, 0.93)",
+    backgroundColor: colors.dark.background.value,
     bottom: 0,
     justifyContent: "center",
     left: 0,

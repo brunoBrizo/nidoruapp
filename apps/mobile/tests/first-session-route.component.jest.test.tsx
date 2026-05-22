@@ -8,10 +8,14 @@ jest.mock("expo-router", () => ({
 }));
 
 jest.mock("../src/session/first-session-screen", () => ({
+  BreathSessionRouteScreen: jest.fn(() => null),
   FirstSessionRouteScreen: jest.fn(() => null),
 }));
 
-import { FirstSessionRouteScreen } from "../src/session/first-session-screen";
+import {
+  BreathSessionRouteScreen,
+  FirstSessionRouteScreen,
+} from "../src/session/first-session-screen";
 import BreatheTechniqueAnchorScreen from "../src/app/(tabs)/breathe/[technique]";
 
 describe("BreatheTechniqueAnchorScreen", () => {
@@ -19,7 +23,7 @@ describe("BreatheTechniqueAnchorScreen", () => {
     jest.clearAllMocks();
   });
 
-  it("returns first-launch reward completion to personalization instead of post-value", () => {
+  it("returns first-launch reward completion to personalization through the first-session wrapper", () => {
     mockUseLocalSearchParams.mockReturnValue({
       durationSeconds: "240",
       firstLaunch: "1",
@@ -41,22 +45,25 @@ describe("BreatheTechniqueAnchorScreen", () => {
       }),
       undefined,
     );
+    expect(BreathSessionRouteScreen).not.toHaveBeenCalled();
   });
 
-  it("keeps normal Breathe-tab sessions on the post-value reward route", () => {
+  it("launches normal Breathe-tab sessions through the generic breath-session route", () => {
     mockUseLocalSearchParams.mockReturnValue({
       technique: "coherent-breathing",
     });
 
     render(<BreatheTechniqueAnchorScreen />);
 
-    expect(FirstSessionRouteScreen).toHaveBeenLastCalledWith(
+    expect(BreathSessionRouteScreen).toHaveBeenLastCalledWith(
       expect.objectContaining({
         postRewardRoute: "/post-value",
+        source: "breathe_tab",
         techniqueId: "coherent-breathing",
       }),
       undefined,
     );
+    expect(FirstSessionRouteScreen).not.toHaveBeenCalled();
   });
 
   it("falls back through the typed route policy for post-MVP techniques and invalid durations", () => {
@@ -67,16 +74,43 @@ describe("BreatheTechniqueAnchorScreen", () => {
 
     render(<BreatheTechniqueAnchorScreen />);
 
-    expect(FirstSessionRouteScreen).toHaveBeenLastCalledWith(
+    expect(BreathSessionRouteScreen).toHaveBeenLastCalledWith(
       expect.not.objectContaining({
         durationSeconds: expect.any(Number),
       }),
       undefined,
     );
-    expect(FirstSessionRouteScreen).toHaveBeenLastCalledWith(
+    expect(BreathSessionRouteScreen).toHaveBeenLastCalledWith(
       expect.objectContaining({
         postRewardRoute: "/post-value",
+        source: "breathe_tab",
         techniqueId: "4-7-8-sleep",
+      }),
+      undefined,
+    );
+  });
+
+  it("preserves valid duration bounds for regular sessions without a plan id", () => {
+    mockUseLocalSearchParams.mockReturnValue({
+      durationSeconds: "600",
+      planId: "not-a-plan",
+      technique: "box-breathing",
+    });
+
+    render(<BreatheTechniqueAnchorScreen />);
+
+    expect(BreathSessionRouteScreen).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        durationSeconds: 600,
+        postRewardRoute: "/post-value",
+        source: "breathe_tab",
+        techniqueId: "box-breathing",
+      }),
+      undefined,
+    );
+    expect(BreathSessionRouteScreen).toHaveBeenLastCalledWith(
+      expect.not.objectContaining({
+        planId: expect.any(String),
       }),
       undefined,
     );

@@ -1,8 +1,14 @@
-import { describe, expect, it, jest } from "@jest/globals";
+import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 import { render, screen, within } from "@testing-library/react-native";
 import { AccessibilityInfo } from "react-native";
 
 import { AppTabBar } from "../src/navigation/app-tab-bar";
+
+const mockUsePathname = jest.fn(() => "/");
+
+jest.mock("expo-router", () => ({
+  usePathname: () => mockUsePathname(),
+}));
 
 const routes = [
   { key: "home-key", name: "index" },
@@ -43,6 +49,10 @@ const renderTabBar = () =>
   );
 
 describe("AppTabBar", () => {
+  beforeEach(() => {
+    mockUsePathname.mockReturnValue("/");
+  });
+
   it("renders the fixed five tab labels in product order", () => {
     renderTabBar();
 
@@ -58,5 +68,14 @@ describe("AppTabBar", () => {
       selected: true,
     });
     expect(screen.queryByText(/badge/i)).toBeNull();
+  });
+
+  it("hides the tab shell on full-screen breath session routes", () => {
+    mockUsePathname.mockReturnValue("/breathe/4-7-8-sleep");
+
+    renderTabBar();
+
+    expect(screen.queryByRole("tab", { name: "Home tab" })).toBeNull();
+    expect(screen.queryByText("Breathe")).toBeNull();
   });
 });

@@ -1,12 +1,12 @@
 # Graph Report - sleep-app  (2026-05-21)
 
 ## Corpus Check
-- 116 files · ~217,021 words
+- 116 files · ~218,030 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 348 nodes · 375 edges · 18 communities detected
-- Extraction: 89% EXTRACTED · 11% INFERRED · 0% AMBIGUOUS · INFERRED: 43 edges (avg confidence: 0.8)
+- 350 nodes · 382 edges · 18 communities detected
+- Extraction: 87% EXTRACTED · 13% INFERRED · 0% AMBIGUOUS · INFERRED: 48 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
@@ -30,13 +30,13 @@
 - [[_COMMUNITY_Community 20|Community 20]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `createPostValueSupabaseClient()` - 8 edges
-2. `requestNotificationPermissionFromGate()` - 8 edges
-3. `loadPostRewardPaywallEligibility()` - 7 edges
-4. `linkPostValueAccount()` - 7 edges
-5. `evaluateGate()` - 7 edges
-6. `createLocalEventId()` - 7 edges
-7. `getBreathSessionSnapshot()` - 7 edges
+1. `getBreathSessionSnapshot()` - 9 edges
+2. `createPostValueSupabaseClient()` - 8 edges
+3. `requestNotificationPermissionFromGate()` - 8 edges
+4. `loadPostRewardPaywallEligibility()` - 7 edges
+5. `linkPostValueAccount()` - 7 edges
+6. `evaluateGate()` - 7 edges
+7. `createLocalEventId()` - 7 edges
 8. `runSqliteMigrations()` - 6 edges
 9. `createPersonalizedOnboardingPlan()` - 5 edges
 10. `getNextEveningReminderDate()` - 5 edges
@@ -50,30 +50,30 @@
   packages/domain/src/index.ts → apps/mobile/src/notifications/notification-permission-service.ts
 - `fetch()` --calls--> `upsertPostValueRecords()`  [INFERRED]
   supabase/functions/foundation-health/index.ts → apps/mobile/src/paywall/post-value-supabase-auth.ts
-- `openMigratedLocalDatabase()` --calls--> `openDefaultLocalDatabase()`  [INFERRED]
-  apps/mobile/src/storage/local-database.ts → apps/mobile/src/notifications/notification-permission-gate-controller.tsx
+- `createClient()` --calls--> `createPostValueSupabaseClient()`  [INFERRED]
+  apps/mobile/tests/post-value-sync.unit.jest.test.ts → apps/mobile/src/paywall/post-value-supabase-auth.ts
 
 ## Communities
 
 ### Community 0 - "Community 0"
-Cohesion: 0.08
-Nodes (29): shouldStartFirstLaunchOnboarding(), canPromptForNotificationPermission(), completeFirstSessionLocally(), completeOnboardingPersonalizationLocally(), createDefaultRandomSegment(), createLocalEventId(), createLocalReflectionId(), getLocalCalendarDayDifference() (+21 more)
+Cohesion: 0.09
+Nodes (28): shouldStartFirstLaunchOnboarding(), canPromptForNotificationPermission(), completeFirstSessionLocally(), completeOnboardingPersonalizationLocally(), createDefaultRandomSegment(), createLocalEventId(), createLocalReflectionId(), getLocalCalendarDayDifference() (+20 more)
 
 ### Community 1 - "Community 1"
 Cohesion: 0.12
 Nodes (19): clamp(), completeBreathSessionIfDue(), createBreathSessionController(), endBreathSessionEarly(), getBreathSessionSnapshot(), getCycleDurationMs(), getPhaseAtElapsedMs(), pauseBreathSession() (+11 more)
 
 ### Community 2 - "Community 2"
+Cohesion: 0.15
+Nodes (10): openAndMigrateLocalDatabase(), openMigratedLocalDatabase(), openDefaultLocalDatabase(), applyMigration(), runSqliteMigrations(), assertCondition(), assertRejects(), runSqlite() (+2 more)
+
+### Community 3 - "Community 3"
 Cohesion: 0.14
 Nodes (12): fetch(), createPostValueSupabaseAuthenticator(), createPostValueSupabaseClient(), createPostValueSyncHttpError(), createSupabaseHeaders(), createSupabaseServiceUrl(), createSupabaseStorageKey(), isAllowedPostValueSyncTarget() (+4 more)
 
-### Community 3 - "Community 3"
+### Community 4 - "Community 4"
 Cohesion: 0.15
 Nodes (11): getAppEnvironment(), isNonProductionEnvironment(), isObservabilityProofModeEnabled(), capturePostHog(), captureSentry(), captureAnalyticsEvent(), captureExplicitEvent(), capturePostHogProofEvent() (+3 more)
-
-### Community 4 - "Community 4"
-Cohesion: 0.18
-Nodes (9): openAndMigrateLocalDatabase(), openMigratedLocalDatabase(), applyMigration(), runSqliteMigrations(), assertCondition(), assertRejects(), runSqlite(), SqliteCliDatabase (+1 more)
 
 ### Community 5 - "Community 5"
 Cohesion: 0.22
@@ -144,17 +144,17 @@ Nodes (2): captureAnalyticsEventDeferred(), captureSyncFailureDeferred()
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `requestNotificationPermissionFromGate()` connect `Community 0` to `Community 3`?**
+- **Why does `requestNotificationPermissionFromGate()` connect `Community 0` to `Community 4`?**
   _High betweenness centrality (0.025) - this node is a cross-community bridge._
-- **Why does `captureAnalyticsEvent()` connect `Community 3` to `Community 0`?**
+- **Why does `captureAnalyticsEvent()` connect `Community 4` to `Community 0`?**
   _High betweenness centrality (0.022) - this node is a cross-community bridge._
-- **Why does `openMigratedLocalDatabase()` connect `Community 4` to `Community 0`?**
-  _High betweenness centrality (0.021) - this node is a cross-community bridge._
+- **Why does `openMigratedLocalDatabase()` connect `Community 2` to `Community 0`?**
+  _High betweenness centrality (0.020) - this node is a cross-community bridge._
+- **Are the 3 inferred relationships involving `getBreathSessionSnapshot()` (e.g. with `pauseSession()` and `resumeSession()`) actually correct?**
+  _`getBreathSessionSnapshot()` has 3 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 4 inferred relationships involving `requestNotificationPermissionFromGate()` (e.g. with `markNotificationPermissionPrompted()` and `captureAnalyticsEvent()`) actually correct?**
   _`requestNotificationPermissionFromGate()` has 4 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 6 inferred relationships involving `evaluateGate()` (e.g. with `getOrCreateLocalInstallIdentity()` and `mapSystemNotificationPermissionState()`) actually correct?**
-  _`evaluateGate()` has 6 INFERRED edges - model-reasoned connections that need verification._
 - **Should `Community 0` be split into smaller, more focused modules?**
-  _Cohesion score 0.08 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.09 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
   _Cohesion score 0.12 - nodes in this community are weakly interconnected._

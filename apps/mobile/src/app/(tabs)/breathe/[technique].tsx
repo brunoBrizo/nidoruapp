@@ -2,7 +2,10 @@ import { onboardingPlanIds, type BreathTechniqueId, type OnboardingPlanId } from
 import { breathSessionDurationSecondsSchema, mvpBreathTechniqueIdSchema } from "@nidoru/validation";
 import { useLocalSearchParams, type Href } from "expo-router";
 
-import { FirstSessionRouteScreen } from "../../../session/first-session-screen";
+import {
+  BreathSessionRouteScreen,
+  FirstSessionRouteScreen,
+} from "../../../session/first-session-screen";
 
 export default function BreatheTechniqueAnchorScreen() {
   const params = useLocalSearchParams<{
@@ -14,12 +17,25 @@ export default function BreatheTechniqueAnchorScreen() {
   const techniqueId = parseTechniqueId(params.technique);
   const planId = parsePlanId(params.planId);
   const durationSeconds = parseDurationSeconds(params.durationSeconds);
-  const postRewardRoute = parseFirstLaunch(params.firstLaunch)
+  const isFirstLaunch = parseFirstLaunch(params.firstLaunch);
+  const postRewardRoute = isFirstLaunch
     ? ({
         params: { stage: "personalization" },
         pathname: "/onboarding",
       } satisfies Href)
     : "/post-value";
+
+  if (!isFirstLaunch) {
+    return (
+      <BreathSessionRouteScreen
+        {...(durationSeconds === undefined ? {} : { durationSeconds })}
+        {...(planId === undefined ? {} : { planId })}
+        postRewardRoute={postRewardRoute}
+        source="breathe_tab"
+        techniqueId={techniqueId}
+      />
+    );
+  }
 
   return (
     <FirstSessionRouteScreen

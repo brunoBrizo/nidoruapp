@@ -1,4 +1,5 @@
 import { colors, spacing, typography } from "@nidoru/ui-tokens";
+import { usePathname } from "expo-router";
 import { ChartColumn, House, Moon, User, Wind, type LucideIcon } from "lucide-react-native";
 import { useEffect, useRef, useState } from "react";
 import { Animated, Easing, Pressable, StyleSheet, Text, View } from "react-native";
@@ -69,6 +70,7 @@ const isDefaultPrevented = (event: unknown) =>
   event.defaultPrevented === true;
 
 export function AppTabBar({ state, descriptors, navigation }: AppTabBarProps) {
+  const pathname = usePathname();
   const activeRoute = state.routes[state.index];
   const activeTabIndex = Math.max(
     0,
@@ -98,6 +100,10 @@ export function AppTabBar({ state, descriptors, navigation }: AppTabBarProps) {
       useNativeDriver: true,
     }).start();
   }, [activeTabIndex, indicatorPosition, motionConfig.durationMs]);
+
+  if (pathname.startsWith("/breathe/")) {
+    return null;
+  }
 
   return (
     <View style={styles.container}>

@@ -1240,30 +1240,30 @@ function ReflectionAmbientFade() {
         <Defs>
           <RadialGradient
             cx="195"
-            cy="364"
+            cy="430"
             fx="195"
-            fy="364"
+            fy="430"
             gradientUnits="userSpaceOnUse"
             id="reflection-center-wash"
-            r="390"
+            r="730"
           >
-            <Stop offset="0" stopColor="#252A50" stopOpacity="0.46" />
-            <Stop offset="0.22" stopColor="#1C2040" stopOpacity="0.34" />
-            <Stop offset="0.48" stopColor="#14172B" stopOpacity="0.2" />
-            <Stop offset="0.78" stopColor="#0F1230" stopOpacity="0.08" />
+            <Stop offset="0" stopColor="#242A52" stopOpacity="0.38" />
+            <Stop offset="0.24" stopColor="#20254B" stopOpacity="0.3" />
+            <Stop offset="0.5" stopColor="#191D3A" stopOpacity="0.2" />
+            <Stop offset="0.76" stopColor="#11152A" stopOpacity="0.08" />
             <Stop offset="1" stopColor="#0D0F1A" stopOpacity="0" />
           </RadialGradient>
           <RadialGradient
             cx="195"
-            cy="350"
+            cy="374"
             fx="195"
-            fy="350"
+            fy="374"
             gradientUnits="userSpaceOnUse"
             id="reflection-core-glow"
-            r="185"
+            r="265"
           >
-            <Stop offset="0" stopColor="#7C6FCD" stopOpacity="0.18" />
-            <Stop offset="0.38" stopColor="#7C6FCD" stopOpacity="0.09" />
+            <Stop offset="0" stopColor="#7C6FCD" stopOpacity="0.14" />
+            <Stop offset="0.4" stopColor="#7C6FCD" stopOpacity="0.07" />
             <Stop offset="1" stopColor="#7C6FCD" stopOpacity="0" />
           </RadialGradient>
         </Defs>

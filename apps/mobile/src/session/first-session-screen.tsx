@@ -40,6 +40,7 @@ import Animated, {
   type SharedValue,
 } from "react-native-reanimated";
 import { SafeAreaInsetsContext } from "react-native-safe-area-context";
+import Svg, { Defs, RadialGradient, Rect, Stop } from "react-native-svg";
 
 import {
   createActiveSessionAudioController,
@@ -1114,7 +1115,7 @@ function ReflectionOverlay({
       style={[styles.reflectionOverlay, overlayAnimatedStyle]}
       testID="first-session-reflection-overlay"
     >
-      <View pointerEvents="none" style={styles.reflectionAmbientGlow} />
+      <ReflectionAmbientFade />
       <View style={styles.reflectionContent}>
         <Animated.View style={[styles.reflectionEyebrowRow, eyebrowAnimatedStyle]}>
           <CheckCircle
@@ -1226,6 +1227,51 @@ function useFadeUpAnimatedStyle(progress: SharedValue<number>, reduceMotionEnabl
     opacity: progress.value,
     transform: [{ translateY: reduceMotionEnabled ? 0 : 16 - progress.value * 16 }],
   }));
+}
+
+function ReflectionAmbientFade() {
+  return (
+    <View
+      pointerEvents="none"
+      style={styles.reflectionFadeLayer}
+      testID="first-session-reflection-fade"
+    >
+      <Svg height="100%" preserveAspectRatio="none" viewBox="0 0 390 844" width="100%">
+        <Defs>
+          <RadialGradient
+            cx="195"
+            cy="364"
+            fx="195"
+            fy="364"
+            gradientUnits="userSpaceOnUse"
+            id="reflection-center-wash"
+            r="390"
+          >
+            <Stop offset="0" stopColor="#252A50" stopOpacity="0.46" />
+            <Stop offset="0.22" stopColor="#1C2040" stopOpacity="0.34" />
+            <Stop offset="0.48" stopColor="#14172B" stopOpacity="0.2" />
+            <Stop offset="0.78" stopColor="#0F1230" stopOpacity="0.08" />
+            <Stop offset="1" stopColor="#0D0F1A" stopOpacity="0" />
+          </RadialGradient>
+          <RadialGradient
+            cx="195"
+            cy="350"
+            fx="195"
+            fy="350"
+            gradientUnits="userSpaceOnUse"
+            id="reflection-core-glow"
+            r="185"
+          >
+            <Stop offset="0" stopColor="#7C6FCD" stopOpacity="0.18" />
+            <Stop offset="0.38" stopColor="#7C6FCD" stopOpacity="0.09" />
+            <Stop offset="1" stopColor="#7C6FCD" stopOpacity="0" />
+          </RadialGradient>
+        </Defs>
+        <Rect fill="url(#reflection-center-wash)" height="844" width="390" x="0" y="0" />
+        <Rect fill="url(#reflection-core-glow)" height="844" width="390" x="0" y="0" />
+      </Svg>
+    </View>
+  );
 }
 
 function AudioModePicker({
@@ -1898,14 +1944,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: 150,
   },
-  reflectionAmbientGlow: {
-    backgroundColor: "rgba(124, 111, 205, 0.08)",
-    borderRadius: 140,
-    boxShadow: "0 0 90px rgba(124, 111, 205, 0.22)",
-    height: 280,
-    position: "absolute",
-    width: 280,
-  },
   reflectionButton: {
     alignItems: "center",
     backgroundColor: colors.dark.surface.value,
@@ -1993,6 +2031,9 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: 0,
     top: 0,
+  },
+  reflectionFadeLayer: {
+    ...StyleSheet.absoluteFillObject,
   },
   reflectionTitle: {
     color: colors.dark.textPrimary.value,

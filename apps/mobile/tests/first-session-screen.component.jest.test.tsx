@@ -654,6 +654,7 @@ describe("FirstSessionScreen", () => {
 
     expect(screen.getByText("First session complete")).toBeTruthy();
     expect(screen.getByText("How do you feel?")).toBeTruthy();
+    expect(screen.getByTestId("first-session-reflection-fade")).toBeTruthy();
     expect(persistCompletion).not.toHaveBeenCalled();
   });
 

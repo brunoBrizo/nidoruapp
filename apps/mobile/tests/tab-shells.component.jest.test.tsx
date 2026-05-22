@@ -236,6 +236,7 @@ describe("tab entry shells", () => {
     expect(screen.getByText("Nidoru member")).toBeTruthy();
     expect(screen.getByText("8-day rhythm")).toBeTruthy();
     expect(screen.getByText("48 min breath time")).toBeTruthy();
+    expect(screen.getByTestId("profile-card-fade")).toBeTruthy();
     expect(screen.getByText("Manage")).toBeTruthy();
     expect(screen.getByText("Quiet")).toBeTruthy();
 

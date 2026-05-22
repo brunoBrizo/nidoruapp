@@ -225,20 +225,42 @@ describe("tab entry shells", () => {
     expect(screen.queryByText("Future check-in trend anchor.")).toBeNull();
   });
 
-  it("renders the Profile MVP anchors without invoking real settings flows", () => {
+  it("renders the Profile reference screen without invoking real settings flows", () => {
     render(<ProfileTabScreen />);
 
-    expect(screen.getByRole("header", { name: "Profile" })).toBeTruthy();
-    expect(screen.getByRole("link", { name: "Settings" })).toBeTruthy();
-    expect(screen.getByRole("link", { name: "Subscription" })).toBeTruthy();
-    expect(screen.getByRole("link", { name: "Cancel Subscription" })).toBeTruthy();
-    expect(screen.getByRole("link", { name: "Notifications" })).toBeTruthy();
-    expect(screen.getByRole("link", { name: "Sound Preferences" })).toBeTruthy();
-    expect(screen.getByRole("link", { name: "Support" })).toBeTruthy();
-    expect(screen.getByRole("link", { name: "Privacy Controls" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Profile details" })).toHaveProp(
+      "href",
+      "/profile/settings",
+    );
+    expect(screen.getByText("Bruno")).toBeTruthy();
+    expect(screen.getByText("Nidoru member")).toBeTruthy();
+    expect(screen.getByText("8-day rhythm")).toBeTruthy();
+    expect(screen.getByText("48 min breath time")).toBeTruthy();
+    expect(screen.getByText("Manage")).toBeTruthy();
+    expect(screen.getByText("Quiet")).toBeTruthy();
+
+    expect(screen.getByRole("link", { name: "Subscription" })).toHaveProp(
+      "href",
+      "/profile/subscription",
+    );
+    expect(screen.getByRole("link", { name: "Settings" })).toHaveProp("href", "/profile/settings");
+    expect(screen.getByRole("link", { name: "Notifications" })).toHaveProp(
+      "href",
+      "/profile/notifications",
+    );
+    expect(screen.getByRole("link", { name: "Sound preferences" })).toHaveProp(
+      "href",
+      "/profile/sound-preferences",
+    );
+    expect(screen.getByRole("link", { name: "Support" })).toHaveProp("href", "/profile/support");
+    expect(screen.getByRole("link", { name: "Privacy" })).toHaveProp("href", "/profile/privacy");
+    expect(screen.getByRole("link", { name: "Notifications" })).toHaveProp(
+      "accessibilityHint",
+      "Opens notification preferences. Current state: Quiet.",
+    );
     expect(
       screen.queryByText(
-        /connect account|enable notifications|manage billing|contact support now/i,
+        /cancel subscription|connect account|enable notifications|manage billing|contact support now/i,
       ),
     ).toBeNull();
   });

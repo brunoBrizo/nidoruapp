@@ -1,11 +1,11 @@
 # Graph Report - sleep-app  (2026-05-22)
 
 ## Corpus Check
-- 120 files · ~224,658 words
+- 121 files · ~225,660 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 360 nodes · 390 edges · 18 communities detected
+- 361 nodes · 390 edges · 18 communities detected
 - Extraction: 87% EXTRACTED · 13% INFERRED · 0% AMBIGUOUS · INFERRED: 49 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 

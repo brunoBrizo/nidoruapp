@@ -1312,7 +1312,7 @@
       "label": "ProgressTabScreen()",
       "file_type": "code",
       "source_file": "apps/mobile/src/app/(tabs)/progress.tsx",
-      "source_location": "L3",
+      "source_location": "L5",
       "id": "progress_progresstabscreen",
       "community": 45,
       "norm_label": "progresstabscreen()"
@@ -1570,12 +1570,21 @@
       "norm_label": "middayresetanchorscreen()"
     },
     {
+      "label": "progress-screen.tsx",
+      "file_type": "code",
+      "source_file": "apps/mobile/src/progress/progress-screen.tsx",
+      "source_location": "L1",
+      "id": "apps_mobile_src_progress_progress_screen_tsx",
+      "community": 97,
+      "norm_label": "progress-screen.tsx"
+    },
+    {
       "label": "sleep-screen.tsx",
       "file_type": "code",
       "source_file": "apps/mobile/src/sleep/sleep-screen.tsx",
       "source_location": "L1",
       "id": "apps_mobile_src_sleep_sleep_screen_tsx",
-      "community": 97,
+      "community": 98,
       "norm_label": "sleep-screen.tsx"
     },
     {
@@ -1584,7 +1593,7 @@
       "source_file": "apps/mobile/src/shell/tab-entry-screen.tsx",
       "source_location": "L1",
       "id": "apps_mobile_src_shell_tab_entry_screen_tsx",
-      "community": 98,
+      "community": 99,
       "norm_label": "tab-entry-screen.tsx"
     },
     {
@@ -1593,7 +1602,7 @@
       "source_file": "apps/mobile/src/breathing/breathing-orb.tsx",
       "source_location": "L1",
       "id": "apps_mobile_src_breathing_breathing_orb_tsx",
-      "community": 99,
+      "community": 100,
       "norm_label": "breathing-orb.tsx"
     },
     {
@@ -2259,7 +2268,7 @@
       "source_file": "apps/mobile/src/paywall/post-value-account-paywall-screen.tsx",
       "source_location": "L1",
       "id": "apps_mobile_src_paywall_post_value_account_paywall_screen_tsx",
-      "community": 100,
+      "community": 101,
       "norm_label": "post-value-account-paywall-screen.tsx"
     },
     {
@@ -2502,7 +2511,7 @@
       "source_file": "apps/mobile/src/notifications/expo-notification-adapter.ts",
       "source_location": "L1",
       "id": "apps_mobile_src_notifications_expo_notification_adapter_ts",
-      "community": 101,
+      "community": 102,
       "norm_label": "expo-notification-adapter.ts"
     },
     {
@@ -4533,7 +4542,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/app/(tabs)/progress.tsx",
-      "source_location": "L3",
+      "source_location": "L5",
       "weight": 1.0,
       "_src": "apps_mobile_src_app_tabs_progress_tsx",
       "_tgt": "progress_progresstabscreen",

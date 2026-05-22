@@ -7,7 +7,7 @@ import BreatheTabScreen, {
   BREATHE_TECHNIQUE_LIBRARY,
 } from "../src/app/(tabs)/breathe";
 import ProfileTabScreen from "../src/app/(tabs)/profile";
-import ProgressTabScreen from "../src/app/(tabs)/progress";
+import ProgressTabScreen, { PROGRESS_DASHBOARD_CARDS } from "../src/app/(tabs)/progress";
 import RescueMeAnchorScreen from "../src/app/(tabs)/rescue-me";
 import SleepTabScreen from "../src/app/(tabs)/sleep";
 import {
@@ -200,14 +200,29 @@ describe("tab entry shells", () => {
     expect(screen.queryByText(/daily calm|hrv training/i)).toBeNull();
   });
 
-  it("renders the Progress MVP anchors", () => {
+  it("renders the Progress reference dashboard and keeps anchors reachable", () => {
     render(<ProgressTabScreen />);
 
     expect(screen.getByRole("header", { name: "Progress" })).toBeTruthy();
-    expect(screen.getByRole("link", { name: "Streak Calendar" })).toBeTruthy();
-    expect(screen.getByRole("link", { name: "Weekly Summary" })).toBeTruthy();
-    expect(screen.getByRole("link", { name: "Mood History" })).toBeTruthy();
-    expect(screen.getByRole("link", { name: "Sleep Trends" })).toBeTruthy();
+    expect(screen.getByText("Small patterns, no pressure.")).toBeTruthy();
+    expect(screen.getByText("current rhythm")).toBeTruthy();
+    expect(screen.getByText("sessions")).toBeTruthy();
+    expect(screen.getByText("breath time")).toBeTruthy();
+    expect(screen.getByText("Missed days pause. They do not reset.")).toBeTruthy();
+    expect(screen.getByText("A gentle look at your last 7 nights.")).toBeTruthy();
+    expect(screen.getByText("5 of 7 nights")).toBeTruthy();
+    expect(screen.getByText("Morning check-ins over time.")).toBeTruthy();
+    expect(screen.getByText("clear")).toBeTruthy();
+    expect(screen.getByText("Patterns appear after a few check-ins.")).toBeTruthy();
+
+    for (const card of PROGRESS_DASHBOARD_CARDS) {
+      expect(screen.getByRole("link", { name: card.title })).toHaveProp("href", card.href);
+    }
+
+    expect(
+      screen.queryByText("Compassionate progress anchors without streak pressure."),
+    ).toBeNull();
+    expect(screen.queryByText("Future check-in trend anchor.")).toBeNull();
   });
 
   it("renders the Profile MVP anchors without invoking real settings flows", () => {

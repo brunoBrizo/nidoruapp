@@ -1,8 +1,11 @@
 import { describe, expect, it, jest } from "@jest/globals";
-import { render, screen, within } from "@testing-library/react-native";
+import { fireEvent, render, screen, within } from "@testing-library/react-native";
 import { AccessibilityInfo } from "react-native";
 
-import BreatheTabScreen from "../src/app/(tabs)/breathe";
+import BreatheTabScreen, {
+  BREATHE_FREE_BREATHE_STATUS,
+  BREATHE_TECHNIQUE_LIBRARY,
+} from "../src/app/(tabs)/breathe";
 import ProfileTabScreen from "../src/app/(tabs)/profile";
 import ProgressTabScreen from "../src/app/(tabs)/progress";
 import RescueMeAnchorScreen from "../src/app/(tabs)/rescue-me";
@@ -89,33 +92,104 @@ describe("tab entry shells", () => {
     expect(screen.getByRole("link", { name: "Sleep Stories when added" })).toBeTruthy();
   });
 
-  it("renders Breathe groups and available domain technique names", () => {
+  it("defines Breathe library route targets with explicit MVP technique ids and durations", () => {
+    expect(
+      BREATHE_TECHNIQUE_LIBRARY.map((technique) => ({
+        href: technique.href,
+        label: technique.label,
+        rhythmLabel: technique.rhythmLabel,
+      })),
+    ).toEqual([
+      {
+        href: "/breathe/4-7-8-sleep?durationSeconds=300",
+        label: "4-7-8 Sleep",
+        rhythmLabel: "4 in · 7 hold · 8 out",
+      },
+      {
+        href: "/breathe/coherent-breathing?durationSeconds=600",
+        label: "Coherent Breathing / Daily Calm",
+        rhythmLabel: "5 in · 5 out",
+      },
+      {
+        href: "/breathe/box-breathing?durationSeconds=300",
+        label: "Box Breathing",
+        rhythmLabel: "4 in · 4 hold · 4 out · 4 hold",
+      },
+      {
+        href: "/breathe/diaphragmatic-breathing?durationSeconds=300",
+        label: "Diaphragmatic Breathing",
+        rhythmLabel: "4 in · 6 out",
+      },
+    ]);
+    expect(
+      BREATHE_TECHNIQUE_LIBRARY.some((technique) => technique.href.includes("physiological-sigh")),
+    ).toBe(false);
+    expect(BREATHE_FREE_BREATHE_STATUS).toBe("post_mvp_disabled");
+  });
+
+  it("renders the Breathe reference library defaulting to the Sleep state", () => {
     render(<BreatheTabScreen />);
 
     expect(screen.getByRole("header", { name: "Breathe" })).toBeTruthy();
-    expect(screen.getByRole("header", { name: "Sleep" })).toBeTruthy();
-    expect(screen.getByRole("header", { name: "Calm" })).toBeTruthy();
-    expect(screen.getByRole("header", { name: "Energy" })).toBeTruthy();
-    expect(screen.getByRole("header", { name: "Focus" })).toBeTruthy();
+    expect(screen.getByText("Find a rhythm for right now.")).toBeTruthy();
+    expect(screen.getByText("Choose by how you want to feel.")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Sleep" })).toHaveProp("accessibilityState", {
+      selected: true,
+    });
+    expect(screen.getByRole("button", { name: "Calm" })).toHaveProp("accessibilityState", {
+      selected: false,
+    });
     expect(screen.getByRole("link", { name: "4-7-8 Sleep" })).toBeTruthy();
-    expect(screen.getByRole("link", { name: "Coherent Breathing / Daily Calm" })).toBeTruthy();
-    expect(screen.getByRole("link", { name: "Box Breathing" })).toBeTruthy();
-    expect(screen.getByRole("link", { name: "Diaphragmatic Breathing" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Coherent Breathing" })).toBeTruthy();
+    expect(screen.getByText("Settle into the night.")).toBeTruthy();
+    expect(screen.getByText("Smooth, steady rhythm.")).toBeTruthy();
+    expect(screen.getByText("4 in · 7 hold · 8 out")).toBeTruthy();
+    expect(screen.getByText("5 in · 5 out")).toBeTruthy();
+    expect(screen.queryByRole("link", { name: "Box Breathing" })).toBeNull();
+    expect(screen.queryByRole("link", { name: "Diaphragmatic Breathing" })).toBeNull();
     expect(screen.queryByRole("link", { name: "Physiological Sigh" })).toBeNull();
   });
 
-  it("surfaces Daily Calm as a regular Breathe-tab HRV practice", () => {
+  it("switches categories with local state and reveals the Calm technique set", () => {
     render(<BreatheTabScreen />);
 
-    const dailyCalm = screen.getByRole("link", { name: "Coherent Breathing / Daily Calm" });
+    fireEvent.press(screen.getByRole("button", { name: "Calm" }));
 
-    expect(dailyCalm).toHaveProp(
+    expect(screen.getByRole("button", { name: "Calm" })).toHaveProp("accessibilityState", {
+      selected: true,
+    });
+    expect(screen.queryByRole("link", { name: "4-7-8 Sleep" })).toBeNull();
+    expect(screen.getByRole("link", { name: "Box Breathing" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Coherent Breathing / Daily Calm" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Diaphragmatic Breathing" })).toBeTruthy();
+  });
+
+  it("gives visible techniques meaningful route and screen-reader labels", () => {
+    render(<BreatheTabScreen />);
+
+    const sleepTechnique = screen.getByRole("link", { name: "4-7-8 Sleep" });
+    const coherentTechnique = screen.getByRole("link", { name: "Coherent Breathing" });
+
+    expect(sleepTechnique).toHaveProp("accessibilityHint", "Starts 4-7-8 Sleep for 5 minutes.");
+    expect(coherentTechnique).toHaveProp(
       "accessibilityHint",
-      "Daily Calm / HRV Training · 10 min · 5.5s in / 5.5s out",
+      "Starts Coherent Breathing / Daily Calm for 10 minutes.",
     );
-    expect(
-      screen.getByText("Daily Calm / HRV Training · 10 min · 5.5s in / 5.5s out"),
-    ).toBeTruthy();
+  });
+
+  it("keeps Free Breathe visible but disabled while the custom mode remains post-MVP", () => {
+    render(<BreatheTabScreen />);
+
+    const freeBreathe = screen.getByRole("button", { name: "Free Breathe" });
+
+    expect(freeBreathe).toHaveProp("accessibilityState", { disabled: true });
+    expect(freeBreathe).toHaveProp(
+      "accessibilityHint",
+      "Custom Free Breathe settings are planned after MVP.",
+    );
+    expect(screen.getByText("Set your own inhale, hold, and exhale.")).toBeTruthy();
+    expect(screen.getByText("Custom rhythm")).toBeTruthy();
+    expect(screen.queryByRole("link", { name: "Free Breathe" })).toBeNull();
   });
 
   it("keeps Rescue Me separate from Daily Calm HRV copy", () => {

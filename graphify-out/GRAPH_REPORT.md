@@ -1,11 +1,11 @@
-# Graph Report - sleep-app  (2026-05-21)
+# Graph Report - sleep-app  (2026-05-22)
 
 ## Corpus Check
-- 116 files · ~218,030 words
+- 116 files · ~219,200 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 350 nodes · 382 edges · 18 communities detected
+- 349 nodes · 381 edges · 18 communities detected
 - Extraction: 87% EXTRACTED · 13% INFERRED · 0% AMBIGUOUS · INFERRED: 48 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
@@ -64,12 +64,12 @@ Cohesion: 0.12
 Nodes (19): clamp(), completeBreathSessionIfDue(), createBreathSessionController(), endBreathSessionEarly(), getBreathSessionSnapshot(), getCycleDurationMs(), getPhaseAtElapsedMs(), pauseBreathSession() (+11 more)
 
 ### Community 2 - "Community 2"
-Cohesion: 0.15
-Nodes (10): openAndMigrateLocalDatabase(), openMigratedLocalDatabase(), openDefaultLocalDatabase(), applyMigration(), runSqliteMigrations(), assertCondition(), assertRejects(), runSqlite() (+2 more)
-
-### Community 3 - "Community 3"
 Cohesion: 0.14
 Nodes (12): fetch(), createPostValueSupabaseAuthenticator(), createPostValueSupabaseClient(), createPostValueSyncHttpError(), createSupabaseHeaders(), createSupabaseServiceUrl(), createSupabaseStorageKey(), isAllowedPostValueSyncTarget() (+4 more)
+
+### Community 3 - "Community 3"
+Cohesion: 0.15
+Nodes (10): openAndMigrateLocalDatabase(), openMigratedLocalDatabase(), openDefaultLocalDatabase(), applyMigration(), runSqliteMigrations(), assertCondition(), assertRejects(), runSqlite() (+2 more)
 
 ### Community 4 - "Community 4"
 Cohesion: 0.15
@@ -148,8 +148,8 @@ _Questions this graph is uniquely positioned to answer:_
   _High betweenness centrality (0.025) - this node is a cross-community bridge._
 - **Why does `captureAnalyticsEvent()` connect `Community 4` to `Community 0`?**
   _High betweenness centrality (0.022) - this node is a cross-community bridge._
-- **Why does `openMigratedLocalDatabase()` connect `Community 2` to `Community 0`?**
-  _High betweenness centrality (0.020) - this node is a cross-community bridge._
+- **Why does `openMigratedLocalDatabase()` connect `Community 3` to `Community 0`?**
+  _High betweenness centrality (0.021) - this node is a cross-community bridge._
 - **Are the 3 inferred relationships involving `getBreathSessionSnapshot()` (e.g. with `pauseSession()` and `resumeSession()`) actually correct?**
   _`getBreathSessionSnapshot()` has 3 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 4 inferred relationships involving `requestNotificationPermissionFromGate()` (e.g. with `markNotificationPermissionPrompted()` and `captureAnalyticsEvent()`) actually correct?**

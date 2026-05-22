@@ -87,9 +87,9 @@ describe("tab entry shells", () => {
     render(<SleepTabScreen />);
 
     expect(screen.getByRole("header", { name: "Sleep" })).toBeTruthy();
-    expect(screen.getByRole("link", { name: "Wind-Down Flow" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Start wind-down" })).toBeTruthy();
     expect(screen.getByRole("link", { name: "Sound Mixer" })).toBeTruthy();
-    expect(screen.getByRole("link", { name: "Sleep Stories when added" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Sleep Stories" })).toBeTruthy();
   });
 
   it("defines Breathe library route targets with explicit MVP technique ids and durations", () => {

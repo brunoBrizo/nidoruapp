@@ -84,8 +84,9 @@ describe("AppTabBar", () => {
 
     expect(StyleSheet.flatten(screen.getByTestId("app-tab-bar").props.style)).toEqual(
       expect.objectContaining({
-        backgroundColor: "rgba(13, 15, 26, 0.9)",
+        backgroundColor: "#0D0F1A",
         minHeight: 84,
+        paddingHorizontal: 18,
       }),
     );
     expect(StyleSheet.flatten(screen.getByTestId("tab-active-indicator").props.style)).toEqual(
@@ -94,5 +95,21 @@ describe("AppTabBar", () => {
         width: 42,
       }),
     );
+    for (const tab of ["home", "sleep", "breathe", "progress", "profile"]) {
+      expect(StyleSheet.flatten(screen.getByTestId(`tab-item-${tab}`).props.style)).toEqual(
+        expect.objectContaining({
+          flex: 1,
+          minWidth: 0,
+        }),
+      );
+      expect(StyleSheet.flatten(screen.getByTestId(`tab-icon-frame-${tab}`).props.style)).toEqual(
+        expect.objectContaining({
+          alignItems: "center",
+          height: 24,
+          justifyContent: "center",
+          width: 24,
+        }),
+      );
+    }
   });
 });

@@ -4,11 +4,13 @@ import { ArrowRight, Heart, Moon, Music, Wind, type LucideIcon } from "lucide-re
 import { useEffect, useRef, type ReactNode } from "react";
 import { Animated, Easing, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
-import { RestingBreathingOrb } from "../breathing/breathing-orb";
 import { useReduceMotionPreference } from "../motion/use-reduce-motion-enabled";
 import { CardFade } from "../surfaces/card-fade";
+import { HomeBreathingOrb, HOME_ORB_MOTION } from "./home-breathing-orb";
 import { type HomeQuickActionId } from "./home-actions";
 import { createHomeOverview, type HomeRhythmSegment } from "./home-state";
+
+export { HOME_ORB_MOTION };
 
 const homeColors = {
   backgroundEnd: "#0F1230",
@@ -41,6 +43,12 @@ const quickActionIcons: Record<HomeQuickActionId, LucideIcon> = {
   "rescue-me": Heart,
   sounds: Music,
   breathe: Wind,
+};
+
+const quickActionIconSizes: Record<HomeQuickActionId, number> = {
+  "rescue-me": 20,
+  sounds: 20,
+  breathe: 20,
 };
 
 const getRhythmSegmentStyles = (segment: HomeRhythmSegment) => [
@@ -147,7 +155,7 @@ export function HomeScreen({
             </Text>
           </View>
 
-          <RestingBreathingOrb style={styles.primaryOrb} testID="home-resting-breathing-orb" />
+          <HomeBreathingOrb style={styles.primaryOrb} testID="home-resting-breathing-orb" />
 
           <Link asChild href={primaryAction.routeTarget}>
             <Pressable
@@ -175,7 +183,16 @@ export function HomeScreen({
                   style={({ pressed }) => [styles.quickActionPressable, pressed && styles.pressed]}
                 >
                   <View style={styles.quickAction} testID={`home-quick-action-card-${action.id}`}>
-                    <Icon color={homeColors.inactiveTab} size={20} strokeWidth={1.7} />
+                    <View
+                      style={styles.quickActionIconBox}
+                      testID={`home-quick-action-icon-box-${action.id}`}
+                    >
+                      <Icon
+                        color={homeColors.inactiveTab}
+                        size={quickActionIconSizes[action.id]}
+                        strokeWidth={1.5}
+                      />
+                    </View>
                     <View style={styles.quickActionCopy}>
                       <Text style={styles.quickActionLabel}>{action.label}</Text>
                       <Text style={styles.quickActionSubtitle}>{action.subtitle}</Text>
@@ -323,7 +340,7 @@ const styles = StyleSheet.create({
     gap: 10,
     height: 255,
     overflow: "hidden",
-    paddingBottom: spacing.sm,
+    paddingBottom: 24,
     paddingHorizontal: spacing.sm,
     paddingTop: 28,
   },
@@ -350,8 +367,8 @@ const styles = StyleSheet.create({
     lineHeight: 21,
   },
   primaryOrb: {
-    height: 104,
-    transform: [{ scale: 0.88 }],
+    alignSelf: "center",
+    transform: [{ scale: 1 }],
     zIndex: 1,
   },
   primaryButtonPressable: {
@@ -397,6 +414,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
     paddingVertical: 12,
     transform: [{ scale: 1 }],
+  },
+  quickActionIconBox: {
+    alignItems: "center",
+    height: 24,
+    justifyContent: "center",
+    width: 24,
   },
   quickActionCopy: {
     alignItems: "center",

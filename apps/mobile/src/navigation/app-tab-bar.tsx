@@ -1,8 +1,9 @@
 import { colors, spacing, typography } from "@nidoru/ui-tokens";
 import { usePathname } from "expo-router";
-import { ChartColumn, House, Moon, User, Wind, type LucideIcon } from "lucide-react-native";
-import { useEffect, useRef, useState } from "react";
+import { ChartColumn, UserRound, Wind, type LucideIcon } from "lucide-react-native";
+import { useEffect, useRef, useState, type ReactElement } from "react";
 import { Animated, Easing, Pressable, StyleSheet, Text, View } from "react-native";
+import Svg, { Path } from "react-native-svg";
 
 import { appShellTabs, type AppShellTabId } from "../home/home-actions";
 import { useReduceMotionEnabled } from "../motion/use-reduce-motion-enabled";
@@ -15,12 +16,19 @@ const routeNameByTabId: Record<AppShellTabId, string> = {
   profile: "profile",
 };
 
-const iconByTabId: Record<AppShellTabId, LucideIcon> = {
-  home: House,
-  sleep: Moon,
+type TabIconProps = {
+  readonly color: string;
+  readonly size: number;
+  readonly strokeWidth: number;
+  readonly testID?: string;
+};
+
+const iconByTabId: Record<AppShellTabId, LucideIcon | ((props: TabIconProps) => ReactElement)> = {
+  home: HomeSmileIcon,
+  sleep: MoonSleepIcon,
   breathe: Wind,
   progress: ChartColumn,
-  profile: User,
+  profile: UserRound,
 };
 
 const inactiveTabColor = "#A0A5C0";
@@ -167,8 +175,11 @@ export function AppTabBar({ state, descriptors, navigation }: AppTabBarProps) {
               onLongPress={onLongPress}
               onPress={onPress}
               style={({ pressed }) => [styles.tabItem, pressed && styles.tabItemPressed]}
+              testID={`tab-item-${tab.id}`}
             >
-              <Icon color={itemColor} size={24} strokeWidth={1.7} />
+              <View style={styles.tabIconFrame} testID={`tab-icon-frame-${tab.id}`}>
+                <Icon color={itemColor} size={24} strokeWidth={1.5} testID={`tab-icon-${tab.id}`} />
+              </View>
               <Text style={[styles.tabLabel, isFocused && styles.activeTabLabel]}>{tab.label}</Text>
             </Pressable>
           );
@@ -181,13 +192,13 @@ export function AppTabBar({ state, descriptors, navigation }: AppTabBarProps) {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "rgba(13, 15, 26, 0.9)",
+    backgroundColor: colors.dark.background.value,
     borderTopColor: colors.dark.surfaceRaised.value,
     borderTopWidth: 1,
     boxShadow: "0 -12px 32px rgba(13, 15, 26, 0.72)",
     minHeight: 84,
     paddingBottom: spacing.xs,
-    paddingHorizontal: spacing.xs,
+    paddingHorizontal: 18,
     paddingTop: 10,
   },
   surface: {
@@ -197,15 +208,22 @@ const styles = StyleSheet.create({
   },
   tabItem: {
     alignItems: "center",
+    flex: 1,
     gap: 4,
     minHeight: 56,
-    minWidth: 64,
+    minWidth: 0,
     paddingBottom: spacing.xs,
     paddingTop: 10,
     transform: [{ scale: 1 }],
   },
   tabItemPressed: {
     transform: [{ scale: 0.96 }],
+  },
+  tabIconFrame: {
+    alignItems: "center",
+    height: 24,
+    justifyContent: "center",
+    width: 24,
   },
   activeIndicator: {
     backgroundColor: colors.dark.primary.value,
@@ -235,3 +253,58 @@ const styles = StyleSheet.create({
     width: 120,
   },
 });
+
+function HomeSmileIcon({ color, size, strokeWidth, testID }: TabIconProps) {
+  return (
+    <Svg fill="none" height={size} viewBox="0 0 24 24" width={size} {...(testID ? { testID } : {})}>
+      <Path
+        d="M4 10.7 12 4l8 6.7"
+        stroke={color}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={strokeWidth}
+      />
+      <Path
+        d="M6.2 9.4V20h11.6V9.4"
+        stroke={color}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={strokeWidth}
+      />
+      <Path
+        d="M9.4 15.7c.7.7 1.6 1 2.6 1s1.9-.3 2.6-1"
+        stroke={color}
+        strokeLinecap="round"
+        strokeWidth={strokeWidth}
+      />
+    </Svg>
+  );
+}
+
+function MoonSleepIcon({ color, size, strokeWidth, testID }: TabIconProps) {
+  return (
+    <Svg fill="none" height={size} viewBox="0 0 24 24" width={size} {...(testID ? { testID } : {})}>
+      <Path
+        d="M15.5 18.7A7.2 7.2 0 0 1 6 9.2 7.3 7.3 0 1 0 15.5 18.7Z"
+        stroke={color}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={strokeWidth}
+      />
+      <Path
+        d="M15.8 5.4h3.2l-3.2 3.8h3.2"
+        stroke={color}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={strokeWidth}
+      />
+      <Path
+        d="M18.4 10.9h2.2l-2.2 2.6h2.2"
+        stroke={color}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={strokeWidth}
+      />
+    </Svg>
+  );
+}

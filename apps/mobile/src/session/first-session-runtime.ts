@@ -1,36 +1,34 @@
-import { breathTechniques, type BreathTechniqueId, type OnboardingPlanId } from "@nidoru/domain";
+import type { BreathPhaseName, BreathTechniqueId, OnboardingPlanId } from "@nidoru/domain";
 import type { FirstSessionRecord } from "@nidoru/validation";
 
-export type FirstSessionPhaseName =
-  (typeof breathTechniques)[BreathTechniqueId]["phases"][number]["name"];
+import {
+  completeBreathSessionIfDue,
+  createBreathSessionController,
+  endBreathSessionEarly,
+  getBreathSessionSnapshot,
+  pauseBreathSession,
+  resumeBreathSession,
+  type BreathSessionController,
+  type BreathSessionControllerInput,
+  type BreathSessionSnapshot,
+} from "./breath-session-runtime";
 
-export type FirstSessionControllerInput = {
-  readonly localInstallId: string;
+export type FirstSessionPhaseName = BreathPhaseName;
+
+export type FirstSessionControllerInput = Omit<
+  BreathSessionControllerInput,
+  "planId" | "source"
+> & {
   readonly planId: OnboardingPlanId;
-  readonly sessionId: string;
-  readonly startedAtMs: number;
-  readonly techniqueId: BreathTechniqueId;
-  readonly totalDurationSeconds: number;
 };
 
-export type FirstSessionController = FirstSessionControllerInput & {
-  readonly pausedAtMs?: number;
-  readonly totalPausedMs: number;
+type FirstSessionBreathControllerInput = FirstSessionControllerInput & {
+  readonly source: "first_session";
 };
 
-export type FirstSessionSnapshot = {
-  readonly completedBreathCycles: number;
-  readonly elapsedDurationMs: number;
-  readonly elapsedSeconds: number;
-  readonly isPaused: boolean;
-  readonly observedAtMs: number;
-  readonly phaseDurationMs: number;
-  readonly phaseElapsedMs: number;
-  readonly phaseName: FirstSessionPhaseName;
-  readonly remainingDurationMs: number;
-  readonly remainingSeconds: number;
-  readonly status: "active" | "completed" | "paused";
-};
+export type FirstSessionController = BreathSessionController<FirstSessionBreathControllerInput>;
+
+export type FirstSessionSnapshot = BreathSessionSnapshot;
 
 export type FirstSessionDraftRecord = {
   readonly completedBreathCycles: number;
@@ -52,121 +50,57 @@ export type FirstSessionAbandonedRecord = Omit<FirstSessionDraftRecord, "status"
   readonly status: "abandoned";
 };
 
-const minimumDurationSeconds = 1;
-
 export function createFirstSessionController(
   input: FirstSessionControllerInput,
 ): FirstSessionController {
-  const technique = breathTechniques[input.techniqueId];
-
-  if (!technique) {
-    throw new Error(`Unknown first-session technique: ${input.techniqueId}`);
-  }
-
-  if (input.totalDurationSeconds < minimumDurationSeconds) {
-    throw new Error("First-session duration must be positive.");
-  }
-
-  return {
+  return createBreathSessionController({
     ...input,
-    totalPausedMs: 0,
-  };
+    source: "first_session",
+  });
 }
 
 export function getFirstSessionSnapshot(
   controller: FirstSessionController,
   observedAtMs: number,
 ): FirstSessionSnapshot {
-  const technique = breathTechniques[controller.techniqueId];
-  const totalDurationMs = controller.totalDurationSeconds * 1000;
-  const effectiveObservedAtMs = controller.pausedAtMs ?? observedAtMs;
-  const elapsedDurationMs = clamp(
-    effectiveObservedAtMs - controller.startedAtMs - controller.totalPausedMs,
-    0,
-    totalDurationMs,
-  );
-  const phase = getPhaseAtElapsedMs(technique.phases, elapsedDurationMs);
-  const remainingDurationMs = totalDurationMs - elapsedDurationMs;
-  const isPaused = controller.pausedAtMs !== undefined;
-  const status = isPaused
-    ? "paused"
-    : elapsedDurationMs >= totalDurationMs
-      ? "completed"
-      : "active";
-
-  return {
-    completedBreathCycles: Math.floor(elapsedDurationMs / getCycleDurationMs(technique.phases)),
-    elapsedDurationMs,
-    elapsedSeconds: Math.floor(elapsedDurationMs / 1000),
-    isPaused,
-    observedAtMs: effectiveObservedAtMs,
-    phaseDurationMs: phase.durationMs,
-    phaseElapsedMs: phase.elapsedMs,
-    phaseName: phase.name,
-    remainingDurationMs,
-    remainingSeconds: Math.ceil(remainingDurationMs / 1000),
-    status,
-  };
+  return getBreathSessionSnapshot(controller, observedAtMs);
 }
 
 export function pauseFirstSession(
   controller: FirstSessionController,
   pausedAtMs: number,
 ): FirstSessionController {
-  if (controller.pausedAtMs !== undefined) {
-    return controller;
-  }
-
-  return {
-    ...controller,
-    pausedAtMs,
-  };
+  return pauseBreathSession(controller, pausedAtMs);
 }
 
 export function resumeFirstSession(
   controller: FirstSessionController,
   resumedAtMs: number,
 ): FirstSessionController {
-  const pausedAtMs = controller.pausedAtMs;
-
-  if (pausedAtMs === undefined) {
-    return controller;
-  }
-
-  return {
-    localInstallId: controller.localInstallId,
-    planId: controller.planId,
-    sessionId: controller.sessionId,
-    startedAtMs: controller.startedAtMs,
-    techniqueId: controller.techniqueId,
-    totalPausedMs: controller.totalPausedMs + Math.max(0, resumedAtMs - pausedAtMs),
-    totalDurationSeconds: controller.totalDurationSeconds,
-  };
+  return resumeBreathSession(controller, resumedAtMs);
 }
 
 export function completeFirstSessionIfDue(
   controller: FirstSessionController,
   observedAtMs: number,
 ): FirstSessionRecord | undefined {
-  const snapshot = getFirstSessionSnapshot(controller, observedAtMs);
+  const completedRecord = completeBreathSessionIfDue(controller, observedAtMs);
 
-  if (snapshot.status !== "completed") {
+  if (!completedRecord) {
     return undefined;
   }
 
-  const completedAt = new Date(snapshot.observedAtMs).toISOString();
-
   return {
-    completedAt,
-    completedBreathCycles: snapshot.completedBreathCycles,
-    completionPersistedAt: completedAt,
-    durationSeconds: controller.totalDurationSeconds,
-    localInstallId: controller.localInstallId,
+    completedAt: completedRecord.completedAt,
+    completedBreathCycles: completedRecord.completedBreathCycles,
+    completionPersistedAt: completedRecord.completionPersistedAt,
+    durationSeconds: completedRecord.durationSeconds,
+    localInstallId: completedRecord.localInstallId,
     planId: controller.planId,
-    sessionId: controller.sessionId,
-    startedAt: new Date(controller.startedAtMs).toISOString(),
+    sessionId: completedRecord.sessionId,
+    startedAt: completedRecord.startedAt,
     status: "completed",
-    techniqueId: controller.techniqueId,
+    techniqueId: completedRecord.techniqueId,
   };
 }
 
@@ -174,13 +108,22 @@ export function endFirstSessionEarly(
   controller: FirstSessionController,
   observedAtMs: number,
 ): FirstSessionAbandonedRecord {
-  const snapshot = getFirstSessionSnapshot(controller, observedAtMs);
-  const abandonedAt = new Date(snapshot.observedAtMs).toISOString();
+  const abandonedRecord = endBreathSessionEarly(controller, observedAtMs);
 
   return {
-    ...createFirstSessionDraftFromSnapshot(controller, snapshot),
-    abandonedAt,
+    abandonedAt: abandonedRecord.abandonedAt,
+    completedBreathCycles: abandonedRecord.completedBreathCycles,
+    currentPhaseName: abandonedRecord.currentPhaseName,
+    durationSeconds: abandonedRecord.durationSeconds,
+    elapsedDurationMs: abandonedRecord.elapsedDurationMs,
+    localInstallId: abandonedRecord.localInstallId,
+    planId: controller.planId,
+    remainingDurationMs: abandonedRecord.remainingDurationMs,
+    sessionId: abandonedRecord.sessionId,
+    startedAt: abandonedRecord.startedAt,
     status: "abandoned",
+    techniqueId: abandonedRecord.techniqueId,
+    updatedAt: abandonedRecord.updatedAt,
   };
 }
 
@@ -202,47 +145,4 @@ export function createFirstSessionDraftFromSnapshot(
     techniqueId: controller.techniqueId,
     updatedAt: new Date(snapshot.observedAtMs).toISOString(),
   };
-}
-
-function getPhaseAtElapsedMs(
-  phases: (typeof breathTechniques)[BreathTechniqueId]["phases"],
-  elapsedDurationMs: number,
-) {
-  const cycleDurationMs = getCycleDurationMs(phases);
-  const cycleElapsedMs = elapsedDurationMs % cycleDurationMs;
-  let phaseStartMs = 0;
-
-  for (const phase of phases) {
-    const phaseEndMs = phaseStartMs + phase.durationMs;
-
-    if (cycleElapsedMs < phaseEndMs) {
-      return {
-        durationMs: phase.durationMs,
-        elapsedMs: cycleElapsedMs - phaseStartMs,
-        name: phase.name,
-      };
-    }
-
-    phaseStartMs = phaseEndMs;
-  }
-
-  const fallbackPhase = phases[phases.length - 1];
-
-  if (!fallbackPhase) {
-    throw new Error("First-session technique must include at least one breath phase.");
-  }
-
-  return {
-    durationMs: fallbackPhase.durationMs,
-    elapsedMs: fallbackPhase.durationMs,
-    name: fallbackPhase.name,
-  };
-}
-
-function getCycleDurationMs(phases: (typeof breathTechniques)[BreathTechniqueId]["phases"]) {
-  return phases.reduce((durationMs, phase) => durationMs + phase.durationMs, 0);
-}
-
-function clamp(value: number, min: number, max: number) {
-  return Math.min(max, Math.max(min, value));
 }

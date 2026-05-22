@@ -27,7 +27,7 @@
       "source_file": "supabase/functions/tests/foundation-health.test.ts",
       "source_location": "L1",
       "id": "supabase_functions_tests_foundation_health_test_ts",
-      "community": 1,
+      "community": 2,
       "norm_label": "foundation-health.test.ts"
     },
     {
@@ -36,7 +36,7 @@
       "source_file": "supabase/functions/tests/foundation-health.test.ts",
       "source_location": "L3",
       "id": "foundation_health_test_assertequals",
-      "community": 1,
+      "community": 2,
       "norm_label": "assertequals()"
     },
     {
@@ -45,7 +45,7 @@
       "source_file": "supabase/functions/foundation-health/index.ts",
       "source_location": "L1",
       "id": "supabase_functions_foundation_health_index_ts",
-      "community": 1,
+      "community": 2,
       "norm_label": "index.ts"
     },
     {
@@ -54,7 +54,7 @@
       "source_file": "supabase/functions/foundation-health/index.ts",
       "source_location": "L7",
       "id": "index_fetch",
-      "community": 1,
+      "community": 2,
       "norm_label": "fetch()"
     },
     {
@@ -576,7 +576,7 @@
       "source_file": "apps/mobile/tests/post-value-sync.unit.jest.test.ts",
       "source_location": "L1",
       "id": "apps_mobile_tests_post_value_sync_unit_jest_test_ts",
-      "community": 1,
+      "community": 2,
       "norm_label": "post-value-sync.unit.jest.test.ts"
     },
     {
@@ -585,7 +585,7 @@
       "source_file": "apps/mobile/tests/post-value-sync.unit.jest.test.ts",
       "source_location": "L11",
       "id": "post_value_sync_unit_jest_test_createdatabase",
-      "community": 1,
+      "community": 2,
       "norm_label": "createdatabase()"
     },
     {
@@ -594,7 +594,7 @@
       "source_file": "apps/mobile/tests/post-value-sync.unit.jest.test.ts",
       "source_location": "L53",
       "id": "post_value_sync_unit_jest_test_createclient",
-      "community": 1,
+      "community": 2,
       "norm_label": "createclient()"
     },
     {
@@ -603,7 +603,7 @@
       "source_file": "apps/mobile/tests/sqlite-migrations.test.ts",
       "source_location": "L1",
       "id": "apps_mobile_tests_sqlite_migrations_test_ts",
-      "community": 2,
+      "community": 4,
       "norm_label": "sqlite-migrations.test.ts"
     },
     {
@@ -612,7 +612,7 @@
       "source_file": "apps/mobile/tests/sqlite-migrations.test.ts",
       "source_location": "L7",
       "id": "sqlite_migrations_test_assertequals",
-      "community": 2,
+      "community": 4,
       "norm_label": "assertequals()"
     },
     {
@@ -621,7 +621,7 @@
       "source_file": "apps/mobile/tests/sqlite-migrations.test.ts",
       "source_location": "L13",
       "id": "sqlite_migrations_test_assertcondition",
-      "community": 2,
+      "community": 4,
       "norm_label": "assertcondition()"
     },
     {
@@ -630,7 +630,7 @@
       "source_file": "apps/mobile/tests/sqlite-migrations.test.ts",
       "source_location": "L19",
       "id": "sqlite_migrations_test_assertrejects",
-      "community": 2,
+      "community": 4,
       "norm_label": "assertrejects()"
     },
     {
@@ -639,7 +639,7 @@
       "source_file": "apps/mobile/tests/sqlite-migrations.test.ts",
       "source_location": "L35",
       "id": "sqlite_migrations_test_sqliteclidatabase",
-      "community": 2,
+      "community": 4,
       "norm_label": "sqliteclidatabase"
     },
     {
@@ -648,7 +648,7 @@
       "source_file": "apps/mobile/tests/sqlite-migrations.test.ts",
       "source_location": "L36",
       "id": "sqlite_migrations_test_sqliteclidatabase_constructor",
-      "community": 2,
+      "community": 4,
       "norm_label": ".constructor()"
     },
     {
@@ -657,7 +657,7 @@
       "source_file": "apps/mobile/tests/sqlite-migrations.test.ts",
       "source_location": "L38",
       "id": "sqlite_migrations_test_sqliteclidatabase_execasync",
-      "community": 2,
+      "community": 4,
       "norm_label": ".execasync()"
     },
     {
@@ -666,7 +666,7 @@
       "source_file": "apps/mobile/tests/sqlite-migrations.test.ts",
       "source_location": "L42",
       "id": "sqlite_migrations_test_sqliteclidatabase_getallasync",
-      "community": 2,
+      "community": 4,
       "norm_label": ".getallasync()"
     },
     {
@@ -675,7 +675,7 @@
       "source_file": "apps/mobile/tests/sqlite-migrations.test.ts",
       "source_location": "L53",
       "id": "sqlite_migrations_test_createdatabase",
-      "community": 2,
+      "community": 4,
       "norm_label": "createdatabase()"
     },
     {
@@ -684,7 +684,7 @@
       "source_file": "apps/mobile/tests/sqlite-migrations.test.ts",
       "source_location": "L66",
       "id": "sqlite_migrations_test_runsqlite",
-      "community": 2,
+      "community": 4,
       "norm_label": "runsqlite()"
     },
     {
@@ -985,12 +985,21 @@
       "norm_label": "rendertabbar()"
     },
     {
+      "label": "breath-session-runtime.unit.jest.test.ts",
+      "file_type": "code",
+      "source_file": "apps/mobile/tests/breath-session-runtime.unit.jest.test.ts",
+      "source_location": "L1",
+      "id": "apps_mobile_tests_breath_session_runtime_unit_jest_test_ts",
+      "community": 88,
+      "norm_label": "breath-session-runtime.unit.jest.test.ts"
+    },
+    {
       "label": "assets.d.ts",
       "file_type": "code",
       "source_file": "apps/mobile/src/assets.d.ts",
       "source_location": "L1",
       "id": "apps_mobile_src_assets_d_ts",
-      "community": 88,
+      "community": 89,
       "norm_label": "assets.d.ts"
     },
     {
@@ -1098,7 +1107,7 @@
       "source_file": "apps/mobile/src/app/post-value.tsx",
       "source_location": "L1",
       "id": "apps_mobile_src_app_post_value_tsx",
-      "community": 89,
+      "community": 90,
       "norm_label": "post-value.tsx"
     },
     {
@@ -1161,7 +1170,7 @@
       "source_file": "apps/mobile/src/app/_layout.tsx",
       "source_location": "L1",
       "id": "apps_mobile_src_app_layout_tsx",
-      "community": 90,
+      "community": 91,
       "norm_label": "_layout.tsx"
     },
     {
@@ -1287,7 +1296,7 @@
       "source_file": "apps/mobile/src/app/(tabs)/_layout.tsx",
       "source_location": "L1",
       "id": "apps_mobile_src_app_tabs_layout_tsx",
-      "community": 91,
+      "community": 92,
       "norm_label": "_layout.tsx"
     },
     {
@@ -1512,7 +1521,7 @@
       "source_file": "apps/mobile/src/shell/tab-entry-screen.tsx",
       "source_location": "L1",
       "id": "apps_mobile_src_shell_tab_entry_screen_tsx",
-      "community": 92,
+      "community": 93,
       "norm_label": "tab-entry-screen.tsx"
     },
     {
@@ -1521,7 +1530,7 @@
       "source_file": "apps/mobile/src/breathing/breathing-orb.tsx",
       "source_location": "L1",
       "id": "apps_mobile_src_breathing_breathing_orb_tsx",
-      "community": 93,
+      "community": 94,
       "norm_label": "breathing-orb.tsx"
     },
     {
@@ -1827,7 +1836,7 @@
       "source_file": "apps/mobile/src/storage/local-database.ts",
       "source_location": "L1",
       "id": "apps_mobile_src_storage_local_database_ts",
-      "community": 2,
+      "community": 4,
       "norm_label": "local-database.ts"
     },
     {
@@ -1836,7 +1845,7 @@
       "source_file": "apps/mobile/src/storage/local-database.ts",
       "source_location": "L9",
       "id": "local_database_openmigratedlocaldatabase",
-      "community": 2,
+      "community": 4,
       "norm_label": "openmigratedlocaldatabase()"
     },
     {
@@ -1845,7 +1854,7 @@
       "source_file": "apps/mobile/src/storage/local-database.ts",
       "source_location": "L27",
       "id": "local_database_openandmigratelocaldatabase",
-      "community": 2,
+      "community": 4,
       "norm_label": "openandmigratelocaldatabase()"
     },
     {
@@ -1854,7 +1863,7 @@
       "source_file": "apps/mobile/src/storage/sqlite-migrations.ts",
       "source_location": "L1",
       "id": "apps_mobile_src_storage_sqlite_migrations_ts",
-      "community": 2,
+      "community": 4,
       "norm_label": "sqlite-migrations.ts"
     },
     {
@@ -1863,7 +1872,7 @@
       "source_file": "apps/mobile/src/storage/sqlite-migrations.ts",
       "source_location": "L213",
       "id": "sqlite_migrations_runsqlitemigrations",
-      "community": 2,
+      "community": 4,
       "norm_label": "runsqlitemigrations()"
     },
     {
@@ -1872,7 +1881,7 @@
       "source_file": "apps/mobile/src/storage/sqlite-migrations.ts",
       "source_location": "L245",
       "id": "sqlite_migrations_validatemigrations",
-      "community": 2,
+      "community": 4,
       "norm_label": "validatemigrations()"
     },
     {
@@ -1881,7 +1890,7 @@
       "source_file": "apps/mobile/src/storage/sqlite-migrations.ts",
       "source_location": "L271",
       "id": "sqlite_migrations_applymigration",
-      "community": 2,
+      "community": 4,
       "norm_label": "applymigration()"
     },
     {
@@ -1980,7 +1989,7 @@
       "source_file": "apps/mobile/src/paywall/post-value-supabase-auth.ts",
       "source_location": "L1",
       "id": "apps_mobile_src_paywall_post_value_supabase_auth_ts",
-      "community": 1,
+      "community": 2,
       "norm_label": "post-value-supabase-auth.ts"
     },
     {
@@ -1989,7 +1998,7 @@
       "source_file": "apps/mobile/src/paywall/post-value-supabase-auth.ts",
       "source_location": "L39",
       "id": "post_value_supabase_auth_createpostvaluesupabaseauthenticator",
-      "community": 1,
+      "community": 2,
       "norm_label": "createpostvaluesupabaseauthenticator()"
     },
     {
@@ -1998,7 +2007,7 @@
       "source_file": "apps/mobile/src/paywall/post-value-supabase-auth.ts",
       "source_location": "L57",
       "id": "post_value_supabase_auth_createpostvaluesupabaseclient",
-      "community": 1,
+      "community": 2,
       "norm_label": "createpostvaluesupabaseclient()"
     },
     {
@@ -2007,7 +2016,7 @@
       "source_file": "apps/mobile/src/paywall/post-value-supabase-auth.ts",
       "source_location": "L99",
       "id": "post_value_supabase_auth_isconfiguredpublicvalue",
-      "community": 1,
+      "community": 2,
       "norm_label": "isconfiguredpublicvalue()"
     },
     {
@@ -2016,7 +2025,7 @@
       "source_file": "apps/mobile/src/paywall/post-value-supabase-auth.ts",
       "source_location": "L103",
       "id": "post_value_supabase_auth_getorcreateanonymoususerid",
-      "community": 1,
+      "community": 2,
       "norm_label": "getorcreateanonymoususerid()"
     },
     {
@@ -2025,7 +2034,7 @@
       "source_file": "apps/mobile/src/paywall/post-value-supabase-auth.ts",
       "source_location": "L119",
       "id": "post_value_supabase_auth_startproviderlink",
-      "community": 1,
+      "community": 2,
       "norm_label": "startproviderlink()"
     },
     {
@@ -2034,7 +2043,7 @@
       "source_file": "apps/mobile/src/paywall/post-value-supabase-auth.ts",
       "source_location": "L140",
       "id": "post_value_supabase_auth_parsesupabaseurl",
-      "community": 1,
+      "community": 2,
       "norm_label": "parsesupabaseurl()"
     },
     {
@@ -2043,7 +2052,7 @@
       "source_file": "apps/mobile/src/paywall/post-value-supabase-auth.ts",
       "source_location": "L148",
       "id": "post_value_supabase_auth_createsupabaseserviceurl",
-      "community": 1,
+      "community": 2,
       "norm_label": "createsupabaseserviceurl()"
     },
     {
@@ -2052,7 +2061,7 @@
       "source_file": "apps/mobile/src/paywall/post-value-supabase-auth.ts",
       "source_location": "L152",
       "id": "post_value_supabase_auth_createsupabasestoragekey",
-      "community": 1,
+      "community": 2,
       "norm_label": "createsupabasestoragekey()"
     },
     {
@@ -2061,7 +2070,7 @@
       "source_file": "apps/mobile/src/paywall/post-value-supabase-auth.ts",
       "source_location": "L156",
       "id": "post_value_supabase_auth_createsupabaseheaders",
-      "community": 1,
+      "community": 2,
       "norm_label": "createsupabaseheaders()"
     },
     {
@@ -2070,7 +2079,7 @@
       "source_file": "apps/mobile/src/paywall/post-value-supabase-auth.ts",
       "source_location": "L164",
       "id": "post_value_supabase_auth_upsertpostvaluerecords",
-      "community": 1,
+      "community": 2,
       "norm_label": "upsertpostvaluerecords()"
     },
     {
@@ -2079,7 +2088,7 @@
       "source_file": "apps/mobile/src/paywall/post-value-supabase-auth.ts",
       "source_location": "L225",
       "id": "post_value_supabase_auth_isallowedpostvaluesynctarget",
-      "community": 1,
+      "community": 2,
       "norm_label": "isallowedpostvaluesynctarget()"
     },
     {
@@ -2088,7 +2097,7 @@
       "source_file": "apps/mobile/src/paywall/post-value-supabase-auth.ts",
       "source_location": "L232",
       "id": "post_value_supabase_auth_createpostvaluesynchttperror",
-      "community": 1,
+      "community": 2,
       "norm_label": "createpostvaluesynchttperror()"
     },
     {
@@ -2124,7 +2133,7 @@
       "source_file": "apps/mobile/src/paywall/post-value-account-paywall-screen.tsx",
       "source_location": "L1",
       "id": "apps_mobile_src_paywall_post_value_account_paywall_screen_tsx",
-      "community": 94,
+      "community": 95,
       "norm_label": "post-value-account-paywall-screen.tsx"
     },
     {
@@ -2277,7 +2286,7 @@
       "source_file": "apps/mobile/src/notifications/notification-permission-gate-controller.tsx",
       "source_location": "L1",
       "id": "apps_mobile_src_notifications_notification_permission_gate_controller_tsx",
-      "community": 2,
+      "community": 0,
       "norm_label": "notification-permission-gate-controller.tsx"
     },
     {
@@ -2286,7 +2295,7 @@
       "source_file": "apps/mobile/src/notifications/notification-permission-gate-controller.tsx",
       "source_location": "L40",
       "id": "notification_permission_gate_controller_getdefaultnow",
-      "community": 2,
+      "community": 0,
       "norm_label": "getdefaultnow()"
     },
     {
@@ -2295,7 +2304,7 @@
       "source_file": "apps/mobile/src/notifications/notification-permission-gate-controller.tsx",
       "source_location": "L41",
       "id": "notification_permission_gate_controller_opendefaultlocaldatabase",
-      "community": 2,
+      "community": 0,
       "norm_label": "opendefaultlocaldatabase()"
     },
     {
@@ -2367,7 +2376,7 @@
       "source_file": "apps/mobile/src/notifications/expo-notification-adapter.ts",
       "source_location": "L1",
       "id": "apps_mobile_src_notifications_expo_notification_adapter_ts",
-      "community": 95,
+      "community": 96,
       "norm_label": "expo-notification-adapter.ts"
     },
     {
@@ -2745,7 +2754,7 @@
       "source_file": "apps/mobile/src/session/first-session-screen.tsx",
       "source_location": "L1",
       "id": "apps_mobile_src_session_first_session_screen_tsx",
-      "community": 4,
+      "community": 1,
       "norm_label": "first-session-screen.tsx"
     },
     {
@@ -2754,7 +2763,7 @@
       "source_file": "apps/mobile/src/session/first-session-screen.tsx",
       "source_location": "L99",
       "id": "first_session_screen_firstsessionroutescreen",
-      "community": 4,
+      "community": 1,
       "norm_label": "firstsessionroutescreen()"
     },
     {
@@ -2763,7 +2772,7 @@
       "source_file": "apps/mobile/src/session/first-session-screen.tsx",
       "source_location": "L426",
       "id": "first_session_screen_pausesession",
-      "community": 4,
+      "community": 1,
       "norm_label": "pausesession()"
     },
     {
@@ -2772,7 +2781,7 @@
       "source_file": "apps/mobile/src/session/first-session-screen.tsx",
       "source_location": "L432",
       "id": "first_session_screen_resumesession",
-      "community": 4,
+      "community": 1,
       "norm_label": "resumesession()"
     },
     {
@@ -2781,7 +2790,7 @@
       "source_file": "apps/mobile/src/session/first-session-screen.tsx",
       "source_location": "L438",
       "id": "first_session_screen_endsessionearly",
-      "community": 4,
+      "community": 1,
       "norm_label": "endsessionearly()"
     },
     {
@@ -2790,7 +2799,7 @@
       "source_file": "apps/mobile/src/session/first-session-screen.tsx",
       "source_location": "L717",
       "id": "first_session_screen_setreflectionerror",
-      "community": 4,
+      "community": 1,
       "norm_label": "setreflectionerror()"
     },
     {
@@ -2799,7 +2808,7 @@
       "source_file": "apps/mobile/src/session/first-session-screen.tsx",
       "source_location": "L773",
       "id": "first_session_screen_selectedfeeling",
-      "community": 4,
+      "community": 1,
       "norm_label": "selectedfeeling()"
     },
     {
@@ -2808,8 +2817,98 @@
       "source_file": "apps/mobile/src/session/first-session-screen.tsx",
       "source_location": "L896",
       "id": "first_session_screen_if",
-      "community": 4,
+      "community": 1,
       "norm_label": "if()"
+    },
+    {
+      "label": "breath-session-runtime.ts",
+      "file_type": "code",
+      "source_file": "apps/mobile/src/session/breath-session-runtime.ts",
+      "source_location": "L1",
+      "id": "apps_mobile_src_session_breath_session_runtime_ts",
+      "community": 1,
+      "norm_label": "breath-session-runtime.ts"
+    },
+    {
+      "label": "createBreathSessionController()",
+      "file_type": "code",
+      "source_file": "apps/mobile/src/session/breath-session-runtime.ts",
+      "source_location": "L96",
+      "id": "breath_session_runtime_createbreathsessioncontroller",
+      "community": 1,
+      "norm_label": "createbreathsessioncontroller()"
+    },
+    {
+      "label": "getBreathSessionSnapshot()",
+      "file_type": "code",
+      "source_file": "apps/mobile/src/session/breath-session-runtime.ts",
+      "source_location": "L123",
+      "id": "breath_session_runtime_getbreathsessionsnapshot",
+      "community": 1,
+      "norm_label": "getbreathsessionsnapshot()"
+    },
+    {
+      "label": "pauseBreathSession()",
+      "file_type": "code",
+      "source_file": "apps/mobile/src/session/breath-session-runtime.ts",
+      "source_location": "L177",
+      "id": "breath_session_runtime_pausebreathsession",
+      "community": 1,
+      "norm_label": "pausebreathsession()"
+    },
+    {
+      "label": "resumeBreathSession()",
+      "file_type": "code",
+      "source_file": "apps/mobile/src/session/breath-session-runtime.ts",
+      "source_location": "L191",
+      "id": "breath_session_runtime_resumebreathsession",
+      "community": 1,
+      "norm_label": "resumebreathsession()"
+    },
+    {
+      "label": "completeBreathSessionIfDue()",
+      "file_type": "code",
+      "source_file": "apps/mobile/src/session/breath-session-runtime.ts",
+      "source_location": "L207",
+      "id": "breath_session_runtime_completebreathsessionifdue",
+      "community": 1,
+      "norm_label": "completebreathsessionifdue()"
+    },
+    {
+      "label": "endBreathSessionEarly()",
+      "file_type": "code",
+      "source_file": "apps/mobile/src/session/breath-session-runtime.ts",
+      "source_location": "L238",
+      "id": "breath_session_runtime_endbreathsessionearly",
+      "community": 1,
+      "norm_label": "endbreathsessionearly()"
+    },
+    {
+      "label": "getPhaseAtElapsedMs()",
+      "file_type": "code",
+      "source_file": "apps/mobile/src/session/breath-session-runtime.ts",
+      "source_location": "L265",
+      "id": "breath_session_runtime_getphaseatelapsedms",
+      "community": 1,
+      "norm_label": "getphaseatelapsedms()"
+    },
+    {
+      "label": "getCycleDurationMs()",
+      "file_type": "code",
+      "source_file": "apps/mobile/src/session/breath-session-runtime.ts",
+      "source_location": "L302",
+      "id": "breath_session_runtime_getcycledurationms",
+      "community": 1,
+      "norm_label": "getcycledurationms()"
+    },
+    {
+      "label": "clamp()",
+      "file_type": "code",
+      "source_file": "apps/mobile/src/session/breath-session-runtime.ts",
+      "source_location": "L312",
+      "id": "breath_session_runtime_clamp",
+      "community": 1,
+      "norm_label": "clamp()"
     },
     {
       "label": "first-session-runtime.ts",
@@ -2817,98 +2916,71 @@
       "source_file": "apps/mobile/src/session/first-session-runtime.ts",
       "source_location": "L1",
       "id": "apps_mobile_src_session_first_session_runtime_ts",
-      "community": 4,
+      "community": 1,
       "norm_label": "first-session-runtime.ts"
     },
     {
       "label": "createFirstSessionController()",
       "file_type": "code",
       "source_file": "apps/mobile/src/session/first-session-runtime.ts",
-      "source_location": "L57",
+      "source_location": "L53",
       "id": "first_session_runtime_createfirstsessioncontroller",
-      "community": 4,
+      "community": 1,
       "norm_label": "createfirstsessioncontroller()"
     },
     {
       "label": "getFirstSessionSnapshot()",
       "file_type": "code",
       "source_file": "apps/mobile/src/session/first-session-runtime.ts",
-      "source_location": "L76",
+      "source_location": "L62",
       "id": "first_session_runtime_getfirstsessionsnapshot",
-      "community": 4,
+      "community": 1,
       "norm_label": "getfirstsessionsnapshot()"
     },
     {
       "label": "pauseFirstSession()",
       "file_type": "code",
       "source_file": "apps/mobile/src/session/first-session-runtime.ts",
-      "source_location": "L112",
+      "source_location": "L69",
       "id": "first_session_runtime_pausefirstsession",
-      "community": 4,
+      "community": 1,
       "norm_label": "pausefirstsession()"
     },
     {
       "label": "resumeFirstSession()",
       "file_type": "code",
       "source_file": "apps/mobile/src/session/first-session-runtime.ts",
-      "source_location": "L126",
+      "source_location": "L76",
       "id": "first_session_runtime_resumefirstsession",
-      "community": 4,
+      "community": 1,
       "norm_label": "resumefirstsession()"
     },
     {
       "label": "completeFirstSessionIfDue()",
       "file_type": "code",
       "source_file": "apps/mobile/src/session/first-session-runtime.ts",
-      "source_location": "L147",
+      "source_location": "L83",
       "id": "first_session_runtime_completefirstsessionifdue",
-      "community": 4,
+      "community": 1,
       "norm_label": "completefirstsessionifdue()"
     },
     {
       "label": "endFirstSessionEarly()",
       "file_type": "code",
       "source_file": "apps/mobile/src/session/first-session-runtime.ts",
-      "source_location": "L173",
+      "source_location": "L107",
       "id": "first_session_runtime_endfirstsessionearly",
-      "community": 4,
+      "community": 1,
       "norm_label": "endfirstsessionearly()"
     },
     {
       "label": "createFirstSessionDraftFromSnapshot()",
       "file_type": "code",
       "source_file": "apps/mobile/src/session/first-session-runtime.ts",
-      "source_location": "L187",
+      "source_location": "L130",
       "id": "first_session_runtime_createfirstsessiondraftfromsnapshot",
-      "community": 4,
+      "community": 1,
       "norm_label": "createfirstsessiondraftfromsnapshot()"
-    },
-    {
-      "label": "getPhaseAtElapsedMs()",
-      "file_type": "code",
-      "source_file": "apps/mobile/src/session/first-session-runtime.ts",
-      "source_location": "L207",
-      "id": "first_session_runtime_getphaseatelapsedms",
-      "community": 4,
-      "norm_label": "getphaseatelapsedms()"
-    },
-    {
-      "label": "getCycleDurationMs()",
-      "file_type": "code",
-      "source_file": "apps/mobile/src/session/first-session-runtime.ts",
-      "source_location": "L242",
-      "id": "first_session_runtime_getcycledurationms",
-      "community": 4,
-      "norm_label": "getcycledurationms()"
-    },
-    {
-      "label": "clamp()",
-      "file_type": "code",
-      "source_file": "apps/mobile/src/session/first-session-runtime.ts",
-      "source_location": "L246",
-      "id": "first_session_runtime_clamp",
-      "community": 4,
-      "norm_label": "clamp()"
     },
     {
       "label": "backend-smoke.js",
@@ -6809,8 +6881,260 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "apps/mobile/src/session/breath-session-runtime.ts",
+      "source_location": "L96",
+      "weight": 1.0,
+      "_src": "apps_mobile_src_session_breath_session_runtime_ts",
+      "_tgt": "breath_session_runtime_createbreathsessioncontroller",
+      "source": "apps_mobile_src_session_breath_session_runtime_ts",
+      "target": "breath_session_runtime_createbreathsessioncontroller",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/mobile/src/session/breath-session-runtime.ts",
+      "source_location": "L123",
+      "weight": 1.0,
+      "_src": "apps_mobile_src_session_breath_session_runtime_ts",
+      "_tgt": "breath_session_runtime_getbreathsessionsnapshot",
+      "source": "apps_mobile_src_session_breath_session_runtime_ts",
+      "target": "breath_session_runtime_getbreathsessionsnapshot",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/mobile/src/session/breath-session-runtime.ts",
+      "source_location": "L177",
+      "weight": 1.0,
+      "_src": "apps_mobile_src_session_breath_session_runtime_ts",
+      "_tgt": "breath_session_runtime_pausebreathsession",
+      "source": "apps_mobile_src_session_breath_session_runtime_ts",
+      "target": "breath_session_runtime_pausebreathsession",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/mobile/src/session/breath-session-runtime.ts",
+      "source_location": "L191",
+      "weight": 1.0,
+      "_src": "apps_mobile_src_session_breath_session_runtime_ts",
+      "_tgt": "breath_session_runtime_resumebreathsession",
+      "source": "apps_mobile_src_session_breath_session_runtime_ts",
+      "target": "breath_session_runtime_resumebreathsession",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/mobile/src/session/breath-session-runtime.ts",
+      "source_location": "L207",
+      "weight": 1.0,
+      "_src": "apps_mobile_src_session_breath_session_runtime_ts",
+      "_tgt": "breath_session_runtime_completebreathsessionifdue",
+      "source": "apps_mobile_src_session_breath_session_runtime_ts",
+      "target": "breath_session_runtime_completebreathsessionifdue",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/mobile/src/session/breath-session-runtime.ts",
+      "source_location": "L238",
+      "weight": 1.0,
+      "_src": "apps_mobile_src_session_breath_session_runtime_ts",
+      "_tgt": "breath_session_runtime_endbreathsessionearly",
+      "source": "apps_mobile_src_session_breath_session_runtime_ts",
+      "target": "breath_session_runtime_endbreathsessionearly",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/mobile/src/session/breath-session-runtime.ts",
+      "source_location": "L265",
+      "weight": 1.0,
+      "_src": "apps_mobile_src_session_breath_session_runtime_ts",
+      "_tgt": "breath_session_runtime_getphaseatelapsedms",
+      "source": "apps_mobile_src_session_breath_session_runtime_ts",
+      "target": "breath_session_runtime_getphaseatelapsedms",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/mobile/src/session/breath-session-runtime.ts",
+      "source_location": "L302",
+      "weight": 1.0,
+      "_src": "apps_mobile_src_session_breath_session_runtime_ts",
+      "_tgt": "breath_session_runtime_getcycledurationms",
+      "source": "apps_mobile_src_session_breath_session_runtime_ts",
+      "target": "breath_session_runtime_getcycledurationms",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/mobile/src/session/breath-session-runtime.ts",
+      "source_location": "L312",
+      "weight": 1.0,
+      "_src": "apps_mobile_src_session_breath_session_runtime_ts",
+      "_tgt": "breath_session_runtime_clamp",
+      "source": "apps_mobile_src_session_breath_session_runtime_ts",
+      "target": "breath_session_runtime_clamp",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
       "source_file": "apps/mobile/src/session/first-session-runtime.ts",
-      "source_location": "L57",
+      "source_location": "L55",
+      "weight": 1.0,
+      "_src": "breath_session_runtime_createbreathsessioncontroller",
+      "_tgt": "first_session_runtime_createfirstsessioncontroller",
+      "source": "breath_session_runtime_createbreathsessioncontroller",
+      "target": "first_session_runtime_createfirstsessioncontroller"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/mobile/src/session/breath-session-runtime.ts",
+      "source_location": "L130",
+      "weight": 1.0,
+      "_src": "breath_session_runtime_getbreathsessionsnapshot",
+      "_tgt": "breath_session_runtime_clamp",
+      "source": "breath_session_runtime_getbreathsessionsnapshot",
+      "target": "breath_session_runtime_clamp",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/mobile/src/session/breath-session-runtime.ts",
+      "source_location": "L135",
+      "weight": 1.0,
+      "_src": "breath_session_runtime_getbreathsessionsnapshot",
+      "_tgt": "breath_session_runtime_getphaseatelapsedms",
+      "source": "breath_session_runtime_getbreathsessionsnapshot",
+      "target": "breath_session_runtime_getphaseatelapsedms",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/mobile/src/session/breath-session-runtime.ts",
+      "source_location": "L148",
+      "weight": 1.0,
+      "_src": "breath_session_runtime_getbreathsessionsnapshot",
+      "_tgt": "breath_session_runtime_getcycledurationms",
+      "source": "breath_session_runtime_getbreathsessionsnapshot",
+      "target": "breath_session_runtime_getcycledurationms",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/mobile/src/session/breath-session-runtime.ts",
+      "source_location": "L211",
+      "weight": 1.0,
+      "_src": "breath_session_runtime_completebreathsessionifdue",
+      "_tgt": "breath_session_runtime_getbreathsessionsnapshot",
+      "source": "breath_session_runtime_getbreathsessionsnapshot",
+      "target": "breath_session_runtime_completebreathsessionifdue",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/mobile/src/session/breath-session-runtime.ts",
+      "source_location": "L242",
+      "weight": 1.0,
+      "_src": "breath_session_runtime_endbreathsessionearly",
+      "_tgt": "breath_session_runtime_getbreathsessionsnapshot",
+      "source": "breath_session_runtime_getbreathsessionsnapshot",
+      "target": "breath_session_runtime_endbreathsessionearly",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "apps/mobile/src/session/first-session-runtime.ts",
+      "source_location": "L65",
+      "weight": 1.0,
+      "_src": "breath_session_runtime_getbreathsessionsnapshot",
+      "_tgt": "first_session_runtime_getfirstsessionsnapshot",
+      "source": "breath_session_runtime_getbreathsessionsnapshot",
+      "target": "first_session_runtime_getfirstsessionsnapshot"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "apps/mobile/src/session/first-session-runtime.ts",
+      "source_location": "L72",
+      "weight": 1.0,
+      "_src": "breath_session_runtime_pausebreathsession",
+      "_tgt": "first_session_runtime_pausefirstsession",
+      "source": "breath_session_runtime_pausebreathsession",
+      "target": "first_session_runtime_pausefirstsession"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "apps/mobile/src/session/first-session-runtime.ts",
+      "source_location": "L79",
+      "weight": 1.0,
+      "_src": "breath_session_runtime_resumebreathsession",
+      "_tgt": "first_session_runtime_resumefirstsession",
+      "source": "breath_session_runtime_resumebreathsession",
+      "target": "first_session_runtime_resumefirstsession"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "apps/mobile/src/session/first-session-runtime.ts",
+      "source_location": "L86",
+      "weight": 1.0,
+      "_src": "breath_session_runtime_completebreathsessionifdue",
+      "_tgt": "first_session_runtime_completefirstsessionifdue",
+      "source": "breath_session_runtime_completebreathsessionifdue",
+      "target": "first_session_runtime_completefirstsessionifdue"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "apps/mobile/src/session/first-session-runtime.ts",
+      "source_location": "L110",
+      "weight": 1.0,
+      "_src": "breath_session_runtime_endbreathsessionearly",
+      "_tgt": "first_session_runtime_endfirstsessionearly",
+      "source": "breath_session_runtime_endbreathsessionearly",
+      "target": "first_session_runtime_endfirstsessionearly"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/mobile/src/session/breath-session-runtime.ts",
+      "source_location": "L266",
+      "weight": 1.0,
+      "_src": "breath_session_runtime_getphaseatelapsedms",
+      "_tgt": "breath_session_runtime_getcycledurationms",
+      "source": "breath_session_runtime_getphaseatelapsedms",
+      "target": "breath_session_runtime_getcycledurationms",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/mobile/src/session/first-session-runtime.ts",
+      "source_location": "L53",
       "weight": 1.0,
       "_src": "apps_mobile_src_session_first_session_runtime_ts",
       "_tgt": "first_session_runtime_createfirstsessioncontroller",
@@ -6822,7 +7146,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/session/first-session-runtime.ts",
-      "source_location": "L76",
+      "source_location": "L62",
       "weight": 1.0,
       "_src": "apps_mobile_src_session_first_session_runtime_ts",
       "_tgt": "first_session_runtime_getfirstsessionsnapshot",
@@ -6834,7 +7158,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/session/first-session-runtime.ts",
-      "source_location": "L112",
+      "source_location": "L69",
       "weight": 1.0,
       "_src": "apps_mobile_src_session_first_session_runtime_ts",
       "_tgt": "first_session_runtime_pausefirstsession",
@@ -6846,7 +7170,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/session/first-session-runtime.ts",
-      "source_location": "L126",
+      "source_location": "L76",
       "weight": 1.0,
       "_src": "apps_mobile_src_session_first_session_runtime_ts",
       "_tgt": "first_session_runtime_resumefirstsession",
@@ -6858,7 +7182,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/session/first-session-runtime.ts",
-      "source_location": "L147",
+      "source_location": "L83",
       "weight": 1.0,
       "_src": "apps_mobile_src_session_first_session_runtime_ts",
       "_tgt": "first_session_runtime_completefirstsessionifdue",
@@ -6870,7 +7194,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/session/first-session-runtime.ts",
-      "source_location": "L173",
+      "source_location": "L107",
       "weight": 1.0,
       "_src": "apps_mobile_src_session_first_session_runtime_ts",
       "_tgt": "first_session_runtime_endfirstsessionearly",
@@ -6882,132 +7206,12 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/session/first-session-runtime.ts",
-      "source_location": "L187",
+      "source_location": "L130",
       "weight": 1.0,
       "_src": "apps_mobile_src_session_first_session_runtime_ts",
       "_tgt": "first_session_runtime_createfirstsessiondraftfromsnapshot",
       "source": "apps_mobile_src_session_first_session_runtime_ts",
       "target": "first_session_runtime_createfirstsessiondraftfromsnapshot",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/mobile/src/session/first-session-runtime.ts",
-      "source_location": "L207",
-      "weight": 1.0,
-      "_src": "apps_mobile_src_session_first_session_runtime_ts",
-      "_tgt": "first_session_runtime_getphaseatelapsedms",
-      "source": "apps_mobile_src_session_first_session_runtime_ts",
-      "target": "first_session_runtime_getphaseatelapsedms",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/mobile/src/session/first-session-runtime.ts",
-      "source_location": "L242",
-      "weight": 1.0,
-      "_src": "apps_mobile_src_session_first_session_runtime_ts",
-      "_tgt": "first_session_runtime_getcycledurationms",
-      "source": "apps_mobile_src_session_first_session_runtime_ts",
-      "target": "first_session_runtime_getcycledurationms",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/mobile/src/session/first-session-runtime.ts",
-      "source_location": "L246",
-      "weight": 1.0,
-      "_src": "apps_mobile_src_session_first_session_runtime_ts",
-      "_tgt": "first_session_runtime_clamp",
-      "source": "apps_mobile_src_session_first_session_runtime_ts",
-      "target": "first_session_runtime_clamp",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/mobile/src/session/first-session-runtime.ts",
-      "source_location": "L83",
-      "weight": 1.0,
-      "_src": "first_session_runtime_getfirstsessionsnapshot",
-      "_tgt": "first_session_runtime_clamp",
-      "source": "first_session_runtime_getfirstsessionsnapshot",
-      "target": "first_session_runtime_clamp",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/mobile/src/session/first-session-runtime.ts",
-      "source_location": "L88",
-      "weight": 1.0,
-      "_src": "first_session_runtime_getfirstsessionsnapshot",
-      "_tgt": "first_session_runtime_getphaseatelapsedms",
-      "source": "first_session_runtime_getfirstsessionsnapshot",
-      "target": "first_session_runtime_getphaseatelapsedms",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/mobile/src/session/first-session-runtime.ts",
-      "source_location": "L98",
-      "weight": 1.0,
-      "_src": "first_session_runtime_getfirstsessionsnapshot",
-      "_tgt": "first_session_runtime_getcycledurationms",
-      "source": "first_session_runtime_getfirstsessionsnapshot",
-      "target": "first_session_runtime_getcycledurationms",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/mobile/src/session/first-session-runtime.ts",
-      "source_location": "L151",
-      "weight": 1.0,
-      "_src": "first_session_runtime_completefirstsessionifdue",
-      "_tgt": "first_session_runtime_getfirstsessionsnapshot",
-      "source": "first_session_runtime_getfirstsessionsnapshot",
-      "target": "first_session_runtime_completefirstsessionifdue",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/mobile/src/session/first-session-runtime.ts",
-      "source_location": "L177",
-      "weight": 1.0,
-      "_src": "first_session_runtime_endfirstsessionearly",
-      "_tgt": "first_session_runtime_getfirstsessionsnapshot",
-      "source": "first_session_runtime_getfirstsessionsnapshot",
-      "target": "first_session_runtime_endfirstsessionearly",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/mobile/src/session/first-session-runtime.ts",
-      "source_location": "L181",
-      "weight": 1.0,
-      "_src": "first_session_runtime_endfirstsessionearly",
-      "_tgt": "first_session_runtime_createfirstsessiondraftfromsnapshot",
-      "source": "first_session_runtime_endfirstsessionearly",
-      "target": "first_session_runtime_createfirstsessiondraftfromsnapshot",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/mobile/src/session/first-session-runtime.ts",
-      "source_location": "L211",
-      "weight": 1.0,
-      "_src": "first_session_runtime_getphaseatelapsedms",
-      "_tgt": "first_session_runtime_getcycledurationms",
-      "source": "first_session_runtime_getphaseatelapsedms",
-      "target": "first_session_runtime_getcycledurationms",
       "confidence_score": 1.0
     },
     {

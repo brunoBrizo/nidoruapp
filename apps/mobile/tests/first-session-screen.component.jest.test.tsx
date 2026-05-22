@@ -12,6 +12,22 @@ jest.mock("expo-haptics", () => ({
   impactAsync: jest.fn(() => Promise.resolve()),
 }));
 
+jest.mock("expo-audio", () => ({
+  createAudioPlayer: jest.fn(() => ({
+    clearLockScreenControls: jest.fn(),
+    loop: false,
+    pause: jest.fn(),
+    play: jest.fn(),
+    remove: jest.fn(),
+    seekTo: jest.fn(() => Promise.resolve()),
+    setActiveForLockScreen: jest.fn(),
+    updateLockScreenMetadata: jest.fn(),
+    volume: 1,
+  })),
+  setAudioModeAsync: jest.fn(() => Promise.resolve()),
+  setIsAudioActiveAsync: jest.fn(() => Promise.resolve()),
+}));
+
 jest
   .spyOn(AccessibilityInfo, "isReduceMotionEnabled")
   .mockImplementation(() => new Promise<boolean>(() => undefined));
@@ -50,10 +66,35 @@ describe("FirstSessionScreen", () => {
     expect(screen.getByText("4-7-8 Sleep · 4 min")).toBeTruthy();
     expect(screen.getByText("Inhale")).toBeTruthy();
     expect(screen.getByText("04:00")).toBeTruthy();
+    expect(screen.getByText("No audio")).toBeTruthy();
     expect(screen.getByText("Bell")).toBeTruthy();
+    expect(screen.getByText("Whoosh")).toBeTruthy();
+    expect(screen.getByText("Nature")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Audio mode: Gentle bell" })).toBeTruthy();
     expect(screen.getByText("Haptics")).toBeTruthy();
     expect(screen.getByLabelText("Pause session")).toBeTruthy();
     expect(screen.queryByText(forbiddenActiveSessionGatePattern)).toBeNull();
+  });
+
+  it("switches audio cue modes during an active session without pausing the controller", () => {
+    render(<FirstSessionScreen {...baseProps} />);
+
+    fireEvent.press(screen.getByRole("button", { name: "Audio mode: Soft whoosh" }));
+
+    expect(screen.getByRole("button", { name: "Audio mode: Soft whoosh" })).toHaveProp(
+      "accessibilityState",
+      { selected: true },
+    );
+    expect(screen.getByText("04:00")).toBeTruthy();
+    expect(screen.queryByText("Paused")).toBeNull();
+
+    fireEvent.press(screen.getByRole("button", { name: "Audio mode: Nature ambient" }));
+
+    expect(screen.getByRole("button", { name: "Audio mode: Nature ambient" })).toHaveProp(
+      "accessibilityState",
+      { selected: true },
+    );
+    expect(screen.getByText("Inhale")).toBeTruthy();
   });
 
   it("pauses and resumes without showing post-value gates", () => {
@@ -340,7 +381,10 @@ describe("BreathSessionScreen", () => {
     expect(screen.getByText("Coherent Breathing · 10 min")).toBeTruthy();
     expect(screen.getByText("Inhale")).toBeTruthy();
     expect(screen.getByText("10:00")).toBeTruthy();
+    expect(screen.getByText("No audio")).toBeTruthy();
     expect(screen.getByText("Bell")).toBeTruthy();
+    expect(screen.getByText("Whoosh")).toBeTruthy();
+    expect(screen.getByText("Nature")).toBeTruthy();
     expect(screen.getByText("Haptics")).toBeTruthy();
     expect(screen.getByLabelText("Pause session")).toBeTruthy();
     expect(screen.queryByText(forbiddenActiveSessionGatePattern)).toBeNull();

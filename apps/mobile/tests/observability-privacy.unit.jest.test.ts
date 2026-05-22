@@ -38,6 +38,11 @@ describe("privacy-safe observability", () => {
   it("allowlists analytics properties and strips prohibited identifiers and user-entered values", () => {
     const properties = createPrivacySafeAnalyticsProperties({
       account_id: "user_123",
+      audio_asset_id: "gentle-bell-transition",
+      audio_failure_class: "cue_playback_failed",
+      audio_file_path: "/private/var/mobile/Containers/Data/session_0123456789abcdef/cue.m4a",
+      audio_mode: "gentle-bell",
+      breath_phase: "inhale",
       attempt_count: 2,
       device_id: "device-secret",
       display_name: "Bruno",
@@ -51,6 +56,10 @@ describe("privacy-safe observability", () => {
     });
 
     expect(properties).toEqual({
+      audio_asset_id: "gentle-bell-transition",
+      audio_failure_class: "cue_playback_failed",
+      audio_mode: "gentle-bell",
+      breath_phase: "inhale",
       attempt_count: 2,
       reason_class: "server_error",
       record_type: "first_session_record",

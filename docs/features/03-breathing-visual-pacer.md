@@ -86,6 +86,14 @@ The breathing visual pacer is the core product animation: a multi-layer orb that
 - If audio interruption occurs, session resumes gracefully or makes stop state clear.
 - If completion happens during crash or backgrounding, local persistence wins.
 
+## Active-Session Audio Implementation Notes
+
+- Phase audio modes are none, gentle bell, soft whoosh, and nature ambient under phase cues.
+- Phase cues use bundled local audio assets, so first breath does not depend on network or CDN availability.
+- iOS background audio is declared with `UIBackgroundModes: ["audio"]`, and active sessions configure `expo-audio` with `shouldPlayInBackground`, `playsInSilentMode`, and non-recording playback.
+- Locked-screen guidance is audio-first. Do not promise locked-screen haptics unless a real-device proof run confirms platform behavior.
+- Real locked-screen proof requires a rebuilt iOS binary after the background audio config is present; JavaScript-only export is not enough to prove this native behavior.
+
 ## Task Checklist
 
 - [ ] Define local technique catalog for MVP techniques.

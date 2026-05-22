@@ -37,6 +37,20 @@ type AnalyticsEventProperties = Readonly<
   Partial<{
     app_environment: ReturnType<typeof getAppEnvironment>;
     attempt_count: number;
+    audio_asset_id:
+      | "gentle-bell-transition"
+      | "nature-ambient-loop"
+      | "soft-whoosh-exhale"
+      | "soft-whoosh-inhale";
+    audio_failure_class:
+      | "ambient_playback_failed"
+      | "audio_mode_configuration"
+      | "cue_playback_failed"
+      | "interruption_handling_failed"
+      | "lock_screen_metadata_failed"
+      | "route_change_handling_failed";
+    audio_mode: "gentle-bell" | "nature-ambient" | "none" | "soft-whoosh";
+    breath_phase: "exhale" | "hold" | "inhale" | "second-inhale";
     proof: boolean;
     reason_class:
       | "offline"
@@ -97,6 +111,10 @@ export function createPrivacySafeAnalyticsProperties(
   const allowlistedKeys = [
     "app_environment",
     "attempt_count",
+    "audio_asset_id",
+    "audio_failure_class",
+    "audio_mode",
+    "breath_phase",
     "proof",
     "reason_class",
     "record_type",

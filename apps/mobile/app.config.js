@@ -28,6 +28,9 @@ const config = {
   },
   ios: {
     bundleIdentifier: "com.nidoru.app",
+    infoPlist: {
+      UIBackgroundModes: ["audio"],
+    },
     supportsTablet: false,
   },
   android: {

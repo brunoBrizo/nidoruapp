@@ -19,9 +19,9 @@ import type {
 import * as Haptics from "expo-haptics";
 import { useRouter, type Href } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { Bell, BellOff, CheckCircle, Pause, Vibrate, VibrateOff } from "lucide-react-native";
+import { Bell, CheckCircle, Pause, TreePine, Vibrate, VibrateOff, VolumeX, Wind } from "lucide-react-native";
 import { useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { AppState, Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -32,6 +32,10 @@ import Animated, {
 } from "react-native-reanimated";
 import { SafeAreaInsetsContext } from "react-native-safe-area-context";
 
+import {
+  createActiveSessionAudioController,
+  type ActiveSessionAudioController,
+} from "../audio/active-session-audio-controller";
 import {
   abandonFirstSessionLocally,
   completeFirstSessionLocally,
@@ -120,7 +124,6 @@ type BreathSessionRouteScreenProps = {
 type FirstSessionRouteScreenProps = Omit<BreathSessionRouteScreenProps, "source">;
 
 type CompletionMode = "completed" | "abandoned" | undefined;
-type FirstSessionAudioMode = "bell" | "none";
 
 const defaultTickIntervalMs = 1000;
 const draftPersistIntervalMs = 15000;
@@ -133,9 +136,16 @@ const phaseLabels = {
   "second-inhale": "Sip in",
 } as const satisfies Record<FirstSessionPhaseName, string>;
 
-function getAudioCueModeId(audioMode: FirstSessionAudioMode): BreathAudioCueModeId {
-  return audioMode === "bell" ? "gentle-bell" : "none";
-}
+const audioModeOptions = [
+  { accessibilityLabel: "Audio mode: No audio", id: "none", label: "No audio" },
+  { accessibilityLabel: "Audio mode: Gentle bell", id: "gentle-bell", label: "Bell" },
+  { accessibilityLabel: "Audio mode: Soft whoosh", id: "soft-whoosh", label: "Whoosh" },
+  { accessibilityLabel: "Audio mode: Nature ambient", id: "nature-ambient", label: "Nature" },
+] as const satisfies readonly {
+  readonly accessibilityLabel: string;
+  readonly id: BreathAudioCueModeId;
+  readonly label: string;
+}[];
 
 export function BreathSessionRouteScreen({
   durationSeconds,
@@ -348,7 +358,8 @@ export function BreathSessionScreen({
   const [snapshot, setSnapshot] = useState(() =>
     getBreathSessionSnapshot(controllerRef.current, startedAtMs),
   );
-  const [audioMode, setAudioMode] = useState<FirstSessionAudioMode>("bell");
+  const audioControllerRef = useRef<ActiveSessionAudioController | undefined>(undefined);
+  const [audioMode, setAudioMode] = useState<BreathAudioCueModeId>("gentle-bell");
   const [hapticsEnabled, setHapticsEnabled] = useState(true);
   const [completionMode, setCompletionMode] = useState<CompletionMode>(initialCompletionMode);
   const isPersistingTerminalStateRef = useRef(false);
@@ -364,6 +375,30 @@ export function BreathSessionScreen({
     controllerRef.current = controller;
   }, [controller]);
 
+  if (!audioControllerRef.current) {
+    audioControllerRef.current = createActiveSessionAudioController();
+  }
+
+  useEffect(
+    () => () => {
+      audioControllerRef.current?.release();
+    },
+    [],
+  );
+
+  useEffect(() => {
+    audioControllerRef.current?.setMode(audioMode);
+  }, [audioMode]);
+
+  useEffect(() => {
+    if (completionMode) {
+      audioControllerRef.current?.release();
+      return;
+    }
+
+    void audioControllerRef.current?.handleSnapshot(snapshot);
+  }, [audioMode, completionMode, snapshot]);
+
   useEffect(() => {
     if (hasPersistedSessionStartRef.current) {
       return;
@@ -373,7 +408,7 @@ export function BreathSessionScreen({
     const startedAt = new Date(startedAtMs).toISOString();
 
     void persistBreathSessionStarted({
-      audioCueModeId: getAudioCueModeId(audioMode),
+      audioCueModeId: audioMode,
       currentPhaseName: snapshot.phaseName,
       durationSeconds: sessionDurationSeconds,
       localInstallId,
@@ -413,6 +448,21 @@ export function BreathSessionScreen({
     setSnapshot(nextSnapshot);
     return nextSnapshot;
   }, []);
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (nextAppState) => {
+      if (completionMode || nextAppState !== "active") {
+        return;
+      }
+
+      const nextSnapshot = refreshSnapshot();
+      void audioControllerRef.current?.handleAppWake(nextSnapshot);
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, [completionMode, refreshSnapshot]);
 
   useEffect(() => {
     if (completionMode) {
@@ -544,7 +594,7 @@ export function BreathSessionScreen({
 
     isPersistingTerminalStateRef.current = true;
     void persistBreathSessionCompletion({
-      audioCueModeId: getAudioCueModeId(audioMode),
+      audioCueModeId: audioMode,
       completedAt,
       completedBreathCycles: completedRecord.completedBreathCycles ?? 0,
       completionPersistedAt,
@@ -605,7 +655,7 @@ export function BreathSessionScreen({
     const persistTerminalState = [
       persistBreathSessionAbandoned({
         ...abandonedRecord,
-        audioCueModeId: getAudioCueModeId(audioMode),
+        audioCueModeId: audioMode,
         stopReason: "user_ended",
       }),
     ];
@@ -673,52 +723,55 @@ export function BreathSessionScreen({
         </Text>
       </View>
 
-      <View style={styles.footer}>
-        <ControlButton
-          active={audioMode === "bell"}
-          activeLabel="Bell"
-          inactiveLabel="No audio"
-          label={audioMode === "bell" ? "Bell" : "No audio"}
-          onPress={() => {
-            setAudioMode((currentMode) => (currentMode === "bell" ? "none" : "bell"));
-          }}
-        >
-          {audioMode === "bell" ? (
-            <Bell color={colors.dark.textSecondary.value} size={20} strokeWidth={1.6} />
-          ) : (
-            <BellOff color={colors.dark.textSecondary.value} size={20} strokeWidth={1.6} />
-          )}
-        </ControlButton>
+      <View style={styles.controlsArea}>
+        <View style={styles.audioModeRow}>
+          {audioModeOptions.map((option) => (
+            <AudioModeButton
+              key={option.id}
+              accessibilityLabel={option.accessibilityLabel}
+              isSelected={audioMode === option.id}
+              label={option.label}
+              mode={option.id}
+              onPress={() => {
+                setAudioMode(option.id);
+              }}
+            />
+          ))}
+        </View>
 
-        <Pressable
-          accessibilityLabel="Pause session"
-          accessibilityRole="button"
-          disabled={Boolean(completionMode)}
-          onPress={pauseSession}
-          style={({ pressed }) => [
-            styles.pauseButton,
-            pressed && !completionMode ? styles.controlPressed : null,
-            completionMode ? styles.controlDisabled : null,
-          ]}
-        >
-          <Pause color={colors.dark.textSecondary.value} size={24} strokeWidth={1.5} />
-        </Pressable>
+        <View style={styles.footer}>
+          <View style={styles.footerSpacer} />
 
-        <ControlButton
-          active={hapticsActive}
-          activeLabel="Haptics"
-          inactiveLabel="No haptics"
-          label={hapticsActive ? "Haptics" : "No haptics"}
-          onPress={() => {
-            setHapticsEnabled((enabled) => !enabled);
-          }}
-        >
-          {hapticsActive ? (
-            <Vibrate color={colors.dark.primaryGlow.value} size={20} strokeWidth={1.6} />
-          ) : (
-            <VibrateOff color={colors.dark.textSecondary.value} size={20} strokeWidth={1.6} />
-          )}
-        </ControlButton>
+          <Pressable
+            accessibilityLabel="Pause session"
+            accessibilityRole="button"
+            disabled={Boolean(completionMode)}
+            onPress={pauseSession}
+            style={({ pressed }) => [
+              styles.pauseButton,
+              pressed && !completionMode ? styles.controlPressed : null,
+              completionMode ? styles.controlDisabled : null,
+            ]}
+          >
+            <Pause color={colors.dark.textSecondary.value} size={24} strokeWidth={1.5} />
+          </Pressable>
+
+          <ControlButton
+            active={hapticsActive}
+            activeLabel="Haptics"
+            inactiveLabel="No haptics"
+            label={hapticsActive ? "Haptics" : "No haptics"}
+            onPress={() => {
+              setHapticsEnabled((enabled) => !enabled);
+            }}
+          >
+            {hapticsActive ? (
+              <Vibrate color={colors.dark.primaryGlow.value} size={20} strokeWidth={1.6} />
+            ) : (
+              <VibrateOff color={colors.dark.textSecondary.value} size={20} strokeWidth={1.6} />
+            )}
+          </ControlButton>
+        </View>
       </View>
 
       {isPaused ? (
@@ -1022,6 +1075,66 @@ function useFadeUpAnimatedStyle(progress: SharedValue<number>, reduceMotionEnabl
   }));
 }
 
+function AudioModeButton({
+  accessibilityLabel,
+  isSelected,
+  label,
+  mode,
+  onPress,
+}: {
+  readonly accessibilityLabel: string;
+  readonly isSelected: boolean;
+  readonly label: string;
+  readonly mode: BreathAudioCueModeId;
+  readonly onPress: () => void;
+}) {
+  const iconColor = isSelected ? colors.dark.primaryGlow.value : colors.dark.textSecondary.value;
+
+  return (
+    <Pressable
+      accessibilityLabel={accessibilityLabel}
+      accessibilityRole="button"
+      accessibilityState={{ selected: isSelected }}
+      onPress={onPress}
+      style={({ pressed }) => [
+        styles.audioModeButton,
+        isSelected ? styles.audioModeButtonSelected : null,
+        pressed ? styles.controlPressed : null,
+      ]}
+    >
+      <View style={[styles.audioModeIconCircle, isSelected ? styles.audioModeIconSelected : null]}>
+        <AudioModeIcon color={iconColor} mode={mode} />
+      </View>
+      <Text
+        numberOfLines={1}
+        selectable={false}
+        style={[styles.audioModeLabel, isSelected ? styles.audioModeLabelSelected : null]}
+      >
+        {label}
+      </Text>
+    </Pressable>
+  );
+}
+
+function AudioModeIcon({
+  color,
+  mode,
+}: {
+  readonly color: string;
+  readonly mode: BreathAudioCueModeId;
+}) {
+  switch (mode) {
+    case "gentle-bell":
+      return <Bell color={color} size={16} strokeWidth={1.7} />;
+    case "nature-ambient":
+      return <TreePine color={color} size={16} strokeWidth={1.7} />;
+    case "none":
+      return <VolumeX color={color} size={16} strokeWidth={1.7} />;
+    case "soft-whoosh":
+      return <Wind color={color} size={16} strokeWidth={1.7} />;
+  }
+}
+
 function ControlButton({
   active,
   activeLabel,
@@ -1061,10 +1174,10 @@ function ControlButton({
 function createBreathSessionDraftFromSnapshot(
   controller: BreathSessionController,
   snapshot: BreathSessionSnapshot,
-  audioMode: FirstSessionAudioMode,
+  audioMode: BreathAudioCueModeId,
 ): RecoverableBreathSessionDraft {
   return {
-    audioCueModeId: getAudioCueModeId(audioMode),
+    audioCueModeId: audioMode,
     completedBreathCycles: snapshot.completedBreathCycles,
     currentPhaseName: snapshot.phaseName,
     durationSeconds: controller.totalDurationSeconds,
@@ -1225,12 +1338,59 @@ const styles = StyleSheet.create({
     top: 150,
     width: 440,
   },
+  audioModeButton: {
+    alignItems: "center",
+    backgroundColor: "rgba(17, 20, 48, 0.78)",
+    borderColor: colors.dark.divider.value,
+    borderRadius: 16,
+    borderWidth: 1,
+    flex: 1,
+    gap: 5,
+    justifyContent: "center",
+    minHeight: 58,
+    minWidth: 0,
+    paddingHorizontal: 6,
+  },
+  audioModeButtonSelected: {
+    backgroundColor: colors.dark.surfaceRaised.value,
+    borderColor: "rgba(168, 156, 224, 0.48)",
+    boxShadow: "0 0 16px rgba(124, 111, 205, 0.22)",
+  },
+  audioModeIconCircle: {
+    alignItems: "center",
+    backgroundColor: "rgba(255, 255, 255, 0.04)",
+    borderRadius: 14,
+    height: 28,
+    justifyContent: "center",
+    width: 28,
+  },
+  audioModeIconSelected: {
+    backgroundColor: "rgba(168, 156, 224, 0.12)",
+  },
+  audioModeLabel: {
+    color: colors.dark.textSecondary.value,
+    fontFamily: typography.mobileFontFamily.primary.semiBold,
+    fontSize: 11,
+    textAlign: "center",
+    width: "100%",
+  },
+  audioModeLabelSelected: {
+    color: colors.dark.textPrimary.value,
+  },
+  audioModeRow: {
+    flexDirection: "row",
+    gap: 8,
+    paddingHorizontal: 18,
+  },
   controlDisabled: {
     opacity: 0.45,
   },
   controlPressed: {
     opacity: 0.78,
     transform: [{ scale: 0.96 }],
+  },
+  controlsArea: {
+    gap: spacing.sm,
   },
   continueButton: {
     alignItems: "center",
@@ -1288,6 +1448,9 @@ const styles = StyleSheet.create({
     paddingBottom: 28,
     paddingHorizontal: 28,
     paddingTop: spacing.sm,
+  },
+  footerSpacer: {
+    width: 72,
   },
   header: {
     alignItems: "center",

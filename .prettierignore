@@ -7,6 +7,7 @@ coverage
 dist
 build
 apps/web/.next
+apps/mobile/expo-env.d.ts
 docs
 graphify-out
 node_modules

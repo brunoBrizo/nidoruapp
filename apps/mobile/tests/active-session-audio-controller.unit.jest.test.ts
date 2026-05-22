@@ -227,6 +227,33 @@ describe("active session audio controller", () => {
     expect(mockSetIsAudioActiveAsync).toHaveBeenCalledWith(true);
   });
 
+  it("does not replay the same phase cue on repeated app wake events", async () => {
+    const playersBySource = new Map<number, MockAudioPlayer>();
+    mockCreateAudioPlayer.mockImplementation((source: number) => {
+      const player = createMockPlayer();
+      playersBySource.set(source, player);
+      return player;
+    });
+    const controller = createActiveSessionAudioController({
+      adapter: mockAudioAdapter,
+      assetSources,
+    });
+    const inhaleSnapshot = createSnapshot({
+      phaseIndex: 0,
+      phaseName: "inhale",
+      phaseStartedAtElapsedMs: 0,
+    });
+
+    controller.setMode("gentle-bell");
+    await controller.handleSnapshot(inhaleSnapshot);
+    await controller.handleAppWake(inhaleSnapshot);
+    await controller.handleAppWake(inhaleSnapshot);
+
+    expect(playersBySource.get(101)?.play).toHaveBeenCalledTimes(1);
+    expect(mockSetIsAudioActiveAsync).toHaveBeenCalledTimes(2);
+    expect(mockSetIsAudioActiveAsync).toHaveBeenCalledWith(true);
+  });
+
   it("stops nature ambient immediately when switching to another mode", async () => {
     const playersBySource = new Map<number, MockAudioPlayer>();
     mockCreateAudioPlayer.mockImplementation((source: number) => {

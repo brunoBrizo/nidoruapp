@@ -379,6 +379,8 @@ export function BreathSessionScreen({
   const [completionMode, setCompletionMode] = useState<CompletionMode>(initialCompletionMode);
   const isPersistingTerminalStateRef = useRef(false);
   const hasPersistedSessionStartRef = useRef(Boolean(initialCompletionMode));
+  const hasPersistedFinalDraftRef = useRef(false);
+  const lastPausedDraftObservedAtMsRef = useRef<number | undefined>(undefined);
   const lastDraftPersistedAtMs = useRef<number | undefined>(undefined);
   const previousPhaseNameRef = useRef<FirstSessionPhaseName>(snapshot.phaseName);
   const currentAppStateRef = useRef<AppStateStatus>(getInitialHapticAppState());
@@ -469,12 +471,15 @@ export function BreathSessionScreen({
     const subscription = AppState.addEventListener("change", (nextAppState) => {
       currentAppStateRef.current = nextAppState;
 
-      if (completionMode || nextAppState !== "active") {
+      if (completionMode) {
         return;
       }
 
       const nextSnapshot = refreshSnapshot();
-      void audioControllerRef.current?.handleAppWake(nextSnapshot);
+
+      if (nextAppState === "active") {
+        void audioControllerRef.current?.handleAppWake(nextSnapshot);
+      }
     });
 
     return () => {
@@ -567,17 +572,31 @@ export function BreathSessionScreen({
       return;
     }
 
+    const isFinalDraftWindow = snapshot.remainingDurationMs <= finalDraftWindowMs;
+    const shouldPersistPausedDraft =
+      snapshot.isPaused && lastPausedDraftObservedAtMsRef.current !== snapshot.observedAtMs;
     const shouldPersistDraft =
       lastDraftPersistedAtMs.current === undefined ||
       snapshot.observedAtMs - lastDraftPersistedAtMs.current >= draftPersistIntervalMs ||
-      snapshot.remainingDurationMs <= finalDraftWindowMs ||
-      snapshot.isPaused;
+      (isFinalDraftWindow && !hasPersistedFinalDraftRef.current) ||
+      shouldPersistPausedDraft;
 
     if (!shouldPersistDraft) {
       return;
     }
 
     lastDraftPersistedAtMs.current = snapshot.observedAtMs;
+
+    if (isFinalDraftWindow) {
+      hasPersistedFinalDraftRef.current = true;
+    }
+
+    if (snapshot.isPaused) {
+      lastPausedDraftObservedAtMsRef.current = snapshot.observedAtMs;
+    } else {
+      lastPausedDraftObservedAtMsRef.current = undefined;
+    }
+
     const breathSessionDraft = createBreathSessionDraftFromSnapshot(
       controllerRef.current,
       snapshot,

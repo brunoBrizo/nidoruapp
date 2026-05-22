@@ -315,7 +315,7 @@ export function createActiveSessionAudioController({
         });
       }
 
-      await handleSnapshotInternal(snapshot, true);
+      await handleSnapshotInternal(snapshot);
     },
 
     async handleAudioInterruption(input) {

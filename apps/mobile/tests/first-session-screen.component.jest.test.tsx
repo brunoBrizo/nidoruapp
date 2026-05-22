@@ -1,7 +1,7 @@
 import { describe, expect, it, jest } from "@jest/globals";
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react-native";
 import * as Haptics from "expo-haptics";
-import { AccessibilityInfo } from "react-native";
+import { AccessibilityInfo, AppState, type AppStateStatus } from "react-native";
 
 import { BreathSessionScreen, FirstSessionScreen } from "../src/session/first-session-screen";
 
@@ -33,6 +33,9 @@ jest
   .spyOn(AccessibilityInfo, "isReduceMotionEnabled")
   .mockImplementation(() => new Promise<boolean>(() => undefined));
 jest.spyOn(AccessibilityInfo, "addEventListener").mockImplementation(() => ({ remove: jest.fn() }));
+const appStateAddEventListener = jest
+  .spyOn(AppState, "addEventListener")
+  .mockImplementation(() => ({ remove: jest.fn() }));
 
 const hapticsImpactAsync = Haptics.impactAsync as jest.MockedFunction<typeof Haptics.impactAsync>;
 
@@ -60,6 +63,29 @@ const baseBreathSessionProps = {
   techniqueId: "coherent-breathing",
   tickIntervalMs: 1000,
 } as const;
+
+function mockAppStateChangeListeners() {
+  const handlers: ((state: AppStateStatus) => void)[] = [];
+  const subscriptions: { readonly remove: jest.Mock }[] = [];
+  appStateAddEventListener.mockImplementation((eventType, listener) => {
+    const subscription = { remove: jest.fn() };
+    subscriptions.push(subscription);
+
+    if (eventType === "change") {
+      handlers.push(listener as (state: AppStateStatus) => void);
+    }
+
+    return subscription;
+  });
+
+  return {
+    handlers,
+    restore: () => {
+      appStateAddEventListener.mockImplementation(() => ({ remove: jest.fn() }));
+    },
+    subscriptions,
+  };
+}
 
 describe("FirstSessionScreen", () => {
   it("fires haptic cues once for inhale and exhale transitions without pulsing on hold or timer ticks", async () => {
@@ -360,6 +386,102 @@ describe("FirstSessionScreen", () => {
     });
     expect(screen.getByText("How do you feel?")).toBeTruthy();
 
+    jest.useRealTimers();
+  });
+
+  it("persists near-completion backgrounding locally before any completion UI can show", async () => {
+    jest.useFakeTimers();
+    jest.setSystemTime(baseProps.startedAtMs);
+    const { handlers, restore } = mockAppStateChangeListeners();
+    let resolveBreathSessionCompletion: (() => void) | undefined;
+    const persistBreathSessionCompletion = jest.fn(
+      () =>
+        new Promise<void>((resolve) => {
+          resolveBreathSessionCompletion = resolve;
+        }),
+    );
+
+    render(
+      <FirstSessionScreen
+        {...baseProps}
+        durationSeconds={1}
+        persistBreathSessionCompletion={persistBreathSessionCompletion}
+        persistCompletion={() => Promise.resolve()}
+        tickIntervalMs={60000}
+      />,
+    );
+
+    act(() => {
+      jest.setSystemTime(baseProps.startedAtMs + 1500);
+      for (const handler of handlers) {
+        handler("background");
+      }
+    });
+
+    await waitFor(() => {
+      expect(persistBreathSessionCompletion).toHaveBeenCalledWith(
+        expect.objectContaining({
+          completedAt: "2026-05-20T01:00:01.000Z",
+          completionPersistedAt: "2026-05-20T01:00:01.000Z",
+          source: "first_session",
+          status: "completed",
+        }),
+      );
+    });
+    expect(screen.queryByText("How do you feel?")).toBeNull();
+
+    await act(async () => {
+      resolveBreathSessionCompletion?.();
+      await Promise.resolve();
+    });
+
+    expect(screen.getByText("How do you feel?")).toBeTruthy();
+
+    restore();
+    jest.useRealTimers();
+  });
+
+  it("deduplicates final-window draft writes across repeated background and foreground cycles", async () => {
+    jest.useFakeTimers();
+    jest.setSystemTime(baseProps.startedAtMs);
+    const { handlers, restore } = mockAppStateChangeListeners();
+    const persistBreathSessionDraft = jest.fn(() => Promise.resolve());
+    const persistDraft = jest.fn(() => Promise.resolve());
+
+    render(
+      <FirstSessionScreen
+        {...baseProps}
+        durationSeconds={20}
+        persistBreathSessionDraft={persistBreathSessionDraft}
+        persistDraft={persistDraft}
+        tickIntervalMs={60000}
+      />,
+    );
+
+    for (const elapsedMs of [11_000, 11_200, 11_400]) {
+      await act(async () => {
+        jest.setSystemTime(baseProps.startedAtMs + elapsedMs);
+        for (const handler of handlers) {
+          handler("background");
+          handler("active");
+        }
+        await Promise.resolve();
+      });
+    }
+
+    await waitFor(() => {
+      expect(persistBreathSessionDraft).toHaveBeenCalledTimes(2);
+    });
+    expect(persistDraft).toHaveBeenCalledTimes(2);
+    expect(persistBreathSessionDraft.mock.calls).toContainEqual([
+      expect.objectContaining({
+        remainingDurationMs: 9000,
+        source: "first_session",
+        status: "draft",
+      }),
+    ]);
+
+    restore();
     jest.useRealTimers();
   });
 

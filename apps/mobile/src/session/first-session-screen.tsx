@@ -391,6 +391,7 @@ export function BreathSessionScreen({
   );
   const audioControllerRef = useRef<ActiveSessionAudioController | undefined>(undefined);
   const [audioMode, setAudioMode] = useState<BreathAudioCueModeId>("gentle-bell");
+  const [isAudioPickerVisible, setAudioPickerVisible] = useState(false);
   const [hapticsEnabled, setHapticsEnabled] = useState(true);
   const [completionMode, setCompletionMode] = useState<CompletionMode>(initialCompletionMode);
   const isPersistingTerminalStateRef = useRef(false);
@@ -741,6 +742,7 @@ export function BreathSessionScreen({
   }));
 
   const pauseSession = () => {
+    setAudioPickerVisible(false);
     const paused = pauseBreathSession(controllerRef.current, Date.now());
     setController(paused);
     setSnapshot(getBreathSessionSnapshot(paused, Date.now()));
@@ -783,6 +785,7 @@ export function BreathSessionScreen({
   };
 
   const sessionLabel = `${technique.name} · ${Math.round(sessionDurationSeconds / 60)} min`;
+  const selectedAudioMode = getAudioModeOption(audioMode);
   const hapticsActive = hapticsEnabled;
   const isPaused = snapshot.isPaused && !completionMode;
 
@@ -858,24 +861,20 @@ export function BreathSessionScreen({
       </View>
 
       <View style={styles.controlsArea}>
-        <View style={styles.audioModeRow}>
-          {audioModeOptions.map((option) => (
-            <AudioModeButton
-              key={option.id}
-              accessibilityLabel={option.accessibilityLabel}
-              accessibilityHint={getAudioModeAccessibilityHint(option.id)}
-              isSelected={audioMode === option.id}
-              label={option.label}
-              mode={option.id}
-              onPress={() => {
-                setAudioMode(option.id);
-              }}
-            />
-          ))}
-        </View>
-
         <View style={styles.footer}>
-          <View style={styles.footerSpacer} />
+          <ControlButton
+            active
+            activeLabel={selectedAudioMode.accessibilityLabel}
+            activeTone="muted"
+            accessibilityHint="Opens audio cue options for this session."
+            inactiveLabel={selectedAudioMode.accessibilityLabel}
+            label={selectedAudioMode.label}
+            onPress={() => {
+              setAudioPickerVisible(true);
+            }}
+          >
+            <AudioModeIcon color={colors.dark.textSecondary.value} mode={audioMode} />
+          </ControlButton>
 
           <Pressable
             accessibilityHint="Pauses this breathing session."
@@ -910,6 +909,19 @@ export function BreathSessionScreen({
           </ControlButton>
         </View>
       </View>
+
+      {isAudioPickerVisible ? (
+        <AudioModePicker
+          onDismiss={() => {
+            setAudioPickerVisible(false);
+          }}
+          onSelect={(mode) => {
+            setAudioMode(mode);
+            setAudioPickerVisible(false);
+          }}
+          selectedMode={audioMode}
+        />
+      ) : null}
 
       {isPaused ? (
         <PauseOverlay
@@ -1216,7 +1228,61 @@ function useFadeUpAnimatedStyle(progress: SharedValue<number>, reduceMotionEnabl
   }));
 }
 
-function AudioModeButton({
+function AudioModePicker({
+  onDismiss,
+  onSelect,
+  selectedMode,
+}: {
+  readonly onDismiss: () => void;
+  readonly onSelect: (mode: BreathAudioCueModeId) => void;
+  readonly selectedMode: BreathAudioCueModeId;
+}) {
+  return (
+    <View
+      accessibilityViewIsModal
+      importantForAccessibility="yes"
+      style={styles.audioPickerLayer}
+      testID="first-session-audio-picker"
+    >
+      <Pressable
+        accessibilityHint="Closes audio cue options."
+        accessibilityLabel="Close audio mode picker"
+        accessibilityRole="button"
+        onPress={onDismiss}
+        style={styles.audioPickerBackdrop}
+      />
+      <View style={styles.audioPickerSheet}>
+        <View style={styles.audioPickerHandle} />
+        <Text accessibilityRole="header" selectable style={styles.audioPickerTitle}>
+          Audio cues
+        </Text>
+        <Text selectable style={styles.audioPickerCopy}>
+          Choose the sound layer for breath phase guidance.
+        </Text>
+        <View style={styles.audioPickerOptions}>
+          {audioModeOptions.map((option) => (
+            <AudioModeOptionButton
+              key={option.id}
+              accessibilityLabel={`Select ${option.accessibilityLabel.replace(
+                "Audio mode",
+                "audio mode",
+              )}`}
+              accessibilityHint={getAudioModeAccessibilityHint(option.id)}
+              isSelected={selectedMode === option.id}
+              label={option.label}
+              mode={option.id}
+              onPress={() => {
+                onSelect(option.id);
+              }}
+            />
+          ))}
+        </View>
+      </View>
+    </View>
+  );
+}
+
+function AudioModeOptionButton({
   accessibilityLabel,
   accessibilityHint,
   isSelected,
@@ -1241,8 +1307,8 @@ function AudioModeButton({
       accessibilityState={{ selected: isSelected }}
       onPress={onPress}
       style={({ pressed }) => [
-        styles.audioModeButton,
-        isSelected ? styles.audioModeButtonSelected : null,
+        styles.audioModeOption,
+        isSelected ? styles.audioModeOptionSelected : null,
         pressed ? styles.controlPressed : null,
       ]}
     >
@@ -1283,6 +1349,7 @@ function ControlButton({
   accessibilityHint,
   active,
   activeLabel,
+  activeTone = "accent",
   children,
   inactiveLabel,
   label,
@@ -1291,11 +1358,14 @@ function ControlButton({
   readonly accessibilityHint: string;
   readonly active: boolean;
   readonly activeLabel: string;
+  readonly activeTone?: "accent" | "muted";
   readonly children: ReactNode;
   readonly inactiveLabel: string;
   readonly label: string;
   readonly onPress: () => void;
 }) {
+  const shouldShowAccent = active && activeTone === "accent";
+
   return (
     <Pressable
       accessibilityHint={accessibilityHint}
@@ -1305,12 +1375,14 @@ function ControlButton({
       onPress={onPress}
       style={({ pressed }) => [styles.statusControl, pressed ? styles.controlPressed : null]}
     >
-      <View style={[styles.statusIconCircle, active ? styles.statusIconCircleActive : null]}>
+      <View
+        style={[styles.statusIconCircle, shouldShowAccent ? styles.statusIconCircleActive : null]}
+      >
         {children}
       </View>
       <Text
         selectable={false}
-        style={[styles.statusLabel, active ? styles.statusLabelActive : null]}
+        style={[styles.statusLabel, shouldShowAccent ? styles.statusLabelActive : null]}
       >
         {label}
       </Text>
@@ -1520,6 +1592,10 @@ function getAudioModeAccessibilityHint(mode: BreathAudioCueModeId) {
   }
 }
 
+function getAudioModeOption(mode: BreathAudioCueModeId) {
+  return audioModeOptions.find((option) => option.id === mode) ?? audioModeOptions[1];
+}
+
 function createFirstSessionId() {
   const randomSegment =
     globalThis.crypto?.randomUUID?.().replaceAll("-", "_") ??
@@ -1544,24 +1620,6 @@ const styles = StyleSheet.create({
     top: 150,
     width: 440,
   },
-  audioModeButton: {
-    alignItems: "center",
-    backgroundColor: "rgba(17, 20, 48, 0.78)",
-    borderColor: colors.dark.divider.value,
-    borderRadius: 16,
-    borderWidth: 1,
-    flex: 1,
-    gap: 5,
-    justifyContent: "center",
-    minHeight: 58,
-    minWidth: 0,
-    paddingHorizontal: 6,
-  },
-  audioModeButtonSelected: {
-    backgroundColor: colors.dark.surfaceRaised.value,
-    borderColor: "rgba(168, 156, 224, 0.48)",
-    boxShadow: "0 0 16px rgba(124, 111, 205, 0.22)",
-  },
   audioModeIconCircle: {
     alignItems: "center",
     backgroundColor: "rgba(255, 255, 255, 0.04)",
@@ -1583,10 +1641,77 @@ const styles = StyleSheet.create({
   audioModeLabelSelected: {
     color: colors.dark.textPrimary.value,
   },
-  audioModeRow: {
+  audioModeOption: {
+    alignItems: "center",
+    backgroundColor: "rgba(17, 20, 48, 0.82)",
+    borderColor: colors.dark.divider.value,
+    borderRadius: 16,
+    borderWidth: 1,
     flexDirection: "row",
-    gap: 8,
-    paddingHorizontal: 18,
+    gap: 12,
+    minHeight: 52,
+    paddingHorizontal: 14,
+    width: "100%",
+  },
+  audioModeOptionSelected: {
+    backgroundColor: colors.dark.surfaceRaised.value,
+    borderColor: "rgba(168, 156, 224, 0.48)",
+    boxShadow: "0 0 16px rgba(124, 111, 205, 0.2)",
+  },
+  audioPickerBackdrop: {
+    bottom: 0,
+    left: 0,
+    position: "absolute",
+    right: 0,
+    top: 0,
+  },
+  audioPickerCopy: {
+    color: colors.dark.textSecondary.value,
+    fontFamily: typography.mobileFontFamily.primary.regular,
+    fontSize: 13,
+    lineHeight: 18,
+    marginBottom: 14,
+    textAlign: "center",
+  },
+  audioPickerHandle: {
+    alignSelf: "center",
+    backgroundColor: "rgba(168, 156, 224, 0.35)",
+    borderRadius: 999,
+    height: 4,
+    marginBottom: 14,
+    width: 36,
+  },
+  audioPickerLayer: {
+    backgroundColor: "rgba(13, 15, 26, 0.62)",
+    bottom: 0,
+    justifyContent: "flex-end",
+    left: 0,
+    padding: 20,
+    position: "absolute",
+    right: 0,
+    top: 0,
+  },
+  audioPickerOptions: {
+    gap: 10,
+    width: "100%",
+  },
+  audioPickerSheet: {
+    alignItems: "center",
+    backgroundColor: colors.dark.background.value,
+    borderColor: colors.dark.divider.value,
+    borderRadius: 24,
+    borderWidth: 1,
+    boxShadow: "0 -10px 38px rgba(4, 6, 16, 0.48)",
+    paddingBottom: 18,
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    width: "100%",
+  },
+  audioPickerTitle: {
+    color: colors.dark.textPrimary.value,
+    fontFamily: typography.mobileFontFamily.primary.semiBold,
+    fontSize: 18,
+    marginBottom: 5,
   },
   controlDisabled: {
     opacity: 0.45,
@@ -1654,9 +1779,6 @@ const styles = StyleSheet.create({
     paddingBottom: 28,
     paddingHorizontal: 28,
     paddingTop: spacing.sm,
-  },
-  footerSpacer: {
-    width: 72,
   },
   header: {
     alignItems: "center",
@@ -1733,8 +1855,9 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xs,
   },
   overlayGlow: {
-    backgroundColor: "rgba(124, 111, 205, 0.17)",
+    backgroundColor: "rgba(124, 111, 205, 0.05)",
     borderRadius: 120,
+    boxShadow: "0 0 86px rgba(124, 111, 205, 0.2)",
     height: 240,
     position: "absolute",
     width: 240,
@@ -1776,8 +1899,9 @@ const styles = StyleSheet.create({
     width: 150,
   },
   reflectionAmbientGlow: {
-    backgroundColor: "rgba(124, 111, 205, 0.18)",
+    backgroundColor: "rgba(124, 111, 205, 0.08)",
     borderRadius: 140,
+    boxShadow: "0 0 90px rgba(124, 111, 205, 0.22)",
     height: 280,
     position: "absolute",
     width: 280,

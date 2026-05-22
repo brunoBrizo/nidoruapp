@@ -269,34 +269,49 @@ describe("FirstSessionScreen", () => {
     expect(screen.getByText("4-7-8 Sleep · 4 min")).toBeTruthy();
     expect(screen.getByText("Inhale")).toBeTruthy();
     expect(screen.getByText("04:00")).toBeTruthy();
-    expect(screen.getByText("No audio")).toBeTruthy();
     expect(screen.getByText("Bell")).toBeTruthy();
-    expect(screen.getByText("Whoosh")).toBeTruthy();
-    expect(screen.getByText("Nature")).toBeTruthy();
     expect(screen.getByRole("button", { name: "Audio mode: Gentle bell" })).toBeTruthy();
+    expect(screen.queryByText("No audio")).toBeNull();
+    expect(screen.queryByText("Whoosh")).toBeNull();
+    expect(screen.queryByText("Nature")).toBeNull();
+    expect(screen.queryByText("Audio cues")).toBeNull();
     expect(screen.getByText("Haptics")).toBeTruthy();
     expect(screen.getByLabelText("Pause session")).toBeTruthy();
     expect(screen.queryByText(forbiddenActiveSessionGatePattern)).toBeNull();
   });
 
-  it("switches audio cue modes during an active session without pausing the controller", () => {
+  it("opens a compact audio picker and switches modes without pausing the controller", () => {
     render(<FirstSessionScreen {...baseProps} />);
 
-    fireEvent.press(screen.getByRole("button", { name: "Audio mode: Soft whoosh" }));
+    fireEvent.press(screen.getByRole("button", { name: "Audio mode: Gentle bell" }));
+
+    expect(screen.getByText("Audio cues")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Select audio mode: No audio" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Select audio mode: Gentle bell" })).toHaveProp(
+      "accessibilityState",
+      { selected: true },
+    );
+    fireEvent.press(screen.getByRole("button", { name: "Select audio mode: Soft whoosh" }));
 
     expect(screen.getByRole("button", { name: "Audio mode: Soft whoosh" })).toHaveProp(
       "accessibilityState",
       { selected: true },
     );
+    expect(screen.queryByText("Audio cues")).toBeNull();
+    expect(screen.getByText("Whoosh")).toBeTruthy();
+    expect(screen.queryByText("Nature")).toBeNull();
     expect(screen.getByText("04:00")).toBeTruthy();
     expect(screen.queryByText("Paused")).toBeNull();
 
-    fireEvent.press(screen.getByRole("button", { name: "Audio mode: Nature ambient" }));
+    fireEvent.press(screen.getByRole("button", { name: "Audio mode: Soft whoosh" }));
+    fireEvent.press(screen.getByRole("button", { name: "Select audio mode: Nature ambient" }));
 
     expect(screen.getByRole("button", { name: "Audio mode: Nature ambient" })).toHaveProp(
       "accessibilityState",
       { selected: true },
     );
+    expect(screen.queryByText("Audio cues")).toBeNull();
+    expect(screen.getByText("Nature")).toBeTruthy();
     expect(screen.getByText("Inhale")).toBeTruthy();
   });
 
@@ -680,10 +695,10 @@ describe("BreathSessionScreen", () => {
     expect(screen.getByText("Coherent Breathing · 10 min")).toBeTruthy();
     expect(screen.getByText("Inhale")).toBeTruthy();
     expect(screen.getByText("10:00")).toBeTruthy();
-    expect(screen.getByText("No audio")).toBeTruthy();
     expect(screen.getByText("Bell")).toBeTruthy();
-    expect(screen.getByText("Whoosh")).toBeTruthy();
-    expect(screen.getByText("Nature")).toBeTruthy();
+    expect(screen.queryByText("No audio")).toBeNull();
+    expect(screen.queryByText("Whoosh")).toBeNull();
+    expect(screen.queryByText("Nature")).toBeNull();
     expect(screen.getByText("Haptics")).toBeTruthy();
     expect(screen.getByLabelText("Pause session")).toBeTruthy();
     expect(screen.queryByText(forbiddenActiveSessionGatePattern)).toBeNull();

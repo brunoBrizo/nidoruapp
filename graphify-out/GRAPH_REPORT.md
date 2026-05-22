@@ -1,11 +1,11 @@
 # Graph Report - sleep-app  (2026-05-22)
 
 ## Corpus Check
-- 123 files · ~227,141 words
+- 123 files · ~227,468 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 363 nodes · 390 edges · 18 communities detected
+- 362 nodes · 389 edges · 18 communities detected
 - Extraction: 87% EXTRACTED · 13% INFERRED · 0% AMBIGUOUS · INFERRED: 49 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
@@ -50,17 +50,17 @@
   packages/domain/src/index.ts → apps/mobile/src/notifications/notification-permission-service.ts
 - `fetch()` --calls--> `upsertPostValueRecords()`  [INFERRED]
   supabase/functions/foundation-health/index.ts → apps/mobile/src/paywall/post-value-supabase-auth.ts
-- `openMigratedLocalDatabase()` --calls--> `openDefaultLocalDatabase()`  [INFERRED]
-  apps/mobile/src/storage/local-database.ts → apps/mobile/src/notifications/notification-permission-gate-controller.tsx
+- `createClient()` --calls--> `createPostValueSupabaseClient()`  [INFERRED]
+  apps/mobile/tests/post-value-sync.unit.jest.test.ts → apps/mobile/src/paywall/post-value-supabase-auth.ts
 
 ## Communities
 
 ### Community 0 - "Community 0"
-Cohesion: 0.08
-Nodes (29): shouldStartFirstLaunchOnboarding(), canPromptForNotificationPermission(), completeFirstSessionLocally(), completeOnboardingPersonalizationLocally(), createDefaultRandomSegment(), createLocalEventId(), createLocalReflectionId(), getLocalCalendarDayDifference() (+21 more)
+Cohesion: 0.09
+Nodes (28): shouldStartFirstLaunchOnboarding(), canPromptForNotificationPermission(), completeFirstSessionLocally(), completeOnboardingPersonalizationLocally(), createDefaultRandomSegment(), createLocalEventId(), createLocalReflectionId(), getLocalCalendarDayDifference() (+20 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.12
+Cohesion: 0.13
 Nodes (18): clamp(), completeBreathSessionIfDue(), createBreathSessionController(), endBreathSessionEarly(), getBreathSessionSnapshot(), getCycleDurationMs(), getPhaseAtElapsedMs(), pauseBreathSession() (+10 more)
 
 ### Community 2 - "Community 2"
@@ -69,11 +69,11 @@ Nodes (12): fetch(), createPostValueSupabaseAuthenticator(), createPostValueSupa
 
 ### Community 3 - "Community 3"
 Cohesion: 0.15
-Nodes (11): getAppEnvironment(), isNonProductionEnvironment(), isObservabilityProofModeEnabled(), capturePostHog(), captureSentry(), captureAnalyticsEvent(), captureExplicitEvent(), capturePostHogProofEvent() (+3 more)
+Nodes (10): openAndMigrateLocalDatabase(), openMigratedLocalDatabase(), openDefaultLocalDatabase(), applyMigration(), runSqliteMigrations(), assertCondition(), assertRejects(), runSqlite() (+2 more)
 
 ### Community 4 - "Community 4"
-Cohesion: 0.18
-Nodes (9): openAndMigrateLocalDatabase(), openMigratedLocalDatabase(), applyMigration(), runSqliteMigrations(), assertCondition(), assertRejects(), runSqlite(), SqliteCliDatabase (+1 more)
+Cohesion: 0.15
+Nodes (11): getAppEnvironment(), isNonProductionEnvironment(), isObservabilityProofModeEnabled(), capturePostHog(), captureSentry(), captureAnalyticsEvent(), captureExplicitEvent(), capturePostHogProofEvent() (+3 more)
 
 ### Community 5 - "Community 5"
 Cohesion: 0.22
@@ -142,17 +142,17 @@ Nodes (2): OnboardingRouteScreen(), parseOnboardingStage()
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `requestNotificationPermissionFromGate()` connect `Community 0` to `Community 3`?**
+- **Why does `requestNotificationPermissionFromGate()` connect `Community 0` to `Community 4`?**
   _High betweenness centrality (0.023) - this node is a cross-community bridge._
-- **Why does `captureAnalyticsEvent()` connect `Community 3` to `Community 0`?**
+- **Why does `captureAnalyticsEvent()` connect `Community 4` to `Community 0`?**
   _High betweenness centrality (0.020) - this node is a cross-community bridge._
-- **Why does `openMigratedLocalDatabase()` connect `Community 4` to `Community 0`?**
+- **Why does `openMigratedLocalDatabase()` connect `Community 3` to `Community 0`?**
   _High betweenness centrality (0.019) - this node is a cross-community bridge._
 - **Are the 3 inferred relationships involving `getBreathSessionSnapshot()` (e.g. with `pauseSession()` and `resumeSession()`) actually correct?**
   _`getBreathSessionSnapshot()` has 3 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 4 inferred relationships involving `requestNotificationPermissionFromGate()` (e.g. with `markNotificationPermissionPrompted()` and `captureAnalyticsEvent()`) actually correct?**
   _`requestNotificationPermissionFromGate()` has 4 INFERRED edges - model-reasoned connections that need verification._
 - **Should `Community 0` be split into smaller, more focused modules?**
-  _Cohesion score 0.08 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.09 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
-  _Cohesion score 0.12 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.13 - nodes in this community are weakly interconnected._

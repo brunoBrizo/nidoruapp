@@ -19,9 +19,18 @@ import type {
 import * as Haptics from "expo-haptics";
 import { useRouter, type Href } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { Bell, CheckCircle, Pause, TreePine, Vibrate, VibrateOff, VolumeX, Wind } from "lucide-react-native";
+import {
+  Bell,
+  CheckCircle,
+  Pause,
+  TreePine,
+  Vibrate,
+  VibrateOff,
+  VolumeX,
+  Wind,
+} from "lucide-react-native";
 import { useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
-import { AppState, Pressable, StyleSheet, Text, View } from "react-native";
+import { AppState, Pressable, StyleSheet, Text, View, type AppStateStatus } from "react-native";
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -69,9 +78,7 @@ import {
   type BreathSessionSnapshot,
   type BreathSessionSource,
 } from "./breath-session-runtime";
-import {
-  type FirstSessionPhaseName,
-} from "./first-session-runtime";
+import { type FirstSessionPhaseName } from "./first-session-runtime";
 
 export type BreathSessionPersistence = {
   readonly persistAbandoned?: (record: AbandonedFirstSessionRecord) => Promise<void>;
@@ -208,7 +215,9 @@ export function BreathSessionRouteScreen({
         durationSeconds ??
         pendingCompletion?.durationSeconds ??
         recoverableDraft?.durationSeconds ??
-        (selectedPlanId ? onboardingPlans[selectedPlanId].firstSession.durationSeconds : undefined) ??
+        (selectedPlanId
+          ? onboardingPlans[selectedPlanId].firstSession.durationSeconds
+          : undefined) ??
         breathTechniques[selectedTechniqueId].defaultDurationSeconds;
       const sessionId =
         pendingCompletion?.sessionId ?? recoverableDraft?.sessionId ?? createFirstSessionId();
@@ -304,7 +313,13 @@ export function FirstSessionRouteScreen(props: FirstSessionRouteScreenProps) {
 }
 
 export function FirstSessionScreen(props: FirstSessionScreenProps) {
-  return <BreathSessionScreen {...props} completionEyebrow="First session complete" source="first_session" />;
+  return (
+    <BreathSessionScreen
+      {...props}
+      completionEyebrow="First session complete"
+      source="first_session"
+    />
+  );
 }
 
 export function BreathSessionScreen({
@@ -366,6 +381,7 @@ export function BreathSessionScreen({
   const hasPersistedSessionStartRef = useRef(Boolean(initialCompletionMode));
   const lastDraftPersistedAtMs = useRef<number | undefined>(undefined);
   const previousPhaseNameRef = useRef<FirstSessionPhaseName>(snapshot.phaseName);
+  const currentAppStateRef = useRef<AppStateStatus>(getInitialHapticAppState());
   const orbScale = useSharedValue(getOrbScale(snapshot.phaseName, reduceMotionEnabled));
   const pulseScale = useSharedValue(1);
   const pulseOpacity = useSharedValue(0);
@@ -451,6 +467,8 @@ export function BreathSessionScreen({
 
   useEffect(() => {
     const subscription = AppState.addEventListener("change", (nextAppState) => {
+      currentAppStateRef.current = nextAppState;
+
       if (completionMode || nextAppState !== "active") {
         return;
       }
@@ -523,12 +541,15 @@ export function BreathSessionScreen({
   useEffect(() => {
     const previousPhaseName = previousPhaseNameRef.current;
     previousPhaseNameRef.current = snapshot.phaseName;
+    const isHapticCuePhase = isBreathHapticCuePhase(snapshot.phaseName);
 
     if (
       disableHaptics ||
       !hapticsEnabled ||
+      !canTriggerScreenOnHaptic(currentAppStateRef.current) ||
       snapshot.status !== "active" ||
-      previousPhaseName === snapshot.phaseName
+      previousPhaseName === snapshot.phaseName ||
+      !isHapticCuePhase
     ) {
       return;
     }
@@ -577,7 +598,10 @@ export function BreathSessionScreen({
       return;
     }
 
-    const completedRecord = completeBreathSessionIfDue(controllerRef.current, snapshot.observedAtMs);
+    const completedRecord = completeBreathSessionIfDue(
+      controllerRef.current,
+      snapshot.observedAtMs,
+    );
     const firstSessionRecord = completedRecord
       ? createFirstSessionCompletionRecord(completedRecord)
       : undefined;
@@ -618,7 +642,14 @@ export function BreathSessionScreen({
       .finally(() => {
         isPersistingTerminalStateRef.current = false;
       });
-  }, [audioMode, completionMode, persistBreathSessionCompletion, persistCompletion, snapshot, source]);
+  }, [
+    audioMode,
+    completionMode,
+    persistBreathSessionCompletion,
+    persistCompletion,
+    snapshot,
+    source,
+  ]);
 
   const orbAnimatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: orbScale.value }],
@@ -702,23 +733,38 @@ export function BreathSessionScreen({
 
       <View style={styles.orbSection}>
         <Animated.View
+          accessibilityHint="Guides the current breath phase."
           accessibilityLabel={`${phaseLabels[snapshot.phaseName]} breathing phase`}
           accessibilityRole="image"
           style={[styles.orbStage, isPaused ? styles.orbStagePaused : null, orbAnimatedStyle]}
           testID="first-session-orb"
         >
-          <View style={styles.outerRing} />
-          <View style={styles.innerGlow} />
-          <View style={styles.core}>
+          {reduceMotionEnabled ? null : (
+            <View style={styles.outerRing} testID="first-session-orb-outer-ring" />
+          )}
+          <View style={styles.innerGlow} testID="first-session-orb-inner-glow" />
+          <View style={styles.core} testID="first-session-orb-core">
             <View style={styles.coreAtmosphere} />
           </View>
-          <Animated.View pointerEvents="none" style={[styles.pulseRing, pulseAnimatedStyle]} />
+          {reduceMotionEnabled ? null : (
+            <Animated.View
+              pointerEvents="none"
+              style={[styles.pulseRing, pulseAnimatedStyle]}
+              testID="first-session-orb-pulse-ring"
+            />
+          )}
           <Animated.Text selectable={false} style={[styles.phaseLabel, labelAnimatedStyle]}>
             {phaseLabels[snapshot.phaseName]}
           </Animated.Text>
         </Animated.View>
 
-        <Text selectable style={styles.timer}>
+        <Text
+          accessibilityLabel={`Time remaining ${formatAccessibleRemainingTime(
+            snapshot.remainingSeconds,
+          )}`}
+          selectable
+          style={styles.timer}
+        >
           {formatRemainingTime(snapshot.remainingSeconds)}
         </Text>
       </View>
@@ -729,6 +775,7 @@ export function BreathSessionScreen({
             <AudioModeButton
               key={option.id}
               accessibilityLabel={option.accessibilityLabel}
+              accessibilityHint={getAudioModeAccessibilityHint(option.id)}
               isSelected={audioMode === option.id}
               label={option.label}
               mode={option.id}
@@ -743,6 +790,7 @@ export function BreathSessionScreen({
           <View style={styles.footerSpacer} />
 
           <Pressable
+            accessibilityHint="Pauses this breathing session."
             accessibilityLabel="Pause session"
             accessibilityRole="button"
             disabled={Boolean(completionMode)}
@@ -758,8 +806,9 @@ export function BreathSessionScreen({
 
           <ControlButton
             active={hapticsActive}
-            activeLabel="Haptics"
-            inactiveLabel="No haptics"
+            activeLabel="Haptics on"
+            accessibilityHint="Toggles breath phase haptics without changing audio or visual guidance."
+            inactiveLabel="Haptics off"
             label={hapticsActive ? "Haptics" : "No haptics"}
             onPress={() => {
               setHapticsEnabled((enabled) => !enabled);
@@ -842,6 +891,8 @@ function PauseOverlay({
       </Text>
       <View style={styles.overlayActions}>
         <Pressable
+          accessibilityHint="Returns to the current breath phase."
+          accessibilityLabel="Resume session"
           accessibilityRole="button"
           onPress={onResume}
           style={({ pressed }) => [styles.continueButton, pressed ? styles.controlPressed : null]}
@@ -851,6 +902,8 @@ function PauseOverlay({
           </Text>
         </Pressable>
         <Pressable
+          accessibilityHint="Saves this session as ended without showing the reflection step."
+          accessibilityLabel="End session for now"
           accessibilityRole="button"
           onPress={onEnd}
           style={({ pressed }) => [styles.endForNowButton, pressed ? styles.endPressed : null]}
@@ -1077,12 +1130,14 @@ function useFadeUpAnimatedStyle(progress: SharedValue<number>, reduceMotionEnabl
 
 function AudioModeButton({
   accessibilityLabel,
+  accessibilityHint,
   isSelected,
   label,
   mode,
   onPress,
 }: {
   readonly accessibilityLabel: string;
+  readonly accessibilityHint: string;
   readonly isSelected: boolean;
   readonly label: string;
   readonly mode: BreathAudioCueModeId;
@@ -1092,6 +1147,7 @@ function AudioModeButton({
 
   return (
     <Pressable
+      accessibilityHint={accessibilityHint}
       accessibilityLabel={accessibilityLabel}
       accessibilityRole="button"
       accessibilityState={{ selected: isSelected }}
@@ -1136,6 +1192,7 @@ function AudioModeIcon({
 }
 
 function ControlButton({
+  accessibilityHint,
   active,
   activeLabel,
   children,
@@ -1143,6 +1200,7 @@ function ControlButton({
   label,
   onPress,
 }: {
+  readonly accessibilityHint: string;
   readonly active: boolean;
   readonly activeLabel: string;
   readonly children: ReactNode;
@@ -1152,6 +1210,7 @@ function ControlButton({
 }) {
   return (
     <Pressable
+      accessibilityHint={accessibilityHint}
       accessibilityLabel={active ? activeLabel : inactiveLabel}
       accessibilityRole="button"
       accessibilityState={{ selected: active }}
@@ -1294,15 +1353,29 @@ function getPlanForTechnique(techniqueId: BreathTechniqueId) {
 }
 
 function getOrbScale(phaseName: FirstSessionPhaseName, reduceMotionEnabled: boolean) {
-  if (reduceMotionEnabled) {
-    return 1;
-  }
+  const activeScale = reduceMotionEnabled ? motion.breathingOrb.inhaleScale : 1.45;
 
-  if (phaseName === "inhale" || phaseName === "hold") {
-    return 1.45;
+  if (isExpandingBreathPhase(phaseName)) {
+    return activeScale;
   }
 
   return 1;
+}
+
+function isExpandingBreathPhase(phaseName: FirstSessionPhaseName) {
+  return phaseName === "inhale" || phaseName === "second-inhale" || phaseName === "hold";
+}
+
+function isBreathHapticCuePhase(phaseName: FirstSessionPhaseName) {
+  return phaseName === "inhale" || phaseName === "second-inhale" || phaseName === "exhale";
+}
+
+function getInitialHapticAppState(): AppStateStatus {
+  return canTriggerScreenOnHaptic(AppState.currentState) ? "active" : AppState.currentState;
+}
+
+function canTriggerScreenOnHaptic(appState: AppStateStatus) {
+  return appState !== "background" && appState !== "inactive";
 }
 
 function formatRemainingTime(remainingSeconds: number, padMinutes = true) {
@@ -1312,6 +1385,36 @@ function formatRemainingTime(remainingSeconds: number, padMinutes = true) {
   const minuteText = padMinutes ? minutes.toString().padStart(2, "0") : minutes.toString();
 
   return `${minuteText}:${seconds.toString().padStart(2, "0")}`;
+}
+
+function formatAccessibleRemainingTime(remainingSeconds: number) {
+  const boundedSeconds = Math.max(0, remainingSeconds);
+  const minutes = Math.floor(boundedSeconds / 60);
+  const seconds = boundedSeconds % 60;
+  const parts: string[] = [];
+
+  if (minutes > 0) {
+    parts.push(`${minutes} ${minutes === 1 ? "minute" : "minutes"}`);
+  }
+
+  if (seconds > 0 || parts.length === 0) {
+    parts.push(`${seconds} ${seconds === 1 ? "second" : "seconds"}`);
+  }
+
+  return parts.join(" ");
+}
+
+function getAudioModeAccessibilityHint(mode: BreathAudioCueModeId) {
+  switch (mode) {
+    case "gentle-bell":
+      return "Uses a gentle bell for phase cues.";
+    case "nature-ambient":
+      return "Uses nature ambience under phase cues.";
+    case "none":
+      return "Turns off audio cues for this session.";
+    case "soft-whoosh":
+      return "Uses a soft whoosh for phase cues.";
+  }
 }
 
 function createFirstSessionId() {

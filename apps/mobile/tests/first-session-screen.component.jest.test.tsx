@@ -1,5 +1,6 @@
 import { describe, expect, it, jest } from "@jest/globals";
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react-native";
+import * as Haptics from "expo-haptics";
 import { AccessibilityInfo } from "react-native";
 
 import { BreathSessionScreen, FirstSessionScreen } from "../src/session/first-session-screen";
@@ -33,6 +34,8 @@ jest
   .mockImplementation(() => new Promise<boolean>(() => undefined));
 jest.spyOn(AccessibilityInfo, "addEventListener").mockImplementation(() => ({ remove: jest.fn() }));
 
+const hapticsImpactAsync = Haptics.impactAsync as jest.MockedFunction<typeof Haptics.impactAsync>;
+
 const forbiddenActiveSessionGatePattern =
   /account|paywall|permission|notification|microphone|health|subscribe|sign in|sync/i;
 
@@ -59,6 +62,169 @@ const baseBreathSessionProps = {
 } as const;
 
 describe("FirstSessionScreen", () => {
+  it("fires haptic cues once for inhale and exhale transitions without pulsing on hold or timer ticks", async () => {
+    jest.useFakeTimers();
+    jest.setSystemTime(baseProps.startedAtMs);
+    hapticsImpactAsync.mockClear();
+
+    render(<FirstSessionScreen {...baseProps} disableHaptics={false} durationSeconds={30} />);
+
+    await act(async () => {
+      jest.advanceTimersByTime(4000);
+      await Promise.resolve();
+    });
+    expect(hapticsImpactAsync).not.toHaveBeenCalled();
+
+    await act(async () => {
+      jest.advanceTimersByTime(7000);
+      await Promise.resolve();
+    });
+    expect(hapticsImpactAsync).toHaveBeenCalledTimes(1);
+    expect(hapticsImpactAsync).toHaveBeenLastCalledWith(Haptics.ImpactFeedbackStyle.Soft);
+
+    await act(async () => {
+      jest.advanceTimersByTime(8000);
+      await Promise.resolve();
+    });
+    expect(hapticsImpactAsync).toHaveBeenCalledTimes(2);
+    expect(hapticsImpactAsync).toHaveBeenLastCalledWith(Haptics.ImpactFeedbackStyle.Light);
+
+    await act(async () => {
+      jest.advanceTimersByTime(1000);
+      await Promise.resolve();
+    });
+    expect(hapticsImpactAsync).toHaveBeenCalledTimes(2);
+
+    jest.useRealTimers();
+  });
+
+  it("lets users disable phase haptics without changing the active visual or audio guidance", async () => {
+    jest.useFakeTimers();
+    jest.setSystemTime(baseProps.startedAtMs);
+    hapticsImpactAsync.mockClear();
+
+    render(<FirstSessionScreen {...baseProps} disableHaptics={false} durationSeconds={30} />);
+
+    fireEvent.press(screen.getByRole("button", { name: "Haptics on" }));
+
+    expect(screen.getByRole("button", { name: "Haptics off" })).toHaveProp("accessibilityState", {
+      selected: false,
+    });
+    expect(screen.getByText("No haptics")).toBeTruthy();
+    expect(screen.getByText("Inhale")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Audio mode: Gentle bell" })).toHaveProp(
+      "accessibilityState",
+      { selected: true },
+    );
+
+    await act(async () => {
+      jest.advanceTimersByTime(19000);
+      await Promise.resolve();
+    });
+    expect(hapticsImpactAsync).not.toHaveBeenCalled();
+
+    jest.useRealTimers();
+  });
+
+  it("keeps local completion persistence moving when haptics are unavailable", async () => {
+    jest.useFakeTimers();
+    jest.setSystemTime(baseProps.startedAtMs);
+    hapticsImpactAsync.mockRejectedValueOnce(new Error("haptics unavailable"));
+    const persistBreathSessionCompletion = jest.fn(() => Promise.resolve());
+    const persistCompletion = jest.fn(() => Promise.resolve());
+
+    render(
+      <FirstSessionScreen
+        {...baseProps}
+        disableHaptics={false}
+        durationSeconds={12}
+        persistBreathSessionCompletion={persistBreathSessionCompletion}
+        persistCompletion={persistCompletion}
+      />,
+    );
+
+    await act(async () => {
+      jest.advanceTimersByTime(12000);
+      await Promise.resolve();
+    });
+
+    await waitFor(() => {
+      expect(persistBreathSessionCompletion).toHaveBeenCalledWith(
+        expect.objectContaining({ status: "completed" }),
+      );
+      expect(persistCompletion).toHaveBeenCalledWith(
+        expect.objectContaining({ status: "completed" }),
+      );
+    });
+    expect(screen.getByText("How do you feel?")).toBeTruthy();
+
+    hapticsImpactAsync.mockReset();
+    hapticsImpactAsync.mockResolvedValue();
+    jest.useRealTimers();
+  });
+
+  it("does not duplicate haptic cues when pausing and resuming inside the same phase", async () => {
+    jest.useFakeTimers();
+    jest.setSystemTime(baseBreathSessionProps.startedAtMs);
+    hapticsImpactAsync.mockClear();
+
+    render(
+      <BreathSessionScreen
+        {...baseBreathSessionProps}
+        disableHaptics={false}
+        durationSeconds={30}
+      />,
+    );
+
+    await act(async () => {
+      jest.advanceTimersByTime(2000);
+      await Promise.resolve();
+    });
+    fireEvent.press(screen.getByLabelText("Pause session"));
+    fireEvent.press(screen.getByRole("button", { name: "Resume session" }));
+    expect(hapticsImpactAsync).not.toHaveBeenCalled();
+
+    await act(async () => {
+      jest.advanceTimersByTime(4000);
+      await Promise.resolve();
+    });
+    expect(hapticsImpactAsync).toHaveBeenCalledTimes(1);
+    expect(hapticsImpactAsync).toHaveBeenLastCalledWith(Haptics.ImpactFeedbackStyle.Soft);
+
+    jest.useRealTimers();
+  });
+
+  it("renders Reduce Motion with a core breath guide, no decorative pulse layer, and accessible controls", async () => {
+    (
+      AccessibilityInfo.isReduceMotionEnabled as jest.MockedFunction<
+        typeof AccessibilityInfo.isReduceMotionEnabled
+      >
+    ).mockResolvedValueOnce(true);
+
+    render(<FirstSessionScreen {...baseProps} />);
+
+    await waitFor(() => {
+      expect(screen.queryByTestId("first-session-orb-pulse-ring")).toBeNull();
+    });
+
+    expect(screen.queryByTestId("first-session-orb-outer-ring")).toBeNull();
+    expect(screen.getByTestId("first-session-orb-inner-glow")).toBeTruthy();
+    expect(screen.getByTestId("first-session-orb-core")).toBeTruthy();
+    expect(screen.getByLabelText("Inhale breathing phase")).toBeTruthy();
+    expect(screen.getByLabelText("Time remaining 4 minutes")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Audio mode: Gentle bell" })).toHaveProp(
+      "accessibilityState",
+      { selected: true },
+    );
+    expect(screen.getByRole("button", { name: "Haptics on" })).toHaveProp("accessibilityState", {
+      selected: true,
+    });
+
+    fireEvent.press(screen.getByRole("button", { name: "Pause session" }));
+    expect(screen.getByRole("button", { name: "Resume session" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "End session for now" })).toBeTruthy();
+  });
+
   it("renders the first full session without account, paywall, permission, or sync gates", () => {
     render(<FirstSessionScreen {...baseProps} />);
 
@@ -107,11 +273,11 @@ describe("FirstSessionScreen", () => {
 
     expect(screen.getByText("Paused")).toBeTruthy();
     expect(screen.getByText("4-7-8 Sleep · 4:00 left")).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Continue" })).toBeTruthy();
-    expect(screen.getByRole("button", { name: "End for now" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Resume session" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "End session for now" })).toBeTruthy();
     expect(screen.queryByText(forbiddenActiveSessionGatePattern)).toBeNull();
 
-    fireEvent.press(screen.getByRole("button", { name: "Continue" }));
+    fireEvent.press(screen.getByRole("button", { name: "Resume session" }));
     expect(screen.queryByText("Paused")).toBeNull();
 
     jest.useRealTimers();
@@ -354,7 +520,7 @@ describe("FirstSessionScreen", () => {
       jest.advanceTimersByTime(5000);
     });
     fireEvent.press(screen.getByLabelText("Pause session"));
-    fireEvent.press(screen.getByRole("button", { name: "End for now" }));
+    fireEvent.press(screen.getByRole("button", { name: "End session for now" }));
 
     await waitFor(() => {
       expect(persistAbandoned).toHaveBeenCalledWith(
@@ -547,7 +713,7 @@ describe("BreathSessionScreen", () => {
     expect(screen.getByText("Paused")).toBeTruthy();
     expect(screen.getByText("Coherent Breathing · 9:55 left")).toBeTruthy();
 
-    fireEvent.press(screen.getByRole("button", { name: "End for now" }));
+    fireEvent.press(screen.getByRole("button", { name: "End session for now" }));
 
     await waitFor(() => {
       expect(persistBreathSessionAbandoned).toHaveBeenCalledWith(

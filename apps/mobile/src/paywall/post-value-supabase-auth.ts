@@ -25,6 +25,7 @@ type PostValueAuthClient = Pick<
 >;
 
 const postValueSyncTables = {
+  breath_sessions: "user_id,local_session_id",
   first_session_sync_records: "user_id,local_session_id",
   local_install_links: "local_install_id",
   post_session_reflection_sync_records: "user_id,local_reflection_id",

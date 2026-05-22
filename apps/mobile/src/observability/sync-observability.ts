@@ -9,6 +9,7 @@ export type SyncFailureReasonClass =
   | "unknown";
 
 export type SyncFailureRecordType =
+  | "breath_session"
   | "local_install_link"
   | "first_session_record"
   | "post_session_reflection"

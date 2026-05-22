@@ -60,6 +60,7 @@ type AnalyticsEventProperties = Readonly<
       | "validation_error"
       | "unknown";
     record_type:
+      | "breath_session"
       | "local_install_link"
       | "first_session_record"
       | "post_session_reflection"

@@ -1,11 +1,11 @@
 # Graph Report - sleep-app  (2026-05-22)
 
 ## Corpus Check
-- 118 files · ~222,650 words
+- 118 files · ~223,200 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 358 nodes · 388 edges · 18 communities detected
+- 359 nodes · 391 edges · 18 communities detected
 - Extraction: 87% EXTRACTED · 13% INFERRED · 0% AMBIGUOUS · INFERRED: 49 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
@@ -38,8 +38,8 @@
 6. `evaluateGate()` - 7 edges
 7. `createLocalEventId()` - 7 edges
 8. `runSqliteMigrations()` - 6 edges
-9. `createPersonalizedOnboardingPlan()` - 5 edges
-10. `getNextEveningReminderDate()` - 5 edges
+9. `syncPostValueLocalRecords()` - 6 edges
+10. `createPersonalizedOnboardingPlan()` - 5 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `getOnboardingPlanForGoal()` --calls--> `completeOnboardingPersonalizationLocally()`  [INFERRED]
@@ -96,8 +96,8 @@ Cohesion: 0.25
 Nodes (3): captureAudioFailedDeferred(), captureAnalyticsEventDeferred(), captureSyncFailureDeferred()
 
 ### Community 10 - "Community 10"
-Cohesion: 0.46
-Nodes (7): classifySyncError(), createSyncTableError(), getFailedRecordType(), parseUserId(), syncPostValueLocalRecords(), unwrapSyncCause(), upsertOrThrow()
+Cohesion: 0.44
+Nodes (8): classifySyncError(), createBreathSessionSyncPayloads(), createSyncTableError(), getFailedRecordType(), parseUserId(), syncPostValueLocalRecords(), unwrapSyncCause(), upsertOrThrow()
 
 ### Community 11 - "Community 11"
 Cohesion: 0.43
@@ -147,7 +147,7 @@ _Questions this graph is uniquely positioned to answer:_
 - **Why does `captureAnalyticsEvent()` connect `Community 4` to `Community 0`?**
   _High betweenness centrality (0.021) - this node is a cross-community bridge._
 - **Why does `openMigratedLocalDatabase()` connect `Community 3` to `Community 0`?**
-  _High betweenness centrality (0.020) - this node is a cross-community bridge._
+  _High betweenness centrality (0.019) - this node is a cross-community bridge._
 - **Are the 3 inferred relationships involving `getBreathSessionSnapshot()` (e.g. with `pauseSession()` and `resumeSession()`) actually correct?**
   _`getBreathSessionSnapshot()` has 3 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 4 inferred relationships involving `requestNotificationPermissionFromGate()` (e.g. with `markNotificationPermissionPrompted()` and `captureAnalyticsEvent()`) actually correct?**

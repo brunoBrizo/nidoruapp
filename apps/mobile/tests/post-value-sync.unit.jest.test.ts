@@ -40,6 +40,28 @@ function createDatabase(): SyncDatabase & {
         ] as never);
       }
 
+      if (source.includes("FROM breath_session_records")) {
+        return Promise.resolve([
+          {
+            audio_cue_mode_id: "gentle-bell",
+            completed_at: "2026-05-20T01:04:30.000Z",
+            completed_breath_cycles: 18,
+            completion_persisted_at: "2026-05-20T01:04:31.000Z",
+            current_phase: "exhale",
+            duration_seconds: 240,
+            elapsed_ms: 240000,
+            local_install_id: localInstallId,
+            plan_id: "sleep_focused",
+            remaining_ms: 0,
+            session_id: "session_generic012345",
+            source: "breathe_tab",
+            started_at: "2026-05-20T01:00:30.000Z",
+            technique_id: "coherent-breathing",
+            updated_at: "2026-05-20T01:04:31.000Z",
+          },
+        ] as never);
+      }
+
       return Promise.resolve([] as never);
     }),
     getFirstAsync: jest.fn<SyncDatabase["getFirstAsync"]>().mockResolvedValue({
@@ -122,6 +144,114 @@ describe("post-value local record sync", () => {
         },
       ],
       { onConflict: "user_id,local_reflection_id" },
+    );
+    expect(client.upserts.breath_sessions).toHaveBeenCalledWith(
+      [
+        {
+          audio_cue_mode_id: "gentle-bell",
+          completed_at: "2026-05-20T01:04:30.000Z",
+          completed_breath_cycles: 18,
+          completion_persisted_at: "2026-05-20T01:04:31.000Z",
+          duration_seconds: 240,
+          local_install_id: localInstallId,
+          local_session_id: "session_generic012345",
+          plan_id: "sleep_focused",
+          source: "breathe_tab",
+          started_at: "2026-05-20T01:00:30.000Z",
+          technique_id: "coherent-breathing",
+          updated_at: "2026-05-20T01:07:00.000Z",
+          user_id: userId,
+        },
+      ],
+      { onConflict: "user_id,local_session_id" },
+    );
+    expect(JSON.stringify(client.upserts.breath_sessions.mock.calls)).not.toMatch(
+      /current_phase|elapsed_ms|payload_json|raw_reflection/,
+    );
+  });
+
+  it("rejects invalid completed breath-session rows before any network upsert", async () => {
+    const database = createDatabase();
+    database.getAllAsync.mockImplementation((source) => {
+      if (source.includes("FROM breath_session_records")) {
+        return Promise.resolve([
+          {
+            audio_cue_mode_id: "none",
+            completed_at: "2026-05-20T01:04:30.000Z",
+            completed_breath_cycles: 18,
+            completion_persisted_at: "2026-05-20T01:04:31.000Z",
+            current_phase: "exhale",
+            duration_seconds: 240,
+            elapsed_ms: 240000,
+            local_install_id: localInstallId,
+            plan_id: null,
+            remaining_ms: 0,
+            session_id: "session_generic012345",
+            source: "breathe_tab",
+            started_at: "2026-05-20T01:00:30.000Z",
+            technique_id: "unknown-technique",
+            updated_at: "2026-05-20T01:04:31.000Z",
+          },
+        ] as never);
+      }
+
+      return Promise.resolve([] as never);
+    });
+    const client = createClient();
+    const observeFailure = jest.fn();
+
+    await expect(
+      syncPostValueLocalRecords({
+        client,
+        database,
+        localInstallId,
+        observeFailure,
+        userId,
+      }),
+    ).resolves.toEqual({ reason: "validation_error", status: "retry_pending" });
+
+    expect(client.from).not.toHaveBeenCalled();
+    expect(observeFailure).toHaveBeenCalledWith({
+      attemptCount: 1,
+      reasonClass: "validation_error",
+      recordType: "breath_session",
+      syncStage: "post_value_sync",
+    });
+  });
+
+  it("classifies generic breath-session sync failures as retryable without deleting local rows", async () => {
+    const database = createDatabase();
+    const client = createClient();
+    client.from.mockImplementation((tableName) => ({
+      upsert: jest.fn(() => {
+        if (tableName === "breath_sessions") {
+          return Promise.reject(new TypeError("Network request failed"));
+        }
+
+        return Promise.resolve({ error: null });
+      }),
+    }));
+    const observeFailure = jest.fn();
+
+    await expect(
+      syncPostValueLocalRecords({
+        client,
+        database,
+        localInstallId,
+        observeFailure,
+        userId,
+      }),
+    ).resolves.toEqual({ reason: "offline", status: "retry_pending" });
+
+    expect(observeFailure).toHaveBeenCalledWith({
+      attemptCount: 1,
+      reasonClass: "offline",
+      recordType: "breath_session",
+      syncStage: "post_value_sync",
+    });
+    expect(database.runAsync).not.toHaveBeenCalledWith(
+      expect.stringMatching(/DELETE FROM breath_session_records|UPDATE breath_session_records/),
+      expect.anything(),
     );
   });
 

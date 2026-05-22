@@ -2,7 +2,7 @@
 name: "ghost-scan-secrets"
 description: |
   Ghost Security - Secrets and credentials scanner. Scans codebase for leaked API keys, tokens, passwords, and sensitive data. Detects hardcoded secrets and generates findings with severity and remediation guidance. Use when the user asks to check for leaked secrets, scan for credentials, find hardcoded API keys or passwords, detect exposed .env values, or audit code for sensitive data exposure.
-allowed-tools: Read, Glob, Grep, Bash, Task, TodoRead, TodoWrite
+allowed-tools: Read, Glob, Grep, Bash, Task, TodoRead, TodoWrite, multi_agent_v1.spawn_agent, multi_agent_v1.wait_agent
 argument-hint: "[path-to-scan]"
 license: apache-2.0
 metadata:
@@ -11,7 +11,7 @@ metadata:
 
 # Ghost Security Secrets Scanner — Orchestrator
 
-You are the top-level orchestrator for secrets scanning. Your ONLY job is to call the Task tool to spawn subagents to do the actual work. Each step below gives you the exact Task tool parameters to use. Do not do the work yourself.
+You are the top-level orchestrator for secrets scanning. Your ONLY job is to call the available subagent tool to spawn agents to do the actual work. In Claude Code, use `Task`. In Codex, use `multi_agent_v1.spawn_agent` with the adapter below. Do not do the scan, analysis, or summary work yourself.
 
 ## Defaults
 
@@ -42,7 +42,30 @@ repo_name=$(basename "$(pwd)") && remote_url=$(git remote get-url origin 2>/dev/
 
 Store `scan_dir` (the absolute path under `~/.ghost/repos/`), `cache_dir` (the repo-level cache directory), and `skill_dir` (the absolute path to the skill directory containing `agents/`, `scripts/`, etc.).
 
-After this step, your only remaining tool is Task. Do not use Bash, Read, Grep, Glob, or any other tool for Steps 1–4.
+After this step, your only remaining tool is the platform subagent tool. In Claude Code, that tool is `Task`. In Codex, that tool is `multi_agent_v1.spawn_agent`, followed by `multi_agent_v1.wait_agent` when the next step depends on the result. Do not use Bash, Read, Grep, Glob, or any other tool for Steps 1–4.
+
+## Codex adapter
+
+If the `Task` tool is unavailable and `multi_agent_v1.spawn_agent` is available, use this adapter for Steps 1-4:
+
+- For every Task call shown below, call `multi_agent_v1.spawn_agent` instead.
+- Set `agent_type` to `worker`.
+- Set `fork_context` to `true`.
+- Put the Task `prompt` value in the `message` field unchanged, after replacing placeholders such as `<repo_path>`, `<scan_dir>`, `<skill_dir>`, and `<cache_dir>`.
+- Do not set `model`, `service_tier`, or `reasoning_effort` unless the user explicitly requested an override.
+- After each spawned agent, call `multi_agent_v1.wait_agent` with that agent id before moving to the next step, because each step depends on the previous step's output files.
+- If Step 2 reports zero candidates, skip Step 3 and continue to Step 4.
+- If any spawned agent fails, retry the same `spawn_agent` call once. If it fails again, stop and report the failure.
+
+Example Codex call shape:
+
+```json
+{
+  "agent_type": "worker",
+  "fork_context": true,
+  "message": "You are the scan agent. Read and follow the instructions in <skill_dir>/agents/scan/agent.md.\n\n## Inputs\n- repo_path: <repo_path>\n- scan_dir: <scan_dir>"
+}
+```
 
 ### Step 1: Initialize Poltergeist
 

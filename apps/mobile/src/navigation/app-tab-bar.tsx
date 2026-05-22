@@ -1,9 +1,8 @@
 import { colors, spacing, typography } from "@nidoru/ui-tokens";
 import { usePathname } from "expo-router";
-import { ChartColumn, UserRound, Wind, type LucideIcon } from "lucide-react-native";
-import { useEffect, useRef, useState, type ReactElement } from "react";
+import { ChartColumn, House, Moon, UserRound, Wind, type LucideIcon } from "lucide-react-native";
+import { useEffect, useRef, useState } from "react";
 import { Animated, Easing, Pressable, StyleSheet, Text, View } from "react-native";
-import Svg, { Path } from "react-native-svg";
 
 import { appShellTabs, type AppShellTabId } from "../home/home-actions";
 import { useReduceMotionEnabled } from "../motion/use-reduce-motion-enabled";
@@ -16,22 +15,15 @@ const routeNameByTabId: Record<AppShellTabId, string> = {
   profile: "profile",
 };
 
-type TabIconProps = {
-  readonly color: string;
-  readonly size: number;
-  readonly strokeWidth: number;
-  readonly testID?: string;
-};
-
-const iconByTabId: Record<AppShellTabId, LucideIcon | ((props: TabIconProps) => ReactElement)> = {
-  home: HomeSmileIcon,
-  sleep: MoonSleepIcon,
+const iconByTabId: Record<AppShellTabId, LucideIcon> = {
+  home: House,
+  sleep: Moon,
   breathe: Wind,
   progress: ChartColumn,
   profile: UserRound,
 };
 
-const inactiveTabColor = "#A0A5C0";
+const inactiveTabColor = colors.dark.textSecondary.value;
 const activeIndicatorWidth = 42;
 
 export const TAB_ACTIVE_INDICATOR_MOTION = {
@@ -94,6 +86,7 @@ export function AppTabBar({ state, descriptors, navigation }: AppTabBarProps) {
   const [surfaceWidth, setSurfaceWidth] = useState(0);
   const tabWidth = surfaceWidth / appShellTabs.length;
   const motionConfig = getTabIndicatorMotionConfig(reduceMotionEnabled);
+  const showActiveIndicator = activeRoute?.name !== routeNameByTabId.breathe;
   const indicatorTranslateX = indicatorPosition.interpolate({
     inputRange: [0, appShellTabs.length - 1],
     outputRange: [0, tabWidth * (appShellTabs.length - 1)],
@@ -121,18 +114,20 @@ export function AppTabBar({ state, descriptors, navigation }: AppTabBarProps) {
         }}
         style={styles.surface}
       >
-        <Animated.View
-          pointerEvents="none"
-          style={[
-            styles.activeIndicator,
-            {
-              left: tabWidth > 0 ? tabWidth / 2 - activeIndicatorWidth / 2 : 0,
-              opacity: tabWidth > 0 ? 1 : 0,
-              transform: [{ translateX: indicatorTranslateX }],
-            },
-          ]}
-          testID="tab-active-indicator"
-        />
+        {showActiveIndicator ? (
+          <Animated.View
+            pointerEvents="none"
+            style={[
+              styles.activeIndicator,
+              {
+                left: tabWidth > 0 ? tabWidth / 2 - activeIndicatorWidth / 2 : 0,
+                opacity: tabWidth > 0 ? 1 : 0,
+                transform: [{ translateX: indicatorTranslateX }],
+              },
+            ]}
+            testID="tab-active-indicator"
+          />
+        ) : null}
         {appShellTabs.map((tab) => {
           const routeName = routeNameByTabId[tab.id];
           const route = state.routes.find((candidate) => candidate.name === routeName);
@@ -253,58 +248,3 @@ const styles = StyleSheet.create({
     width: 120,
   },
 });
-
-function HomeSmileIcon({ color, size, strokeWidth, testID }: TabIconProps) {
-  return (
-    <Svg fill="none" height={size} viewBox="0 0 24 24" width={size} {...(testID ? { testID } : {})}>
-      <Path
-        d="M4 10.7 12 4l8 6.7"
-        stroke={color}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={strokeWidth}
-      />
-      <Path
-        d="M6.2 9.4V20h11.6V9.4"
-        stroke={color}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={strokeWidth}
-      />
-      <Path
-        d="M9.4 15.7c.7.7 1.6 1 2.6 1s1.9-.3 2.6-1"
-        stroke={color}
-        strokeLinecap="round"
-        strokeWidth={strokeWidth}
-      />
-    </Svg>
-  );
-}
-
-function MoonSleepIcon({ color, size, strokeWidth, testID }: TabIconProps) {
-  return (
-    <Svg fill="none" height={size} viewBox="0 0 24 24" width={size} {...(testID ? { testID } : {})}>
-      <Path
-        d="M15.5 18.7A7.2 7.2 0 0 1 6 9.2 7.3 7.3 0 1 0 15.5 18.7Z"
-        stroke={color}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={strokeWidth}
-      />
-      <Path
-        d="M15.8 5.4h3.2l-3.2 3.8h3.2"
-        stroke={color}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={strokeWidth}
-      />
-      <Path
-        d="M18.4 10.9h2.2l-2.2 2.6h2.2"
-        stroke={color}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={strokeWidth}
-      />
-    </Svg>
-  );
-}

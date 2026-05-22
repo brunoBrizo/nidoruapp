@@ -32,7 +32,12 @@ type CardFadeConfig = {
   readonly wash?: LinearFade;
 };
 
-export type CardFadeVariant = "home-primary" | "personalized-plan" | "profile" | "sleep-primary";
+export type CardFadeVariant =
+  | "breathe-sleep-card"
+  | "home-primary"
+  | "personalized-plan"
+  | "profile"
+  | "sleep-primary";
 
 type CardFadeProps = {
   readonly testID: string;
@@ -43,6 +48,40 @@ const primaryColor = colors.dark.primary.value;
 const primaryGlowColor = colors.dark.primaryGlow.value;
 
 const cardFadeVariants: Record<CardFadeVariant, CardFadeConfig> = {
+  "breathe-sleep-card": {
+    viewBox: "0 0 327 100",
+    corner: {
+      cx: 0,
+      cy: 50,
+      r: 104,
+      stops: [
+        { offset: "0", color: primaryColor, opacity: "0.15" },
+        { offset: "0.38", color: primaryColor, opacity: "0.08" },
+        { offset: "0.72", color: primaryColor, opacity: "0.026" },
+        { offset: "1", color: primaryColor, opacity: "0" },
+      ],
+    },
+    topEdge: {
+      x: 0,
+      y: 0,
+      width: 1,
+      height: 1,
+      stops: [
+        { offset: "0", color: primaryColor, opacity: "0" },
+        { offset: "1", color: primaryColor, opacity: "0" },
+      ],
+    },
+    rightEdge: {
+      x: 0,
+      y: 0,
+      width: 1,
+      height: 1,
+      stops: [
+        { offset: "0", color: primaryColor, opacity: "0" },
+        { offset: "1", color: primaryColor, opacity: "0" },
+      ],
+    },
+  },
   "home-primary": {
     viewBox: "0 0 325 255",
     wash: {

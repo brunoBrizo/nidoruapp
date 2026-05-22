@@ -1,6 +1,6 @@
 import { describe, expect, it, jest } from "@jest/globals";
 import { fireEvent, render, screen, within } from "@testing-library/react-native";
-import { AccessibilityInfo } from "react-native";
+import { AccessibilityInfo, StyleSheet } from "react-native";
 
 import BreatheTabScreen, {
   BREATHE_FREE_BREATHE_STATUS,
@@ -70,10 +70,10 @@ describe("tab entry shells", () => {
     });
   });
 
-  it("renders one active indicator for the fixed five-tab bar without badges", () => {
+  it("renders the fixed five-tab bar without a Breathe active indicator or badges", () => {
     renderTabBar(2);
 
-    expect(screen.getByTestId("tab-active-indicator")).toBeTruthy();
+    expect(screen.queryByTestId("tab-active-indicator")).toBeNull();
     expect(
       screen.getAllByRole("tab").map((tab) => within(tab).getByText(/.+/).props.children),
     ).toEqual([...tabLabels]);
@@ -133,6 +133,12 @@ describe("tab entry shells", () => {
     expect(screen.getByRole("header", { name: "Breathe" })).toBeTruthy();
     expect(screen.getByText("Find a rhythm for right now.")).toBeTruthy();
     expect(screen.getByText("Choose by how you want to feel.")).toBeTruthy();
+    expect(StyleSheet.flatten(screen.getByTestId("breathe-tabs").props.style)).toEqual(
+      expect.objectContaining({
+        minHeight: 52,
+        padding: 6,
+      }),
+    );
     expect(screen.getByRole("button", { name: "Sleep" })).toHaveProp("accessibilityState", {
       selected: true,
     });
@@ -141,6 +147,7 @@ describe("tab entry shells", () => {
     });
     expect(screen.getByRole("link", { name: "4-7-8 Sleep" })).toBeTruthy();
     expect(screen.getByRole("link", { name: "Coherent Breathing" })).toBeTruthy();
+    expect(screen.getByTestId("breathe-sleep-card-fade")).toBeTruthy();
     expect(screen.getByText("Settle into the night.")).toBeTruthy();
     expect(screen.getByText("Smooth, steady rhythm.")).toBeTruthy();
     expect(screen.getByText("4 in · 7 hold · 8 out")).toBeTruthy();

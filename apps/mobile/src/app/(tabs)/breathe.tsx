@@ -1,9 +1,12 @@
 import { breathTechniques, type MvpBreathTechniqueId } from "@nidoru/domain";
 import { colors, radii, spacing, typography } from "@nidoru/ui-tokens";
-import { Link, type Href } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import { Link, type Href, usePathname } from "expo-router";
 import { ChevronRight, Wind } from "lucide-react-native";
 import { useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+
+import { CardFade } from "../../surfaces/card-fade";
 
 type BreatheCategoryId = "sleep" | "calm" | "energy" | "focus";
 
@@ -97,6 +100,7 @@ const techniqueById = BREATHE_TECHNIQUE_LIBRARY.reduce(
 );
 
 export default function BreatheTabScreen() {
+  const pathname = usePathname();
   const [selectedCategoryId, setSelectedCategoryId] = useState<BreatheCategoryId>("sleep");
   const visibleTechniques = useMemo(
     () =>
@@ -105,89 +109,94 @@ export default function BreatheTabScreen() {
   );
 
   return (
-    <ScrollView
-      style={styles.screen}
-      contentContainerStyle={styles.content}
-      contentInsetAdjustmentBehavior="automatic"
-    >
-      <View style={styles.header}>
-        <Text accessibilityRole="header" selectable style={styles.title}>
-          Breathe
-        </Text>
-        <Text selectable style={styles.subtitle}>
-          Find a rhythm for right now.
-        </Text>
-      </View>
+    <>
+      <StatusBar hidden={pathname === "/breathe"} />
+      <ScrollView
+        automaticallyAdjustContentInsets={false}
+        contentContainerStyle={styles.content}
+        contentInsetAdjustmentBehavior="never"
+        showsVerticalScrollIndicator={false}
+        style={styles.screen}
+      >
+        <View style={styles.header}>
+          <Text accessibilityRole="header" selectable style={styles.title}>
+            Breathe
+          </Text>
+          <Text selectable style={styles.subtitle}>
+            Find a rhythm for right now.
+          </Text>
+        </View>
 
-      <View accessibilityRole="tablist" style={styles.segmentedControl}>
-        {breatheCategories.map((category) => {
-          const isSelected = category.id === selectedCategoryId;
+        <View accessibilityRole="tablist" style={styles.segmentedControl} testID="breathe-tabs">
+          {breatheCategories.map((category) => {
+            const isSelected = category.id === selectedCategoryId;
 
-          return (
-            <Pressable
-              accessibilityLabel={category.label}
-              accessibilityRole="button"
-              accessibilityState={{ selected: isSelected }}
-              key={category.id}
-              onPress={() => {
-                setSelectedCategoryId(category.id);
-              }}
-              style={({ pressed }) => [
-                styles.segmentButton,
-                isSelected ? styles.segmentButtonSelected : styles.segmentButtonIdle,
-                pressed ? styles.segmentButtonPressed : null,
-              ]}
-            >
-              <Text style={[styles.segmentText, isSelected ? styles.segmentTextSelected : null]}>
-                {category.label}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </View>
+            return (
+              <Pressable
+                accessibilityLabel={category.label}
+                accessibilityRole="button"
+                accessibilityState={{ selected: isSelected }}
+                key={category.id}
+                onPress={() => {
+                  setSelectedCategoryId(category.id);
+                }}
+                style={({ pressed }) => [
+                  styles.segmentButton,
+                  isSelected ? styles.segmentButtonSelected : styles.segmentButtonIdle,
+                  pressed ? styles.segmentButtonPressed : null,
+                ]}
+              >
+                <Text style={[styles.segmentText, isSelected ? styles.segmentTextSelected : null]}>
+                  {category.label}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
 
-      <View style={styles.explainer}>
-        <Text selectable style={styles.explainerText}>
-          Choose by how you want to feel.
-        </Text>
-      </View>
+        <View style={styles.explainer}>
+          <Text selectable style={styles.explainerText}>
+            Choose by how you want to feel.
+          </Text>
+        </View>
 
-      <View style={styles.cardList}>
-        {visibleTechniques.map((technique, index) => (
-          <BreatheTechniqueCard
-            categoryId={selectedCategoryId}
-            index={index}
-            key={`${selectedCategoryId}-${technique.id}`}
-            technique={technique}
-          />
-        ))}
-      </View>
+        <View style={styles.cardList}>
+          {visibleTechniques.map((technique, index) => (
+            <BreatheTechniqueCard
+              categoryId={selectedCategoryId}
+              index={index}
+              key={`${selectedCategoryId}-${technique.id}`}
+              technique={technique}
+            />
+          ))}
+        </View>
 
-      <View style={styles.freeBreatheSection}>
-        <Pressable
-          accessibilityHint="Custom Free Breathe settings are planned after MVP."
-          accessibilityLabel="Free Breathe"
-          accessibilityRole="button"
-          accessibilityState={{ disabled: true }}
-          disabled
-          style={styles.freeBreatheCard}
-        >
-          <View style={styles.freeBreatheCopy}>
-            <Text style={styles.cardTitle}>Free Breathe</Text>
-            <Text style={styles.cardDescription}>Set your own inhale, hold, and exhale.</Text>
-            <View style={styles.badge}>
-              <Text style={[styles.badgeText, styles.freeBreatheBadgeText]}>Custom rhythm</Text>
+        <View style={styles.freeBreatheSection}>
+          <Pressable
+            accessibilityHint="Custom Free Breathe settings are planned after MVP."
+            accessibilityLabel="Free Breathe"
+            accessibilityRole="button"
+            accessibilityState={{ disabled: true }}
+            disabled
+            style={styles.freeBreatheCard}
+          >
+            <View style={styles.freeBreatheCopy}>
+              <Text style={styles.cardTitle}>Free Breathe</Text>
+              <Text style={styles.cardDescription}>Set your own inhale, hold, and exhale.</Text>
+              <View style={styles.badge}>
+                <Text style={[styles.badgeText, styles.freeBreatheBadgeText]}>Custom rhythm</Text>
+              </View>
             </View>
-          </View>
-          <View style={styles.freeBreatheActions}>
-            <View style={styles.freeBreatheIconSurface}>
-              <Wind color={colors.dark.primaryGlow.value} size={18} strokeWidth={1.6} />
+            <View style={styles.freeBreatheActions}>
+              <View style={styles.freeBreatheIconSurface}>
+                <Wind color={colors.dark.primaryGlow.value} size={18} strokeWidth={1.6} />
+              </View>
+              <ChevronRight color={colors.dark.textTertiary.value} size={20} strokeWidth={1.8} />
             </View>
-            <ChevronRight color={colors.dark.textTertiary.value} size={20} strokeWidth={1.8} />
-          </View>
-        </Pressable>
-      </View>
-    </ScrollView>
+          </Pressable>
+        </View>
+      </ScrollView>
+    </>
   );
 }
 
@@ -203,22 +212,22 @@ function BreatheTechniqueCard({ categoryId, index, technique }: BreatheTechnique
         accessibilityHint={`Starts ${technique.label} for ${technique.durationMinutes} minutes.`}
         accessibilityLabel={label}
         accessibilityRole="link"
-        style={({ pressed }) => [
-          styles.techniqueCard,
-          pressed ? styles.techniqueCardPressed : null,
-        ]}
       >
-        {index === 0 && categoryId === "sleep" ? (
-          <View pointerEvents="none" style={styles.sleepGlow} />
-        ) : null}
-        <View style={styles.cardCopy}>
-          <Text style={styles.cardTitle}>{label}</Text>
-          <Text style={styles.cardDescription}>{description}</Text>
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>{technique.rhythmLabel}</Text>
+        {({ pressed }) => (
+          <View style={[styles.techniqueCard, pressed ? styles.techniqueCardPressed : null]}>
+            {index === 0 && categoryId === "sleep" ? (
+              <CardFade testID="breathe-sleep-card-fade" variant="breathe-sleep-card" />
+            ) : null}
+            <View style={styles.cardCopy}>
+              <Text style={styles.cardTitle}>{label}</Text>
+              <Text style={styles.cardDescription}>{description}</Text>
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>{technique.rhythmLabel}</Text>
+              </View>
+            </View>
+            <ChevronRight color={colors.dark.textTertiary.value} size={20} strokeWidth={1.8} />
           </View>
-        </View>
-        <ChevronRight color={colors.dark.textTertiary.value} size={20} strokeWidth={1.8} />
+        )}
       </Pressable>
     </Link>
   );
@@ -229,7 +238,6 @@ const referenceColors = {
   freeBreatheCard: "rgba(20, 23, 43, 0.2)",
   selectedSegment: "rgba(28, 32, 64, 0.6)",
   segmentSurface: "rgba(20, 23, 43, 0.5)",
-  sleepGlow: "rgba(124, 111, 205, 0.15)",
 } as const;
 
 const styles = StyleSheet.create({
@@ -240,8 +248,8 @@ const styles = StyleSheet.create({
   content: {
     gap: spacing.sm,
     paddingBottom: spacing.bottomNavigationHeight + spacing.sm,
-    paddingHorizontal: spacing.screenPadding,
-    paddingTop: spacing.xl + spacing.xs,
+    paddingHorizontal: 30,
+    paddingTop: 60,
   },
   header: {
     gap: 4,
@@ -265,7 +273,7 @@ const styles = StyleSheet.create({
     boxShadow: "inset 0 1px 0 rgba(238, 240, 255, 0.05)",
     flexDirection: "row",
     gap: 2,
-    minHeight: 56,
+    minHeight: 52,
     padding: 6,
   },
   segmentButton: {
@@ -273,7 +281,7 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     flex: 1,
     justifyContent: "center",
-    minHeight: 44,
+    minHeight: 40,
     transform: [{ scale: 1 }],
   },
   segmentButtonIdle: {
@@ -336,18 +344,10 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(28, 32, 64, 0.8)",
     transform: [{ scale: 0.96 }],
   },
-  sleepGlow: {
-    backgroundColor: referenceColors.sleepGlow,
-    borderRadius: 9999,
-    height: 96,
-    left: -48,
-    position: "absolute",
-    top: 2,
-    width: 96,
-  },
   cardCopy: {
     flex: 1,
     gap: 4,
+    zIndex: 1,
   },
   cardTitle: {
     color: colors.dark.textPrimary.value,

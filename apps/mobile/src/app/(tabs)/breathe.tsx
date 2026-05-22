@@ -22,7 +22,6 @@ type BreatheTechniqueLibraryItem = {
 
 type BreatheTechniqueCardProps = {
   readonly categoryId: BreatheCategoryId;
-  readonly index: number;
   readonly technique: BreatheTechniqueLibraryItem;
 };
 
@@ -90,6 +89,8 @@ const techniqueIdsByCategory = {
   focus: ["box-breathing", "coherent-breathing"],
   sleep: ["4-7-8-sleep", "coherent-breathing"],
 } as const satisfies Record<BreatheCategoryId, readonly MvpBreathTechniqueId[]>;
+
+const fadeTechniqueIds = ["4-7-8-sleep", "coherent-breathing"] as const;
 
 const techniqueById = BREATHE_TECHNIQUE_LIBRARY.reduce(
   (catalog, technique) => ({
@@ -161,10 +162,9 @@ export default function BreatheTabScreen() {
         </View>
 
         <View style={styles.cardList}>
-          {visibleTechniques.map((technique, index) => (
+          {visibleTechniques.map((technique) => (
             <BreatheTechniqueCard
               categoryId={selectedCategoryId}
-              index={index}
               key={`${selectedCategoryId}-${technique.id}`}
               technique={technique}
             />
@@ -200,11 +200,13 @@ export default function BreatheTabScreen() {
   );
 }
 
-function BreatheTechniqueCard({ categoryId, index, technique }: BreatheTechniqueCardProps) {
+function BreatheTechniqueCard({ categoryId, technique }: BreatheTechniqueCardProps) {
   const label =
     categoryId === "sleep" && technique.referenceLabel ? technique.referenceLabel : technique.label;
   const description =
     technique.categoryCopy[categoryId] ?? breathTechniques[technique.id].description;
+  const showsFade =
+    categoryId === "sleep" && fadeTechniqueIds.some((techniqueId) => techniqueId === technique.id);
 
   return (
     <Link asChild href={technique.href}>
@@ -215,8 +217,8 @@ function BreatheTechniqueCard({ categoryId, index, technique }: BreatheTechnique
       >
         {({ pressed }) => (
           <View style={[styles.techniqueCard, pressed ? styles.techniqueCardPressed : null]}>
-            {index === 0 && categoryId === "sleep" ? (
-              <CardFade testID="breathe-sleep-card-fade" variant="breathe-sleep-card" />
+            {showsFade ? (
+              <CardFade testID={`breathe-${technique.id}-card-fade`} variant="breathe-sleep-card" />
             ) : null}
             <View style={styles.cardCopy}>
               <Text style={styles.cardTitle}>{label}</Text>
@@ -235,7 +237,7 @@ function BreatheTechniqueCard({ categoryId, index, technique }: BreatheTechnique
 
 const referenceColors = {
   card: "rgba(20, 23, 43, 0.5)",
-  freeBreatheCard: "rgba(20, 23, 43, 0.2)",
+  freeBreatheCard: "rgba(20, 23, 43, 0.36)",
   selectedSegment: "rgba(28, 32, 64, 0.6)",
   segmentSurface: "rgba(20, 23, 43, 0.5)",
 } as const;
@@ -385,9 +387,10 @@ const styles = StyleSheet.create({
   freeBreatheCard: {
     alignItems: "center",
     backgroundColor: referenceColors.freeBreatheCard,
-    borderColor: "transparent",
+    borderColor: "rgba(238, 240, 255, 0.025)",
     borderRadius: radii.card,
     borderWidth: 1,
+    boxShadow: "inset 0 1px 0 rgba(238, 240, 255, 0.045)",
     flexDirection: "row",
     gap: spacing.sm,
     justifyContent: "space-between",

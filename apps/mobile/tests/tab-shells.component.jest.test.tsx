@@ -147,7 +147,8 @@ describe("tab entry shells", () => {
     });
     expect(screen.getByRole("link", { name: "4-7-8 Sleep" })).toBeTruthy();
     expect(screen.getByRole("link", { name: "Coherent Breathing" })).toBeTruthy();
-    expect(screen.getByTestId("breathe-sleep-card-fade")).toBeTruthy();
+    expect(screen.getByTestId("breathe-4-7-8-sleep-card-fade")).toBeTruthy();
+    expect(screen.getByTestId("breathe-coherent-breathing-card-fade")).toBeTruthy();
     expect(screen.getByText("Settle into the night.")).toBeTruthy();
     expect(screen.getByText("Smooth, steady rhythm.")).toBeTruthy();
     expect(screen.getByText("4 in · 7 hold · 8 out")).toBeTruthy();
@@ -190,6 +191,12 @@ describe("tab entry shells", () => {
     const freeBreathe = screen.getByRole("button", { name: "Free Breathe" });
 
     expect(freeBreathe).toHaveProp("accessibilityState", { disabled: true });
+    expect(StyleSheet.flatten(freeBreathe.props.style)).toEqual(
+      expect.objectContaining({
+        backgroundColor: "rgba(20, 23, 43, 0.36)",
+        boxShadow: "inset 0 1px 0 rgba(238, 240, 255, 0.045)",
+      }),
+    );
     expect(freeBreathe).toHaveProp(
       "accessibilityHint",
       "Custom Free Breathe settings are planned after MVP.",

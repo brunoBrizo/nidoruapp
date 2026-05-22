@@ -90,8 +90,6 @@ const techniqueIdsByCategory = {
   sleep: ["4-7-8-sleep", "coherent-breathing"],
 } as const satisfies Record<BreatheCategoryId, readonly MvpBreathTechniqueId[]>;
 
-const fadeTechniqueIds = ["4-7-8-sleep", "coherent-breathing"] as const;
-
 const techniqueById = BREATHE_TECHNIQUE_LIBRARY.reduce(
   (catalog, technique) => ({
     ...catalog,
@@ -205,8 +203,6 @@ function BreatheTechniqueCard({ categoryId, technique }: BreatheTechniqueCardPro
     categoryId === "sleep" && technique.referenceLabel ? technique.referenceLabel : technique.label;
   const description =
     technique.categoryCopy[categoryId] ?? breathTechniques[technique.id].description;
-  const showsFade =
-    categoryId === "sleep" && fadeTechniqueIds.some((techniqueId) => techniqueId === technique.id);
 
   return (
     <Link asChild href={technique.href}>
@@ -217,9 +213,7 @@ function BreatheTechniqueCard({ categoryId, technique }: BreatheTechniqueCardPro
       >
         {({ pressed }) => (
           <View style={[styles.techniqueCard, pressed ? styles.techniqueCardPressed : null]}>
-            {showsFade ? (
-              <CardFade testID={`breathe-${technique.id}-card-fade`} variant="breathe-sleep-card" />
-            ) : null}
+            <CardFade testID={`breathe-${technique.id}-card-fade`} variant="breathe-sleep-card" />
             <View style={styles.cardCopy}>
               <Text style={styles.cardTitle}>{label}</Text>
               <Text style={styles.cardDescription}>{description}</Text>

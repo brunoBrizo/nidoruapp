@@ -170,6 +170,30 @@ describe("tab entry shells", () => {
     expect(screen.getByRole("link", { name: "Box Breathing" })).toBeTruthy();
     expect(screen.getByRole("link", { name: "Coherent Breathing / Daily Calm" })).toBeTruthy();
     expect(screen.getByRole("link", { name: "Diaphragmatic Breathing" })).toBeTruthy();
+    expect(screen.getByTestId("breathe-box-breathing-card-fade")).toBeTruthy();
+    expect(screen.getByTestId("breathe-coherent-breathing-card-fade")).toBeTruthy();
+    expect(screen.getByTestId("breathe-diaphragmatic-breathing-card-fade")).toBeTruthy();
+
+    fireEvent.press(screen.getByRole("button", { name: "Energy" }));
+
+    expect(screen.getByRole("button", { name: "Energy" })).toHaveProp("accessibilityState", {
+      selected: true,
+    });
+    expect(screen.getByRole("link", { name: "Coherent Breathing / Daily Calm" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Box Breathing" })).toBeTruthy();
+    expect(screen.getByTestId("breathe-coherent-breathing-card-fade")).toBeTruthy();
+    expect(screen.getByTestId("breathe-box-breathing-card-fade")).toBeTruthy();
+
+    fireEvent.press(screen.getByRole("button", { name: "Focus" }));
+
+    expect(screen.getByRole("button", { name: "Focus" })).toHaveProp("accessibilityState", {
+      selected: true,
+    });
+    expect(screen.getByRole("link", { name: "Box Breathing" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Coherent Breathing / Daily Calm" })).toBeTruthy();
+    expect(screen.getByTestId("breathe-box-breathing-card-fade")).toBeTruthy();
+    expect(screen.getByTestId("breathe-coherent-breathing-card-fade")).toBeTruthy();
+    expect(screen.queryByTestId("breathe-free-breathe-card-fade")).toBeNull();
   });
 
   it("gives visible techniques meaningful route and screen-reader labels", () => {

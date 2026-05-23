@@ -173,6 +173,7 @@ export function HomeScreen({
         <View style={styles.quickActionGrid}>
           {homeState.quickActions.map((action) => {
             const Icon = quickActionIcons[action.id];
+            const isRescueAction = action.id === "rescue-me";
 
             return (
               <Link asChild href={action.routeTarget} key={action.id}>
@@ -182,13 +183,19 @@ export function HomeScreen({
                   accessibilityRole="link"
                   style={({ pressed }) => [styles.quickActionPressable, pressed && styles.pressed]}
                 >
-                  <View style={styles.quickAction} testID={`home-quick-action-card-${action.id}`}>
+                  <View
+                    style={[styles.quickAction, isRescueAction && styles.rescueQuickAction]}
+                    testID={`home-quick-action-card-${action.id}`}
+                  >
                     <View
-                      style={styles.quickActionIconBox}
+                      style={[
+                        styles.quickActionIconBox,
+                        isRescueAction && styles.rescueQuickActionIconBox,
+                      ]}
                       testID={`home-quick-action-icon-box-${action.id}`}
                     >
                       <Icon
-                        color={homeColors.inactiveTab}
+                        color={isRescueAction ? colors.dark.danger.value : homeColors.inactiveTab}
                         size={quickActionIconSizes[action.id]}
                         strokeWidth={1.5}
                       />
@@ -394,12 +401,16 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   quickActionGrid: {
+    alignSelf: "center",
     flexDirection: "row",
     gap: 12,
+    justifyContent: "center",
+    maxWidth: 300,
+    width: "100%",
   },
   quickActionPressable: {
-    flex: 1,
     transform: [{ scale: 1 }],
+    width: 92,
   },
   quickAction: {
     alignItems: "center",
@@ -409,11 +420,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     boxShadow: "inset 0 1px 0 rgba(238, 240, 255, 0.08)",
     gap: 6,
+    height: 86,
     justifyContent: "center",
-    minHeight: 80,
     paddingHorizontal: 6,
-    paddingVertical: 12,
+    paddingVertical: 10,
     transform: [{ scale: 1 }],
+    width: 92,
+  },
+  rescueQuickAction: {
+    borderColor: "rgba(255, 107, 107, 0.08)",
+    boxShadow: "inset 0 1px 0 rgba(238, 240, 255, 0.08), 0 0 18px rgba(255, 107, 107, 0.08)",
   },
   quickActionIconBox: {
     alignItems: "center",
@@ -421,9 +437,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: 24,
   },
+  rescueQuickActionIconBox: {
+    backgroundColor: "rgba(255, 107, 107, 0.12)",
+    borderRadius: 12,
+  },
   quickActionCopy: {
     alignItems: "center",
     gap: 1,
+    width: "100%",
   },
   quickActionLabel: {
     color: homeColors.textPrimary,

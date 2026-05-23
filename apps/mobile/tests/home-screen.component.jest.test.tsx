@@ -227,7 +227,8 @@ describe("HomeScreen", () => {
         expect.objectContaining({
           backgroundColor: "rgba(20, 23, 43, 0.5)",
           borderRadius: 16,
-          minHeight: 80,
+          height: 86,
+          width: 92,
         }),
       ]),
     );
@@ -245,6 +246,22 @@ describe("HomeScreen", () => {
         }),
       );
     }
+
+    expect(
+      StyleSheet.flatten(screen.getByTestId("home-quick-action-card-rescue-me").props.style),
+    ).toEqual(
+      expect.objectContaining({
+        borderColor: "rgba(255, 107, 107, 0.08)",
+      }),
+    );
+    expect(
+      StyleSheet.flatten(screen.getByTestId("home-quick-action-icon-box-rescue-me").props.style),
+    ).toEqual(
+      expect.objectContaining({
+        backgroundColor: "rgba(255, 107, 107, 0.12)",
+        borderRadius: 12,
+      }),
+    );
   });
 
   it("omits prohibited Home surfaces", () => {

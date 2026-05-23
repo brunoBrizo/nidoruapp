@@ -1,11 +1,11 @@
 # Graph Report - sleep-app  (2026-05-23)
 
 ## Corpus Check
-- 129 files · ~273,412 words
+- 130 files · ~274,023 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 381 nodes · 413 edges · 19 communities detected
+- 383 nodes · 414 edges · 19 communities detected
 - Extraction: 86% EXTRACTED · 14% INFERRED · 0% AMBIGUOUS · INFERRED: 57 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
@@ -110,11 +110,11 @@ Nodes (5): BreatheTechniqueAnchorScreen(), parseDurationSeconds(), parseFirstLau
 
 ### Community 13 - "Community 13"
 Cohesion: 0.5
-Nodes (3): TabLayout(), allowsIncompleteOnboardingForRoute(), parseFirstLaunch()
+Nodes (2): isDefaultPrevented(), onPress()
 
 ### Community 14 - "Community 14"
 Cohesion: 0.5
-Nodes (2): isDefaultPrevented(), onPress()
+Nodes (3): TabLayout(), allowsIncompleteOnboardingForRoute(), parseFirstLaunch()
 
 ### Community 15 - "Community 15"
 Cohesion: 0.5
@@ -133,7 +133,7 @@ Cohesion: 1.0
 Nodes (2): OnboardingRouteScreen(), parseOnboardingStage()
 
 ## Knowledge Gaps
-- **Thin community `Community 14`** (5 nodes): `getTabIndicatorMotionConfig()`, `isDefaultPrevented()`, `onLongPress()`, `onPress()`, `app-tab-bar.tsx`
+- **Thin community `Community 13`** (5 nodes): `getTabIndicatorMotionConfig()`, `isDefaultPrevented()`, `onLongPress()`, `onPress()`, `app-tab-bar.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 15`** (4 nodes): `assertCondition()`, `assertEquals()`, `index.test.ts`, `index.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.

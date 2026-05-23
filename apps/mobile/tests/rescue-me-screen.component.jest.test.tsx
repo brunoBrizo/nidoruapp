@@ -1,6 +1,12 @@
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react-native";
 import { afterEach, beforeEach, describe, expect, it, jest } from "@jest/globals";
-import { AccessibilityInfo, Animated, StyleSheet } from "react-native";
+import {
+  AccessibilityInfo,
+  Animated,
+  AppState,
+  type AppStateStatus,
+  StyleSheet,
+} from "react-native";
 
 import {
   parseRescueMeScreenState,
@@ -25,6 +31,27 @@ jest
   .spyOn(AccessibilityInfo, "isReduceMotionEnabled")
   .mockImplementation(() => new Promise<boolean>(() => undefined));
 jest.spyOn(AccessibilityInfo, "addEventListener").mockImplementation(() => ({ remove: jest.fn() }));
+const appStateAddEventListener = jest
+  .spyOn(AppState, "addEventListener")
+  .mockImplementation(() => ({ remove: jest.fn() }));
+
+function mockAppStateChangeListeners() {
+  const handlers: ((state: AppStateStatus) => void)[] = [];
+  appStateAddEventListener.mockImplementation((eventType, listener) => {
+    if (eventType === "change") {
+      handlers.push(listener as (state: AppStateStatus) => void);
+    }
+
+    return { remove: jest.fn() };
+  });
+
+  return {
+    handlers,
+    restore: () => {
+      appStateAddEventListener.mockImplementation(() => ({ remove: jest.fn() }));
+    },
+  };
+}
 
 describe("RescueMeScreen", () => {
   beforeEach(() => {
@@ -232,6 +259,74 @@ describe("RescueMeScreen", () => {
     });
   });
 
+  it("does not rewrite a recovered Rescue Me draft as a fresh local start", async () => {
+    jest.useFakeTimers();
+    jest.setSystemTime(rescueStartedAtMs + 60_000);
+    const persistBreathSessionStarted = jest.fn(() => Promise.resolve());
+    const persistBreathSessionDraft = jest.fn(() => Promise.resolve());
+
+    render(
+      <RescueMeActiveSessionScreen
+        {...rescueSessionProps}
+        hasExistingLocalRecord
+        persistBreathSessionDraft={persistBreathSessionDraft}
+        persistBreathSessionStarted={persistBreathSessionStarted}
+      />,
+    );
+
+    await act(async () => {
+      jest.advanceTimersByTime(15_000);
+      await Promise.resolve();
+    });
+
+    expect(persistBreathSessionStarted).not.toHaveBeenCalled();
+    expect(persistBreathSessionDraft).toHaveBeenCalledWith(
+      expect.objectContaining({
+        elapsedDurationMs: 75_000,
+        localInstallId: rescueSessionProps.localInstallId,
+        sessionId: rescueSessionProps.sessionId,
+        source: "rescue_me",
+        status: "draft",
+      }),
+    );
+  });
+
+  it("persists Rescue Me progress when the app backgrounds", async () => {
+    jest.useFakeTimers();
+    jest.setSystemTime(rescueStartedAtMs);
+    const { handlers, restore } = mockAppStateChangeListeners();
+    const persistBreathSessionDraft = jest.fn(() => Promise.resolve());
+
+    render(
+      <RescueMeActiveSessionScreen
+        {...rescueSessionProps}
+        persistBreathSessionDraft={persistBreathSessionDraft}
+      />,
+    );
+
+    await act(async () => {
+      jest.setSystemTime(rescueStartedAtMs + 42_000);
+      for (const handler of handlers) {
+        handler("background");
+      }
+      await Promise.resolve();
+    });
+
+    expect(persistBreathSessionDraft).toHaveBeenCalledWith(
+      expect.objectContaining({
+        completedBreathCycles: 1,
+        elapsedDurationMs: 42_000,
+        localInstallId: rescueSessionProps.localInstallId,
+        remainingDurationMs: 167_000,
+        sessionId: rescueSessionProps.sessionId,
+        source: "rescue_me",
+        status: "draft",
+      }),
+    );
+
+    restore();
+  });
+
   it("shows reassurance only after two fixed Rescue Me cycles without moving the orb stage", async () => {
     jest.useFakeTimers();
     jest.setSystemTime(rescueStartedAtMs);
@@ -320,6 +415,49 @@ describe("RescueMeScreen", () => {
 
     await waitFor(() => {
       expect(screen.queryByTestId("rescue-me-pause-overlay")).toBeNull();
+    });
+  });
+
+  it("persists a neutral Rescue Me partial stop before returning home", async () => {
+    jest.useFakeTimers();
+    jest.setSystemTime(rescueStartedAtMs);
+    const onReturnHome = jest.fn();
+    const persistBreathSessionAbandoned = jest.fn(() => Promise.resolve());
+
+    render(
+      <RescueMeActiveSessionScreen
+        {...rescueSessionProps}
+        onReturnHome={onReturnHome}
+        persistBreathSessionAbandoned={persistBreathSessionAbandoned}
+      />,
+    );
+
+    await act(async () => {
+      jest.setSystemTime(rescueStartedAtMs + 42_000);
+      fireEvent.press(screen.getByRole("button", { name: "Pause Rescue Me session" }));
+      await Promise.resolve();
+    });
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "End Rescue Me for now" })).toBeTruthy();
+    });
+    fireEvent.press(screen.getByRole("button", { name: "End Rescue Me for now" }));
+
+    expect(persistBreathSessionAbandoned).toHaveBeenCalledWith(
+      expect.objectContaining({
+        completedBreathCycles: 1,
+        elapsedDurationMs: 42_000,
+        localInstallId: rescueSessionProps.localInstallId,
+        remainingDurationMs: 167_000,
+        sessionId: rescueSessionProps.sessionId,
+        source: "rescue_me",
+        status: "abandoned",
+        stopReason: "user_ended",
+        techniqueId: "4-7-8-sleep",
+      }),
+    );
+    await waitFor(() => {
+      expect(onReturnHome).toHaveBeenCalledTimes(1);
     });
   });
 

@@ -16,6 +16,7 @@ import { RescueMeActiveSessionScreen, RescueMeScreen } from "./rescue-me-screen"
 
 type RescueMeRouteConfig = {
   readonly database?: BreathSessionLocalPersistenceDatabase;
+  readonly hasExistingLocalRecord?: boolean;
   readonly initialCompletionMode?: "completed";
   readonly localInstallId: string;
   readonly sessionId: string;
@@ -44,6 +45,7 @@ export function RescueMeSessionRoute() {
             if (pendingCompletion) {
               return {
                 database: localDatabase,
+                hasExistingLocalRecord: true,
                 initialCompletionMode: "completed" as const,
                 localInstallId,
                 sessionId: pendingCompletion.sessionId,
@@ -56,6 +58,7 @@ export function RescueMeSessionRoute() {
               source: "rescue_me",
             }).then((draft) => ({
               database: localDatabase,
+              hasExistingLocalRecord: Boolean(draft),
               localInstallId,
               sessionId: draft?.sessionId ?? createRescueMeSessionId(),
               startedAtMs: draft ? Date.now() - draft.elapsedDurationMs : Date.now(),
@@ -86,6 +89,7 @@ export function RescueMeSessionRoute() {
   return (
     <RescueMeActiveSessionScreen
       initialCompletionMode={sessionConfig.initialCompletionMode}
+      hasExistingLocalRecord={sessionConfig.hasExistingLocalRecord === true}
       localInstallId={sessionConfig.localInstallId}
       onContinueWithSound={() => {
         router.replace("/rescue-me?state=sound-handoff");

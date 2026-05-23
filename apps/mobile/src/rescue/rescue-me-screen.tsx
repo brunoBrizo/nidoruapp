@@ -67,6 +67,7 @@ type RescueMeCompletionMode = "completed" | "abandoned" | undefined;
 
 type RescueMeActiveSessionScreenProps = {
   readonly disableHaptics?: boolean;
+  readonly hasExistingLocalRecord?: boolean;
   readonly initialCompletionMode?: RescueMeCompletionMode;
   readonly localInstallId: string;
   readonly onContinueWithSound?: () => void;
@@ -182,6 +183,7 @@ export function RescueMeScreen({ state }: { readonly state: RescueMeScreenState 
 
 export function RescueMeActiveSessionScreen({
   disableHaptics = false,
+  hasExistingLocalRecord = false,
   initialCompletionMode,
   localInstallId,
   onContinueWithSound = () => undefined,
@@ -219,7 +221,9 @@ export function RescueMeActiveSessionScreen({
   const [hapticsEnabled, setHapticsEnabled] = useState(true);
   const [completionMode, setCompletionMode] =
     useState<RescueMeCompletionMode>(initialCompletionMode);
-  const hasPersistedSessionStartRef = useRef(Boolean(initialCompletionMode));
+  const hasPersistedSessionStartRef = useRef(
+    Boolean(initialCompletionMode) || hasExistingLocalRecord,
+  );
   const hasPersistedFinalDraftRef = useRef(false);
   const isPersistingTerminalStateRef = useRef(false);
   const lastDraftPersistedAtMs = useRef<number | undefined>(undefined);

@@ -1,9 +1,10 @@
-import { beforeEach, describe, expect, it, jest } from "@jest/globals";
-import { render, screen, waitFor, within } from "@testing-library/react-native";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react-native";
+import { afterEach, beforeEach, describe, expect, it, jest } from "@jest/globals";
 import { AccessibilityInfo, Animated, StyleSheet } from "react-native";
 
 import {
   parseRescueMeScreenState,
+  RescueMeActiveSessionScreen,
   RESCUE_ME_SCREEN_STATES,
   RescueMeScreen,
   type RescueMeScreenState,
@@ -11,6 +12,14 @@ import {
 
 const forbiddenSurfacePattern =
   /account|paywall|permission|choose|pick|setup|loading|spinner|network|medical|crisis|badge|streak|reward|ember/i;
+const rescueStartedAtMs = Date.parse("2026-05-23T05:00:00.000Z");
+const rescueSessionProps = {
+  disableHaptics: true,
+  localInstallId: "install_0123456789abcdef",
+  sessionId: "session_rescueme0123456789",
+  startedAtMs: rescueStartedAtMs,
+  tickIntervalMs: 1000,
+} as const;
 
 jest
   .spyOn(AccessibilityInfo, "isReduceMotionEnabled")
@@ -20,6 +29,10 @@ jest.spyOn(AccessibilityInfo, "addEventListener").mockImplementation(() => ({ re
 describe("RescueMeScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
   });
 
   it("renders every accepted visual state without setup or gate surfaces", () => {
@@ -182,5 +195,148 @@ describe("RescueMeScreen", () => {
         width: 68,
       }),
     );
+  });
+
+  it("starts the fixed Rescue Me runtime without launch setup copy", async () => {
+    jest.useFakeTimers();
+    jest.setSystemTime(rescueStartedAtMs);
+    const persistBreathSessionStarted = jest.fn(() => Promise.resolve());
+
+    render(
+      <RescueMeActiveSessionScreen
+        {...rescueSessionProps}
+        persistBreathSessionStarted={persistBreathSessionStarted}
+      />,
+    );
+
+    expect(screen.getByTestId("rescue-me-active-session-screen")).toBeTruthy();
+    expect(screen.getByLabelText("Inhale breathing phase")).toBeTruthy();
+    expect(screen.getByText("Inhale")).toBeTruthy();
+    expect(screen.getByText("03:29")).toBeTruthy();
+    expect(screen.queryByText(forbiddenSurfacePattern)).toBeNull();
+    expect(screen.queryByRole("button", { name: /choose|pick|setup/i })).toBeNull();
+
+    await waitFor(() => {
+      expect(persistBreathSessionStarted).toHaveBeenCalledWith(
+        expect.objectContaining({
+          audioCueModeId: "gentle-bell",
+          currentPhaseName: "inhale",
+          durationSeconds: 209,
+          localInstallId: rescueSessionProps.localInstallId,
+          sessionId: rescueSessionProps.sessionId,
+          source: "rescue_me",
+          status: "started",
+          techniqueId: "4-7-8-sleep",
+        }),
+      );
+    });
+  });
+
+  it("shows reassurance only after two fixed Rescue Me cycles without moving the orb stage", async () => {
+    jest.useFakeTimers();
+    jest.setSystemTime(rescueStartedAtMs);
+
+    render(<RescueMeActiveSessionScreen {...rescueSessionProps} />);
+
+    expect(screen.queryByText("You’re doing enough. Stay with the next breath.")).toBeNull();
+    expect(StyleSheet.flatten(screen.getByTestId("rescue-me-orb").props.style)).toEqual(
+      expect.objectContaining({
+        height: 300,
+        width: 300,
+      }),
+    );
+
+    await act(async () => {
+      jest.advanceTimersByTime(84000);
+      await Promise.resolve();
+    });
+
+    const reassurance = screen.getByText("You’re doing enough. Stay with the next breath.");
+
+    expect(reassurance).toBeTruthy();
+    expect(StyleSheet.flatten(screen.getByTestId("rescue-me-orb").props.style)).toEqual(
+      expect.objectContaining({
+        height: 300,
+        width: 300,
+      }),
+    );
+  });
+
+  it("renders completion only after five Rescue Me cycles and persists the local completion", async () => {
+    jest.useFakeTimers();
+    jest.setSystemTime(rescueStartedAtMs);
+    const persistBreathSessionCompletion = jest.fn(() => Promise.resolve());
+
+    render(
+      <RescueMeActiveSessionScreen
+        {...rescueSessionProps}
+        persistBreathSessionCompletion={persistBreathSessionCompletion}
+      />,
+    );
+
+    expect(screen.queryByText("That took courage to start.")).toBeNull();
+
+    await act(async () => {
+      jest.advanceTimersByTime(209000);
+      await Promise.resolve();
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText("That took courage to start.")).toBeTruthy();
+    });
+
+    expect(screen.getByText("You completed 5 breath cycles.")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Continue with a calming sound" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Return home" })).toBeTruthy();
+    expect(persistBreathSessionCompletion).toHaveBeenCalledWith(
+      expect.objectContaining({
+        completedBreathCycles: 5,
+        durationSeconds: 209,
+        localInstallId: rescueSessionProps.localInstallId,
+        remainingDurationMs: 0,
+        sessionId: rescueSessionProps.sessionId,
+        source: "rescue_me",
+        status: "completed",
+        techniqueId: "4-7-8-sleep",
+      }),
+    );
+  });
+
+  it("pauses and resumes with neutral Rescue Me copy", async () => {
+    jest.useFakeTimers();
+    jest.setSystemTime(rescueStartedAtMs);
+
+    render(<RescueMeActiveSessionScreen {...rescueSessionProps} />);
+
+    fireEvent.press(screen.getByRole("button", { name: "Pause Rescue Me session" }));
+
+    expect(screen.getByTestId("rescue-me-pause-overlay")).toBeTruthy();
+    expect(screen.getByText("Paused")).toBeTruthy();
+    expect(screen.getByText("You can continue when you’re ready.")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Resume Rescue Me session" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "End Rescue Me for now" })).toBeTruthy();
+
+    fireEvent.press(screen.getByRole("button", { name: "Resume Rescue Me session" }));
+
+    await waitFor(() => {
+      expect(screen.queryByTestId("rescue-me-pause-overlay")).toBeNull();
+    });
+  });
+
+  it("keeps the core breathing cue and removes decorative pulse layers under reduced motion", async () => {
+    const reduceMotionMock = AccessibilityInfo.isReduceMotionEnabled as jest.MockedFunction<
+      typeof AccessibilityInfo.isReduceMotionEnabled
+    >;
+
+    reduceMotionMock.mockResolvedValueOnce(true);
+    render(<RescueMeActiveSessionScreen {...rescueSessionProps} />);
+
+    await waitFor(() => {
+      expect(screen.queryByTestId("rescue-me-orb-pulse-ring")).toBeNull();
+    });
+
+    expect(screen.queryByTestId("rescue-me-orb-outer-glow")).toBeNull();
+    expect(screen.getByTestId("rescue-me-orb-core")).toBeTruthy();
+    expect(screen.getByText("Inhale")).toBeTruthy();
   });
 });

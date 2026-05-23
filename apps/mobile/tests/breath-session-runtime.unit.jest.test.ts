@@ -148,6 +148,44 @@ describe("breath session runtime", () => {
     });
   });
 
+  it("supports a fixed five-cycle Rescue Me session scaled to the accepted 03:29 timer", () => {
+    const controller = createBreathSessionController({
+      ...baseInput,
+      planId: undefined,
+      source: "rescue_me",
+      targetBreathCycles: 5,
+      totalDurationSeconds: 209,
+    });
+
+    expect(getBreathSessionSnapshot(controller, startedAtMs)).toMatchObject({
+      completedBreathCycles: 0,
+      phaseDurationMs: 8800,
+      phaseName: "inhale",
+      remainingDurationMs: 209000,
+      totalDurationMs: 209000,
+    });
+    expect(getBreathSessionSnapshot(controller, startedAtMs + 8800)).toMatchObject({
+      phaseDurationMs: 15400,
+      phaseName: "hold",
+    });
+    expect(getBreathSessionSnapshot(controller, startedAtMs + 24200)).toMatchObject({
+      phaseDurationMs: 17600,
+      phaseName: "exhale",
+    });
+    expect(getBreathSessionSnapshot(controller, startedAtMs + 83600)).toMatchObject({
+      completedBreathCycles: 2,
+      phaseName: "inhale",
+      status: "active",
+    });
+    expect(completeBreathSessionIfDue(controller, startedAtMs + 209000)).toMatchObject({
+      completedBreathCycles: 5,
+      durationSeconds: 209,
+      source: "rescue_me",
+      status: "completed",
+      techniqueId: "4-7-8-sleep",
+    });
+  });
+
   it("uses the configured Diaphragmatic cadence", () => {
     const controller = createBreathSessionController({
       ...baseInput,

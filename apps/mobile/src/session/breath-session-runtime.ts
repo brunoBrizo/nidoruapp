@@ -6,7 +6,12 @@ import {
   type OnboardingPlanId,
 } from "@nidoru/domain";
 
-type BreathTechniquePhases = (typeof breathTechniques)[BreathTechniqueId]["phases"];
+type BreathTechniquePhase = {
+  readonly durationMs: number;
+  readonly name: BreathPhaseName;
+};
+
+type BreathTechniquePhases = readonly BreathTechniquePhase[];
 
 export type BreathSessionSource =
   | "breathe_tab"
@@ -20,6 +25,7 @@ export type BreathSessionControllerInput = {
   readonly sessionId: string;
   readonly source: BreathSessionSource;
   readonly startedAtMs: number;
+  readonly targetBreathCycles?: number;
   readonly techniqueId: BreathTechniqueId;
   readonly totalDurationSeconds: number;
 };
@@ -114,6 +120,13 @@ export function createBreathSessionController<TInput extends BreathSessionContro
     throw new Error("Breath-session duration is outside the supported bounds.");
   }
 
+  if (
+    input.targetBreathCycles !== undefined &&
+    (!Number.isInteger(input.targetBreathCycles) || input.targetBreathCycles <= 0)
+  ) {
+    throw new Error("Breath-session target cycle count must be a positive integer.");
+  }
+
   return {
     ...input,
     totalPausedMs: 0,
@@ -126,13 +139,18 @@ export function getBreathSessionSnapshot(
 ): BreathSessionSnapshot {
   const technique = breathTechniques[controller.techniqueId];
   const totalDurationMs = controller.totalDurationSeconds * 1000;
+  const phases = getSessionPhases({
+    phases: technique.phases,
+    targetBreathCycles: controller.targetBreathCycles,
+    totalDurationMs,
+  });
   const effectiveObservedAtMs = controller.pausedAtMs ?? observedAtMs;
   const elapsedDurationMs = clamp(
     effectiveObservedAtMs - controller.startedAtMs - controller.totalPausedMs,
     0,
     totalDurationMs,
   );
-  const phase = getPhaseAtElapsedMs(technique.phases, elapsedDurationMs);
+  const phase = getPhaseAtElapsedMs(phases, elapsedDurationMs);
   const phaseStartedAtMs =
     controller.startedAtMs + controller.totalPausedMs + phase.startedAtElapsedMs;
   const remainingDurationMs = totalDurationMs - elapsedDurationMs;
@@ -145,7 +163,7 @@ export function getBreathSessionSnapshot(
   const phaseProgress = phase.elapsedMs / phase.durationMs;
 
   return {
-    completedBreathCycles: Math.floor(elapsedDurationMs / getCycleDurationMs(technique.phases)),
+    completedBreathCycles: Math.floor(elapsedDurationMs / getCycleDurationMs(phases)),
     currentPhase: {
       durationMs: phase.durationMs,
       elapsedMs: phase.elapsedMs,
@@ -297,6 +315,38 @@ function getPhaseAtElapsedMs(phases: BreathTechniquePhases, elapsedDurationMs: n
     name: fallbackPhase.name,
     startedAtElapsedMs: cycleStartElapsedMs + phaseStartInCycleMs - fallbackPhase.durationMs,
   };
+}
+
+function getSessionPhases({
+  phases,
+  targetBreathCycles,
+  totalDurationMs,
+}: {
+  readonly phases: BreathTechniquePhases;
+  readonly targetBreathCycles: number | undefined;
+  readonly totalDurationMs: number;
+}): BreathTechniquePhases {
+  if (targetBreathCycles === undefined) {
+    return phases;
+  }
+
+  const baseCycleDurationMs = getCycleDurationMs(phases);
+  const targetCycleDurationMs = totalDurationMs / targetBreathCycles;
+  let accumulatedDurationMs = 0;
+
+  return phases.map((phase, index) => {
+    const isLastPhase = index === phases.length - 1;
+    const durationMs = isLastPhase
+      ? Math.max(1, Math.round(targetCycleDurationMs - accumulatedDurationMs))
+      : Math.max(1, Math.round((phase.durationMs / baseCycleDurationMs) * targetCycleDurationMs));
+
+    accumulatedDurationMs += durationMs;
+
+    return {
+      ...phase,
+      durationMs,
+    };
+  }) as BreathTechniquePhases;
 }
 
 function getCycleDurationMs(phases: BreathTechniquePhases) {

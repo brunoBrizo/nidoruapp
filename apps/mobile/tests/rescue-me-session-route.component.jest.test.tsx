@@ -2,7 +2,6 @@ import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 import { act, render } from "@testing-library/react-native";
 
 const mockRouterReplace = jest.fn();
-
 jest.mock("expo-router", () => ({
   useRouter: () => ({
     replace: mockRouterReplace,

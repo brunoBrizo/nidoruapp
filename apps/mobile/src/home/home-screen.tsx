@@ -9,6 +9,7 @@ import { CardFade } from "../surfaces/card-fade";
 import { HomeBreathingOrb, HOME_ORB_MOTION } from "./home-breathing-orb";
 import { type HomeQuickActionId } from "./home-actions";
 import { createHomeOverview, type HomeRhythmSegment } from "./home-state";
+import { markRescueMeHomeTap } from "../rescue/rescue-me-launch-performance";
 
 export { HOME_ORB_MOTION };
 
@@ -112,6 +113,11 @@ export function HomeScreen({
   const primaryAction = homeState.primaryAction;
   const summarySlot = homeState.summarySlot;
   const rhythm = homeState.rhythm;
+  const markRescueMeTapIfNeeded = (actionId: string) => {
+    if (actionId === "rescue-me") {
+      markRescueMeHomeTap();
+    }
+  };
 
   return (
     <>
@@ -160,6 +166,7 @@ export function HomeScreen({
             <Pressable
               accessibilityHint={`Opens the ${primaryAction.label} anchor.`}
               accessibilityRole="link"
+              onPress={() => markRescueMeTapIfNeeded(primaryAction.id)}
               style={({ pressed }) => [styles.primaryButtonPressable, pressed && styles.pressed]}
             >
               <View style={styles.primaryButtonFrame} testID="home-primary-button-frame">
@@ -185,6 +192,7 @@ export function HomeScreen({
                     accessibilityHint={action.accessibilityHint}
                     accessibilityLabel={`${action.label} quick action`}
                     accessibilityRole="link"
+                    onPress={() => markRescueMeTapIfNeeded(action.id)}
                     style={({ pressed }) => [
                       styles.quickActionPressable,
                       pressed && styles.pressed,

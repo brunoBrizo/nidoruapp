@@ -8,11 +8,37 @@ import {
   StyleSheet,
 } from "react-native";
 
+const mockSoundHandoffAudioPlayer = {
+  clearLockScreenControls: jest.fn(),
+  loop: false,
+  pause: jest.fn(),
+  play: jest.fn(),
+  remove: jest.fn(),
+  seekTo: jest.fn(() => Promise.resolve()),
+  setActiveForLockScreen: jest.fn(),
+  updateLockScreenMetadata: jest.fn(),
+  volume: 1,
+};
+const mockCreateAudioPlayer = jest.fn(() => mockSoundHandoffAudioPlayer);
+const mockSetAudioModeAsync = jest.fn(() => Promise.resolve());
+const mockSetIsAudioActiveAsync = jest.fn(() => Promise.resolve());
+
+jest.mock("expo-audio", () => ({
+  createAudioPlayer: mockCreateAudioPlayer,
+  setAudioModeAsync: mockSetAudioModeAsync,
+  setIsAudioActiveAsync: mockSetIsAudioActiveAsync,
+}));
+
 jest.mock("../src/observability/deferred-capture", () => ({
   captureAnalyticsEventDeferred: jest.fn(),
 }));
 
+jest.mock("../src/rescue/rescue-me-launch-performance", () => ({
+  recordRescueMeOrbVisible: jest.fn(),
+}));
+
 import { captureAnalyticsEventDeferred } from "../src/observability/deferred-capture";
+import { recordRescueMeOrbVisible } from "../src/rescue/rescue-me-launch-performance";
 import {
   parseRescueMeScreenState,
   RescueMeActiveSessionScreen,
@@ -31,8 +57,12 @@ const rescueSessionProps = {
   startedAtMs: rescueStartedAtMs,
   tickIntervalMs: 1000,
 } as const;
-const mockCaptureAnalyticsEventDeferred =
-  captureAnalyticsEventDeferred as jest.MockedFunction<typeof captureAnalyticsEventDeferred>;
+const mockCaptureAnalyticsEventDeferred = captureAnalyticsEventDeferred as jest.MockedFunction<
+  typeof captureAnalyticsEventDeferred
+>;
+const mockRecordRescueMeOrbVisible = recordRescueMeOrbVisible as jest.MockedFunction<
+  typeof recordRescueMeOrbVisible
+>;
 
 jest
   .spyOn(AccessibilityInfo, "isReduceMotionEnabled")
@@ -60,11 +90,49 @@ function mockAppStateChangeListeners() {
   };
 }
 
+function mockFetchOffline() {
+  const globalWithFetch = globalThis as typeof globalThis & { fetch?: typeof fetch };
+  const originalFetch = globalWithFetch.fetch;
+  const fetchMock = jest.fn<typeof fetch>(() =>
+    Promise.reject(new Error("Network access disabled for Rescue Me sound handoff.")),
+  );
+
+  globalWithFetch.fetch = fetchMock;
+
+  return {
+    fetchMock,
+    restoreFetch: () => {
+      if (originalFetch) {
+        globalWithFetch.fetch = originalFetch;
+      } else {
+        delete globalWithFetch.fetch;
+      }
+    },
+  };
+}
+
 describe("RescueMeScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockCaptureAnalyticsEventDeferred.mockReset();
     mockCaptureAnalyticsEventDeferred.mockImplementation(() => undefined);
+    mockCreateAudioPlayer.mockReset();
+    mockCreateAudioPlayer.mockReturnValue(mockSoundHandoffAudioPlayer);
+    mockSetAudioModeAsync.mockReset();
+    mockSetAudioModeAsync.mockImplementation(() => Promise.resolve());
+    mockSetIsAudioActiveAsync.mockReset();
+    mockSetIsAudioActiveAsync.mockImplementation(() => Promise.resolve());
+    mockSoundHandoffAudioPlayer.clearLockScreenControls.mockReset();
+    mockSoundHandoffAudioPlayer.loop = false;
+    mockSoundHandoffAudioPlayer.pause.mockReset();
+    mockSoundHandoffAudioPlayer.play.mockReset();
+    mockSoundHandoffAudioPlayer.remove.mockReset();
+    mockSoundHandoffAudioPlayer.seekTo.mockReset();
+    mockSoundHandoffAudioPlayer.seekTo.mockImplementation(() => Promise.resolve());
+    mockSoundHandoffAudioPlayer.setActiveForLockScreen.mockReset();
+    mockSoundHandoffAudioPlayer.updateLockScreenMetadata.mockReset();
+    mockSoundHandoffAudioPlayer.volume = 1;
+    mockRecordRescueMeOrbVisible.mockReset();
   });
 
   afterEach(() => {
@@ -93,6 +161,12 @@ describe("RescueMeScreen", () => {
     expect(screen.getByRole("button", { name: "Pause Rescue Me session" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Haptics on" })).toBeTruthy();
     expect(screen.queryByText("You’re doing enough. Stay with the next breath.")).toBeNull();
+
+    fireEvent(screen.getByTestId("rescue-me-orb"), "layout", {
+      nativeEvent: { layout: { height: 300, width: 300, x: 34, y: 170 } },
+    });
+
+    expect(mockRecordRescueMeOrbVisible).toHaveBeenCalledTimes(1);
   });
 
   it("defaults the route state parser to the active launch contract", () => {
@@ -167,6 +241,57 @@ describe("RescueMeScreen", () => {
         scaleY: 1,
       }),
     ]);
+  });
+
+  it("starts bundled Rain audio offline and supports pause, resume, and return home", async () => {
+    const { fetchMock, restoreFetch } = mockFetchOffline();
+    const onReturnHome = jest.fn();
+
+    try {
+      render(<RescueMeScreen onReturnHome={onReturnHome} state="sound-handoff" />);
+
+      await waitFor(() => {
+        expect(mockSoundHandoffAudioPlayer.play).toHaveBeenCalledTimes(1);
+      });
+
+      expect(fetchMock).not.toHaveBeenCalled();
+      expect(mockCreateAudioPlayer).toHaveBeenCalledTimes(1);
+
+      fireEvent.press(screen.getByRole("button", { name: "Pause Rain sound" }));
+
+      await waitFor(() => {
+        expect(mockSoundHandoffAudioPlayer.pause).toHaveBeenCalledTimes(1);
+      });
+      expect(screen.getByRole("button", { name: "Resume Rain sound" })).toBeTruthy();
+
+      fireEvent.press(screen.getByRole("button", { name: "Resume Rain sound" }));
+
+      await waitFor(() => {
+        expect(mockSoundHandoffAudioPlayer.play).toHaveBeenCalledTimes(2);
+      });
+
+      fireEvent.press(screen.getByRole("button", { name: "Return home" }));
+
+      expect(onReturnHome).toHaveBeenCalledTimes(1);
+    } finally {
+      restoreFetch();
+    }
+  });
+
+  it("keeps the handoff calm when bundled audio startup fails", async () => {
+    mockCreateAudioPlayer.mockImplementationOnce(() => {
+      throw new Error("audio unavailable");
+    });
+
+    render(<RescueMeScreen state="sound-handoff" />);
+
+    expect(screen.getByText("Rain is playing")).toBeTruthy();
+    expect(screen.getByText("Works offline. You can stop anytime.")).toBeTruthy();
+
+    await waitFor(() => {
+      expect(mockCreateAudioPlayer).toHaveBeenCalledTimes(1);
+    });
+    expect(screen.getByRole("button", { name: "Pause Rain sound" })).toBeTruthy();
   });
 
   it("starts the handoff playback bar loop when reduced motion is off", async () => {

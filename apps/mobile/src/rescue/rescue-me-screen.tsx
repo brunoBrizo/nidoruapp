@@ -26,7 +26,12 @@ import {
   useReduceMotionEnabled,
   useReduceMotionPreference,
 } from "../motion/use-reduce-motion-enabled";
+import {
+  createRescueMeSoundHandoffAudioController,
+  type RescueMeSoundHandoffAudioController,
+} from "../audio/rescue-me-sound-handoff-audio";
 import { captureAnalyticsEventDeferred } from "../observability/deferred-capture";
+import { recordRescueMeOrbVisible } from "./rescue-me-launch-performance";
 import {
   completeBreathSessionIfDue,
   createBreathSessionController,
@@ -149,7 +154,13 @@ export function parseOptionalRescueMeScreenState(
   return state && screenStateSet.has(state) ? (state as RescueMeScreenState) : undefined;
 }
 
-export function RescueMeScreen({ state }: { readonly state: RescueMeScreenState }) {
+export function RescueMeScreen({
+  onReturnHome = () => undefined,
+  state,
+}: {
+  readonly onReturnHome?: () => void;
+  readonly state: RescueMeScreenState;
+}) {
   const safeAreaInsets = useContext(SafeAreaInsetsContext) ?? {
     bottom: 0,
     left: 0,
@@ -158,6 +169,15 @@ export function RescueMeScreen({ state }: { readonly state: RescueMeScreenState 
   };
   const { height } = useWindowDimensions();
   const isCompactHeight = height < 760;
+  const hasRecordedOrbVisibleRef = useRef(false);
+  const recordOrbVisibleOnce = useCallback(() => {
+    if (hasRecordedOrbVisibleRef.current) {
+      return;
+    }
+
+    hasRecordedOrbVisibleRef.current = true;
+    recordRescueMeOrbVisible();
+  }, []);
   const rootStyle = [
     styles.screen,
     {
@@ -173,11 +193,15 @@ export function RescueMeScreen({ state }: { readonly state: RescueMeScreenState 
         variant={state === "sound-handoff" || state === "sound-handoff-alt" ? "sound" : "standard"}
       />
       {state === "complete" ? (
-        <CompletionState compact={isCompactHeight} />
+        <CompletionState compact={isCompactHeight} onReturnHome={onReturnHome} />
       ) : state === "sound-handoff" || state === "sound-handoff-alt" ? (
-        <SoundHandoffState compact={isCompactHeight} state={state} />
+        <SoundHandoffState compact={isCompactHeight} onReturnHome={onReturnHome} state={state} />
       ) : (
-        <ActiveSessionState compact={isCompactHeight} state={state} />
+        <ActiveSessionState
+          compact={isCompactHeight}
+          onOrbLayout={recordOrbVisibleOnce}
+          state={state}
+        />
       )}
     </View>
   );
@@ -229,6 +253,15 @@ export function RescueMeActiveSessionScreen({
   const hasPersistedFinalDraftRef = useRef(false);
   const isPersistingTerminalStateRef = useRef(false);
   const lastDraftPersistedAtMs = useRef<number | undefined>(undefined);
+  const hasRecordedOrbVisibleRef = useRef(false);
+  const recordOrbVisibleOnce = useCallback(() => {
+    if (hasRecordedOrbVisibleRef.current) {
+      return;
+    }
+
+    hasRecordedOrbVisibleRef.current = true;
+    recordRescueMeOrbVisible();
+  }, []);
 
   useEffect(() => {
     controllerRef.current = controller;
@@ -425,6 +458,7 @@ export function RescueMeActiveSessionScreen({
                 setHapticsEnabled((enabled) => !enabled);
               }
             }}
+            onOrbLayout={recordOrbVisibleOnce}
             reduceMotionEnabled={reduceMotionEnabled}
             snapshot={snapshot}
           />
@@ -485,9 +519,11 @@ function RescueMeBackground({ variant }: { readonly variant: "standard" | "sound
 
 function ActiveSessionState({
   compact,
+  onOrbLayout,
   state,
 }: {
   readonly compact: boolean;
+  readonly onOrbLayout?: (() => void) | undefined;
   readonly state: ActiveState;
 }) {
   const config = activeStateConfig[state];
@@ -500,6 +536,7 @@ function ActiveSessionState({
           accessibilityLabel={config.accessibilityLabel}
           coreSize={config.coreSize}
           glowScale={config.glowScale}
+          onLayout={onOrbLayout}
           phase={config.phase}
         />
         <Text
@@ -526,6 +563,7 @@ function ActiveSessionRuntimeState({
   compact,
   hapticsEnabled,
   onPause,
+  onOrbLayout,
   onToggleHaptics,
   reduceMotionEnabled,
   snapshot,
@@ -533,6 +571,7 @@ function ActiveSessionRuntimeState({
   readonly compact: boolean;
   readonly hapticsEnabled: boolean;
   readonly onPause: () => void;
+  readonly onOrbLayout?: (() => void) | undefined;
   readonly onToggleHaptics: () => void;
   readonly reduceMotionEnabled: boolean;
   readonly snapshot: BreathSessionSnapshot;
@@ -547,6 +586,7 @@ function ActiveSessionRuntimeState({
           accessibilityLabel={config.accessibilityLabel}
           coreSize={config.coreSize}
           glowScale={config.glowScale}
+          onLayout={onOrbLayout}
           phase={config.phase}
           reduceMotionEnabled={reduceMotionEnabled}
         />
@@ -580,12 +620,14 @@ function BreathingOrb({
   accessibilityLabel,
   coreSize,
   glowScale,
+  onLayout,
   phase,
   reduceMotionEnabled = false,
 }: {
   readonly accessibilityLabel: string;
   readonly coreSize: number;
   readonly glowScale: number;
+  readonly onLayout?: (() => void) | undefined;
   readonly phase: string;
   readonly reduceMotionEnabled?: boolean;
 }) {
@@ -598,6 +640,7 @@ function BreathingOrb({
       accessibilityHint="Guides the current breath phase."
       accessibilityLabel={accessibilityLabel}
       accessibilityRole="timer"
+      onLayout={onLayout}
       style={styles.orbStage}
       testID="rescue-me-orb"
     >
@@ -785,11 +828,40 @@ function CompletionState({
 
 function SoundHandoffState({
   compact,
+  onReturnHome = () => undefined,
   state,
 }: {
   readonly compact: boolean;
+  readonly onReturnHome?: () => void;
   readonly state: Extract<RescueMeScreenState, "sound-handoff" | "sound-handoff-alt">;
 }) {
+  const audioControllerRef = useRef<RescueMeSoundHandoffAudioController | undefined>(undefined);
+  const [isPlaying, setIsPlaying] = useState(true);
+
+  useEffect(() => {
+    const audioController = createRescueMeSoundHandoffAudioController();
+    audioControllerRef.current = audioController;
+    void audioController.start().catch(() => undefined);
+
+    return () => {
+      audioControllerRef.current?.release();
+      audioControllerRef.current = undefined;
+    };
+  }, []);
+
+  const togglePlayback = useCallback(() => {
+    const audioController = audioControllerRef.current;
+
+    if (isPlaying) {
+      setIsPlaying(false);
+      void audioController?.pause().catch(() => undefined);
+      return;
+    }
+
+    setIsPlaying(true);
+    void audioController?.resume().catch(() => undefined);
+  }, [isPlaying]);
+
   return (
     <View
       style={[styles.centeredState, styles.handoffState, compact && styles.centeredStateCompact]}
@@ -802,18 +874,22 @@ function SoundHandoffState({
         Works offline. You can stop anytime.
       </Text>
       <Pressable
-        accessibilityLabel="Pause Rain sound"
+        accessibilityLabel={isPlaying ? "Pause Rain sound" : "Resume Rain sound"}
         accessibilityRole="button"
         hitSlop={10}
-        onPress={() => undefined}
+        onPress={togglePlayback}
         style={styles.soundPauseButton}
       >
-        <Pause color={colors.dark.textPrimary.value} size={28} strokeWidth={1.5} />
+        {isPlaying ? (
+          <Pause color={colors.dark.textPrimary.value} size={28} strokeWidth={1.5} />
+        ) : (
+          <Play color={colors.dark.textPrimary.value} size={24} strokeWidth={1.5} />
+        )}
       </Pressable>
       <Text selectable={false} style={styles.soundLabel}>
         Rain
       </Text>
-      <ReturnHomeButton />
+      <ReturnHomeButton onPress={onReturnHome} />
     </View>
   );
 }

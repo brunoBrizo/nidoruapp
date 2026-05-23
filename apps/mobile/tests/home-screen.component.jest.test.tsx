@@ -1,6 +1,25 @@
 import { describe, expect, it, jest } from "@jest/globals";
-import { render, screen, within } from "@testing-library/react-native";
+import { fireEvent, render, screen, within } from "@testing-library/react-native";
 import { AccessibilityInfo, StyleSheet } from "react-native";
+
+jest.mock("../src/rescue/rescue-me-launch-performance", () => ({
+  markRescueMeHomeTap: jest.fn(),
+}));
+
+jest.mock("expo-router", () => {
+  const React = jest.requireActual<typeof import("react")>("react");
+
+  return {
+    Link: ({
+      children,
+      href,
+    }: {
+      readonly children: React.ReactElement<{ readonly href?: string }>;
+      readonly href: string;
+    }) => React.cloneElement(children, { href }),
+    usePathname: () => "/",
+  };
+});
 
 import { RESTING_BREATHING_ORB_TEST_IDS } from "../src/breathing/breathing-orb";
 import { AppTabBar } from "../src/navigation/app-tab-bar";
@@ -10,6 +29,7 @@ import {
   HOME_ORB_MOTION,
   getHomeContentEntranceMotionConfig,
 } from "../src/home/home-screen";
+import { markRescueMeHomeTap } from "../src/rescue/rescue-me-launch-performance";
 
 const routes = [
   { key: "home-key", name: "index" },
@@ -40,8 +60,19 @@ jest.spyOn(AccessibilityInfo, "addEventListener").mockImplementation(() => ({ re
 const localDateAt = (hour: number, minute = 0) => new Date(2026, 0, 1, hour, minute);
 
 const quickActionIds = ["rescue-me", "sounds", "breathe"] as const;
+const mockMarkRescueMeHomeTap = markRescueMeHomeTap as jest.MockedFunction<
+  typeof markRescueMeHomeTap
+>;
+const routePressEvent = {
+  defaultPrevented: true,
+  preventDefault: jest.fn(),
+};
 
 describe("HomeScreen", () => {
+  beforeEach(() => {
+    mockMarkRescueMeHomeTap.mockClear();
+  });
+
   it("defines decorative Home entrance timing without delaying action routes", () => {
     expect(HOME_CONTENT_ENTRANCE_MOTION).toEqual({
       durationMs: 400,
@@ -181,6 +212,23 @@ describe("HomeScreen", () => {
       "accessibilityHint",
       "Opens the Breathe anchor.",
     );
+  });
+
+  it("marks Rescue Me taps before route navigation for repeatable latency proof", () => {
+    const { unmount } = render(<HomeScreen now={localDateAt(0)} />);
+
+    fireEvent.press(screen.getByRole("link", { name: "Start now" }), routePressEvent);
+
+    expect(mockMarkRescueMeHomeTap).toHaveBeenCalledTimes(1);
+
+    unmount();
+    mockMarkRescueMeHomeTap.mockClear();
+
+    render(<HomeScreen now={localDateAt(20)} />);
+
+    fireEvent.press(screen.getByRole("link", { name: "Rescue Me quick action" }), routePressEvent);
+
+    expect(mockMarkRescueMeHomeTap).toHaveBeenCalledTimes(1);
   });
 
   it.each([

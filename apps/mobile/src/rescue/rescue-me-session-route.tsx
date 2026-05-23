@@ -1,4 +1,5 @@
 import { useRouter } from "expo-router";
+import * as Linking from "expo-linking";
 import { useEffect, useState } from "react";
 
 import {
@@ -95,7 +96,9 @@ export function RescueMeSessionRoute() {
         router.replace("/rescue-me?state=sound-handoff");
       }}
       onReturnHome={() => {
-        router.navigate("/");
+        void Linking.openURL("nidoru://").catch(() => {
+          router.navigate("/");
+        });
       }}
       persistBreathSessionAbandoned={(record) =>
         sessionConfig.database

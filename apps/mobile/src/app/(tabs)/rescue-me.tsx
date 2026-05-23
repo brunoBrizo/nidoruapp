@@ -1,3 +1,4 @@
+import * as Linking from "expo-linking";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback } from "react";
 
@@ -9,7 +10,9 @@ export default function RescueMeAnchorScreen() {
   const router = useRouter();
   const state = parseOptionalRescueMeScreenState(params.state);
   const returnHome = useCallback(() => {
-    router.navigate("/");
+    void Linking.openURL("nidoru://").catch(() => {
+      router.navigate("/");
+    });
   }, [router]);
 
   if (state) {

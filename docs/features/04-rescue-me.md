@@ -43,6 +43,13 @@ Rescue Me is the zero-friction emergency breathwork path. One tap from Home star
 - Local session progress is saved even if app backgrounds.
 - No paywall or account prompt can appear before or during Rescue Me.
 
+## Frozen UI Handoff
+
+- Rescue Me UI source contract: [Rescue Me UI Handoff](../design/screens/rescue-me/README.md)
+- Home entry context: [Home PNG](../design/screens/home/home.png)
+- Downstream native UI work must match the frozen handoff pixel by pixel on iOS before
+  deeper runtime implementation depends on it.
+
 ## UX References
 
 - [Feature Deep Specs](../product/feature-deep-specs.md)

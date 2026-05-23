@@ -1,0 +1,178 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nidoru - Rescue Me Active</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&amp;family=Nunito:wght@400;500&amp;display=swap" rel="stylesheet">
+    <style>
+      :root {
+        --void: #0D0F1A;
+        --midnight-blue: #0F1230;
+        --deep-ink: #14172B;
+        --midnight: #1C2040;
+        --iris: #7C6FCD;
+        --lavender: #A89CE0;
+        --cloud: #EEF0FF;
+        --mist: #8A8FA8;
+      }
+      body {
+        font-family: 'Nunito', sans-serif;
+        background-color: #000;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      .font-inter {
+        font-family: 'Inter', sans-serif;
+      }
+
+      /* 4-7-8 Breathing Cycle Animations (Total 19s) */
+      @keyframes orb-breathe {
+        0%, 100% { transform: scale(0.85); }
+        /* Inhale (4s) */
+        21% { transform: scale(1.35); }
+        /* Hold (7s) */
+        58% { transform: scale(1.35); }
+        /* Exhale (8s) */
+        99% { transform: scale(0.85); }
+      }
+
+      @keyframes orb-glow {
+        0%, 100% { transform: scale(0.85); opacity: 0.6; }
+        21% { transform: scale(1.35); opacity: 1; }
+        58% { transform: scale(1.35); opacity: 0.9; }
+        99% { transform: scale(0.85); opacity: 0.6; }
+      }
+
+      @keyframes pulse-ring {
+        0% { transform: scale(0.85); opacity: 0; }
+        5% { opacity: 0.3; }
+        21% { transform: scale(1.8); opacity: 0; }
+        100% { opacity: 0; transform: scale(1.8); }
+      }
+
+      /* Phase Text Crossfade */
+      @keyframes text-inhale {
+        0%, 18% { opacity: 1; transform: translateY(0); }
+        21%, 100% { opacity: 0; transform: translateY(-4px); }
+      }
+      @keyframes text-hold {
+        0%, 18% { opacity: 0; transform: translateY(4px); }
+        21%, 55% { opacity: 1; transform: translateY(0); }
+        58%, 100% { opacity: 0; transform: translateY(-4px); }
+      }
+      @keyframes text-exhale {
+        0%, 55% { opacity: 0; transform: translateY(4px); }
+        58%, 97% { opacity: 1; transform: translateY(0); }
+        100% { opacity: 0; transform: translateY(-4px); }
+      }
+
+      .animate-orb-core { animation: orb-breathe 19s ease-in-out infinite; }
+      .animate-orb-glow { animation: orb-glow 19s ease-in-out infinite; }
+      .animate-pulse-ring { animation: pulse-ring 19s ease-out infinite; }
+
+      .phase-inhale { animation: text-inhale 19s ease-in-out infinite; }
+      .phase-hold { animation: text-hold 19s ease-in-out infinite; }
+      .phase-exhale { animation: text-exhale 19s ease-in-out infinite; }
+
+      /* Reduced motion fallback */
+      @media (prefers-reduced-motion: reduce) {
+        .animate-orb-core, .animate-orb-glow, .animate-pulse-ring,
+        .phase-inhale, .phase-hold, .phase-exhale {
+          animation: none;
+          opacity: 1;
+          transform: none;
+        }
+        .phase-hold, .phase-exhale, .animate-pulse-ring {
+          display: none;
+        }
+      }
+    </style>
+    <style>
+      @keyframes hold-shimmer {
+        0%, 20% { opacity: 0; }
+        21%, 39% { opacity: 0.15; }
+        40%, 58% { opacity: 0.3; }
+        59%, 100% { opacity: 0; }
+      }
+      .animate-hold-shimmer { animation: hold-shimmer 19s ease-in-out infinite; }
+    </style>
+  </head>
+  <body class="flex items-center justify-center min-h-screen text-[#EEF0FF]">
+    <div class="relative w-full max-w-[390px] h-[844px] bg-[#0D0F1A] overflow-hidden sm:rounded-[40px] sm:border-[8px] sm:border-[#0F1230] shadow-2xl flex flex-col justify-between">
+      <!-- Deep calm radial background -->
+      <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(124,111,205,0.08)_0%,rgba(13,15,26,0)_70%)] pointer-events-none"></div>
+
+      <!-- Safe Area Top Spacer -->
+      <div class="h-16 w-full shrink-0"></div>
+
+      <!-- Central Focus: Breathing Orb -->
+      <main class="flex-1 flex flex-col items-center justify-center relative z-10 -mt-12">
+        <div class="relative flex items-center justify-center w-[280px] h-[280px]" role="timer" aria-label="Inhale breathing phase">
+          <!-- 1. Large soft outer glow -->
+          <div class="absolute w-[270px] h-[270px] rounded-full border border-[#7C6FCD]/15 animate-orb-glow pointer-events-none"></div>
+          <div class="absolute w-[220px] h-[220px] rounded-full bg-[#7C6FCD]/25 blur-[40px] animate-orb-glow pointer-events-none"></div>
+          <div class="absolute w-[280px] h-[280px] rounded-full bg-[#7C6FCD]/15 blur-[56px] animate-orb-glow pointer-events-none"></div>
+
+          <!-- 2. Inner glow -->
+          <div class="absolute w-[180px] h-[180px] rounded-full bg-[#A89CE0]/20 blur-[28px] animate-orb-glow pointer-events-none"></div>
+
+          <!-- 5. Inhale pulse ring -->
+          <div class="absolute w-[132px] h-[132px] rounded-full border-[1.5px] border-[#A89CE0]/50 animate-pulse-ring pointer-events-none"></div>
+
+          <!-- 3. Core Iris orb -->
+          <div class="relative w-[132px] h-[132px] rounded-full shadow-[0_0_40px_rgba(124,111,205,0.4)] overflow-hidden flex items-center justify-center animate-orb-core z-10">
+            <div class="absolute inset-0 bg-gradient-to-tr from-[#7C6FCD] to-[#A89CE0] opacity-95"></div>
+
+            <!-- 4. Subtle highlight for depth -->
+            <div class="absolute inset-0 bg-gradient-to-b from-white/25 to-transparent mix-blend-overlay"></div>
+
+            <!-- Phase Labels (Crossfading) -->
+            <div class="relative z-20 flex items-center justify-center w-full h-full text-[#EEF0FF]/90 font-medium tracking-wide text-base">
+              <span class="absolute phase-inhale">Inhale</span>
+              <span class="absolute opacity-0 phase-hold">Hold</span>
+              <span class="absolute opacity-0 phase-exhale">Exhale</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quiet Timer -->
+        <div class="mt-16 text-[#8A8FA8] font-inter font-medium text-lg tracking-widest tabular-nums opacity-80">
+          03:29
+        </div>
+      </main>
+
+      <!-- Bottom Controls -->
+      <nav class="relative h-[160px] w-full shrink-0 flex items-center justify-center gap-10 z-10 pb-8 px-8">
+        <!-- Soft background fade protecting bottom legibility -->
+        <div class="absolute inset-0 bg-gradient-to-t from-[#0D0F1A] via-[#0D0F1A]/90 to-transparent pointer-events-none -z-10"></div>
+
+        <!-- Audio Cue: Bell -->
+        <button class="flex flex-col items-center gap-2.5 active:scale-95 transition-[transform,background-color] duration-200 group w-16" aria-label="Audio cue: Bell">
+          <div class="w-12 h-12 rounded-full flex items-center justify-center bg-[#14172B]/60 text-[#8A8FA8] border border-[#EEF0FF]/5 group-hover:text-[#EEF0FF] group-active:bg-[#1C2040]/80 transition-[color,background-color] duration-200">
+            <iconify-icon icon="solar:bell-linear" stroke-width="1.5" class="text-2xl"></iconify-icon>
+          </div>
+          <span class="text-[11px] font-medium text-[#8A8FA8] tracking-wide group-hover:text-[#EEF0FF] transition-colors duration-200">
+            Bell
+          </span>
+        </button>
+
+        <!-- Pause -->
+        <button class="flex items-center justify-center w-[68px] h-[68px] rounded-full bg-[#1C2040]/60 border border-[#7C6FCD]/25 text-[#EEF0FF] active:scale-95 transition-[transform,background-color,border-color] duration-200 hover:bg-[#1C2040] hover:border-[#7C6FCD]/40 shadow-[0_0_24px_rgba(124,111,205,0.1)] -mt-4" aria-label="Pause Rescue Me session">
+          <iconify-icon icon="solar:pause-linear" stroke-width="1.5" class="text-[28px]"></iconify-icon>
+        </button>
+
+        <!-- Haptics -->
+        <button class="flex flex-col items-center gap-2.5 active:scale-95 transition-[transform,background-color] duration-200 group w-16" aria-label="Haptics on">
+          <div class="w-12 h-12 rounded-full flex items-center justify-center bg-[#14172B]/60 text-[#8A8FA8] border border-[#EEF0FF]/5 group-hover:text-[#EEF0FF] group-active:bg-[#1C2040]/80 transition-[color,background-color] duration-200">
+            <iconify-icon icon="solar:smartphone-vibration-linear" stroke-width="1.5" class="text-2xl"></iconify-icon>
+          </div>
+          <span class="text-[11px] font-medium text-[#8A8FA8] tracking-wide group-hover:text-[#EEF0FF] transition-colors duration-200">
+            Haptics
+          </span>
+        </button>
+      </nav>
+    </div>
+</body></html>

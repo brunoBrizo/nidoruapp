@@ -222,13 +222,28 @@ describe("HomeScreen", () => {
       screen.getByTestId(`home-quick-action-card-${actionId}`),
     );
 
+    expect(StyleSheet.flatten(screen.getByTestId("home-quick-action-grid").props.style)).toEqual(
+      expect.objectContaining({
+        gap: 12,
+        width: "100%",
+      }),
+    );
+    for (const actionId of ["rescue-me", "sounds", "breathe"]) {
+      expect(
+        StyleSheet.flatten(screen.getByTestId(`home-quick-action-slot-${actionId}`).props.style),
+      ).toEqual(
+        expect.objectContaining({
+          flex: 1,
+        }),
+      );
+    }
     expect(quickActionCards.map((action) => StyleSheet.flatten(action.props.style))).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           backgroundColor: "rgba(20, 23, 43, 0.5)",
           borderRadius: 16,
           height: 86,
-          width: 92,
+          width: "100%",
         }),
       ]),
     );

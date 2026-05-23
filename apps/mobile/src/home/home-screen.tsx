@@ -170,43 +170,52 @@ export function HomeScreen({
           </Link>
         </View>
 
-        <View style={styles.quickActionGrid}>
+        <View style={styles.quickActionGrid} testID="home-quick-action-grid">
           {homeState.quickActions.map((action) => {
             const Icon = quickActionIcons[action.id];
             const isRescueAction = action.id === "rescue-me";
 
             return (
-              <Link asChild href={action.routeTarget} key={action.id}>
-                <Pressable
-                  accessibilityHint={action.accessibilityHint}
-                  accessibilityLabel={`${action.label} quick action`}
-                  accessibilityRole="link"
-                  style={({ pressed }) => [styles.quickActionPressable, pressed && styles.pressed]}
-                >
-                  <View
-                    style={[styles.quickAction, isRescueAction && styles.rescueQuickAction]}
-                    testID={`home-quick-action-card-${action.id}`}
+              <View
+                key={action.id}
+                style={styles.quickActionSlot}
+                testID={`home-quick-action-slot-${action.id}`}
+              >
+                <Link asChild href={action.routeTarget}>
+                  <Pressable
+                    accessibilityHint={action.accessibilityHint}
+                    accessibilityLabel={`${action.label} quick action`}
+                    accessibilityRole="link"
+                    style={({ pressed }) => [
+                      styles.quickActionPressable,
+                      pressed && styles.pressed,
+                    ]}
                   >
                     <View
-                      style={[
-                        styles.quickActionIconBox,
-                        isRescueAction && styles.rescueQuickActionIconBox,
-                      ]}
-                      testID={`home-quick-action-icon-box-${action.id}`}
+                      style={[styles.quickAction, isRescueAction && styles.rescueQuickAction]}
+                      testID={`home-quick-action-card-${action.id}`}
                     >
-                      <Icon
-                        color={isRescueAction ? colors.dark.danger.value : homeColors.inactiveTab}
-                        size={quickActionIconSizes[action.id]}
-                        strokeWidth={1.5}
-                      />
+                      <View
+                        style={[
+                          styles.quickActionIconBox,
+                          isRescueAction && styles.rescueQuickActionIconBox,
+                        ]}
+                        testID={`home-quick-action-icon-box-${action.id}`}
+                      >
+                        <Icon
+                          color={isRescueAction ? colors.dark.danger.value : homeColors.inactiveTab}
+                          size={quickActionIconSizes[action.id]}
+                          strokeWidth={1.5}
+                        />
+                      </View>
+                      <View style={styles.quickActionCopy}>
+                        <Text style={styles.quickActionLabel}>{action.label}</Text>
+                        <Text style={styles.quickActionSubtitle}>{action.subtitle}</Text>
+                      </View>
                     </View>
-                    <View style={styles.quickActionCopy}>
-                      <Text style={styles.quickActionLabel}>{action.label}</Text>
-                      <Text style={styles.quickActionSubtitle}>{action.subtitle}</Text>
-                    </View>
-                  </View>
-                </Pressable>
-              </Link>
+                  </Pressable>
+                </Link>
+              </View>
             );
           })}
         </View>
@@ -401,16 +410,16 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   quickActionGrid: {
-    alignSelf: "center",
     flexDirection: "row",
     gap: 12,
-    justifyContent: "center",
-    maxWidth: 300,
     width: "100%",
+  },
+  quickActionSlot: {
+    flex: 1,
   },
   quickActionPressable: {
     transform: [{ scale: 1 }],
-    width: 92,
+    width: "100%",
   },
   quickAction: {
     alignItems: "center",
@@ -425,7 +434,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
     paddingVertical: 10,
     transform: [{ scale: 1 }],
-    width: 92,
+    width: "100%",
   },
   rescueQuickAction: {
     borderColor: "rgba(255, 107, 107, 0.08)",

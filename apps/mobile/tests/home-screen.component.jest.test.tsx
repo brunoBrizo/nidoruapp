@@ -39,6 +39,8 @@ jest.spyOn(AccessibilityInfo, "addEventListener").mockImplementation(() => ({ re
 
 const localDateAt = (hour: number, minute = 0) => new Date(2026, 0, 1, hour, minute);
 
+const quickActionIds = ["rescue-me", "sounds", "breathe"] as const;
+
 describe("HomeScreen", () => {
   it("defines decorative Home entrance timing without delaying action routes", () => {
     expect(HOME_CONTENT_ENTRANCE_MOTION).toEqual({
@@ -218,17 +220,18 @@ describe("HomeScreen", () => {
   it("matches the compact home.png quick action card structure", () => {
     render(<HomeScreen now={localDateAt(20)} />);
 
-    const quickActionCards = ["rescue-me", "sounds", "breathe"].map((actionId) =>
+    const quickActionCards = quickActionIds.map((actionId) =>
       screen.getByTestId(`home-quick-action-card-${actionId}`),
     );
 
     expect(StyleSheet.flatten(screen.getByTestId("home-quick-action-grid").props.style)).toEqual(
       expect.objectContaining({
+        alignSelf: "stretch",
         gap: 12,
         width: "100%",
       }),
     );
-    for (const actionId of ["rescue-me", "sounds", "breathe"]) {
+    for (const actionId of quickActionIds) {
       expect(
         StyleSheet.flatten(screen.getByTestId(`home-quick-action-slot-${actionId}`).props.style),
       ).toEqual(
@@ -237,17 +240,27 @@ describe("HomeScreen", () => {
         }),
       );
     }
-    expect(quickActionCards.map((action) => StyleSheet.flatten(action.props.style))).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          backgroundColor: "rgba(20, 23, 43, 0.5)",
-          borderRadius: 16,
-          height: 86,
-          width: "100%",
-        }),
-      ]),
-    );
-    for (const actionId of ["rescue-me", "sounds", "breathe"]) {
+    expect(quickActionCards.map((action) => StyleSheet.flatten(action.props.style))).toEqual([
+      expect.objectContaining({
+        backgroundColor: "rgba(20, 23, 43, 0.5)",
+        borderRadius: 16,
+        height: 86,
+        width: "100%",
+      }),
+      expect.objectContaining({
+        backgroundColor: "rgba(20, 23, 43, 0.5)",
+        borderRadius: 16,
+        height: 86,
+        width: "100%",
+      }),
+      expect.objectContaining({
+        backgroundColor: "rgba(20, 23, 43, 0.5)",
+        borderRadius: 16,
+        height: 86,
+        width: "100%",
+      }),
+    ]);
+    for (const actionId of quickActionIds) {
       expect(
         StyleSheet.flatten(
           screen.getByTestId(`home-quick-action-icon-box-${actionId}`).props.style,
@@ -266,17 +279,34 @@ describe("HomeScreen", () => {
       StyleSheet.flatten(screen.getByTestId("home-quick-action-card-rescue-me").props.style),
     ).toEqual(
       expect.objectContaining({
-        borderColor: "rgba(255, 107, 107, 0.08)",
+        borderColor: "rgba(255, 107, 107, 0.12)",
       }),
     );
     expect(
       StyleSheet.flatten(screen.getByTestId("home-quick-action-icon-box-rescue-me").props.style),
     ).toEqual(
       expect.objectContaining({
-        backgroundColor: "rgba(255, 107, 107, 0.12)",
+        backgroundColor: "rgba(255, 107, 107, 0.08)",
+        borderColor: "rgba(255, 107, 107, 0.36)",
         borderRadius: 12,
+        borderWidth: 1,
       }),
     );
+    expect(
+      within(screen.getByTestId("home-quick-action-card-rescue-me")).getByText("Rescue Me"),
+    ).toBeTruthy();
+    expect(
+      within(screen.getByTestId("home-quick-action-card-rescue-me")).getByText("Immediate"),
+    ).toBeTruthy();
+    expect(screen.queryByText("Immediate 4-7-8 relief")).toBeNull();
+    for (const actionId of ["sounds", "breathe"]) {
+      expect(
+        JSON.stringify(screen.getByTestId(`home-quick-action-card-${actionId}`).props.style),
+      ).not.toContain("255, 107, 107");
+      expect(
+        JSON.stringify(screen.getByTestId(`home-quick-action-icon-box-${actionId}`).props.style),
+      ).not.toContain("255, 107, 107");
+    }
   });
 
   it("omits prohibited Home surfaces", () => {

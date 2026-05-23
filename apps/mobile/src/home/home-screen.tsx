@@ -18,7 +18,6 @@ const homeColors = {
   cardGlassStrong: "rgba(20, 23, 43, 0.78)",
   borderSilk: "rgba(238, 240, 255, 0.08)",
   textPrimary: "#E8E6F2",
-  inactiveTab: "#A0A5C0",
 } as const;
 
 export const HOME_CONTENT_ENTRANCE_MOTION = {
@@ -203,7 +202,11 @@ export function HomeScreen({
                         testID={`home-quick-action-icon-box-${action.id}`}
                       >
                         <Icon
-                          color={isRescueAction ? colors.dark.danger.value : homeColors.inactiveTab}
+                          color={
+                            isRescueAction
+                              ? colors.dark.danger.value
+                              : colors.dark.textSecondary.value
+                          }
                           size={quickActionIconSizes[action.id]}
                           strokeWidth={1.5}
                         />
@@ -410,6 +413,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   quickActionGrid: {
+    alignSelf: "stretch",
     flexDirection: "row",
     gap: 12,
     width: "100%",
@@ -418,6 +422,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   quickActionPressable: {
+    minHeight: 86,
     transform: [{ scale: 1 }],
     width: "100%",
   },
@@ -437,7 +442,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   rescueQuickAction: {
-    borderColor: "rgba(255, 107, 107, 0.08)",
+    borderColor: "rgba(255, 107, 107, 0.12)",
     boxShadow: "inset 0 1px 0 rgba(238, 240, 255, 0.08), 0 0 18px rgba(255, 107, 107, 0.08)",
   },
   quickActionIconBox: {
@@ -447,8 +452,10 @@ const styles = StyleSheet.create({
     width: 24,
   },
   rescueQuickActionIconBox: {
-    backgroundColor: "rgba(255, 107, 107, 0.12)",
+    backgroundColor: "rgba(255, 107, 107, 0.08)",
+    borderColor: "rgba(255, 107, 107, 0.36)",
     borderRadius: 12,
+    borderWidth: 1,
   },
   quickActionCopy: {
     alignItems: "center",
@@ -456,7 +463,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   quickActionLabel: {
-    color: homeColors.textPrimary,
+    color: colors.dark.textPrimary.value,
     fontFamily: typography.mobileFontFamily.primary.semiBold,
     fontSize: 14,
     lineHeight: 17,

@@ -2,10 +2,20 @@ import { colors, typography } from "@nidoru/ui-tokens";
 import { StatusBar } from "expo-status-bar";
 import { Bell, Pause, Vibrate } from "lucide-react-native";
 import type { ReactNode } from "react";
-import { useContext } from "react";
-import { Pressable, StyleSheet, Text, useWindowDimensions, View } from "react-native";
+import { useContext, useEffect, useRef } from "react";
+import {
+  Animated,
+  Easing,
+  Pressable,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import { SafeAreaInsetsContext } from "react-native-safe-area-context";
 import Svg, { Circle, Defs, LinearGradient, RadialGradient, Rect, Stop } from "react-native-svg";
+
+import { useReduceMotionEnabled } from "../motion/use-reduce-motion-enabled";
 
 export const RESCUE_ME_SCREEN_STATES = [
   "active-launch",
@@ -93,7 +103,9 @@ export function RescueMeScreen({ state }: { readonly state: RescueMeScreenState 
   return (
     <View style={rootStyle} testID={`rescue-me-screen-${state}`}>
       <StatusBar hidden />
-      <RescueMeBackground />
+      <RescueMeBackground
+        variant={state === "sound-handoff" || state === "sound-handoff-alt" ? "sound" : "standard"}
+      />
       {state === "complete" ? (
         <CompletionState compact={isCompactHeight} />
       ) : state === "sound-handoff" || state === "sound-handoff-alt" ? (
@@ -105,7 +117,9 @@ export function RescueMeScreen({ state }: { readonly state: RescueMeScreenState 
   );
 }
 
-function RescueMeBackground() {
+function RescueMeBackground({ variant }: { readonly variant: "standard" | "sound" }) {
+  const isSoundHandoff = variant === "sound";
+
   return (
     <View pointerEvents="none" style={StyleSheet.absoluteFill} testID="rescue-me-background">
       <Svg height="100%" preserveAspectRatio="none" viewBox="0 0 390 844" width="100%">
@@ -126,15 +140,19 @@ function RescueMeBackground() {
           </RadialGradient>
           <RadialGradient
             cx="195"
-            cy="300"
+            cy={isSoundHandoff ? "274" : "300"}
             fx="195"
-            fy="300"
+            fy={isSoundHandoff ? "274" : "300"}
             gradientUnits="userSpaceOnUse"
             id="rescue-orb-wash"
-            r="250"
+            r={isSoundHandoff ? "178" : "250"}
           >
-            <Stop offset="0" stopColor="#7C6FCD" stopOpacity="0.1" />
-            <Stop offset="0.42" stopColor="#7C6FCD" stopOpacity="0.05" />
+            <Stop offset="0" stopColor="#7C6FCD" stopOpacity={isSoundHandoff ? "0.075" : "0.1"} />
+            <Stop
+              offset="0.42"
+              stopColor="#7C6FCD"
+              stopOpacity={isSoundHandoff ? "0.032" : "0.05"}
+            />
             <Stop offset="1" stopColor="#7C6FCD" stopOpacity="0" />
           </RadialGradient>
         </Defs>
@@ -418,19 +436,117 @@ function SoundBars({
 }: {
   readonly variant: Extract<RescueMeScreenState, "sound-handoff" | "sound-handoff-alt">;
 }) {
-  const bars = variant === "sound-handoff" ? [24, 18, 14] : [8, 14, 24];
+  const reduceMotionEnabled = useReduceMotionEnabled();
+  const playbackProgress = useRef(new Animated.Value(variant === "sound-handoff" ? 0 : 1)).current;
+
+  useEffect(() => {
+    const initialValue = variant === "sound-handoff" ? 0 : 1;
+    const oppositeValue = initialValue === 0 ? 1 : 0;
+
+    playbackProgress.setValue(initialValue);
+
+    if (reduceMotionEnabled) {
+      return undefined;
+    }
+
+    const animation = Animated.loop(
+      Animated.sequence([
+        Animated.timing(playbackProgress, {
+          duration: 620,
+          easing: Easing.inOut(Easing.ease),
+          toValue: oppositeValue,
+          useNativeDriver: true,
+        }),
+        Animated.timing(playbackProgress, {
+          duration: 620,
+          easing: Easing.inOut(Easing.ease),
+          toValue: initialValue,
+          useNativeDriver: true,
+        }),
+      ]),
+    );
+
+    animation.start();
+
+    return () => {
+      animation.stop();
+    };
+  }, [playbackProgress, reduceMotionEnabled, variant]);
 
   return (
     <View style={styles.soundBarsStage} testID={`rescue-me-${variant}-bars`}>
-      <View style={styles.soundBarsGlow} />
+      <SoundHandoffIconAura />
       <View style={styles.soundBars}>
-        {bars.map((height, index) => (
-          <View
-            key={`${variant}-${height}-${index}`}
-            style={[styles.soundBar, { height, opacity: 0.52 + index * 0.16 }]}
+        {soundBarFrames.map(({ soundHandoff, soundHandoffAlt }, index) => (
+          <Animated.View
+            key={`sound-bar-${index}`}
+            style={[
+              styles.soundBar,
+              {
+                height: soundBarMaxHeight,
+                opacity: playbackProgress.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [soundHandoff.opacity, soundHandoffAlt.opacity],
+                }),
+                transform: [
+                  {
+                    scaleY: playbackProgress.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [
+                        soundHandoff.height / soundBarMaxHeight,
+                        soundHandoffAlt.height / soundBarMaxHeight,
+                      ],
+                    }),
+                  },
+                ],
+              },
+            ]}
+            testID={`rescue-me-sound-bar-${index}`}
           />
         ))}
       </View>
+    </View>
+  );
+}
+
+const soundBarMaxHeight = 24;
+const soundBarFrames = [
+  {
+    soundHandoff: { height: 24, opacity: 0.92 },
+    soundHandoffAlt: { height: 8, opacity: 0.5 },
+  },
+  {
+    soundHandoff: { height: 18, opacity: 0.72 },
+    soundHandoffAlt: { height: 14, opacity: 0.68 },
+  },
+  {
+    soundHandoff: { height: 14, opacity: 0.58 },
+    soundHandoffAlt: { height: 24, opacity: 0.94 },
+  },
+] as const;
+
+function SoundHandoffIconAura() {
+  return (
+    <View pointerEvents="none" style={styles.soundBarsAura} testID="rescue-me-sound-bars-aura">
+      <Svg height="100%" preserveAspectRatio="none" viewBox="0 0 220 174" width="100%">
+        <Defs>
+          <RadialGradient
+            cx="110"
+            cy="87"
+            fx="110"
+            fy="87"
+            gradientUnits="userSpaceOnUse"
+            id="rescue-sound-bars-aura"
+            r="110"
+          >
+            <Stop offset="0" stopColor="#A89CE0" stopOpacity="0.15" />
+            <Stop offset="0.3" stopColor="#7C6FCD" stopOpacity="0.085" />
+            <Stop offset="0.62" stopColor="#242A52" stopOpacity="0.035" />
+            <Stop offset="1" stopColor="#0D0F1A" stopOpacity="0" />
+          </RadialGradient>
+        </Defs>
+        <Rect fill="url(#rescue-sound-bars-aura)" height="174" width="220" x="0" y="0" />
+      </Svg>
     </View>
   );
 }
@@ -682,19 +798,16 @@ const styles = StyleSheet.create({
     height: 30,
     justifyContent: "center",
   },
-  soundBarsGlow: {
-    backgroundColor: "rgba(124, 111, 205, 0.12)",
-    borderRadius: 120,
-    boxShadow: "0 0 54px rgba(124, 111, 205, 0.22)",
-    height: 210,
+  soundBarsAura: {
+    height: 174,
     position: "absolute",
-    width: 210,
+    width: 220,
   },
   soundBarsStage: {
     alignItems: "center",
     height: 112,
     justifyContent: "center",
-    width: 210,
+    width: 220,
   },
   soundLabel: {
     color: colors.dark.textSecondary.value,

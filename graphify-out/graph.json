@@ -1645,7 +1645,7 @@
       "label": "parseRescueMeScreenState()",
       "file_type": "code",
       "source_file": "apps/mobile/src/rescue/rescue-me-screen.tsx",
-      "source_location": "L68",
+      "source_location": "L78",
       "id": "rescue_me_screen_parserescuemescreenstate",
       "community": 55,
       "norm_label": "parserescuemescreenstate()"
@@ -4866,7 +4866,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/rescue/rescue-me-screen.tsx",
-      "source_location": "L68",
+      "source_location": "L78",
       "weight": 1.0,
       "_src": "apps_mobile_src_rescue_rescue_me_screen_tsx",
       "_tgt": "rescue_me_screen_parserescuemescreenstate",

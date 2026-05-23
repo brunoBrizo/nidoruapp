@@ -1,6 +1,6 @@
-import { describe, expect, it } from "@jest/globals";
-import { render, screen, within } from "@testing-library/react-native";
-import { StyleSheet } from "react-native";
+import { beforeEach, describe, expect, it, jest } from "@jest/globals";
+import { render, screen, waitFor, within } from "@testing-library/react-native";
+import { AccessibilityInfo, Animated, StyleSheet } from "react-native";
 
 import {
   RESCUE_ME_SCREEN_STATES,
@@ -11,7 +11,16 @@ import {
 const forbiddenSurfacePattern =
   /account|paywall|permission|choose|pick|setup|loading|spinner|network|medical|crisis|badge|streak|reward|ember/i;
 
+jest
+  .spyOn(AccessibilityInfo, "isReduceMotionEnabled")
+  .mockImplementation(() => new Promise<boolean>(() => undefined));
+jest.spyOn(AccessibilityInfo, "addEventListener").mockImplementation(() => ({ remove: jest.fn() }));
+
 describe("RescueMeScreen", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it("renders every accepted visual state without setup or gate surfaces", () => {
     for (const state of RESCUE_ME_SCREEN_STATES) {
       const { unmount } = render(<RescueMeScreen state={state} />);
@@ -70,9 +79,63 @@ describe("RescueMeScreen", () => {
       expect(screen.getByText("Works offline. You can stop anytime.")).toBeTruthy();
       expect(screen.getByRole("button", { name: "Pause Rain sound" })).toBeTruthy();
       expect(screen.getByRole("button", { name: "Return home" })).toBeTruthy();
+      expect(screen.getByTestId("rescue-me-sound-bars-aura")).toBeTruthy();
       expect(screen.queryByText(/sound picker|choose sound|select sound/i)).toBeNull();
 
       unmount();
+    }
+  });
+
+  it("renders the handoff sound icon with a fading aura and animated playback bars", () => {
+    render(<RescueMeScreen state="sound-handoff" />);
+
+    const auraStyle = StyleSheet.flatten(
+      screen.getByTestId("rescue-me-sound-bars-aura").props.style,
+    );
+    const firstBarStyle = StyleSheet.flatten(
+      screen.getByTestId("rescue-me-sound-bar-0").props.style,
+    );
+
+    expect(auraStyle).toEqual(
+      expect.objectContaining({
+        height: 174,
+        position: "absolute",
+        width: 220,
+      }),
+    );
+    expect(auraStyle.backgroundColor).toBeUndefined();
+    expect(firstBarStyle.height).toBe(24);
+    expect(firstBarStyle.opacity).toBe(0.92);
+    expect(firstBarStyle.transform).toEqual([
+      expect.objectContaining({
+        scaleY: 1,
+      }),
+    ]);
+  });
+
+  it("starts the handoff playback bar loop when reduced motion is off", async () => {
+    const reduceMotionMock = AccessibilityInfo.isReduceMotionEnabled as jest.MockedFunction<
+      typeof AccessibilityInfo.isReduceMotionEnabled
+    >;
+    const loopStart = jest.fn();
+    const loopStop = jest.fn();
+    const loopSpy = jest.spyOn(Animated, "loop").mockReturnValue({
+      reset: jest.fn(),
+      start: loopStart,
+      stop: loopStop,
+    } as unknown as ReturnType<typeof Animated.loop>);
+
+    reduceMotionMock.mockResolvedValueOnce(false);
+    try {
+      render(<RescueMeScreen state="sound-handoff" />);
+
+      await waitFor(() => {
+        expect(loopStart).toHaveBeenCalledTimes(1);
+      });
+
+      expect(loopSpy).toHaveBeenCalledTimes(1);
+    } finally {
+      loopSpy.mockRestore();
     }
   });
 

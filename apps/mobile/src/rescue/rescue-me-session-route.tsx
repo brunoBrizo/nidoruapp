@@ -95,7 +95,7 @@ export function RescueMeSessionRoute() {
         router.replace("/rescue-me?state=sound-handoff");
       }}
       onReturnHome={() => {
-        router.replace("/(tabs)");
+        router.navigate("/");
       }}
       persistBreathSessionAbandoned={(record) =>
         sessionConfig.database

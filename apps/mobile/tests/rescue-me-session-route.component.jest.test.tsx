@@ -4,6 +4,7 @@ import { act, render } from "@testing-library/react-native";
 const mockRouterReplace = jest.fn();
 jest.mock("expo-router", () => ({
   useRouter: () => ({
+    navigate: jest.fn(),
     replace: mockRouterReplace,
   }),
 }));

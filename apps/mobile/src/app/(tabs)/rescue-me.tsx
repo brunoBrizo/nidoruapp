@@ -9,7 +9,7 @@ export default function RescueMeAnchorScreen() {
   const router = useRouter();
   const state = parseOptionalRescueMeScreenState(params.state);
   const returnHome = useCallback(() => {
-    router.replace("/(tabs)");
+    router.navigate("/");
   }, [router]);
 
   if (state) {

@@ -1,11 +1,11 @@
 # Graph Report - sleep-app  (2026-05-23)
 
 ## Corpus Check
-- 125 files · ~268,421 words
+- 127 files · ~270,496 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 366 nodes · 392 edges · 18 communities detected
+- 369 nodes · 393 edges · 18 communities detected
 - Extraction: 87% EXTRACTED · 13% INFERRED · 0% AMBIGUOUS · INFERRED: 50 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
@@ -143,11 +143,11 @@ Nodes (2): OnboardingRouteScreen(), parseOnboardingStage()
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `requestNotificationPermissionFromGate()` connect `Community 0` to `Community 4`?**
-  _High betweenness centrality (0.023) - this node is a cross-community bridge._
+  _High betweenness centrality (0.022) - this node is a cross-community bridge._
 - **Why does `captureAnalyticsEvent()` connect `Community 4` to `Community 0`?**
   _High betweenness centrality (0.020) - this node is a cross-community bridge._
 - **Why does `openMigratedLocalDatabase()` connect `Community 3` to `Community 0`?**
-  _High betweenness centrality (0.019) - this node is a cross-community bridge._
+  _High betweenness centrality (0.018) - this node is a cross-community bridge._
 - **Are the 3 inferred relationships involving `getBreathSessionSnapshot()` (e.g. with `pauseSession()` and `resumeSession()`) actually correct?**
   _`getBreathSessionSnapshot()` has 3 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 4 inferred relationships involving `requestNotificationPermissionFromGate()` (e.g. with `markNotificationPermissionPrompted()` and `captureAnalyticsEvent()`) actually correct?**

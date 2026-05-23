@@ -79,6 +79,15 @@ describe("AppTabBar", () => {
     expect(screen.queryByText("Breathe")).toBeNull();
   });
 
+  it("hides the tab shell on full-screen Rescue Me routes", () => {
+    mockUsePathname.mockReturnValue("/rescue-me");
+
+    renderTabBar();
+
+    expect(screen.queryByRole("tab", { name: "Home tab" })).toBeNull();
+    expect(screen.queryByText("Rescue Me")).toBeNull();
+  });
+
   it("matches the home.png tab shell frame and active indicator", () => {
     renderTabBar();
 

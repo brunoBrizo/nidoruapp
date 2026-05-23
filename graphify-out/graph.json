@@ -9,7 +9,7 @@
       "source_file": "eslint.config.mjs",
       "source_location": "L1",
       "id": "eslint_config_mjs",
-      "community": 63,
+      "community": 64,
       "norm_label": "eslint.config.mjs"
     },
     {
@@ -18,7 +18,7 @@
       "source_file": "supabase/tests/revenuecat/revenuecat-webhook-fixtures.test.mjs",
       "source_location": "L1",
       "id": "supabase_tests_revenuecat_revenuecat_webhook_fixtures_test_mjs",
-      "community": 64,
+      "community": 65,
       "norm_label": "revenuecat-webhook-fixtures.test.mjs"
     },
     {
@@ -63,7 +63,7 @@
       "source_file": "packages/config/eslint/base.mjs",
       "source_location": "L1",
       "id": "packages_config_eslint_base_mjs",
-      "community": 65,
+      "community": 66,
       "norm_label": "base.mjs"
     },
     {
@@ -72,7 +72,7 @@
       "source_file": "packages/i18n/src/locale-coverage.test.ts",
       "source_location": "L1",
       "id": "packages_i18n_src_locale_coverage_test_ts",
-      "community": 66,
+      "community": 67,
       "norm_label": "locale-coverage.test.ts"
     },
     {
@@ -108,7 +108,7 @@
       "source_file": "packages/ui-tokens/src/index.test.ts",
       "source_location": "L1",
       "id": "packages_ui_tokens_src_index_test_ts",
-      "community": 67,
+      "community": 68,
       "norm_label": "index.test.ts"
     },
     {
@@ -342,7 +342,7 @@
       "source_file": "apps/web/next.config.mjs",
       "source_location": "L1",
       "id": "apps_web_next_config_mjs",
-      "community": 68,
+      "community": 69,
       "norm_label": "next.config.mjs"
     },
     {
@@ -351,7 +351,7 @@
       "source_file": "apps/web/next-env.d.ts",
       "source_location": "L1",
       "id": "apps_web_next_env_d_ts",
-      "community": 69,
+      "community": 70,
       "norm_label": "next-env.d.ts"
     },
     {
@@ -360,7 +360,7 @@
       "source_file": "apps/web/eslint.config.mjs",
       "source_location": "L1",
       "id": "apps_web_eslint_config_mjs",
-      "community": 70,
+      "community": 71,
       "norm_label": "eslint.config.mjs"
     },
     {
@@ -369,7 +369,7 @@
       "source_file": "apps/web/src/index.ts",
       "source_location": "L1",
       "id": "apps_web_src_index_ts",
-      "community": 71,
+      "community": 72,
       "norm_label": "index.ts"
     },
     {
@@ -396,7 +396,7 @@
       "source_file": "apps/web/src/app/route-shells.test.ts",
       "source_location": "L1",
       "id": "apps_web_src_app_route_shells_test_ts",
-      "community": 72,
+      "community": 73,
       "norm_label": "route-shells.test.ts"
     },
     {
@@ -423,7 +423,7 @@
       "source_file": "apps/web/src/app/route-shells.ts",
       "source_location": "L1",
       "id": "apps_web_src_app_route_shells_ts",
-      "community": 73,
+      "community": 74,
       "norm_label": "route-shells.ts"
     },
     {
@@ -504,7 +504,7 @@
       "source_file": "apps/mobile/app.config.js",
       "source_location": "L1",
       "id": "apps_mobile_app_config_js",
-      "community": 74,
+      "community": 75,
       "norm_label": "app.config.js"
     },
     {
@@ -513,7 +513,7 @@
       "source_file": "apps/mobile/expo-env.d.ts",
       "source_location": "L1",
       "id": "apps_mobile_expo_env_d_ts",
-      "community": 75,
+      "community": 76,
       "norm_label": "expo-env.d.ts"
     },
     {
@@ -522,7 +522,7 @@
       "source_file": "apps/mobile/jest.config.js",
       "source_location": "L1",
       "id": "apps_mobile_jest_config_js",
-      "community": 76,
+      "community": 77,
       "norm_label": "jest.config.js"
     },
     {
@@ -531,7 +531,7 @@
       "source_file": "apps/mobile/metro.config.js",
       "source_location": "L1",
       "id": "apps_mobile_metro_config_js",
-      "community": 77,
+      "community": 78,
       "norm_label": "metro.config.js"
     },
     {
@@ -558,7 +558,7 @@
       "source_file": "apps/mobile/tests/first-launch-onboarding-gate.component.jest.test.tsx",
       "source_location": "L1",
       "id": "apps_mobile_tests_first_launch_onboarding_gate_component_jest_test_tsx",
-      "community": 78,
+      "community": 79,
       "norm_label": "first-launch-onboarding-gate.component.jest.test.tsx"
     },
     {
@@ -567,7 +567,7 @@
       "source_file": "apps/mobile/tests/local-database.unit.jest.test.ts",
       "source_location": "L1",
       "id": "apps_mobile_tests_local_database_unit_jest_test_ts",
-      "community": 79,
+      "community": 80,
       "norm_label": "local-database.unit.jest.test.ts"
     },
     {
@@ -594,7 +594,7 @@
       "source_file": "apps/mobile/tests/sleep-timer-power-management.unit.jest.test.ts",
       "source_location": "L1",
       "id": "apps_mobile_tests_sleep_timer_power_management_unit_jest_test_ts",
-      "community": 80,
+      "community": 81,
       "norm_label": "sleep-timer-power-management.unit.jest.test.ts"
     },
     {
@@ -603,7 +603,7 @@
       "source_file": "apps/mobile/tests/personalized-plan-screen.component.jest.test.tsx",
       "source_location": "L1",
       "id": "apps_mobile_tests_personalized_plan_screen_component_jest_test_tsx",
-      "community": 81,
+      "community": 82,
       "norm_label": "personalized-plan-screen.component.jest.test.tsx"
     },
     {
@@ -729,7 +729,7 @@
       "source_file": "apps/mobile/tests/onboarding-splash-screen.component.jest.test.tsx",
       "source_location": "L1",
       "id": "apps_mobile_tests_onboarding_splash_screen_component_jest_test_tsx",
-      "community": 82,
+      "community": 83,
       "norm_label": "onboarding-splash-screen.component.jest.test.tsx"
     },
     {
@@ -738,7 +738,7 @@
       "source_file": "apps/mobile/tests/first-session-runtime.unit.jest.test.ts",
       "source_location": "L1",
       "id": "apps_mobile_tests_first_session_runtime_unit_jest_test_ts",
-      "community": 83,
+      "community": 84,
       "norm_label": "first-session-runtime.unit.jest.test.ts"
     },
     {
@@ -828,7 +828,7 @@
       "source_file": "apps/mobile/tests/first-session-route.component.jest.test.tsx",
       "source_location": "L1",
       "id": "apps_mobile_tests_first_session_route_component_jest_test_tsx",
-      "community": 84,
+      "community": 85,
       "norm_label": "first-session-route.component.jest.test.tsx"
     },
     {
@@ -891,7 +891,7 @@
       "source_file": "apps/mobile/tests/navigation-contract.unit.jest.test.ts",
       "source_location": "L1",
       "id": "apps_mobile_tests_navigation_contract_unit_jest_test_ts",
-      "community": 85,
+      "community": 86,
       "norm_label": "navigation-contract.unit.jest.test.ts"
     },
     {
@@ -900,7 +900,7 @@
       "source_file": "apps/mobile/tests/tab-shells.component.jest.test.tsx",
       "source_location": "L1",
       "id": "apps_mobile_tests_tab_shells_component_jest_test_tsx",
-      "community": 86,
+      "community": 87,
       "norm_label": "tab-shells.component.jest.test.tsx"
     },
     {
@@ -936,7 +936,7 @@
       "source_file": "apps/mobile/tests/launch-catalog.unit.jest.test.ts",
       "source_location": "L1",
       "id": "apps_mobile_tests_launch_catalog_unit_jest_test_ts",
-      "community": 87,
+      "community": 88,
       "norm_label": "launch-catalog.unit.jest.test.ts"
     },
     {
@@ -945,7 +945,7 @@
       "source_file": "apps/mobile/tests/post-value-account-paywall-screen.component.jest.test.tsx",
       "source_location": "L1",
       "id": "apps_mobile_tests_post_value_account_paywall_screen_component_jest_test_tsx",
-      "community": 88,
+      "community": 89,
       "norm_label": "post-value-account-paywall-screen.component.jest.test.tsx"
     },
     {
@@ -1017,7 +1017,7 @@
       "source_file": "apps/mobile/tests/sleep-screen.component.jest.test.tsx",
       "source_location": "L1",
       "id": "apps_mobile_tests_sleep_screen_component_jest_test_tsx",
-      "community": 89,
+      "community": 90,
       "norm_label": "sleep-screen.component.jest.test.tsx"
     },
     {
@@ -1044,7 +1044,7 @@
       "source_file": "apps/mobile/tests/notification-permission-gate-screen.component.jest.test.tsx",
       "source_location": "L1",
       "id": "apps_mobile_tests_notification_permission_gate_screen_component_jest_test_tsx",
-      "community": 90,
+      "community": 91,
       "norm_label": "notification-permission-gate-screen.component.jest.test.tsx"
     },
     {
@@ -1066,12 +1066,21 @@
       "norm_label": "rendertabbar()"
     },
     {
+      "label": "rescue-me-screen.component.jest.test.tsx",
+      "file_type": "code",
+      "source_file": "apps/mobile/tests/rescue-me-screen.component.jest.test.tsx",
+      "source_location": "L1",
+      "id": "apps_mobile_tests_rescue_me_screen_component_jest_test_tsx",
+      "community": 92,
+      "norm_label": "rescue-me-screen.component.jest.test.tsx"
+    },
+    {
       "label": "breath-session-runtime.unit.jest.test.ts",
       "file_type": "code",
       "source_file": "apps/mobile/tests/breath-session-runtime.unit.jest.test.ts",
       "source_location": "L1",
       "id": "apps_mobile_tests_breath_session_runtime_unit_jest_test_ts",
-      "community": 91,
+      "community": 93,
       "norm_label": "breath-session-runtime.unit.jest.test.ts"
     },
     {
@@ -1080,7 +1089,7 @@
       "source_file": "apps/mobile/src/assets.d.ts",
       "source_location": "L1",
       "id": "apps_mobile_src_assets_d_ts",
-      "community": 92,
+      "community": 94,
       "norm_label": "assets.d.ts"
     },
     {
@@ -1206,7 +1215,7 @@
       "source_file": "apps/mobile/src/app/post-value.tsx",
       "source_location": "L1",
       "id": "apps_mobile_src_app_post_value_tsx",
-      "community": 93,
+      "community": 95,
       "norm_label": "post-value.tsx"
     },
     {
@@ -1269,7 +1278,7 @@
       "source_file": "apps/mobile/src/app/_layout.tsx",
       "source_location": "L1",
       "id": "apps_mobile_src_app_layout_tsx",
-      "community": 94,
+      "community": 96,
       "norm_label": "_layout.tsx"
     },
     {
@@ -1312,7 +1321,7 @@
       "label": "RescueMeAnchorScreen()",
       "file_type": "code",
       "source_file": "apps/mobile/src/app/(tabs)/rescue-me.tsx",
-      "source_location": "L3",
+      "source_location": "L5",
       "id": "rescue_me_rescuemeanchorscreen",
       "community": 44,
       "norm_label": "rescuemeanchorscreen()"
@@ -1323,7 +1332,7 @@
       "source_file": "apps/mobile/src/app/(tabs)/sleep.tsx",
       "source_location": "L1",
       "id": "apps_mobile_src_app_tabs_sleep_tsx",
-      "community": 95,
+      "community": 97,
       "norm_label": "sleep.tsx"
     },
     {
@@ -1368,7 +1377,7 @@
       "source_file": "apps/mobile/src/app/(tabs)/profile.tsx",
       "source_location": "L1",
       "id": "apps_mobile_src_app_tabs_profile_tsx",
-      "community": 96,
+      "community": 98,
       "norm_label": "profile.tsx"
     },
     {
@@ -1377,7 +1386,7 @@
       "source_file": "apps/mobile/src/app/(tabs)/_layout.tsx",
       "source_location": "L1",
       "id": "apps_mobile_src_app_tabs_layout_tsx",
-      "community": 97,
+      "community": 99,
       "norm_label": "_layout.tsx"
     },
     {
@@ -1386,7 +1395,7 @@
       "source_file": "apps/mobile/src/app/(tabs)/breathe.tsx",
       "source_location": "L1",
       "id": "apps_mobile_src_app_tabs_breathe_tsx",
-      "community": 98,
+      "community": 100,
       "norm_label": "breathe.tsx"
     },
     {
@@ -1593,7 +1602,7 @@
       "source_file": "apps/mobile/src/progress/progress-screen.tsx",
       "source_location": "L1",
       "id": "apps_mobile_src_progress_progress_screen_tsx",
-      "community": 99,
+      "community": 101,
       "norm_label": "progress-screen.tsx"
     },
     {
@@ -1602,7 +1611,7 @@
       "source_file": "apps/mobile/src/sleep/sleep-screen.tsx",
       "source_location": "L1",
       "id": "apps_mobile_src_sleep_sleep_screen_tsx",
-      "community": 100,
+      "community": 102,
       "norm_label": "sleep-screen.tsx"
     },
     {
@@ -1611,7 +1620,7 @@
       "source_file": "apps/mobile/src/shell/tab-entry-screen.tsx",
       "source_location": "L1",
       "id": "apps_mobile_src_shell_tab_entry_screen_tsx",
-      "community": 101,
+      "community": 103,
       "norm_label": "tab-entry-screen.tsx"
     },
     {
@@ -1620,8 +1629,26 @@
       "source_file": "apps/mobile/src/breathing/breathing-orb.tsx",
       "source_location": "L1",
       "id": "apps_mobile_src_breathing_breathing_orb_tsx",
-      "community": 102,
+      "community": 104,
       "norm_label": "breathing-orb.tsx"
+    },
+    {
+      "label": "rescue-me-screen.tsx",
+      "file_type": "code",
+      "source_file": "apps/mobile/src/rescue/rescue-me-screen.tsx",
+      "source_location": "L1",
+      "id": "apps_mobile_src_rescue_rescue_me_screen_tsx",
+      "community": 55,
+      "norm_label": "rescue-me-screen.tsx"
+    },
+    {
+      "label": "parseRescueMeScreenState()",
+      "file_type": "code",
+      "source_file": "apps/mobile/src/rescue/rescue-me-screen.tsx",
+      "source_location": "L68",
+      "id": "rescue_me_screen_parserescuemescreenstate",
+      "community": 55,
+      "norm_label": "parserescuemescreenstate()"
     },
     {
       "label": "tab-placeholder-screen.tsx",
@@ -1629,7 +1656,7 @@
       "source_file": "apps/mobile/src/navigation/tab-placeholder-screen.tsx",
       "source_location": "L1",
       "id": "apps_mobile_src_navigation_tab_placeholder_screen_tsx",
-      "community": 55,
+      "community": 56,
       "norm_label": "tab-placeholder-screen.tsx"
     },
     {
@@ -1638,7 +1665,7 @@
       "source_file": "apps/mobile/src/navigation/tab-placeholder-screen.tsx",
       "source_location": "L9",
       "id": "tab_placeholder_screen_tabplaceholderscreen",
-      "community": 55,
+      "community": 56,
       "norm_label": "tabplaceholderscreen()"
     },
     {
@@ -1719,7 +1746,7 @@
       "source_file": "apps/mobile/src/observability/sync-observability.ts",
       "source_location": "L1",
       "id": "apps_mobile_src_observability_sync_observability_ts",
-      "community": 56,
+      "community": 57,
       "norm_label": "sync-observability.ts"
     },
     {
@@ -1728,7 +1755,7 @@
       "source_file": "apps/mobile/src/observability/sync-observability.ts",
       "source_location": "L49",
       "id": "sync_observability_createprivacysafesyncfailurecontext",
-      "community": 56,
+      "community": 57,
       "norm_label": "createprivacysafesyncfailurecontext()"
     },
     {
@@ -1791,7 +1818,7 @@
       "source_file": "apps/mobile/src/observability/ObservabilityProvider.tsx",
       "source_location": "L1",
       "id": "apps_mobile_src_observability_observabilityprovider_tsx",
-      "community": 57,
+      "community": 58,
       "norm_label": "observabilityprovider.tsx"
     },
     {
@@ -1800,7 +1827,7 @@
       "source_file": "apps/mobile/src/observability/ObservabilityProvider.tsx",
       "source_location": "L10",
       "id": "observabilityprovider_observabilityprovider",
-      "community": 57,
+      "community": 58,
       "norm_label": "observabilityprovider()"
     },
     {
@@ -2043,7 +2070,7 @@
       "source_file": "apps/mobile/src/audio/sleep-timer-power-management.ts",
       "source_location": "L1",
       "id": "apps_mobile_src_audio_sleep_timer_power_management_ts",
-      "community": 58,
+      "community": 59,
       "norm_label": "sleep-timer-power-management.ts"
     },
     {
@@ -2052,7 +2079,7 @@
       "source_file": "apps/mobile/src/audio/sleep-timer-power-management.ts",
       "source_location": "L40",
       "id": "sleep_timer_power_management_createsleeptimerpowercontroller",
-      "community": 58,
+      "community": 59,
       "norm_label": "createsleeptimerpowercontroller()"
     },
     {
@@ -2061,7 +2088,7 @@
       "source_file": "apps/mobile/src/profile/profile-screen.tsx",
       "source_location": "L1",
       "id": "apps_mobile_src_profile_profile_screen_tsx",
-      "community": 103,
+      "community": 105,
       "norm_label": "profile-screen.tsx"
     },
     {
@@ -2070,7 +2097,7 @@
       "source_file": "apps/mobile/src/surfaces/card-fade.tsx",
       "source_location": "L1",
       "id": "apps_mobile_src_surfaces_card_fade_tsx",
-      "community": 59,
+      "community": 60,
       "norm_label": "card-fade.tsx"
     },
     {
@@ -2079,7 +2106,7 @@
       "source_file": "apps/mobile/src/surfaces/card-fade.tsx",
       "source_location": "L265",
       "id": "card_fade_cardfade",
-      "community": 59,
+      "community": 60,
       "norm_label": "cardfade()"
     },
     {
@@ -2313,7 +2340,7 @@
       "source_file": "apps/mobile/src/paywall/post-value-account-paywall-screen.tsx",
       "source_location": "L1",
       "id": "apps_mobile_src_paywall_post_value_account_paywall_screen_tsx",
-      "community": 104,
+      "community": 106,
       "norm_label": "post-value-account-paywall-screen.tsx"
     },
     {
@@ -2565,7 +2592,7 @@
       "source_file": "apps/mobile/src/notifications/expo-notification-adapter.ts",
       "source_location": "L1",
       "id": "apps_mobile_src_notifications_expo_notification_adapter_ts",
-      "community": 105,
+      "community": 107,
       "norm_label": "expo-notification-adapter.ts"
     },
     {
@@ -2844,7 +2871,7 @@
       "source_file": "apps/mobile/src/onboarding/onboarding-splash-screen.tsx",
       "source_location": "L1",
       "id": "apps_mobile_src_onboarding_onboarding_splash_screen_tsx",
-      "community": 60,
+      "community": 61,
       "norm_label": "onboarding-splash-screen.tsx"
     },
     {
@@ -2853,7 +2880,7 @@
       "source_file": "apps/mobile/src/onboarding/onboarding-splash-screen.tsx",
       "source_location": "L19",
       "id": "onboarding_splash_screen_getonboardingsplashorbpulseconfig",
-      "community": 60,
+      "community": 61,
       "norm_label": "getonboardingsplashorbpulseconfig()"
     },
     {
@@ -2898,7 +2925,7 @@
       "source_file": "apps/mobile/src/onboarding/personalized-plan-screen.tsx",
       "source_location": "L1",
       "id": "apps_mobile_src_onboarding_personalized_plan_screen_tsx",
-      "community": 61,
+      "community": 62,
       "norm_label": "personalized-plan-screen.tsx"
     },
     {
@@ -2907,7 +2934,7 @@
       "source_file": "apps/mobile/src/onboarding/personalized-plan-screen.tsx",
       "source_location": "L120",
       "id": "personalized_plan_screen_continuewithplan",
-      "community": 61,
+      "community": 62,
       "norm_label": "continuewithplan()"
     },
     {
@@ -3285,7 +3312,7 @@
       "source_file": "load-tests/k6/backend-smoke.js",
       "source_location": "L1",
       "id": "load_tests_k6_backend_smoke_js",
-      "community": 62,
+      "community": 63,
       "norm_label": "backend-smoke.js"
     },
     {
@@ -3294,7 +3321,7 @@
       "source_file": "load-tests/k6/backend-smoke.js",
       "source_location": "L21",
       "id": "backend_smoke_backendsmoke",
-      "community": 62,
+      "community": 63,
       "norm_label": "backendsmoke()"
     }
   ],
@@ -4599,7 +4626,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/app/(tabs)/rescue-me.tsx",
-      "source_location": "L3",
+      "source_location": "L5",
       "weight": 1.0,
       "_src": "apps_mobile_src_app_tabs_rescue_me_tsx",
       "_tgt": "rescue_me_rescuemeanchorscreen",
@@ -4833,6 +4860,18 @@
       "_tgt": "midday_reset_middayresetanchorscreen",
       "source": "apps_mobile_src_app_tabs_breathe_midday_reset_tsx",
       "target": "midday_reset_middayresetanchorscreen",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/mobile/src/rescue/rescue-me-screen.tsx",
+      "source_location": "L68",
+      "weight": 1.0,
+      "_src": "apps_mobile_src_rescue_rescue_me_screen_tsx",
+      "_tgt": "rescue_me_screen_parserescuemescreenstate",
+      "source": "apps_mobile_src_rescue_rescue_me_screen_tsx",
+      "target": "rescue_me_screen_parserescuemescreenstate",
       "confidence_score": 1.0
     },
     {

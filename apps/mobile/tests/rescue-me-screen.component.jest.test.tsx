@@ -3,6 +3,7 @@ import { render, screen, waitFor, within } from "@testing-library/react-native";
 import { AccessibilityInfo, Animated, StyleSheet } from "react-native";
 
 import {
+  parseRescueMeScreenState,
   RESCUE_ME_SCREEN_STATES,
   RescueMeScreen,
   type RescueMeScreenState,
@@ -43,6 +44,12 @@ describe("RescueMeScreen", () => {
     expect(screen.getByRole("button", { name: "Pause Rescue Me session" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Haptics on" })).toBeTruthy();
     expect(screen.queryByText("You’re doing enough. Stay with the next breath.")).toBeNull();
+  });
+
+  it("defaults the route state parser to the active launch contract", () => {
+    expect(parseRescueMeScreenState(undefined)).toBe("active-launch");
+    expect(parseRescueMeScreenState("setup")).toBe("active-launch");
+    expect(parseRescueMeScreenState(["active-phase", "complete"])).toBe("active-phase");
   });
 
   it("keeps reassurance as subtle bottom copy only after two cycles", () => {

@@ -169,6 +169,10 @@ describe("HomeScreen", () => {
       "accessibilityHint",
       "Starts the Rescue Me anchor immediately.",
     );
+    expect(screen.getByRole("link", { name: "Rescue Me quick action" })).toHaveProp(
+      "href",
+      "/rescue-me",
+    );
     expect(screen.getByRole("link", { name: "Sounds quick action" })).toHaveProp(
       "accessibilityHint",
       "Opens the Sound Mixer anchor.",

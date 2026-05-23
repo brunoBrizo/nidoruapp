@@ -1,6 +1,9 @@
 import { describe, expect, it } from "@jest/globals";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 
 import { coreFeatureReachability, homeQuickActions } from "../src/home/home-actions";
+import { allowsIncompleteOnboardingForRoute } from "../src/navigation/onboarding-route-contract";
 
 describe("navigation reachability contract", () => {
   it("keeps Home quick actions routed to their persistent feature anchors", () => {
@@ -55,5 +58,31 @@ describe("navigation reachability contract", () => {
       },
     ]);
     expect(coreFeatureReachability.every((anchor) => anchor.tapsFromHome <= 3)).toBe(true);
+  });
+
+  it("lets Rescue Me bypass first-launch onboarding while preserving the first-session rule", () => {
+    expect(allowsIncompleteOnboardingForRoute("/rescue-me", undefined)).toBe(true);
+    expect(allowsIncompleteOnboardingForRoute("/rescue-me?state=active-launch", undefined)).toBe(
+      true,
+    );
+    expect(allowsIncompleteOnboardingForRoute("/breathe/4-7-8-sleep", "true")).toBe(true);
+    expect(allowsIncompleteOnboardingForRoute("/breathe/4-7-8-sleep", undefined)).toBe(false);
+    expect(allowsIncompleteOnboardingForRoute("/", undefined)).toBe(false);
+  });
+
+  it("keeps the Rescue Me pre-orb route free of prohibited launch dependencies", () => {
+    const routeSource = readFileSync(
+      resolve(__dirname, "../src/app/(tabs)/rescue-me.tsx"),
+      "utf8",
+    );
+    const screenSource = readFileSync(
+      resolve(__dirname, "../src/rescue/rescue-me-screen.tsx"),
+      "utf8",
+    );
+    const preOrbSource = `${routeSource}\n${screenSource}`;
+
+    expect(preOrbSource).not.toMatch(
+      /account|analytics|auth|fetch\(|network|notification|paywall|permission|posthog|purchase|remote|sentry|supabase|sync/i,
+    );
   });
 });

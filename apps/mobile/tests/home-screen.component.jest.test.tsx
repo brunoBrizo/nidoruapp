@@ -285,9 +285,9 @@ describe("HomeScreen", () => {
     expect(
       StyleSheet.flatten(screen.getByTestId("home-quick-action-icon-box-rescue-me").props.style),
     ).toEqual(
-      expect.objectContaining({
-        backgroundColor: "rgba(255, 107, 107, 0.08)",
-        borderColor: "rgba(255, 107, 107, 0.36)",
+      expect.not.objectContaining({
+        backgroundColor: expect.stringContaining("255, 107, 107"),
+        borderColor: expect.stringContaining("255, 107, 107"),
         borderRadius: 12,
         borderWidth: 1,
       }),

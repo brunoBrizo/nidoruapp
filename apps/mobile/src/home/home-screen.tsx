@@ -195,10 +195,7 @@ export function HomeScreen({
                       testID={`home-quick-action-card-${action.id}`}
                     >
                       <View
-                        style={[
-                          styles.quickActionIconBox,
-                          isRescueAction && styles.rescueQuickActionIconBox,
-                        ]}
+                        style={styles.quickActionIconBox}
                         testID={`home-quick-action-icon-box-${action.id}`}
                       >
                         <Icon
@@ -450,12 +447,6 @@ const styles = StyleSheet.create({
     height: 24,
     justifyContent: "center",
     width: 24,
-  },
-  rescueQuickActionIconBox: {
-    backgroundColor: "rgba(255, 107, 107, 0.08)",
-    borderColor: "rgba(255, 107, 107, 0.36)",
-    borderRadius: 12,
-    borderWidth: 1,
   },
   quickActionCopy: {
     alignItems: "center",

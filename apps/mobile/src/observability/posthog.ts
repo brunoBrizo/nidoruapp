@@ -79,7 +79,7 @@ const allowedEventNames = new Set<string>([...approvedAnalyticsEventNames, posth
 
 const posthogOptions: PostHogOptions = {
   before_send: (event) => {
-    if (!event || typeof event.event !== "string" || !allowedEventNames.has(event.event)) {
+    if (!event || typeof event.event !== "string" || !isApprovedAnalyticsEventName(event.event)) {
       return null;
     }
 
@@ -103,6 +103,12 @@ export const posthogClient = posthogApiKey ? new PostHog(posthogApiKey, posthogO
 
 export function isPostHogConfigured() {
   return posthogClient !== null;
+}
+
+export function isApprovedAnalyticsEventName(
+  eventName: string,
+): eventName is AnalyticsEventName | typeof posthogProofEventName {
+  return allowedEventNames.has(eventName);
 }
 
 export function createPrivacySafeAnalyticsProperties(

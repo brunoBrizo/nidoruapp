@@ -1,7 +1,6 @@
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 
-import { getOrCreateLocalInstallIdentity } from "../onboarding/local-first-onboarding";
 import {
   abandonBreathSessionLocally,
   completeBreathSessionLocally,
@@ -11,6 +10,7 @@ import {
   saveBreathSessionDraftLocally,
   type BreathSessionLocalPersistenceDatabase,
 } from "../session/breath-session-local-persistence";
+import { getOrCreateLocalInstallIdentity } from "../storage/local-install-identity";
 import { openMigratedLocalDatabase } from "../storage/local-database";
 import { RescueMeActiveSessionScreen, RescueMeScreen } from "./rescue-me-screen";
 

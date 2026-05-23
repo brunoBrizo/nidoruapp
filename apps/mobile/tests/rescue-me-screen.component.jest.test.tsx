@@ -8,6 +8,11 @@ import {
   StyleSheet,
 } from "react-native";
 
+jest.mock("../src/observability/deferred-capture", () => ({
+  captureAnalyticsEventDeferred: jest.fn(),
+}));
+
+import { captureAnalyticsEventDeferred } from "../src/observability/deferred-capture";
 import {
   parseRescueMeScreenState,
   RescueMeActiveSessionScreen,
@@ -26,6 +31,8 @@ const rescueSessionProps = {
   startedAtMs: rescueStartedAtMs,
   tickIntervalMs: 1000,
 } as const;
+const mockCaptureAnalyticsEventDeferred =
+  captureAnalyticsEventDeferred as jest.MockedFunction<typeof captureAnalyticsEventDeferred>;
 
 jest
   .spyOn(AccessibilityInfo, "isReduceMotionEnabled")
@@ -56,6 +63,8 @@ function mockAppStateChangeListeners() {
 describe("RescueMeScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockCaptureAnalyticsEventDeferred.mockReset();
+    mockCaptureAnalyticsEventDeferred.mockImplementation(() => undefined);
   });
 
   afterEach(() => {
@@ -227,6 +236,9 @@ describe("RescueMeScreen", () => {
   it("starts the fixed Rescue Me runtime without launch setup copy", async () => {
     jest.useFakeTimers();
     jest.setSystemTime(rescueStartedAtMs);
+    mockCaptureAnalyticsEventDeferred.mockImplementationOnce(() => {
+      throw new Error("PostHog unavailable");
+    });
     const persistBreathSessionStarted = jest.fn(() => Promise.resolve());
 
     render(
@@ -257,6 +269,7 @@ describe("RescueMeScreen", () => {
         }),
       );
     });
+    expect(mockCaptureAnalyticsEventDeferred).toHaveBeenCalledWith("rescue_me_started");
   });
 
   it("does not rewrite a recovered Rescue Me draft as a fresh local start", async () => {
@@ -280,6 +293,7 @@ describe("RescueMeScreen", () => {
     });
 
     expect(persistBreathSessionStarted).not.toHaveBeenCalled();
+    expect(mockCaptureAnalyticsEventDeferred).not.toHaveBeenCalledWith("rescue_me_started");
     expect(persistBreathSessionDraft).toHaveBeenCalledWith(
       expect.objectContaining({
         elapsedDurationMs: 75_000,
@@ -360,6 +374,11 @@ describe("RescueMeScreen", () => {
   it("renders completion only after five Rescue Me cycles and persists the local completion", async () => {
     jest.useFakeTimers();
     jest.setSystemTime(rescueStartedAtMs);
+    mockCaptureAnalyticsEventDeferred
+      .mockImplementationOnce(() => undefined)
+      .mockImplementationOnce(() => {
+        throw new Error("PostHog unavailable");
+      });
     const persistBreathSessionCompletion = jest.fn(() => Promise.resolve());
 
     render(
@@ -395,6 +414,7 @@ describe("RescueMeScreen", () => {
         techniqueId: "4-7-8-sleep",
       }),
     );
+    expect(mockCaptureAnalyticsEventDeferred).toHaveBeenCalledWith("rescue_me_completed");
   });
 
   it("pauses and resumes with neutral Rescue Me copy", async () => {

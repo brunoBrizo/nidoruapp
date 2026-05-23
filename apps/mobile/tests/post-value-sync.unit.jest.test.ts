@@ -89,6 +89,26 @@ function createClient(upsertResult: unknown = { error: null }): SyncClient & {
   };
 }
 
+function createCompletedRescueMeSyncRow() {
+  return {
+    audio_cue_mode_id: "gentle-bell",
+    completed_at: "2026-05-23T05:03:29.000Z",
+    completed_breath_cycles: 5,
+    completion_persisted_at: "2026-05-23T05:03:30.000Z",
+    current_phase: "exhale",
+    duration_seconds: 209,
+    elapsed_ms: 209000,
+    local_install_id: localInstallId,
+    plan_id: null,
+    remaining_ms: 0,
+    session_id: "session_rescueme0123456789",
+    source: "rescue_me",
+    started_at: "2026-05-23T05:00:00.000Z",
+    technique_id: "4-7-8-sleep",
+    updated_at: "2026-05-23T05:03:30.000Z",
+  };
+}
+
 describe("post-value local record sync", () => {
   it("upserts linked install, first session, and reflection records with idempotent conflicts", async () => {
     const database = createDatabase();
@@ -170,6 +190,51 @@ describe("post-value local record sync", () => {
     );
   });
 
+  it("syncs completed Rescue Me records later without sensitive runtime fields", async () => {
+    const database = createDatabase();
+    database.getAllAsync.mockImplementation((source) => {
+      if (source.includes("FROM breath_session_records")) {
+        return Promise.resolve([createCompletedRescueMeSyncRow()] as never);
+      }
+
+      return Promise.resolve([] as never);
+    });
+    const client = createClient();
+
+    await expect(
+      syncPostValueLocalRecords({
+        client,
+        database,
+        localInstallId,
+        now: new Date("2026-05-23T05:04:00.000Z"),
+        userId,
+      }),
+    ).resolves.toEqual({ status: "succeeded" });
+
+    expect(client.upserts.breath_sessions).toHaveBeenCalledWith(
+      [
+        {
+          audio_cue_mode_id: "gentle-bell",
+          completed_at: "2026-05-23T05:03:29.000Z",
+          completed_breath_cycles: 5,
+          completion_persisted_at: "2026-05-23T05:03:30.000Z",
+          duration_seconds: 209,
+          local_install_id: localInstallId,
+          local_session_id: "session_rescueme0123456789",
+          source: "rescue_me",
+          started_at: "2026-05-23T05:00:00.000Z",
+          technique_id: "4-7-8-sleep",
+          updated_at: "2026-05-23T05:04:00.000Z",
+          user_id: userId,
+        },
+      ],
+      { onConflict: "user_id,local_session_id" },
+    );
+    expect(JSON.stringify(client.upserts.breath_sessions.mock.calls)).not.toMatch(
+      /current_phase|elapsed_ms|payload_json|raw_reflection/,
+    );
+  });
+
   it("rejects invalid completed breath-session rows before any network upsert", async () => {
     const database = createDatabase();
     database.getAllAsync.mockImplementation((source) => {
@@ -219,8 +284,15 @@ describe("post-value local record sync", () => {
     });
   });
 
-  it("classifies generic breath-session sync failures as retryable without deleting local rows", async () => {
+  it("classifies later Rescue Me sync failures as retryable without deleting local rows", async () => {
     const database = createDatabase();
+    database.getAllAsync.mockImplementation((source) => {
+      if (source.includes("FROM breath_session_records")) {
+        return Promise.resolve([createCompletedRescueMeSyncRow()] as never);
+      }
+
+      return Promise.resolve([] as never);
+    });
     const client = createClient();
     client.from.mockImplementation((tableName) => ({
       upsert: jest.fn(() => {

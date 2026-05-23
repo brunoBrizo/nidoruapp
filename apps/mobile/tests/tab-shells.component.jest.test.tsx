@@ -231,12 +231,14 @@ describe("tab entry shells", () => {
   });
 
   it("keeps Rescue Me separate from Daily Calm HRV copy", () => {
-    render(<RescueMeAnchorScreen />);
+    const { unmount } = render(<RescueMeAnchorScreen />);
 
     expect(screen.getByTestId("rescue-me-screen-active-launch")).toBeTruthy();
     expect(screen.getByLabelText("Inhale breathing phase")).toBeTruthy();
     expect(screen.queryByText(/daily calm|hrv training/i)).toBeNull();
     expect(screen.queryByText(/setup|technique|choose|account|paywall|permission/i)).toBeNull();
+
+    unmount();
   });
 
   it("renders the Progress reference dashboard and keeps anchors reachable", () => {

@@ -19,8 +19,10 @@ jest.mock("../src/observability/sentry", () => ({
 }));
 
 import {
+  approvedAnalyticsEventNames,
   capturePostHogProofEvent,
   createPrivacySafeAnalyticsProperties,
+  isApprovedAnalyticsEventName,
   posthogClient,
   posthogProofEventName,
 } from "../src/observability/posthog";
@@ -68,6 +70,21 @@ describe("privacy-safe observability", () => {
     expect(JSON.stringify(properties)).not.toMatch(
       /Bruno|install_|device-secret|ExponentPushToken|anxious|user_123|rc_123/,
     );
+  });
+
+  it("allowlists Rescue Me lifecycle events and rejects unknown event names", () => {
+    expect(approvedAnalyticsEventNames).toEqual(
+      expect.arrayContaining([
+        "rescue_me_started",
+        "rescue_me_completed",
+        "audio_failed",
+        "sync_failed",
+      ]),
+    );
+    expect(isApprovedAnalyticsEventName("rescue_me_started")).toBe(true);
+    expect(isApprovedAnalyticsEventName("rescue_me_completed")).toBe(true);
+    expect(isApprovedAnalyticsEventName("rescue_me_started_install_0123456789abcdef")).toBe(false);
+    expect(isApprovedAnalyticsEventName("session_details_submitted")).toBe(false);
   });
 
   it("redacts sync failure observability to reason classes and non-sensitive counters", () => {

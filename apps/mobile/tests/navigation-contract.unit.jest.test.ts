@@ -75,14 +75,32 @@ describe("navigation reachability contract", () => {
       resolve(__dirname, "../src/app/(tabs)/rescue-me.tsx"),
       "utf8",
     );
+    const sessionRouteSource = readFileSync(
+      resolve(__dirname, "../src/rescue/rescue-me-session-route.tsx"),
+      "utf8",
+    );
     const screenSource = readFileSync(
       resolve(__dirname, "../src/rescue/rescue-me-screen.tsx"),
       "utf8",
     );
-    const preOrbSource = `${routeSource}\n${screenSource}`;
+    const preOrbSource = `${routeSource}\n${sessionRouteSource}\n${screenSource}`;
 
-    expect(preOrbSource).not.toMatch(
-      /account|analytics|auth|fetch\(|network|notification|paywall|permission|posthog|purchase|remote|sentry|supabase|sync/i,
-    );
+    const prohibitedLaunchDependencies = [
+      {
+        label: "auth/account/paywall/network/sync/permission modules or copy",
+        pattern:
+          /account|auth|fetch\(|network|notification|paywall|permission|posthog|purchase|remote|sentry|supabase|\.\.\/sync\/|syncPostValue/i,
+      },
+      {
+        label: "shared onboarding persistence module with notification-gate code",
+        pattern: /local-first-onboarding/i,
+      },
+    ];
+
+    expect(
+      prohibitedLaunchDependencies
+        .filter(({ pattern }) => pattern.test(preOrbSource))
+        .map(({ label }) => label),
+    ).toEqual([]);
   });
 });

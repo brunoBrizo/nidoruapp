@@ -26,6 +26,7 @@ import {
   useReduceMotionEnabled,
   useReduceMotionPreference,
 } from "../motion/use-reduce-motion-enabled";
+import { captureAnalyticsEventDeferred } from "../observability/deferred-capture";
 import {
   completeBreathSessionIfDue,
   createBreathSessionController,
@@ -64,6 +65,7 @@ type ActiveStateConfig = {
 };
 
 type RescueMeCompletionMode = "completed" | "abandoned" | undefined;
+type RescueMeAnalyticsEventName = "rescue_me_started" | "rescue_me_completed";
 
 type RescueMeActiveSessionScreenProps = {
   readonly disableHaptics?: boolean;
@@ -252,6 +254,7 @@ export function RescueMeActiveSessionScreen({
     }
 
     hasPersistedSessionStartRef.current = true;
+    captureRescueMeAnalyticsEvent("rescue_me_started");
 
     void persistBreathSessionStarted({
       audioCueModeId: rescueMeAudioCueModeId,
@@ -344,6 +347,7 @@ export function RescueMeActiveSessionScreen({
       updatedAt: completedRecord.completionPersistedAt,
     })
       .then(() => {
+        captureRescueMeAnalyticsEvent("rescue_me_completed");
         setCompletionMode("completed");
       })
       .finally(() => {
@@ -1119,6 +1123,14 @@ function formatAccessibleRemainingTime(remainingSeconds: number) {
   }
 
   return parts.join(" ");
+}
+
+function captureRescueMeAnalyticsEvent(eventName: RescueMeAnalyticsEventName): void {
+  try {
+    captureAnalyticsEventDeferred(eventName);
+  } catch {
+    // Telemetry must never block Rescue Me rendering or local persistence.
+  }
 }
 
 const styles = StyleSheet.create({

@@ -1,5 +1,4 @@
 <html lang="en"><head>
-    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Nidoru - Nightly Ritual</title>
@@ -73,175 +72,312 @@
   </head>
   <body class="flex items-center justify-center min-h-screen text-[#EEF0FF]">
     <!-- Native Mobile Canvas Simulation -->
-    <div class="w-full max-w-[390px] h-[844px] bg-[#0D0F1A] relative overflow-hidden shadow-2xl sm:rounded-[40px] sm:border-[8px] sm:border-[#0F1230] flex flex-col">
+    <div class="w-full max-w-[390px] h-[844px] bg-[#0D0F1A] relative overflow-hidden shadow-2xl sm:rounded-[44px] sm:border-[10px] sm:border-[#0A0B14] flex flex-col">
+      <div class="absolute inset-0 w-full h-full pointer-events-none z-0">
+        <div class="absolute -top-32 -left-20 w-[340px] h-[340px] rounded-full bg-[#7C6FCD]/25 blur-[90px]"></div>
+        <div class="absolute top-40 -right-24 w-[300px] h-[300px] rounded-full bg-[#5EC4D4]/15 blur-[100px]"></div>
+        <div class="absolute bottom-20 -left-16 w-[280px] h-[280px] rounded-full bg-[#A89CE0]/15 blur-[90px]"></div>
+        <div class="absolute inset-0 opacity-[0.05] mix-blend-overlay" style="background-image:radial-gradient(rgba(255,255,255,0.6) 1px,transparent 1px);background-size:3px 3px;"></div>
+        <div class="absolute inset-0" style="background:radial-gradient(120% 80% at 50% 0%,transparent 40%,rgba(0,0,0,0.5) 100%);"></div>
+      </div>
       <!-- Scrollable Content Area -->
       <main class="flex-1 overflow-y-auto scrollbar-hide px-5 pt-12 pb-[96px] space-y-4 relative z-10">
         <!-- 1. Greeting & Streak -->
         <header class="flex justify-between items-start animate-fade-in-1">
-          <div class="space-y-1">
-            <h1 class="text-xl tracking-tight font-medium text-[#EEF0FF]">
-              Good evening, Bruno
+          <div class="space-y-1.5">
+            <p class="text-[11px] uppercase tracking-[0.18em] text-[#7C6FCD]/80 font-medium font-inter">
+              Tuesday · 10:42 PM
+            </p>
+            <h1 class="text-[26px] leading-tight tracking-tight font-medium text-[#EEF0FF]">
+              Good evening,
+              <br>
+              <span class="text-[#A89CE0]">Bruno</span>
             </h1>
-            <p class="text-sm text-[#8A8FA8] font-normal">
-              Tonight’s wind-down is ready
+            <p class="text-sm text-[#8A8FA8] font-normal pt-0.5">
+              Tonight's wind-down is ready
             </p>
           </div>
-          <div class="flex items-center gap-1.5 bg-[#14172B] px-3 py-1.5 rounded-full border border-[#EEF0FF]/5 shadow-sm">
-            <iconify-icon icon="solar:moon-fog-linear" class="text-[#7C6FCD] text-base" stroke-width="1.5"></iconify-icon>
-            <span class="font-inter text-sm font-medium text-[#EEF0FF]">
-              8 days
-            </span>
+          <div class="flex flex-col items-end gap-2">
+            <div class="flex items-center gap-1.5 bg-gradient-to-b from-[#1C2040]/80 to-[#14172B]/60 px-3 py-1.5 rounded-full border border-[#A89CE0]/15 shadow-[inset_0_1px_0_rgba(238,240,255,0.08)]">
+              <iconify-icon icon="solar:moon-stars-bold" class="text-[#A89CE0] text-base"></iconify-icon>
+              <span class="font-inter text-sm font-medium text-[#EEF0FF]">
+                8
+              </span>
+              <span class="text-xs text-[#8A8FA8] font-normal">nights</span>
+            </div>
           </div>
         </header>
 
         <!-- 2. Primary Action Card (Glassmorphism & Orb) -->
-        <section class="bg-[#14172B]/50 backdrop-blur-xl rounded-[24px] p-4 relative overflow-hidden animate-fade-in-2 shadow-[inset_0_1px_0_rgba(238,240,255,0.1),0_8px_32px_rgba(124,111,205,0.25)]">
-          <!-- Soft background glow for the orb -->
-          <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-[#7C6FCD]/20 rounded-full blur-[48px] pointer-events-none"></div>
+        <section class="relative rounded-[28px] p-5 overflow-hidden animate-fade-in-2 border border-white/[0.06] shadow-[inset_0_1px_0_rgba(238,240,255,0.08),0_20px_60px_-15px_rgba(124,111,205,0.45)]" style="background:linear-gradient(160deg,rgba(124,111,205,0.22) 0%,rgba(20,23,43,0.85) 50%,rgba(15,18,48,0.95) 100%);">
+          <div class="absolute top-0 right-0 w-56 h-56 bg-[#A89CE0]/20 rounded-full blur-[60px] pointer-events-none"></div>
+          <div class="absolute -bottom-10 -left-10 w-48 h-48 bg-[#5EC4D4]/10 rounded-full blur-[60px] pointer-events-none"></div>
 
-          <div class="text-center z-10 relative space-y-1 mb-4 mt-1">
-            <h2 class="text-lg tracking-tight font-medium text-[#EEF0FF]">
+          <div class="flex items-center justify-between mb-1 relative z-10">
+            <span class="text-[10px] uppercase tracking-[0.2em] text-[#A89CE0]/90 font-medium font-inter">
+              Tonight's Ritual
+            </span>
+            <span class="text-[10px] text-[#8A8FA8] font-inter">~22 min</span>
+          </div>
+          <div class="text-left z-10 relative mb-5">
+            <h2 class="text-[22px] tracking-tight font-medium text-[#EEF0FF] leading-tight">
               Evening Wind-Down
             </h2>
-            <p class="text-sm text-[#8A8FA8] font-normal">
+            <p class="text-sm text-[#A0A5C0] font-normal mt-1">
               <span class="font-inter">4-7-8</span>
-              breathing ·
-              <span class="font-inter">20</span>
-              min sounds
+              breathing · rain &amp; low strings
             </p>
           </div>
 
-          <!-- Central Breathing Orb -->
-          <div class="relative h-28 flex items-center justify-center mb-5 z-10">
-            <!-- Rhythm cue: 4-7-8 Timing Arcs -->
-            <svg class="absolute w-[116px] h-[116px] -rotate-90 z-0" viewBox="0 0 100 100">
-              <circle cx="50" cy="50" r="48" fill="none" stroke="#7C6FCD" stroke-width="0.5" class="opacity-15"></circle>
-              <!-- Inhale (4) -->
-              <circle cx="50" cy="50" r="48" fill="none" stroke="#7C6FCD" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="60 241.6" stroke-dashoffset="0" class="opacity-70"></circle>
-              <!-- Hold (7) -->
-              <circle cx="50" cy="50" r="48" fill="none" stroke="#A89CE0" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="106 195.6" stroke-dashoffset="-66" class="opacity-50"></circle>
-              <!-- Exhale (8) -->
-              <circle cx="50" cy="50" r="48" fill="none" stroke="#8A8FA8" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="117 184.6" stroke-dashoffset="-178" class="opacity-40"></circle>
+          <!-- Constellation / horizon scene -->
+          <div class="relative h-36 mb-6 z-10 rounded-[20px] overflow-hidden border border-white/[0.05]" style="background:linear-gradient(180deg,rgba(13,15,26,0) 0%,rgba(13,15,26,0.35) 70%,rgba(13,15,26,0.6) 100%);">
+            <!-- starfield -->
+            <div class="absolute inset-0 opacity-70" style="background-image:radial-gradient(1px 1px at 18% 28%,#EEF0FF 50%,transparent 100%),radial-gradient(1px 1px at 72% 18%,#A89CE0 50%,transparent 100%),radial-gradient(1px 1px at 42% 44%,#EEF0FF 50%,transparent 100%),radial-gradient(1px 1px at 88% 38%,#5EC4D4 50%,transparent 100%),radial-gradient(1px 1px at 12% 62%,#EEF0FF 50%,transparent 100%),radial-gradient(1.5px 1.5px at 58% 30%,#EEF0FF 50%,transparent 100%),radial-gradient(1px 1px at 32% 12%,#A89CE0 50%,transparent 100%),radial-gradient(1px 1px at 80% 60%,#EEF0FF 50%,transparent 100%);background-repeat:no-repeat;"></div>
+            <!-- horizon mountains -->
+            <svg class="absolute bottom-0 left-0 w-full h-20" viewBox="0 0 390 80" preserveAspectRatio="none" fill="none">
+              <path d="M0 60 L60 30 L110 50 L160 22 L220 55 L280 28 L340 48 L390 32 L390 80 L0 80 Z" fill="url(#mtnFar)" opacity="0.55"></path>
+              <path d="M0 70 L40 50 L90 65 L150 42 L210 68 L260 50 L320 66 L390 52 L390 80 L0 80 Z" fill="url(#mtnNear)"></path>
+              <defs>
+                <linearGradient id="mtnFar" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#7C6FCD" stop-opacity="0.55"></stop>
+                  <stop offset="100%" stop-color="#14172B" stop-opacity="0.9"></stop>
+                </linearGradient>
+                <linearGradient id="mtnNear" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#1C2040"></stop>
+                  <stop offset="100%" stop-color="#0D0F1A"></stop>
+                </linearGradient>
+              </defs>
             </svg>
-
-            <!-- One very subtle pulse ring -->
-            <div class="absolute w-[84px] h-[84px] rounded-full border border-[#7C6FCD]/20 orb-ring z-10"></div>
-
-            <!-- Faint Lavender outer ring -->
-            <div class="absolute w-[68px] h-[68px] rounded-full border border-[#A89CE0]/15 bg-[#7C6FCD]/5 backdrop-blur-sm shadow-[inset_0_0_12px_rgba(168,156,224,0.1)] z-10"></div>
-
-            <!-- Soft inner glow -->
-            <div class="absolute w-[56px] h-[56px] rounded-full bg-gradient-to-tr from-[#7C6FCD]/40 to-[#A89CE0]/40 blur-lg shadow-[0_0_24px_rgba(168,156,224,0.4)] z-10 orb-glow"></div>
-
-            <!-- Iris core -->
-            <div class="relative w-[42px] h-[42px] rounded-full shadow-[0_0_24px_rgba(124,111,205,0.5)] z-20 orb-core overflow-hidden">
-              <div class="absolute inset-0 bg-gradient-to-tr from-[#7C6FCD] to-[#A89CE0] opacity-90"></div>
-              <div class="absolute inset-0 bg-gradient-to-b from-white/30 to-transparent mix-blend-overlay"></div>
+            <!-- crescent moon -->
+            <div class="absolute top-4 right-5 w-10 h-10">
+              <div class="absolute inset-0 rounded-full bg-[#A89CE0]/30 blur-xl"></div>
+              <div class="absolute inset-0 rounded-full bg-gradient-to-br from-[#EEF0FF] to-[#A89CE0] orb-glow"></div>
+              <div class="absolute -inset-0.5 rounded-full bg-[#0D0F1A]" style="clip-path:circle(48% at 30% 45%);"></div>
+            </div>
+            <!-- breath phases overlay -->
+            <div class="absolute left-0 right-0 bottom-2 grid grid-cols-3 px-4 z-10">
+              <div class="flex flex-col items-start gap-0.5">
+                <span class="text-[9px] uppercase tracking-[0.18em] text-[#7C6FCD] font-inter font-medium">
+                  In
+                </span>
+                <span class="font-inter text-[11px] text-[#EEF0FF]/90">4s</span>
+              </div>
+              <div class="flex flex-col items-center gap-0.5">
+                <span class="text-[9px] uppercase tracking-[0.18em] text-[#A89CE0] font-inter font-medium">
+                  Hold
+                </span>
+                <span class="font-inter text-[11px] text-[#EEF0FF]/90">7s</span>
+              </div>
+              <div class="flex flex-col items-end gap-0.5">
+                <span class="text-[9px] uppercase tracking-[0.18em] text-[#5EC4D4] font-inter font-medium">
+                  Out
+                </span>
+                <span class="font-inter text-[11px] text-[#EEF0FF]/90">8s</span>
+              </div>
             </div>
           </div>
 
-          <button class="w-full h-12 bg-[#7C6FCD]/85 backdrop-blur-md text-[#EEF0FF] rounded-[16px] font-medium text-sm active:scale-[0.96] transition-all duration-200 ease-out z-10 relative shadow-[inset_0_1px_0_rgba(255,255,255,0.15)]">
+          <button class="w-full h-13 py-3.5 bg-gradient-to-b from-[#A89CE0] to-[#7C6FCD] text-[#0D0F1A] rounded-[16px] font-semibold text-sm active:scale-[0.97] transition-all duration-200 ease-out z-10 relative shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_8px_20px_-5px_rgba(124,111,205,0.6)] flex items-center justify-center gap-2">
+            <iconify-icon icon="solar:play-bold" class="text-base"></iconify-icon>
             Start now
           </button>
         </section>
 
         <!-- 3. Quick Actions -->
-        <section class="grid grid-cols-3 gap-3 animate-fade-in-3">
-          <!-- Rescue Me (No red dot, calm) -->
-          <button class="bg-[#14172B]/50 hover:bg-[#1C2040]/80 rounded-[16px] py-3 flex flex-col items-center justify-center gap-1.5 active:scale-[0.96] transition-all duration-200 group shadow-[inset_0_1px_0_rgba(238,240,255,0.08)] min-h-[80px]">
-            <iconify-icon icon="lucide:heart" class="text-[#8A8FA8] group-hover:text-[#EEF0FF] text-[20px] transition-colors" stroke-width="1.5"></iconify-icon>
+        <section class="grid grid-cols-3 gap-2.5 animate-fade-in-3">
+          <button class="relative bg-gradient-to-b from-[#1C2040]/70 to-[#14172B]/50 hover:from-[#1C2040]/90 rounded-[18px] py-3.5 px-2 flex flex-col items-center justify-center gap-2 active:scale-[0.96] transition-all duration-200 group border border-[#FF6B6B]/15 shadow-[inset_0_1px_0_rgba(255,107,107,0.12),0_4px_20px_-8px_rgba(255,107,107,0.25)] min-h-[92px]">
+            <div class="relative flex items-center justify-center w-9 h-9 rounded-full bg-gradient-to-br from-[#FF6B6B]/20 to-[#FF6B6B]/5 border border-[#FF6B6B]/20">
+              <iconify-icon icon="solar:heart-pulse-bold" class="text-[#FF8A8A] text-[18px]"></iconify-icon>
+            </div>
             <div class="flex flex-col items-center">
-              <span class="text-sm font-medium text-[#EEF0FF] leading-tight">
+              <span class="text-[13px] font-semibold text-[#EEF0FF] leading-tight">
                 Rescue Me
               </span>
-              <span class="text-xs font-normal text-[#8A8FA8]">Immediate</span>
+              <span class="text-[10px] font-normal text-[#FF8A8A]/80 tracking-wide">
+                Immediate
+              </span>
             </div>
           </button>
-
-          <!-- Sounds -->
-          <button class="bg-[#14172B]/50 hover:bg-[#1C2040]/80 rounded-[16px] py-3 flex flex-col items-center justify-center gap-1.5 active:scale-[0.96] transition-all duration-200 group shadow-[inset_0_1px_0_rgba(238,240,255,0.08)] min-h-[80px]">
-            <iconify-icon icon="lucide:music" class="text-[#8A8FA8] group-hover:text-[#EEF0FF] text-[20px] transition-colors" stroke-width="1.5"></iconify-icon>
+          <button class="relative bg-gradient-to-b from-[#1C2040]/70 to-[#14172B]/50 hover:from-[#1C2040]/90 rounded-[18px] py-3.5 px-2 flex flex-col items-center justify-center gap-2 active:scale-[0.96] transition-all duration-200 group border border-white/[0.06] shadow-[inset_0_1px_0_rgba(238,240,255,0.08)] min-h-[92px]">
+            <div class="relative flex items-center justify-center w-9 h-9 rounded-full bg-gradient-to-br from-[#5EC4D4]/15 to-[#5EC4D4]/5 border border-[#5EC4D4]/15">
+              <iconify-icon icon="solar:music-notes-bold" class="text-[#5EC4D4] text-[18px]"></iconify-icon>
+            </div>
             <div class="flex flex-col items-center">
-              <span class="text-sm font-medium text-[#EEF0FF] leading-tight">
+              <span class="text-[13px] font-semibold text-[#EEF0FF] leading-tight">
                 Sounds
               </span>
-              <span class="text-xs font-normal text-[#8A8FA8]">Mixer</span>
+              <span class="text-[10px] font-normal text-[#8A8FA8] tracking-wide">
+                3 mixes
+              </span>
             </div>
           </button>
-
-          <!-- Breathe -->
-          <button class="bg-[#14172B]/50 hover:bg-[#1C2040]/80 rounded-[16px] py-3 flex flex-col items-center justify-center gap-1.5 active:scale-[0.96] transition-all duration-200 group shadow-[inset_0_1px_0_rgba(238,240,255,0.08)] min-h-[80px]">
-            <iconify-icon icon="lucide:wind" class="text-[#8A8FA8] group-hover:text-[#EEF0FF] text-[20px] transition-colors" stroke-width="1.5"></iconify-icon>
+          <button class="relative bg-gradient-to-b from-[#1C2040]/70 to-[#14172B]/50 hover:from-[#1C2040]/90 rounded-[18px] py-3.5 px-2 flex flex-col items-center justify-center gap-2 active:scale-[0.96] transition-all duration-200 group border border-white/[0.06] shadow-[inset_0_1px_0_rgba(238,240,255,0.08)] min-h-[92px]">
+            <div class="relative flex items-center justify-center w-9 h-9 rounded-full bg-gradient-to-br from-[#A89CE0]/20 to-[#A89CE0]/5 border border-[#A89CE0]/20">
+              <iconify-icon icon="solar:wind-bold" class="text-[#A89CE0] text-[18px]"></iconify-icon>
+            </div>
             <div class="flex flex-col items-center">
-              <span class="text-sm font-medium text-[#EEF0FF] leading-tight">
+              <span class="text-[13px] font-semibold text-[#EEF0FF] leading-tight">
                 Breathe
               </span>
-              <span class="text-xs font-normal text-[#8A8FA8]">
-                Just the orb
+              <span class="text-[10px] font-normal text-[#8A8FA8] tracking-wide">
+                Just orb
               </span>
             </div>
           </button>
         </section>
 
         <!-- 4. Sleep Check-in (Last night) -->
-        <section class="bg-[#14172B]/50 rounded-[20px] p-4 animate-fade-in-4 relative group cursor-pointer active:scale-[0.98] transition-transform duration-200 shadow-[inset_0_1px_0_rgba(238,240,255,0.08)]">
-          <div class="flex justify-between items-center mb-2">
-            <span class="text-sm text-[#8A8FA8] font-normal">Last night</span>
-            <span class="font-inter text-[11px] text-[#EEF0FF] font-medium tabular-nums bg-[#0D0F1A]/40 px-2 py-1 rounded-md shadow-[inset_0_1px_0_rgba(238,240,255,0.08)] ring-1 ring-white/5">
-              4/5
-            </span>
-          </div>
-          <div class="space-y-0.5 mb-3">
-            <p class="text-base font-medium text-[#EEF0FF] leading-snug">
-              Rain helped you settle
-            </p>
-            <p class="text-sm text-[#8A8FA8] font-normal">
-              Box breathing may help tonight.
-            </p>
-          </div>
-          <div class="flex items-center gap-1.5 text-[#7C6FCD] text-sm font-medium py-2 -my-2">
-            View insight
-            <iconify-icon icon="solar:arrow-right-linear" class="text-sm" stroke-width="1.5"></iconify-icon>
+        <section class="relative rounded-[22px] p-4 animate-fade-in-4 group cursor-pointer active:scale-[0.98] transition-transform duration-200 border border-white/[0.06] overflow-hidden" style="background:linear-gradient(135deg,rgba(94,196,212,0.08) 0%,rgba(20,23,43,0.6) 60%);">
+          <div class="absolute top-0 right-0 w-32 h-32 bg-[#5EC4D4]/10 rounded-full blur-[40px] pointer-events-none"></div>
+          <div class="relative z-10">
+            <div class="flex justify-between items-center mb-3">
+              <div class="flex items-center gap-2">
+                <iconify-icon icon="solar:cloud-rain-bold" class="text-[#5EC4D4] text-base"></iconify-icon>
+                <span class="text-[11px] uppercase tracking-[0.15em] text-[#8A8FA8] font-medium font-inter">
+                  Last night
+                </span>
+              </div>
+              <div class="flex items-center gap-1">
+                <div class="flex gap-0.5">
+                  <div class="w-1 h-3 rounded-full bg-[#A89CE0]"></div>
+                  <div class="w-1 h-3 rounded-full bg-[#A89CE0]"></div>
+                  <div class="w-1 h-3 rounded-full bg-[#A89CE0]"></div>
+                  <div class="w-1 h-3 rounded-full bg-[#A89CE0]"></div>
+                  <div class="w-1 h-3 rounded-full bg-[#1C2040]"></div>
+                </div>
+                <span class="font-inter text-[11px] text-[#EEF0FF] font-medium tabular-nums ml-1">
+                  4/5
+                </span>
+              </div>
+            </div>
+            <div class="space-y-1 mb-3">
+              <p class="text-[17px] font-medium text-[#EEF0FF] leading-snug tracking-tight">
+                Rain helped you settle
+              </p>
+              <p class="text-sm text-[#8A8FA8] font-normal leading-relaxed">
+                You fell asleep
+                <span class="text-[#EEF0FF]">14 min</span>
+                faster. Try box breathing tonight.
+              </p>
+            </div>
+            <div class="flex items-center justify-between pt-2 border-t border-white/[0.05]">
+              <div class="flex items-center gap-1.5 text-[#A89CE0] text-sm font-medium">
+                View insight
+                <iconify-icon icon="solar:arrow-right-linear" class="text-sm"></iconify-icon>
+              </div>
+              <div class="flex items-center gap-1 text-[11px] text-[#8A8FA8] font-inter">
+                <iconify-icon icon="solar:clock-circle-linear" class="text-xs"></iconify-icon>
+                7h 12m
+              </div>
+            </div>
           </div>
         </section>
 
         <!-- 5. Progress / Rhythm Strip -->
-        <section class="space-y-3 animate-fade-in-5 px-1">
-          <div class="flex justify-between items-end">
-            <h3 class="text-sm font-medium text-[#EEF0FF]">
-              Your sleep rhythm
-            </h3>
-            <span class="font-inter text-xs text-[#8A8FA8] font-normal">
-              This week
-            </span>
-          </div>
-
-          <div class="flex justify-between items-center w-full h-8">
-            <!-- Past days (completed) -->
-            <div class="w-8 h-1.5 rounded-full bg-[#7C6FCD] opacity-40"></div>
-            <div class="w-8 h-1.5 rounded-full bg-[#7C6FCD] opacity-60"></div>
-            <div class="w-8 h-1.5 rounded-full bg-[#7C6FCD] opacity-80"></div>
-            <div class="w-8 h-1.5 rounded-full bg-[#7C6FCD]"></div>
-            <!-- Past day (paused/missed) - subdued -->
-            <div class="w-8 h-1.5 rounded-full bg-[#1C2040]"></div>
-            <!-- Today (completed) -->
-            <div class="w-8 h-1.5 rounded-full bg-[#7C6FCD] shadow-[0_0_8px_rgba(124,111,205,0.4)] relative">
-              <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-[#A89CE0] rounded-full"></div>
+        <section class="space-y-3 animate-fade-in-5 pt-1">
+          <div class="flex justify-between items-center px-1">
+            <div class="flex items-center gap-2">
+              <iconify-icon icon="solar:notebook-bookmark-bold" class="text-[#A89CE0] text-base"></iconify-icon>
+              <h3 class="text-sm font-medium text-[#EEF0FF]">
+                Wind-down library
+              </h3>
             </div>
-            <!-- Future day -->
-            <div class="w-8 h-1.5 rounded-full bg-transparent border border-[#1C2040]"></div>
+            <button class="font-inter text-[10px] uppercase tracking-[0.15em] text-[#7C6FCD] font-medium flex items-center gap-1 active:opacity-70 transition-opacity">
+              See all
+              <iconify-icon icon="solar:arrow-right-linear" class="text-xs"></iconify-icon>
+            </button>
+          </div>
+          <div class="flex gap-3 overflow-x-auto scrollbar-hide -mx-5 px-5 pb-1">
+            <button class="relative shrink-0 w-[148px] h-[180px] rounded-[22px] overflow-hidden border border-white/[0.06] shadow-[inset_0_1px_0_rgba(238,240,255,0.08),0_10px_30px_-10px_rgba(124,111,205,0.4)] active:scale-[0.97] transition-transform duration-200 text-left" style="background:linear-gradient(160deg,rgba(124,111,205,0.35) 0%,rgba(20,23,43,0.9) 65%);">
+              <div class="absolute -top-8 -right-8 w-28 h-28 rounded-full bg-[#A89CE0]/30 blur-[40px]"></div>
+              <div class="absolute inset-0 opacity-50" style="background-image:radial-gradient(1px 1px at 30% 25%,#EEF0FF 50%,transparent 100%),radial-gradient(1px 1px at 70% 40%,#A89CE0 50%,transparent 100%),radial-gradient(1px 1px at 50% 65%,#EEF0FF 50%,transparent 100%);"></div>
+              <div class="relative h-full flex flex-col justify-between p-3.5 z-10">
+                <div class="flex items-center justify-between">
+                  <div class="w-9 h-9 rounded-full bg-gradient-to-br from-[#A89CE0]/30 to-[#7C6FCD]/10 border border-[#A89CE0]/25 flex items-center justify-center">
+                    <iconify-icon icon="solar:book-bold" class="text-[#EEF0FF] text-[18px]"></iconify-icon>
+                  </div>
+                  <span class="font-inter text-[10px] text-[#A89CE0] tracking-wider">
+                    12 MIN
+                  </span>
+                </div>
+                <div class="space-y-1">
+                  <span class="text-[10px] uppercase tracking-[0.18em] text-[#A89CE0]/80 font-inter font-medium">
+                    Story
+                  </span>
+                  <p class="text-[15px] font-medium text-[#EEF0FF] leading-tight tracking-tight">
+                    The Lantern Keeper
+                  </p>
+                  <p class="text-[11px] text-[#8A8FA8] font-normal">
+                    Narrated · soft rain
+                  </p>
+                </div>
+              </div>
+            </button>
+            <button class="relative shrink-0 w-[148px] h-[180px] rounded-[22px] overflow-hidden border border-white/[0.06] shadow-[inset_0_1px_0_rgba(238,240,255,0.08),0_10px_30px_-10px_rgba(94,196,212,0.3)] active:scale-[0.97] transition-transform duration-200 text-left" style="background:linear-gradient(160deg,rgba(94,196,212,0.28) 0%,rgba(20,23,43,0.9) 65%);">
+              <div class="absolute -top-8 -left-8 w-28 h-28 rounded-full bg-[#5EC4D4]/25 blur-[40px]"></div>
+              <svg class="absolute bottom-0 left-0 w-full h-14 opacity-60" viewBox="0 0 148 56" preserveAspectRatio="none" fill="none">
+                <path d="M0 32 Q18 18 36 30 T74 28 T112 26 T148 22 L148 56 L0 56 Z" fill="#5EC4D4" fill-opacity="0.15"></path>
+                <path d="M0 40 Q18 30 36 38 T74 36 T112 34 T148 32" stroke="#5EC4D4" stroke-opacity="0.5" stroke-width="1" fill="none"></path>
+              </svg>
+              <div class="relative h-full flex flex-col justify-between p-3.5 z-10">
+                <div class="flex items-center justify-between">
+                  <div class="w-9 h-9 rounded-full bg-gradient-to-br from-[#5EC4D4]/30 to-[#5EC4D4]/10 border border-[#5EC4D4]/25 flex items-center justify-center">
+                    <iconify-icon icon="solar:waterdrops-bold" class="text-[#5EC4D4] text-[18px]"></iconify-icon>
+                  </div>
+                  <span class="font-inter text-[10px] text-[#5EC4D4] tracking-wider">
+                    ∞
+                  </span>
+                </div>
+                <div class="space-y-1">
+                  <span class="text-[10px] uppercase tracking-[0.18em] text-[#5EC4D4]/90 font-inter font-medium">
+                    Soundscape
+                  </span>
+                  <p class="text-[15px] font-medium text-[#EEF0FF] leading-tight tracking-tight">
+                    Coastal Rainfall
+                  </p>
+                  <p class="text-[11px] text-[#8A8FA8] font-normal">
+                    Loop · brown noise
+                  </p>
+                </div>
+              </div>
+            </button>
+            <button class="relative shrink-0 w-[148px] h-[180px] rounded-[22px] overflow-hidden border border-white/[0.06] shadow-[inset_0_1px_0_rgba(238,240,255,0.08),0_10px_30px_-10px_rgba(168,156,224,0.3)] active:scale-[0.97] transition-transform duration-200 text-left" style="background:linear-gradient(160deg,rgba(168,156,224,0.22) 0%,rgba(20,23,43,0.9) 65%);">
+              <div class="absolute -bottom-8 -right-8 w-28 h-28 rounded-full bg-[#A89CE0]/20 blur-[40px]"></div>
+              <div class="relative h-full flex flex-col justify-between p-3.5 z-10">
+                <div class="flex items-center justify-between">
+                  <div class="w-9 h-9 rounded-full bg-gradient-to-br from-[#A89CE0]/25 to-[#A89CE0]/5 border border-[#A89CE0]/20 flex items-center justify-center">
+                    <iconify-icon icon="solar:meditation-bold" class="text-[#A89CE0] text-[18px]"></iconify-icon>
+                  </div>
+                  <span class="font-inter text-[10px] text-[#A89CE0] tracking-wider">
+                    8 MIN
+                  </span>
+                </div>
+                <div class="space-y-1">
+                  <span class="text-[10px] uppercase tracking-[0.18em] text-[#A89CE0]/80 font-inter font-medium">
+                    Meditation
+                  </span>
+                  <p class="text-[15px] font-medium text-[#EEF0FF] leading-tight tracking-tight">
+                    Body Scan
+                  </p>
+                  <p class="text-[11px] text-[#8A8FA8] font-normal">
+                    Guided · release tension
+                  </p>
+                </div>
+              </div>
+            </button>
           </div>
         </section>
       </main>
 
       <!-- 6. Fixed Bottom Navigation -->
-      <nav class="absolute bottom-0 w-full h-[84px] bg-[#0D0F1A]/90 backdrop-blur-xl border-t border-[#1C2040] flex justify-around items-start pt-2.5 pb-safe z-50 px-2">
+      <nav class="absolute bottom-0 w-full h-[84px] bg-[#0D0F1A]/85 backdrop-blur-2xl border-t border-white/[0.06] flex justify-around items-start pt-2.5 pb-safe z-50 px-2">
         <!-- Home (Active) -->
-        <button class="flex flex-col items-center gap-1 w-16 group">
+        <button class="flex flex-col items-center gap-1 w-16 group relative">
+          <div class="absolute -top-2.5 w-8 h-0.5 rounded-full bg-[#A89CE0] shadow-[0_0_8px_rgba(168,156,224,0.8)]"></div>
           <div class="relative flex items-center justify-center">
-            <iconify-icon icon="solar:home-smile-linear" class="text-[#7C6FCD] text-2xl transition-transform group-active:scale-95" stroke-width="1.5"></iconify-icon>
+            <iconify-icon icon="solar:home-smile-bold" class="text-[#A89CE0] text-2xl transition-transform group-active:scale-95"></iconify-icon>
           </div>
-          <span class="text-xs font-medium text-[#7C6FCD]">Home</span>
+          <span class="text-[11px] font-semibold text-[#A89CE0]">Home</span>
         </button>
 
         <!-- Sleep -->
@@ -281,7 +417,6 @@
       </nav>
 
       <!-- Top Safe Area Gradient / Blur (optional for native feel) -->
-      <div class="absolute top-0 w-full h-10 bg-gradient-to-b from-[#0D0F1A] to-transparent pointer-events-none z-20"></div>
     </div>
   
 </body></html>

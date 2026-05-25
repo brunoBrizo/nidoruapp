@@ -2,6 +2,7 @@ import { describe, expect, it, jest } from "@jest/globals";
 
 import {
   completeWindDownRunLocally,
+  loadRememberedWindDownContextChoiceLocally,
   loadLatestRecoverableWindDownRun,
   recordWindDownStartedLocally,
   saveRememberedWindDownContextChoiceLocally,
@@ -13,9 +14,7 @@ import {
 function createMockDatabase(firstRow: Record<string, unknown> | null = null) {
   const database: WindDownLocalPersistenceDatabase & {
     readonly runAsync: jest.MockedFunction<WindDownLocalPersistenceDatabase["runAsync"]>;
-    readonly getFirstAsync: jest.MockedFunction<
-      WindDownLocalPersistenceDatabase["getFirstAsync"]
-    >;
+    readonly getFirstAsync: jest.MockedFunction<WindDownLocalPersistenceDatabase["getFirstAsync"]>;
   } = {
     runAsync: jest.fn<WindDownLocalPersistenceDatabase["runAsync"]>().mockResolvedValue(undefined),
     getFirstAsync: jest
@@ -140,6 +139,32 @@ describe("wind-down local persistence", () => {
       3,
       expect.stringContaining("INSERT INTO local_event_queue"),
       expect.arrayContaining(["audio_started", "wind_down_run", "winddown_0123456789abcdef", "{}"]),
+    );
+  });
+
+  it("loads the remembered context choice with local-install scoping", async () => {
+    const database = createMockDatabase();
+    database.getFirstAsync.mockResolvedValue({
+      context_goal: "wake_up_fewer_times",
+      local_install_id: "install_0123456789abcdef",
+      routine_id: "wind_down_daily_calm",
+      selected_at: "2026-05-25T22:30:00.000Z",
+    });
+
+    await expect(
+      loadRememberedWindDownContextChoiceLocally(database, {
+        localInstallId: "install_0123456789abcdef",
+      }),
+    ).resolves.toEqual({
+      contextGoal: "wake_up_fewer_times",
+      localInstallId: "install_0123456789abcdef",
+      routineId: "wind_down_daily_calm",
+      selectedAt: "2026-05-25T22:30:00.000Z",
+    });
+
+    expect(database.getFirstAsync).toHaveBeenCalledWith(
+      expect.stringContaining("WHERE local_install_id = ?"),
+      ["install_0123456789abcdef"],
     );
   });
 

@@ -102,7 +102,11 @@ export function AppTabBar({ state, descriptors, navigation }: AppTabBarProps) {
     }).start();
   }, [activeTabIndex, indicatorPosition, motionConfig.durationMs]);
 
-  if (pathname.startsWith("/breathe/") || pathname.startsWith("/rescue-me")) {
+  if (
+    pathname.startsWith("/breathe/") ||
+    pathname.startsWith("/rescue-me") ||
+    pathname.startsWith("/sleep/wind-down")
+  ) {
     return null;
   }
 

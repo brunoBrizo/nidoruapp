@@ -24,10 +24,7 @@ export type WindDownLocalPersistenceDatabase = {
     source: string,
     params?: readonly WindDownLocalPersistenceBindValue[],
   ): Promise<Row | null>;
-  runAsync(
-    source: string,
-    params?: readonly WindDownLocalPersistenceBindValue[],
-  ): Promise<unknown>;
+  runAsync(source: string, params?: readonly WindDownLocalPersistenceBindValue[]): Promise<unknown>;
 };
 
 type WindDownRunRow = {
@@ -51,6 +48,13 @@ type WindDownRunRow = {
   readonly stopped_at: string | null;
   readonly total_duration_seconds: number | null;
   readonly updated_at: string;
+};
+
+type RememberedWindDownContextChoiceRow = {
+  readonly context_goal: string;
+  readonly local_install_id: string;
+  readonly routine_id: string;
+  readonly selected_at: string;
 };
 
 type WindDownEventName =
@@ -120,6 +124,37 @@ export async function saveRememberedWindDownContextChoiceLocally(
   );
 }
 
+export async function loadRememberedWindDownContextChoiceLocally(
+  database: WindDownLocalPersistenceDatabase,
+  input: { readonly localInstallId: string },
+): Promise<RememberedWindDownContextChoice | null> {
+  const localInstallId = localInstallIdSchema.parse(input.localInstallId);
+  const row = await database.getFirstAsync<RememberedWindDownContextChoiceRow>(
+    `
+      SELECT
+        local_install_id,
+        context_goal,
+        routine_id,
+        selected_at
+      FROM wind_down_context_preferences
+      WHERE local_install_id = ?
+      LIMIT 1;
+    `,
+    [localInstallId],
+  );
+
+  if (!row) {
+    return null;
+  }
+
+  return rememberedWindDownContextChoiceSchema.parse({
+    contextGoal: row.context_goal,
+    localInstallId: row.local_install_id,
+    routineId: row.routine_id,
+    selectedAt: row.selected_at,
+  });
+}
+
 export async function saveWindDownStepProgressLocally(
   database: WindDownLocalPersistenceDatabase,
   input: WindDownStepProgress,
@@ -170,7 +205,9 @@ export async function saveWindDownStepProgressLocally(
 
   await insertWindDownEventQueue({
     database,
-    ...(progress.queuedEvent.eventId === undefined ? {} : { eventId: progress.queuedEvent.eventId }),
+    ...(progress.queuedEvent.eventId === undefined
+      ? {}
+      : { eventId: progress.queuedEvent.eventId }),
     eventName: progress.queuedEvent.eventName,
     localInstallId: progress.localInstallId,
     occurredAt: progress.queuedEvent.occurredAt,
@@ -412,7 +449,9 @@ function parseWindDownRunRow(row: WindDownRunRow): WindDownRunRecord {
     ...(row.ambient_completed_at === null ? {} : { ambientCompletedAt: row.ambient_completed_at }),
     ambientSoundId: row.ambient_sound_id,
     ...(row.ambient_started_at === null ? {} : { ambientStartedAt: row.ambient_started_at }),
-    ...(row.body_cue_completed_at === null ? {} : { bodyCueCompletedAt: row.body_cue_completed_at }),
+    ...(row.body_cue_completed_at === null
+      ? {}
+      : { bodyCueCompletedAt: row.body_cue_completed_at }),
     ...(row.body_cue_started_at === null ? {} : { bodyCueStartedAt: row.body_cue_started_at }),
     ...(row.breath_session_id === null ? {} : { breathSessionId: row.breath_session_id }),
     ...(row.breathwork_completed_at === null

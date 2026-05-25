@@ -88,6 +88,15 @@ describe("AppTabBar", () => {
     expect(screen.queryByText("Rescue Me")).toBeNull();
   });
 
+  it("hides the tab shell on the full-screen Wind-Down route", () => {
+    mockUsePathname.mockReturnValue("/sleep/wind-down");
+
+    renderTabBar();
+
+    expect(screen.queryByRole("tab", { name: "Home tab" })).toBeNull();
+    expect(screen.queryByText("Sleep")).toBeNull();
+  });
+
   it("matches the home.png tab shell frame and active indicator", () => {
     renderTabBar();
 

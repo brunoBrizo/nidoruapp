@@ -1,10 +1,5 @@
-import { TabPlaceholderScreen } from "../../../navigation/tab-placeholder-screen";
+import { WindDownRoute } from "../../../wind-down/wind-down-route";
 
 export default function WindDownFlowAnchorScreen() {
-  return (
-    <TabPlaceholderScreen
-      title="Wind-Down Flow"
-      description="Wind-Down Flow anchor for the guided breathwork and sleep sound sequence."
-    />
-  );
+  return <WindDownRoute />;
 }

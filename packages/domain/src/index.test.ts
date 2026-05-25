@@ -27,6 +27,12 @@ import {
   postMvpBreathTechniqueIds,
   sleepBaselineOptions,
   streakRules,
+  parseWindDownContextGoalInput,
+  resolveWindDownRoutine,
+  windDownContextGoalOptions,
+  windDownContextGoals,
+  windDownRoutineIds,
+  windDownStartupRequirements,
   windDownTimePresets,
 } from "@nidoru/domain";
 
@@ -328,6 +334,133 @@ assertEquals(onboardingPlanIds, [
   "stress_reset",
   "general_wellness",
 ]);
+assertEquals(windDownContextGoals, [
+  "fall_asleep_faster",
+  "calm_racing_thoughts",
+  "wake_up_fewer_times",
+]);
+assertEquals(
+  windDownContextGoalOptions.map((option) => [option.value, option.label, option.subtitle]),
+  [
+    ["fall_asleep_faster", "Fall asleep faster", "4-7-8 breath · sleep sounds"],
+    ["calm_racing_thoughts", "Calm racing thoughts", "Box breathing · body relax"],
+    ["wake_up_fewer_times", "Wake up fewer times", "Daily Calm · longer audio"],
+  ],
+);
+assertEquals(windDownRoutineIds, [
+  "wind_down_sleep_starter",
+  "wind_down_racing_thoughts",
+  "wind_down_daily_calm",
+]);
+assertEquals(windDownStartupRequirements, {
+  account: false,
+  auth: false,
+  brightnessPermission: false,
+  network: false,
+  notificationPermission: false,
+  paywall: false,
+  remoteConfig: false,
+});
+assertEquals(parseWindDownContextGoalInput("fall_asleep_faster"), "fall_asleep_faster");
+assertEquals(parseWindDownContextGoalInput("wake_up_fewer_times"), "wake_up_fewer_times");
+assertEquals(parseWindDownContextGoalInput("sleep_story"), null);
+assertEquals(parseWindDownContextGoalInput(""), null);
+assertEquals(parseWindDownContextGoalInput({ value: "fall_asleep_faster" }), null);
+assertEquals(resolveWindDownRoutine().selectionSource, "default");
+assertEquals(resolveWindDownRoutine().maxTapsFromHome, 2);
+assertEquals(resolveWindDownRoutine().requiresQuickContextCheck, true);
+assertEquals(resolveWindDownRoutine().routine, {
+  id: "wind_down_sleep_starter",
+  contextGoal: "fall_asleep_faster",
+  steps: ["breathwork", "transition", "body_relaxation", "ambient_sound"],
+  breathwork: {
+    techniqueId: "4-7-8-sleep",
+    durationSeconds: 300,
+    uiState: "active_winddown",
+  },
+  transition: {
+    durationSeconds: 5,
+    uiState: "transition_card",
+    copy: "Good. Now let your body relax.",
+  },
+  bodyCue: {
+    durationSeconds: 120,
+    uiState: "body_cue",
+  },
+  ambient: {
+    soundId: "light-rain",
+    soundLabel: "Rain",
+    startsUnderBreathwork: true,
+    timerDurationSeconds: 1800,
+    fadeOutDurationSeconds: 120,
+    uiState: "ambient_handoff",
+    requiresNetwork: false,
+  },
+  startupRequirements: windDownStartupRequirements,
+});
+assertEquals(resolveWindDownRoutine({ selectedGoal: "calm_racing_thoughts" }), {
+  selectionSource: "selected_goal",
+  maxTapsFromHome: 2,
+  requiresQuickContextCheck: false,
+  routine: {
+    id: "wind_down_racing_thoughts",
+    contextGoal: "calm_racing_thoughts",
+    steps: ["breathwork", "transition", "body_relaxation", "ambient_sound"],
+    breathwork: {
+      techniqueId: "box-breathing",
+      durationSeconds: 300,
+      uiState: "active_winddown",
+    },
+    transition: {
+      durationSeconds: 5,
+      uiState: "transition_card",
+      copy: "Good. Now let your body relax.",
+    },
+    bodyCue: {
+      durationSeconds: 120,
+      uiState: "body_cue",
+    },
+    ambient: {
+      soundId: "light-rain",
+      soundLabel: "Rain",
+      startsUnderBreathwork: true,
+      timerDurationSeconds: 1800,
+      fadeOutDurationSeconds: 120,
+      uiState: "ambient_handoff",
+      requiresNetwork: false,
+    },
+    startupRequirements: windDownStartupRequirements,
+  },
+});
+assertEquals(resolveWindDownRoutine({ selectedGoal: "wake_up_fewer_times" }).routine.breathwork, {
+  techniqueId: "coherent-breathing",
+  durationSeconds: 600,
+  uiState: "daily_calm",
+});
+assertCondition(
+  resolveWindDownRoutine({ selectedGoal: "wake_up_fewer_times" }).routine.ambient
+    .timerDurationSeconds >
+    resolveWindDownRoutine({ selectedGoal: "fall_asleep_faster" }).routine.ambient
+      .timerDurationSeconds,
+  "Wake-up-fewer-times routine must use longer ambient playback than the default timer.",
+);
+assertEquals(
+  resolveWindDownRoutine({ rememberedGoal: "wake_up_fewer_times" }).selectionSource,
+  "remembered_goal",
+);
+assertEquals(resolveWindDownRoutine({ rememberedGoal: "wake_up_fewer_times" }).maxTapsFromHome, 1);
+assertEquals(
+  resolveWindDownRoutine({
+    rememberedGoal: "wake_up_fewer_times",
+    selectedGoal: "calm_racing_thoughts",
+  }).routine.contextGoal,
+  "calm_racing_thoughts",
+);
+const fallAsleepFasterStepIds: readonly string[] = resolveWindDownRoutine({
+  selectedGoal: "fall_asleep_faster",
+}).routine.steps;
+
+assertEquals(fallAsleepFasterStepIds.includes("sleep_story"), false);
 assertEquals(getOnboardingPlanForGoal("sleep").id, "sleep_focused");
 assertEquals(getOnboardingPlanForGoal("anxiety").id, "anxiety_relief");
 assertEquals(getOnboardingPlanForGoal("stress").id, "stress_reset");

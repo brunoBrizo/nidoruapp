@@ -142,7 +142,7 @@
       "label": "assertEquals()",
       "file_type": "code",
       "source_file": "packages/domain/src/index.test.ts",
-      "source_location": "L33",
+      "source_location": "L39",
       "id": "index_test_assertequals",
       "community": 16,
       "norm_label": "assertequals()"
@@ -162,86 +162,104 @@
       "source_file": "packages/domain/src/index.ts",
       "source_location": "L1",
       "id": "packages_domain_src_index_ts",
-      "community": 6,
+      "community": 5,
       "norm_label": "index.ts"
+    },
+    {
+      "label": "parseWindDownContextGoalInput()",
+      "file_type": "code",
+      "source_file": "packages/domain/src/index.ts",
+      "source_location": "L485",
+      "id": "index_parsewinddowncontextgoalinput",
+      "community": 5,
+      "norm_label": "parsewinddowncontextgoalinput()"
+    },
+    {
+      "label": "resolveWindDownRoutine()",
+      "file_type": "code",
+      "source_file": "packages/domain/src/index.ts",
+      "source_location": "L495",
+      "id": "index_resolvewinddownroutine",
+      "community": 5,
+      "norm_label": "resolvewinddownroutine()"
     },
     {
       "label": "getOnboardingPlanForGoal()",
       "file_type": "code",
       "source_file": "packages/domain/src/index.ts",
-      "source_location": "L510",
+      "source_location": "L744",
       "id": "index_getonboardingplanforgoal",
-      "community": 6,
+      "community": 5,
       "norm_label": "getonboardingplanforgoal()"
     },
     {
       "label": "createPersonalizedOnboardingPlan()",
       "file_type": "code",
       "source_file": "packages/domain/src/index.ts",
-      "source_location": "L542",
+      "source_location": "L776",
       "id": "index_createpersonalizedonboardingplan",
-      "community": 6,
+      "community": 5,
       "norm_label": "createpersonalizedonboardingplan()"
     },
     {
       "label": "getInstructionDepthForFamiliarity()",
       "file_type": "code",
       "source_file": "packages/domain/src/index.ts",
-      "source_location": "L575",
+      "source_location": "L809",
       "id": "index_getinstructiondepthforfamiliarity",
-      "community": 6,
+      "community": 5,
       "norm_label": "getinstructiondepthforfamiliarity()"
     },
     {
       "label": "formatWindDownTime()",
       "file_type": "code",
       "source_file": "packages/domain/src/index.ts",
-      "source_location": "L584",
+      "source_location": "L818",
       "id": "index_formatwinddowntime",
-      "community": 6,
+      "community": 5,
       "norm_label": "formatwinddowntime()"
     },
     {
       "label": "normalizeOptionalDisplayName()",
       "file_type": "code",
       "source_file": "packages/domain/src/index.ts",
-      "source_location": "L594",
+      "source_location": "L828",
       "id": "index_normalizeoptionaldisplayname",
-      "community": 6,
+      "community": 5,
       "norm_label": "normalizeoptionaldisplayname()"
     },
     {
       "label": "canShowAccountPrompt()",
       "file_type": "code",
       "source_file": "packages/domain/src/index.ts",
-      "source_location": "L658",
+      "source_location": "L892",
       "id": "index_canshowaccountprompt",
-      "community": 6,
+      "community": 5,
       "norm_label": "canshowaccountprompt()"
     },
     {
       "label": "canShowPaywall()",
       "file_type": "code",
       "source_file": "packages/domain/src/index.ts",
-      "source_location": "L662",
+      "source_location": "L896",
       "id": "index_canshowpaywall",
-      "community": 6,
+      "community": 5,
       "norm_label": "canshowpaywall()"
     },
     {
       "label": "canStartDeferredAnonymousAuth()",
       "file_type": "code",
       "source_file": "packages/domain/src/index.ts",
-      "source_location": "L666",
+      "source_location": "L900",
       "id": "index_canstartdeferredanonymousauth",
-      "community": 6,
+      "community": 5,
       "norm_label": "canstartdeferredanonymousauth()"
     },
     {
       "label": "canPromptForNotificationPermission()",
       "file_type": "code",
       "source_file": "packages/domain/src/index.ts",
-      "source_location": "L673",
+      "source_location": "L907",
       "id": "index_canpromptfornotificationpermission",
       "community": 1,
       "norm_label": "canpromptfornotificationpermission()"
@@ -250,54 +268,54 @@
       "label": "clampEveningReminderMinuteOfDay()",
       "file_type": "code",
       "source_file": "packages/domain/src/index.ts",
-      "source_location": "L689",
+      "source_location": "L923",
       "id": "index_clampeveningreminderminuteofday",
-      "community": 6,
+      "community": 5,
       "norm_label": "clampeveningreminderminuteofday()"
     },
     {
       "label": "hasOpenedInReminderSuppressionWindow()",
       "file_type": "code",
       "source_file": "packages/domain/src/index.ts",
-      "source_location": "L696",
+      "source_location": "L930",
       "id": "index_hasopenedinremindersuppressionwindow",
-      "community": 6,
+      "community": 5,
       "norm_label": "hasopenedinremindersuppressionwindow()"
     },
     {
       "label": "getNextEveningReminderDate()",
       "file_type": "code",
       "source_file": "packages/domain/src/index.ts",
-      "source_location": "L712",
+      "source_location": "L946",
       "id": "index_getnexteveningreminderdate",
-      "community": 6,
+      "community": 5,
       "norm_label": "getnexteveningreminderdate()"
     },
     {
       "label": "createLocalDateAtMinuteOfDay()",
       "file_type": "code",
       "source_file": "packages/domain/src/index.ts",
-      "source_location": "L729",
+      "source_location": "L963",
       "id": "index_createlocaldateatminuteofday",
-      "community": 6,
+      "community": 5,
       "norm_label": "createlocaldateatminuteofday()"
     },
     {
       "label": "getLocalMinuteOfDay()",
       "file_type": "code",
       "source_file": "packages/domain/src/index.ts",
-      "source_location": "L737",
+      "source_location": "L971",
       "id": "index_getlocalminuteofday",
-      "community": 6,
+      "community": 5,
       "norm_label": "getlocalminuteofday()"
     },
     {
       "label": "isSameLocalCalendarDay()",
       "file_type": "code",
       "source_file": "packages/domain/src/index.ts",
-      "source_location": "L741",
+      "source_location": "L975",
       "id": "index_issamelocalcalendarday",
-      "community": 6,
+      "community": 5,
       "norm_label": "issamelocalcalendarday()"
     },
     {
@@ -648,7 +666,7 @@
       "source_file": "apps/mobile/tests/sqlite-migrations.test.ts",
       "source_location": "L1",
       "id": "apps_mobile_tests_sqlite_migrations_test_ts",
-      "community": 5,
+      "community": 6,
       "norm_label": "sqlite-migrations.test.ts"
     },
     {
@@ -657,7 +675,7 @@
       "source_file": "apps/mobile/tests/sqlite-migrations.test.ts",
       "source_location": "L7",
       "id": "sqlite_migrations_test_assertequals",
-      "community": 5,
+      "community": 6,
       "norm_label": "assertequals()"
     },
     {
@@ -666,7 +684,7 @@
       "source_file": "apps/mobile/tests/sqlite-migrations.test.ts",
       "source_location": "L13",
       "id": "sqlite_migrations_test_assertcondition",
-      "community": 5,
+      "community": 6,
       "norm_label": "assertcondition()"
     },
     {
@@ -675,7 +693,7 @@
       "source_file": "apps/mobile/tests/sqlite-migrations.test.ts",
       "source_location": "L19",
       "id": "sqlite_migrations_test_assertrejects",
-      "community": 5,
+      "community": 6,
       "norm_label": "assertrejects()"
     },
     {
@@ -684,7 +702,7 @@
       "source_file": "apps/mobile/tests/sqlite-migrations.test.ts",
       "source_location": "L35",
       "id": "sqlite_migrations_test_sqliteclidatabase",
-      "community": 5,
+      "community": 6,
       "norm_label": "sqliteclidatabase"
     },
     {
@@ -693,7 +711,7 @@
       "source_file": "apps/mobile/tests/sqlite-migrations.test.ts",
       "source_location": "L36",
       "id": "sqlite_migrations_test_sqliteclidatabase_constructor",
-      "community": 5,
+      "community": 6,
       "norm_label": ".constructor()"
     },
     {
@@ -702,7 +720,7 @@
       "source_file": "apps/mobile/tests/sqlite-migrations.test.ts",
       "source_location": "L38",
       "id": "sqlite_migrations_test_sqliteclidatabase_execasync",
-      "community": 5,
+      "community": 6,
       "norm_label": ".execasync()"
     },
     {
@@ -711,7 +729,7 @@
       "source_file": "apps/mobile/tests/sqlite-migrations.test.ts",
       "source_location": "L42",
       "id": "sqlite_migrations_test_sqliteclidatabase_getallasync",
-      "community": 5,
+      "community": 6,
       "norm_label": ".getallasync()"
     },
     {
@@ -720,7 +738,7 @@
       "source_file": "apps/mobile/tests/sqlite-migrations.test.ts",
       "source_location": "L53",
       "id": "sqlite_migrations_test_createdatabase",
-      "community": 5,
+      "community": 6,
       "norm_label": "createdatabase()"
     },
     {
@@ -729,7 +747,7 @@
       "source_file": "apps/mobile/tests/sqlite-migrations.test.ts",
       "source_location": "L66",
       "id": "sqlite_migrations_test_runsqlite",
-      "community": 5,
+      "community": 6,
       "norm_label": "runsqlite()"
     },
     {
@@ -1476,7 +1494,7 @@
       "source_file": "apps/mobile/src/app/(tabs)/_layout.tsx",
       "source_location": "L1",
       "id": "apps_mobile_src_app_tabs_layout_tsx",
-      "community": 15,
+      "community": 14,
       "norm_label": "_layout.tsx"
     },
     {
@@ -1485,7 +1503,7 @@
       "source_file": "apps/mobile/src/app/(tabs)/_layout.tsx",
       "source_location": "L7",
       "id": "layout_tablayout",
-      "community": 15,
+      "community": 14,
       "norm_label": "tablayout()"
     },
     {
@@ -1881,7 +1899,7 @@
       "source_file": "apps/mobile/src/navigation/app-tab-bar.tsx",
       "source_location": "L1",
       "id": "apps_mobile_src_navigation_app_tab_bar_tsx",
-      "community": 14,
+      "community": 15,
       "norm_label": "app-tab-bar.tsx"
     },
     {
@@ -1890,7 +1908,7 @@
       "source_file": "apps/mobile/src/navigation/app-tab-bar.tsx",
       "source_location": "L34",
       "id": "app_tab_bar_gettabindicatormotionconfig",
-      "community": 14,
+      "community": 15,
       "norm_label": "gettabindicatormotionconfig()"
     },
     {
@@ -1899,7 +1917,7 @@
       "source_file": "apps/mobile/src/navigation/app-tab-bar.tsx",
       "source_location": "L66",
       "id": "app_tab_bar_isdefaultprevented",
-      "community": 14,
+      "community": 15,
       "norm_label": "isdefaultprevented()"
     },
     {
@@ -1908,7 +1926,7 @@
       "source_file": "apps/mobile/src/navigation/app-tab-bar.tsx",
       "source_location": "L145",
       "id": "app_tab_bar_onpress",
-      "community": 14,
+      "community": 15,
       "norm_label": "onpress()"
     },
     {
@@ -1917,7 +1935,7 @@
       "source_file": "apps/mobile/src/navigation/app-tab-bar.tsx",
       "source_location": "L157",
       "id": "app_tab_bar_onlongpress",
-      "community": 14,
+      "community": 15,
       "norm_label": "onlongpress()"
     },
     {
@@ -1926,7 +1944,7 @@
       "source_file": "apps/mobile/src/navigation/onboarding-route-contract.ts",
       "source_location": "L1",
       "id": "apps_mobile_src_navigation_onboarding_route_contract_ts",
-      "community": 15,
+      "community": 14,
       "norm_label": "onboarding-route-contract.ts"
     },
     {
@@ -1935,7 +1953,7 @@
       "source_file": "apps/mobile/src/navigation/onboarding-route-contract.ts",
       "source_location": "L1",
       "id": "onboarding_route_contract_allowsincompleteonboardingforroute",
-      "community": 15,
+      "community": 14,
       "norm_label": "allowsincompleteonboardingforroute()"
     },
     {
@@ -1944,7 +1962,7 @@
       "source_file": "apps/mobile/src/navigation/onboarding-route-contract.ts",
       "source_location": "L12",
       "id": "onboarding_route_contract_parsefirstlaunch",
-      "community": 15,
+      "community": 14,
       "norm_label": "parsefirstlaunch()"
     },
     {
@@ -2232,7 +2250,7 @@
       "source_file": "apps/mobile/src/storage/local-database.ts",
       "source_location": "L1",
       "id": "apps_mobile_src_storage_local_database_ts",
-      "community": 5,
+      "community": 6,
       "norm_label": "local-database.ts"
     },
     {
@@ -2241,7 +2259,7 @@
       "source_file": "apps/mobile/src/storage/local-database.ts",
       "source_location": "L9",
       "id": "local_database_openmigratedlocaldatabase",
-      "community": 5,
+      "community": 6,
       "norm_label": "openmigratedlocaldatabase()"
     },
     {
@@ -2250,7 +2268,7 @@
       "source_file": "apps/mobile/src/storage/local-database.ts",
       "source_location": "L27",
       "id": "local_database_openandmigratelocaldatabase",
-      "community": 5,
+      "community": 6,
       "norm_label": "openandmigratelocaldatabase()"
     },
     {
@@ -2259,7 +2277,7 @@
       "source_file": "apps/mobile/src/storage/sqlite-migrations.ts",
       "source_location": "L1",
       "id": "apps_mobile_src_storage_sqlite_migrations_ts",
-      "community": 5,
+      "community": 6,
       "norm_label": "sqlite-migrations.ts"
     },
     {
@@ -2268,7 +2286,7 @@
       "source_file": "apps/mobile/src/storage/sqlite-migrations.ts",
       "source_location": "L333",
       "id": "sqlite_migrations_runsqlitemigrations",
-      "community": 5,
+      "community": 6,
       "norm_label": "runsqlitemigrations()"
     },
     {
@@ -2277,7 +2295,7 @@
       "source_file": "apps/mobile/src/storage/sqlite-migrations.ts",
       "source_location": "L365",
       "id": "sqlite_migrations_validatemigrations",
-      "community": 5,
+      "community": 6,
       "norm_label": "validatemigrations()"
     },
     {
@@ -2286,7 +2304,7 @@
       "source_file": "apps/mobile/src/storage/sqlite-migrations.ts",
       "source_location": "L391",
       "id": "sqlite_migrations_applymigration",
-      "community": 5,
+      "community": 6,
       "norm_label": "applymigration()"
     },
     {
@@ -3006,7 +3024,7 @@
       "source_file": "apps/mobile/src/onboarding/local-first-onboarding.ts",
       "source_location": "L463",
       "id": "local_first_onboarding_completeonboardingpersonalizationlocally",
-      "community": 1,
+      "community": 5,
       "norm_label": "completeonboardingpersonalizationlocally()"
     },
     {
@@ -3723,7 +3741,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "packages/domain/src/index.test.ts",
-      "source_location": "L33",
+      "source_location": "L39",
       "weight": 1.0,
       "_src": "packages_domain_src_index_test_ts",
       "_tgt": "index_test_assertequals",
@@ -3735,7 +3753,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "packages/domain/src/index.test.ts",
-      "source_location": "L39",
+      "source_location": "L45",
       "weight": 1.0,
       "_src": "packages_domain_src_index_test_ts",
       "_tgt": "index_test_assertcondition",
@@ -3759,7 +3777,31 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "packages/domain/src/index.ts",
-      "source_location": "L510",
+      "source_location": "L485",
+      "weight": 1.0,
+      "_src": "packages_domain_src_index_ts",
+      "_tgt": "index_parsewinddowncontextgoalinput",
+      "source": "packages_domain_src_index_ts",
+      "target": "index_parsewinddowncontextgoalinput",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/domain/src/index.ts",
+      "source_location": "L495",
+      "weight": 1.0,
+      "_src": "packages_domain_src_index_ts",
+      "_tgt": "index_resolvewinddownroutine",
+      "source": "packages_domain_src_index_ts",
+      "target": "index_resolvewinddownroutine",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/domain/src/index.ts",
+      "source_location": "L744",
       "weight": 1.0,
       "_src": "packages_domain_src_index_ts",
       "_tgt": "index_getonboardingplanforgoal",
@@ -3771,7 +3813,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "packages/domain/src/index.ts",
-      "source_location": "L542",
+      "source_location": "L776",
       "weight": 1.0,
       "_src": "packages_domain_src_index_ts",
       "_tgt": "index_createpersonalizedonboardingplan",
@@ -3783,7 +3825,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "packages/domain/src/index.ts",
-      "source_location": "L575",
+      "source_location": "L809",
       "weight": 1.0,
       "_src": "packages_domain_src_index_ts",
       "_tgt": "index_getinstructiondepthforfamiliarity",
@@ -3795,7 +3837,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "packages/domain/src/index.ts",
-      "source_location": "L584",
+      "source_location": "L818",
       "weight": 1.0,
       "_src": "packages_domain_src_index_ts",
       "_tgt": "index_formatwinddowntime",
@@ -3807,7 +3849,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "packages/domain/src/index.ts",
-      "source_location": "L594",
+      "source_location": "L828",
       "weight": 1.0,
       "_src": "packages_domain_src_index_ts",
       "_tgt": "index_normalizeoptionaldisplayname",
@@ -3819,7 +3861,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "packages/domain/src/index.ts",
-      "source_location": "L658",
+      "source_location": "L892",
       "weight": 1.0,
       "_src": "packages_domain_src_index_ts",
       "_tgt": "index_canshowaccountprompt",
@@ -3831,7 +3873,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "packages/domain/src/index.ts",
-      "source_location": "L662",
+      "source_location": "L896",
       "weight": 1.0,
       "_src": "packages_domain_src_index_ts",
       "_tgt": "index_canshowpaywall",
@@ -3843,7 +3885,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "packages/domain/src/index.ts",
-      "source_location": "L666",
+      "source_location": "L900",
       "weight": 1.0,
       "_src": "packages_domain_src_index_ts",
       "_tgt": "index_canstartdeferredanonymousauth",
@@ -3855,7 +3897,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "packages/domain/src/index.ts",
-      "source_location": "L673",
+      "source_location": "L907",
       "weight": 1.0,
       "_src": "packages_domain_src_index_ts",
       "_tgt": "index_canpromptfornotificationpermission",
@@ -3867,7 +3909,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "packages/domain/src/index.ts",
-      "source_location": "L689",
+      "source_location": "L923",
       "weight": 1.0,
       "_src": "packages_domain_src_index_ts",
       "_tgt": "index_clampeveningreminderminuteofday",
@@ -3879,7 +3921,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "packages/domain/src/index.ts",
-      "source_location": "L696",
+      "source_location": "L930",
       "weight": 1.0,
       "_src": "packages_domain_src_index_ts",
       "_tgt": "index_hasopenedinremindersuppressionwindow",
@@ -3891,7 +3933,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "packages/domain/src/index.ts",
-      "source_location": "L712",
+      "source_location": "L946",
       "weight": 1.0,
       "_src": "packages_domain_src_index_ts",
       "_tgt": "index_getnexteveningreminderdate",
@@ -3903,7 +3945,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "packages/domain/src/index.ts",
-      "source_location": "L729",
+      "source_location": "L963",
       "weight": 1.0,
       "_src": "packages_domain_src_index_ts",
       "_tgt": "index_createlocaldateatminuteofday",
@@ -3915,7 +3957,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "packages/domain/src/index.ts",
-      "source_location": "L737",
+      "source_location": "L971",
       "weight": 1.0,
       "_src": "packages_domain_src_index_ts",
       "_tgt": "index_getlocalminuteofday",
@@ -3927,7 +3969,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "packages/domain/src/index.ts",
-      "source_location": "L741",
+      "source_location": "L975",
       "weight": 1.0,
       "_src": "packages_domain_src_index_ts",
       "_tgt": "index_issamelocalcalendarday",
@@ -3939,7 +3981,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "packages/domain/src/index.ts",
-      "source_location": "L549",
+      "source_location": "L783",
       "weight": 1.0,
       "_src": "index_createpersonalizedonboardingplan",
       "_tgt": "index_getonboardingplanforgoal",
@@ -3963,7 +4005,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "packages/domain/src/index.ts",
-      "source_location": "L551",
+      "source_location": "L785",
       "weight": 1.0,
       "_src": "index_createpersonalizedonboardingplan",
       "_tgt": "index_formatwinddowntime",
@@ -3975,7 +4017,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "packages/domain/src/index.ts",
-      "source_location": "L552",
+      "source_location": "L786",
       "weight": 1.0,
       "_src": "index_createpersonalizedonboardingplan",
       "_tgt": "index_normalizeoptionaldisplayname",
@@ -3987,7 +4029,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "packages/domain/src/index.ts",
-      "source_location": "L563",
+      "source_location": "L797",
       "weight": 1.0,
       "_src": "index_createpersonalizedonboardingplan",
       "_tgt": "index_getinstructiondepthforfamiliarity",
@@ -4011,7 +4053,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "packages/domain/src/index.ts",
-      "source_location": "L717",
+      "source_location": "L951",
       "weight": 1.0,
       "_src": "index_getnexteveningreminderdate",
       "_tgt": "index_clampeveningreminderminuteofday",
@@ -4023,7 +4065,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "packages/domain/src/index.ts",
-      "source_location": "L700",
+      "source_location": "L934",
       "weight": 1.0,
       "_src": "index_hasopenedinremindersuppressionwindow",
       "_tgt": "index_issamelocalcalendarday",
@@ -4035,7 +4077,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "packages/domain/src/index.ts",
-      "source_location": "L704",
+      "source_location": "L938",
       "weight": 1.0,
       "_src": "index_hasopenedinremindersuppressionwindow",
       "_tgt": "index_getlocalminuteofday",
@@ -4047,7 +4089,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "packages/domain/src/index.ts",
-      "source_location": "L722",
+      "source_location": "L956",
       "weight": 1.0,
       "_src": "index_getnexteveningreminderdate",
       "_tgt": "index_hasopenedinremindersuppressionwindow",
@@ -4059,7 +4101,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "packages/domain/src/index.ts",
-      "source_location": "L720",
+      "source_location": "L954",
       "weight": 1.0,
       "_src": "index_getnexteveningreminderdate",
       "_tgt": "index_createlocaldateatminuteofday",

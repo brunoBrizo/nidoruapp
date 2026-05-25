@@ -288,6 +288,240 @@ export const initialInsightRuleTypes = [
 export type LaunchSoundId = (typeof launchSoundIds)[number];
 export type InitialInsightRuleType = (typeof initialInsightRuleTypes)[number];
 
+export const windDownContextGoals = [
+  "fall_asleep_faster",
+  "calm_racing_thoughts",
+  "wake_up_fewer_times",
+] as const;
+
+export type WindDownContextGoal = (typeof windDownContextGoals)[number];
+
+export const windDownContextGoalOptions = [
+  {
+    value: "fall_asleep_faster",
+    label: "Fall asleep faster",
+    subtitle: "4-7-8 breath · sleep sounds",
+  },
+  {
+    value: "calm_racing_thoughts",
+    label: "Calm racing thoughts",
+    subtitle: "Box breathing · body relax",
+  },
+  {
+    value: "wake_up_fewer_times",
+    label: "Wake up fewer times",
+    subtitle: "Daily Calm · longer audio",
+  },
+] as const satisfies readonly {
+  readonly value: WindDownContextGoal;
+  readonly label: string;
+  readonly subtitle: string;
+}[];
+
+export const windDownRoutineIds = [
+  "wind_down_sleep_starter",
+  "wind_down_racing_thoughts",
+  "wind_down_daily_calm",
+] as const;
+
+export type WindDownRoutineId = (typeof windDownRoutineIds)[number];
+
+export const windDownRoutineStepIds = [
+  "breathwork",
+  "transition",
+  "body_relaxation",
+  "ambient_sound",
+] as const;
+
+export type WindDownRoutineStepId = (typeof windDownRoutineStepIds)[number];
+
+export type WindDownRoutineUiState =
+  | "active_winddown"
+  | "daily_calm"
+  | "transition_card"
+  | "body_cue"
+  | "ambient_handoff";
+
+export const windDownStartupRequirements = {
+  account: false,
+  auth: false,
+  brightnessPermission: false,
+  network: false,
+  notificationPermission: false,
+  paywall: false,
+  remoteConfig: false,
+} as const;
+
+export type WindDownStartupRequirements = typeof windDownStartupRequirements;
+
+export type WindDownBreathworkStep = {
+  readonly techniqueId: BreathTechniqueId;
+  readonly durationSeconds: number;
+  readonly uiState: Extract<WindDownRoutineUiState, "active_winddown" | "daily_calm">;
+};
+
+export type WindDownTransitionStep = {
+  readonly durationSeconds: 5;
+  readonly uiState: "transition_card";
+  readonly copy: "Good. Now let your body relax.";
+};
+
+export type WindDownBodyCueStep = {
+  readonly durationSeconds: 120;
+  readonly uiState: "body_cue";
+};
+
+export type WindDownAmbientStep = {
+  readonly soundId: LaunchSoundId;
+  readonly soundLabel: string;
+  readonly startsUnderBreathwork: boolean;
+  readonly timerDurationSeconds: number;
+  readonly fadeOutDurationSeconds: 120;
+  readonly uiState: "ambient_handoff";
+  readonly requiresNetwork: false;
+};
+
+export type WindDownRoutine = {
+  readonly id: WindDownRoutineId;
+  readonly contextGoal: WindDownContextGoal;
+  readonly steps: readonly WindDownRoutineStepId[];
+  readonly breathwork: WindDownBreathworkStep;
+  readonly transition: WindDownTransitionStep;
+  readonly bodyCue: WindDownBodyCueStep;
+  readonly ambient: WindDownAmbientStep;
+  readonly startupRequirements: WindDownStartupRequirements;
+};
+
+const defaultWindDownRoutineSteps = [
+  "breathwork",
+  "transition",
+  "body_relaxation",
+  "ambient_sound",
+] as const satisfies readonly WindDownRoutineStepId[];
+
+const defaultWindDownTransition = {
+  durationSeconds: 5,
+  uiState: "transition_card",
+  copy: "Good. Now let your body relax.",
+} as const satisfies WindDownTransitionStep;
+
+const defaultWindDownBodyCue = {
+  durationSeconds: 120,
+  uiState: "body_cue",
+} as const satisfies WindDownBodyCueStep;
+
+const defaultWindDownAmbient = {
+  soundId: "light-rain",
+  soundLabel: "Rain",
+  startsUnderBreathwork: true,
+  timerDurationSeconds: 30 * 60,
+  fadeOutDurationSeconds: 120,
+  uiState: "ambient_handoff",
+  requiresNetwork: false,
+} as const satisfies WindDownAmbientStep;
+
+export const windDownRoutines = {
+  fall_asleep_faster: {
+    id: "wind_down_sleep_starter",
+    contextGoal: "fall_asleep_faster",
+    steps: defaultWindDownRoutineSteps,
+    breathwork: {
+      techniqueId: "4-7-8-sleep",
+      durationSeconds: 300,
+      uiState: "active_winddown",
+    },
+    transition: defaultWindDownTransition,
+    bodyCue: defaultWindDownBodyCue,
+    ambient: defaultWindDownAmbient,
+    startupRequirements: windDownStartupRequirements,
+  },
+  calm_racing_thoughts: {
+    id: "wind_down_racing_thoughts",
+    contextGoal: "calm_racing_thoughts",
+    steps: defaultWindDownRoutineSteps,
+    breathwork: {
+      techniqueId: "box-breathing",
+      durationSeconds: 300,
+      uiState: "active_winddown",
+    },
+    transition: defaultWindDownTransition,
+    bodyCue: defaultWindDownBodyCue,
+    ambient: defaultWindDownAmbient,
+    startupRequirements: windDownStartupRequirements,
+  },
+  wake_up_fewer_times: {
+    id: "wind_down_daily_calm",
+    contextGoal: "wake_up_fewer_times",
+    steps: defaultWindDownRoutineSteps,
+    breathwork: {
+      techniqueId: "coherent-breathing",
+      durationSeconds: 600,
+      uiState: "daily_calm",
+    },
+    transition: defaultWindDownTransition,
+    bodyCue: defaultWindDownBodyCue,
+    ambient: {
+      ...defaultWindDownAmbient,
+      timerDurationSeconds: 45 * 60,
+    },
+    startupRequirements: windDownStartupRequirements,
+  },
+} as const satisfies Record<WindDownContextGoal, WindDownRoutine>;
+
+export type WindDownRoutineSelectionSource = "selected_goal" | "remembered_goal" | "default";
+
+export type WindDownRoutineResolutionInput = {
+  readonly rememberedGoal?: WindDownContextGoal | null;
+  readonly selectedGoal?: WindDownContextGoal | null;
+};
+
+export type WindDownRoutineResolution = {
+  readonly selectionSource: WindDownRoutineSelectionSource;
+  readonly maxTapsFromHome: 1 | 2;
+  readonly requiresQuickContextCheck: boolean;
+  readonly routine: WindDownRoutine;
+};
+
+export function parseWindDownContextGoalInput(value: unknown): WindDownContextGoal | null {
+  if (typeof value !== "string") {
+    return null;
+  }
+
+  return windDownContextGoals.includes(value as WindDownContextGoal)
+    ? (value as WindDownContextGoal)
+    : null;
+}
+
+export function resolveWindDownRoutine({
+  rememberedGoal,
+  selectedGoal,
+}: WindDownRoutineResolutionInput = {}): WindDownRoutineResolution {
+  if (selectedGoal) {
+    return {
+      selectionSource: "selected_goal",
+      maxTapsFromHome: 2,
+      requiresQuickContextCheck: false,
+      routine: windDownRoutines[selectedGoal],
+    };
+  }
+
+  if (rememberedGoal) {
+    return {
+      selectionSource: "remembered_goal",
+      maxTapsFromHome: 1,
+      requiresQuickContextCheck: false,
+      routine: windDownRoutines[rememberedGoal],
+    };
+  }
+
+  return {
+    selectionSource: "default",
+    maxTapsFromHome: 2,
+    requiresQuickContextCheck: true,
+    routine: windDownRoutines.fall_asleep_faster,
+  };
+}
+
 export const onboardingQuestionLimit = 5;
 
 export const onboardingQuestionIds = [

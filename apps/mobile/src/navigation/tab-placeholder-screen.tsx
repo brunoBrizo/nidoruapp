@@ -1,5 +1,4 @@
-import { colors, spacing, typography } from "@nidoru/ui-tokens";
-import { ScrollView, StyleSheet, Text } from "react-native";
+import { ScrollView, Text } from "../tw";
 
 type TabPlaceholderScreenProps = {
   readonly title: string;
@@ -9,42 +8,24 @@ type TabPlaceholderScreenProps = {
 export function TabPlaceholderScreen({ title, description }: TabPlaceholderScreenProps) {
   return (
     <ScrollView
-      style={styles.screen}
-      contentContainerStyle={styles.content}
+      className="flex-1 bg-nidoru-dark-background"
+      contentContainerClassName="gap-nidoru-sm px-nidoru-screen pb-[104px] pt-nidoru-xl"
       contentInsetAdjustmentBehavior="automatic"
+      testID="tab-placeholder-screen"
     >
-      <Text accessibilityRole="header" selectable style={styles.title}>
+      <Text
+        accessibilityRole="header"
+        className="font-nidoru-primary-bold text-nidoru-h1 text-nidoru-dark-text-primary"
+        selectable
+      >
         {title}
       </Text>
-      <Text selectable style={styles.description}>
+      <Text
+        className="font-nidoru-primary-regular text-nidoru-body text-nidoru-dark-text-secondary"
+        selectable
+      >
         {description}
       </Text>
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  screen: {
-    backgroundColor: colors.dark.background.value,
-    flex: 1,
-  },
-  content: {
-    gap: spacing.sm,
-    paddingBottom: spacing.xxl,
-    paddingHorizontal: spacing.screenPadding,
-    paddingTop: spacing.xl,
-  },
-  title: {
-    color: colors.dark.textPrimary.value,
-    fontFamily: typography.mobileFontFamily.primary.bold,
-    fontSize: typography.scale.h1.size,
-    letterSpacing: 0,
-    lineHeight: 30,
-  },
-  description: {
-    color: colors.dark.textSecondary.value,
-    fontFamily: typography.mobileFontFamily.primary.regular,
-    fontSize: typography.scale.body.size,
-    lineHeight: 22,
-  },
-});

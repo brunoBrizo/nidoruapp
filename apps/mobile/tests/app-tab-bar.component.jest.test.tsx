@@ -3,6 +3,7 @@ import { render, screen, within } from "@testing-library/react-native";
 import { AccessibilityInfo } from "react-native";
 
 import { AppTabBar } from "../src/navigation/app-tab-bar";
+import { TabPlaceholderScreen } from "../src/navigation/tab-placeholder-screen";
 
 jest.mock("react-native-css", () => {
   const React = jest.requireActual<typeof import("react")>("react");
@@ -155,7 +156,7 @@ describe("AppTabBar", () => {
     );
     for (const tab of ["home", "sleep", "breathe", "progress", "profile"]) {
       expect(screen.getByTestId(`tab-item-${tab}`).props.className).toEqual(
-        expect.stringContaining("flex-1 min-w-0"),
+        expect.stringContaining("w-16"),
       );
       expect(screen.getByTestId(`tab-icon-frame-${tab}`).props.className).toEqual(
         expect.stringContaining("h-6 w-6 items-center justify-center"),
@@ -192,5 +193,42 @@ describe("AppTabBar", () => {
     expect(screen.getByTestId("tab-label-sleep").props.className).toEqual(
       expect.stringContaining("text-xs font-normal text-[#A0A5C0]"),
     );
+  });
+
+  it("keeps each tab item at the Home handoff 64px width with press scale feedback", () => {
+    renderTabBar();
+
+    for (const tab of ["home", "sleep", "breathe", "progress", "profile"]) {
+      expect(screen.getByTestId(`tab-item-${tab}`).props.className).toEqual(
+        expect.stringContaining("w-16"),
+      );
+      expect(screen.getByTestId(`tab-item-${tab}`).props.className).toEqual(
+        expect.stringContaining("active:scale-[0.95]"),
+      );
+      expect(screen.getByTestId(`tab-item-${tab}`).props.className).not.toEqual(
+        expect.stringContaining("flex-1"),
+      );
+    }
+  });
+
+  it("renders intentional future placeholder routes with Tailwind shell primitives", () => {
+    render(
+      <TabPlaceholderScreen
+        title="Future tab route"
+        description="Intentionally scoped for a later migrated surface."
+      />,
+    );
+
+    expect(screen.getByTestId("tab-placeholder-screen").props.className).toEqual(
+      expect.stringContaining("bg-nidoru-dark-background"),
+    );
+    expect(screen.getByTestId("tab-placeholder-screen").props.contentContainerClassName).toEqual(
+      expect.stringContaining("pb-[104px]"),
+    );
+    expect(screen.getByRole("header", { name: "Future tab route" }).props.className).toEqual(
+      expect.stringContaining("font-nidoru-primary-bold text-nidoru-h1"),
+    );
+    expect(screen.getByText("Intentionally scoped for a later migrated surface.").props.className)
+      .toEqual(expect.stringContaining("font-nidoru-primary-regular text-nidoru-body"));
   });
 });

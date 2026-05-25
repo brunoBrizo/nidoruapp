@@ -73,7 +73,7 @@ export function GlobalTabBarItem({
   return (
     <Pressable
       className={cn(
-        "min-h-[56px] flex-1 min-w-0 items-center justify-start gap-1 active:scale-[0.96]",
+        "min-h-[56px] w-16 items-center justify-start gap-1 active:scale-[0.95]",
         className,
       )}
       testID={`tab-item-${tabId}`}

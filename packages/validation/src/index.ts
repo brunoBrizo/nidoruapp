@@ -8,6 +8,8 @@ import {
   mvpBreathTechniqueIds,
   onboardingGoalOptions,
   onboardingPlanIds,
+  windDownContextGoals,
+  windDownRoutineIds,
   type NotificationPermissionState,
   type SystemNotificationPermissionState,
 } from "@nidoru/domain";
@@ -39,6 +41,9 @@ export const breathworkFamiliaritySchema = z.enum(
     ...(typeof breathworkFamiliarityOptions)[number]["value"][],
   ],
 );
+const localRecordIdSchema = (prefix: string) =>
+  z.string().regex(new RegExp(`^${prefix}_[A-Za-z0-9_-]{8,64}$`));
+
 export const onboardingStatusSchema = z.enum(["draft", "completed"]);
 export const firstSessionStatusSchema = z.enum(["draft", "completed", "abandoned"]);
 export const breathSessionSourceSchema = z.enum([
@@ -46,6 +51,7 @@ export const breathSessionSourceSchema = z.enum([
   "first_session",
   "morning_check_in",
   "rescue_me",
+  "wind_down",
 ]);
 export const breathSessionStatusSchema = z.enum(["started", "draft", "completed", "abandoned"]);
 export const breathSessionStopReasonSchema = z.enum([
@@ -53,6 +59,38 @@ export const breathSessionStopReasonSchema = z.enum([
   "interrupted",
   "unknown",
   "user_ended",
+]);
+export const windDownRunIdSchema = localRecordIdSchema("winddown");
+export const windDownContextGoalSchema = z.enum(windDownContextGoals);
+export const windDownRoutineIdSchema = z.enum(windDownRoutineIds);
+export const windDownRunStatusSchema = z.enum([
+  "started",
+  "breath_completed",
+  "body_cue_completed",
+  "ambient_playing",
+  "completed",
+  "stopped",
+]);
+export const windDownRunStopReasonSchema = z.enum([
+  "user_stop",
+  "app_backgrounded_after_main_exercise",
+  "interrupted",
+  "timer_ended",
+  "unknown",
+]);
+export const windDownRecoveryStateSchema = z.enum([
+  "quick_context",
+  "active_winddown",
+  "daily_calm",
+  "transition_card",
+  "body_cue",
+  "ambient_handoff",
+  "dimmed_idle",
+  "tap_to_wake",
+  "audio_interruption",
+  "completion",
+  "partial_stop",
+  "background_recovery",
 ]);
 export const postSessionFeelingSchema = z.enum(["same", "better", "much_better"]);
 export const notificationPermissionStateSchema = z.enum([
@@ -66,9 +104,6 @@ export const systemNotificationPermissionStateSchema = z.enum([
   "granted",
   "denied",
 ] satisfies readonly SystemNotificationPermissionState[]);
-
-const localRecordIdSchema = (prefix: string) =>
-  z.string().regex(new RegExp(`^${prefix}_[A-Za-z0-9_-]{8,64}$`));
 
 export const displayNameSchema = z.preprocess(
   (value) => {
@@ -207,6 +242,7 @@ const breathSessionBaseRecordSchema = z.object({
   source: breathSessionSourceSchema,
   startedAt: isoDateTimeSchema,
   techniqueId: breathTechniqueIdSchema,
+  windDownRunId: windDownRunIdSchema.optional(),
 });
 
 function refineBreathSessionProgress(
@@ -295,6 +331,197 @@ export const abandonedBreathSessionRecordSchema = breathSessionBaseRecordSchema
   })
   .superRefine(refineBreathSessionProgress);
 
+export const windDownQueuedEventSchema = z.object({
+  eventId: localRecordIdSchema("event").optional(),
+  eventName: z.enum(["audio_started", "audio_failed"]),
+  occurredAt: isoDateTimeSchema,
+});
+
+const windDownTimestampFields = {
+  ambientCompletedAt: isoDateTimeSchema.optional(),
+  ambientStartedAt: isoDateTimeSchema.optional(),
+  bodyCueCompletedAt: isoDateTimeSchema.optional(),
+  bodyCueStartedAt: isoDateTimeSchema.optional(),
+  breathSessionId: localRecordIdSchema("session").optional(),
+  breathworkCompletedAt: isoDateTimeSchema.optional(),
+  breathworkStartedAt: isoDateTimeSchema.optional(),
+  completedAt: isoDateTimeSchema.optional(),
+  stoppedAt: isoDateTimeSchema.optional(),
+} as const;
+
+function refineWindDownRunTerminalState(
+  value: {
+    readonly ambientCompletedAt?: string | undefined;
+    readonly ambientStartedAt?: string | undefined;
+    readonly bodyCueCompletedAt?: string | undefined;
+    readonly breathworkCompletedAt?: string | undefined;
+    readonly completedAt?: string | undefined;
+    readonly status: z.infer<typeof windDownRunStatusSchema>;
+    readonly stopReason?: z.infer<typeof windDownRunStopReasonSchema> | undefined;
+    readonly stoppedAt?: string | undefined;
+    readonly totalDurationSeconds?: number | undefined;
+  },
+  context: z.RefinementCtx,
+): void {
+  if (value.status === "breath_completed" && !value.breathworkCompletedAt) {
+    context.addIssue({
+      code: "custom",
+      message: "breathworkCompletedAt is required after breathwork completion",
+      path: ["breathworkCompletedAt"],
+    });
+  }
+
+  if (value.status === "body_cue_completed" && !value.bodyCueCompletedAt) {
+    context.addIssue({
+      code: "custom",
+      message: "bodyCueCompletedAt is required after body cue completion",
+      path: ["bodyCueCompletedAt"],
+    });
+  }
+
+  if (value.status === "ambient_playing" && !value.ambientStartedAt) {
+    context.addIssue({
+      code: "custom",
+      message: "ambientStartedAt is required while ambient audio is playing",
+      path: ["ambientStartedAt"],
+    });
+  }
+
+  if (value.status === "completed") {
+    if (!value.completedAt) {
+      context.addIssue({
+        code: "custom",
+        message: "completedAt is required for completed wind-down runs",
+        path: ["completedAt"],
+      });
+    }
+
+    if (!value.ambientCompletedAt) {
+      context.addIssue({
+        code: "custom",
+        message: "ambientCompletedAt is required for completed wind-down runs",
+        path: ["ambientCompletedAt"],
+      });
+    }
+
+    if (value.totalDurationSeconds === undefined) {
+      context.addIssue({
+        code: "custom",
+        message: "totalDurationSeconds is required for completed wind-down runs",
+        path: ["totalDurationSeconds"],
+      });
+    }
+  }
+
+  if (value.status === "stopped") {
+    if (!value.stoppedAt) {
+      context.addIssue({
+        code: "custom",
+        message: "stoppedAt is required for stopped wind-down runs",
+        path: ["stoppedAt"],
+      });
+    }
+
+    if (!value.stopReason) {
+      context.addIssue({
+        code: "custom",
+        message: "stopReason is required for stopped wind-down runs",
+        path: ["stopReason"],
+      });
+    }
+
+    if (value.totalDurationSeconds === undefined) {
+      context.addIssue({
+        code: "custom",
+        message: "totalDurationSeconds is required for stopped wind-down runs",
+        path: ["totalDurationSeconds"],
+      });
+    }
+  }
+
+  if (value.status !== "stopped" && value.stopReason !== undefined) {
+    context.addIssue({
+      code: "custom",
+      message: "stopReason can only be stored for stopped wind-down runs",
+      path: ["stopReason"],
+    });
+  }
+}
+
+export const windDownRunRecordSchema = z
+  .object({
+    ambientSoundId: launchSoundIdSchema,
+    contextGoal: windDownContextGoalSchema,
+    localInstallId: localInstallIdSchema,
+    recoveryState: windDownRecoveryStateSchema,
+    routineId: windDownRoutineIdSchema,
+    runId: windDownRunIdSchema,
+    startedAt: isoDateTimeSchema,
+    status: windDownRunStatusSchema,
+    stopReason: windDownRunStopReasonSchema.optional(),
+    totalDurationSeconds: z.number().int().min(0).max(28_800).optional(),
+    updatedAt: isoDateTimeSchema,
+    ...windDownTimestampFields,
+  })
+  .superRefine(refineWindDownRunTerminalState);
+
+export const windDownRunStartSchema = z.object({
+  ambientSoundId: launchSoundIdSchema,
+  breathSessionId: localRecordIdSchema("session").optional(),
+  contextGoal: windDownContextGoalSchema,
+  eventId: localRecordIdSchema("event").optional(),
+  localInstallId: localInstallIdSchema,
+  routineId: windDownRoutineIdSchema,
+  runId: windDownRunIdSchema,
+  startedAt: isoDateTimeSchema,
+});
+
+export const windDownStepProgressSchema = z
+  .object({
+    localInstallId: localInstallIdSchema,
+    queuedEvent: windDownQueuedEventSchema.optional(),
+    recoveryState: windDownRecoveryStateSchema,
+    runId: windDownRunIdSchema,
+    status: z.enum(["started", "breath_completed", "body_cue_completed", "ambient_playing"]),
+    updatedAt: isoDateTimeSchema,
+    ...windDownTimestampFields,
+  })
+  .superRefine(refineWindDownRunTerminalState);
+
+export const windDownCompletionSchema = z
+  .object({
+    ambientCompletedAt: isoDateTimeSchema,
+    completedAt: isoDateTimeSchema,
+    eventId: localRecordIdSchema("event").optional(),
+    localInstallId: localInstallIdSchema,
+    recoveryState: windDownRecoveryStateSchema,
+    runId: windDownRunIdSchema,
+    status: z.literal("completed").default("completed"),
+    totalDurationSeconds: z.number().int().min(0).max(28_800),
+    updatedAt: isoDateTimeSchema,
+  })
+  .superRefine(refineWindDownRunTerminalState);
+
+export const windDownStopSchema = z
+  .object({
+    localInstallId: localInstallIdSchema,
+    recoveryState: windDownRecoveryStateSchema,
+    runId: windDownRunIdSchema,
+    status: z.literal("stopped").default("stopped"),
+    stopReason: windDownRunStopReasonSchema,
+    stoppedAt: isoDateTimeSchema,
+    totalDurationSeconds: z.number().int().min(0).max(28_800),
+    updatedAt: isoDateTimeSchema,
+  })
+  .superRefine(refineWindDownRunTerminalState);
+
+export const rememberedWindDownContextChoiceSchema = z.object({
+  contextGoal: windDownContextGoalSchema,
+  localInstallId: localInstallIdSchema,
+  routineId: windDownRoutineIdSchema,
+  selectedAt: isoDateTimeSchema,
+});
+
 export const postSessionReflectionSchema = z.object({
   localInstallId: localInstallIdSchema,
   sessionId: localRecordIdSchema("session"),
@@ -333,6 +560,14 @@ export type BreathSessionStartedRecord = z.infer<typeof breathSessionStartedReco
 export type RecoverableBreathSessionDraft = z.infer<typeof recoverableBreathSessionDraftSchema>;
 export type CompletedBreathSessionRecord = z.infer<typeof completedBreathSessionRecordSchema>;
 export type AbandonedBreathSessionRecord = z.infer<typeof abandonedBreathSessionRecordSchema>;
+export type WindDownRunRecord = z.infer<typeof windDownRunRecordSchema>;
+export type WindDownRunStart = z.infer<typeof windDownRunStartSchema>;
+export type WindDownStepProgress = z.infer<typeof windDownStepProgressSchema>;
+export type WindDownCompletion = z.infer<typeof windDownCompletionSchema>;
+export type WindDownStop = z.infer<typeof windDownStopSchema>;
+export type RememberedWindDownContextChoice = z.infer<
+  typeof rememberedWindDownContextChoiceSchema
+>;
 export type PostSessionReflection = z.infer<typeof postSessionReflectionSchema>;
 export type NotificationGateEligibility = z.infer<typeof notificationGateEligibilitySchema>;
 export type SoundMixLayer = z.infer<typeof soundMixLayerSchema>;

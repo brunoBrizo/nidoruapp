@@ -328,6 +328,308 @@ export const sqliteMigrations = [
         ON local_event_queue (status, next_attempt_at, created_at);
     `,
   },
+  {
+    id: "0006_wind_down_local_persistence",
+    sql: `
+      CREATE TABLE wind_down_context_preferences (
+        local_install_id TEXT PRIMARY KEY NOT NULL REFERENCES local_install_identity(local_install_id) ON DELETE CASCADE,
+        context_goal TEXT NOT NULL CHECK (
+          context_goal IN ('fall_asleep_faster', 'calm_racing_thoughts', 'wake_up_fewer_times')
+        ),
+        routine_id TEXT NOT NULL CHECK (
+          routine_id IN ('wind_down_sleep_starter', 'wind_down_racing_thoughts', 'wind_down_daily_calm')
+        ),
+        selected_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+      );
+
+      CREATE TABLE wind_down_runs (
+        run_id TEXT PRIMARY KEY NOT NULL,
+        local_install_id TEXT NOT NULL REFERENCES local_install_identity(local_install_id) ON DELETE CASCADE,
+        routine_id TEXT NOT NULL CHECK (
+          routine_id IN ('wind_down_sleep_starter', 'wind_down_racing_thoughts', 'wind_down_daily_calm')
+        ),
+        context_goal TEXT NOT NULL CHECK (
+          context_goal IN ('fall_asleep_faster', 'calm_racing_thoughts', 'wake_up_fewer_times')
+        ),
+        breath_session_id TEXT CHECK (
+          breath_session_id IS NULL OR (
+            substr(breath_session_id, 1, 8) = 'session_'
+            AND length(breath_session_id) BETWEEN 16 AND 72
+          )
+        ),
+        ambient_sound_id TEXT NOT NULL CHECK (
+          ambient_sound_id IN (
+            'light-rain',
+            'heavy-rain',
+            'rain-on-window',
+            'thunderstorm',
+            'ocean-waves',
+            'forest',
+            'river-stream',
+            'wind',
+            'white-noise',
+            'brown-noise',
+            'pink-noise',
+            'fireplace-crackling',
+            'cafe-ambience',
+            'fan',
+            '432hz-tone',
+            'delta-wave-binaural'
+          )
+        ),
+        status TEXT NOT NULL CHECK (
+          status IN (
+            'started',
+            'breath_completed',
+            'body_cue_completed',
+            'ambient_playing',
+            'completed',
+            'stopped'
+          )
+        ),
+        stop_reason TEXT CHECK (
+          stop_reason IS NULL OR stop_reason IN (
+            'user_stop',
+            'app_backgrounded_after_main_exercise',
+            'interrupted',
+            'timer_ended',
+            'unknown'
+          )
+        ),
+        recovery_state TEXT NOT NULL CHECK (
+          recovery_state IN (
+            'quick_context',
+            'active_winddown',
+            'daily_calm',
+            'transition_card',
+            'body_cue',
+            'ambient_handoff',
+            'dimmed_idle',
+            'tap_to_wake',
+            'audio_interruption',
+            'completion',
+            'partial_stop',
+            'background_recovery'
+          )
+        ),
+        started_at TEXT NOT NULL,
+        breathwork_started_at TEXT,
+        breathwork_completed_at TEXT,
+        body_cue_started_at TEXT,
+        body_cue_completed_at TEXT,
+        ambient_started_at TEXT,
+        ambient_completed_at TEXT,
+        completed_at TEXT,
+        stopped_at TEXT,
+        total_duration_seconds INTEGER CHECK (
+          total_duration_seconds IS NULL OR (
+            total_duration_seconds >= 0
+            AND total_duration_seconds <= 28800
+          )
+        ),
+        updated_at TEXT NOT NULL,
+        CHECK (substr(run_id, 1, 9) = 'winddown_'),
+        CHECK (length(run_id) BETWEEN 17 AND 73),
+        CHECK (status != 'breath_completed' OR breathwork_completed_at IS NOT NULL),
+        CHECK (status != 'body_cue_completed' OR body_cue_completed_at IS NOT NULL),
+        CHECK (status != 'ambient_playing' OR ambient_started_at IS NOT NULL),
+        CHECK (status != 'completed' OR (
+          completed_at IS NOT NULL
+          AND ambient_completed_at IS NOT NULL
+          AND total_duration_seconds IS NOT NULL
+        )),
+        CHECK (status != 'stopped' OR (
+          stopped_at IS NOT NULL
+          AND stop_reason IS NOT NULL
+          AND total_duration_seconds IS NOT NULL
+        )),
+        CHECK (status = 'stopped' OR stop_reason IS NULL)
+      );
+
+      CREATE UNIQUE INDEX wind_down_runs_breath_session_idx
+        ON wind_down_runs (breath_session_id)
+        WHERE breath_session_id IS NOT NULL;
+
+      CREATE INDEX wind_down_runs_recovery_idx
+        ON wind_down_runs (local_install_id, status, updated_at);
+
+      CREATE TABLE breath_session_records_next (
+        session_id TEXT PRIMARY KEY NOT NULL,
+        local_install_id TEXT NOT NULL REFERENCES local_install_identity(local_install_id) ON DELETE CASCADE,
+        source TEXT NOT NULL CHECK (
+          source IN ('breathe_tab', 'first_session', 'morning_check_in', 'rescue_me', 'wind_down')
+        ),
+        wind_down_run_id TEXT REFERENCES wind_down_runs(run_id) ON DELETE SET NULL,
+        plan_id TEXT CHECK (plan_id IS NULL OR plan_id IN ('sleep_focused', 'anxiety_relief', 'stress_reset', 'general_wellness')),
+        technique_id TEXT NOT NULL CHECK (technique_id IN ('4-7-8-sleep', 'box-breathing', 'coherent-breathing', 'diaphragmatic-breathing', 'physiological-sigh')),
+        audio_cue_mode_id TEXT CHECK (audio_cue_mode_id IS NULL OR audio_cue_mode_id IN ('none', 'gentle-bell', 'soft-whoosh', 'nature-ambient')),
+        status TEXT NOT NULL CHECK (status IN ('started', 'draft', 'completed', 'abandoned')),
+        started_at TEXT NOT NULL,
+        completed_at TEXT,
+        duration_seconds INTEGER NOT NULL CHECK (duration_seconds > 0 AND duration_seconds <= 1800),
+        completed_breath_cycles INTEGER NOT NULL DEFAULT 0 CHECK (completed_breath_cycles >= 0),
+        completion_persisted_at TEXT,
+        elapsed_ms INTEGER NOT NULL DEFAULT 0 CHECK (elapsed_ms >= 0),
+        remaining_ms INTEGER NOT NULL DEFAULT 0 CHECK (remaining_ms >= 0),
+        current_phase TEXT CHECK (
+          current_phase IS NULL OR current_phase IN ('inhale', 'hold', 'second-inhale', 'exhale')
+        ),
+        abandoned_at TEXT,
+        stop_reason TEXT CHECK (
+          stop_reason IS NULL OR stop_reason IN ('app_backgrounded', 'interrupted', 'unknown', 'user_ended')
+        ),
+        updated_at TEXT NOT NULL,
+        CHECK (substr(session_id, 1, 8) = 'session_'),
+        CHECK (length(session_id) BETWEEN 16 AND 72),
+        CHECK (elapsed_ms <= duration_seconds * 1000),
+        CHECK (remaining_ms <= duration_seconds * 1000),
+        CHECK (elapsed_ms + remaining_ms <= duration_seconds * 1000),
+        CHECK (status != 'completed' OR (
+          completed_at IS NOT NULL
+          AND completion_persisted_at IS NOT NULL
+          AND remaining_ms = 0
+        )),
+        CHECK (status != 'abandoned' OR abandoned_at IS NOT NULL),
+        CHECK (status != 'abandoned' OR stop_reason IS NOT NULL)
+      );
+
+      INSERT INTO breath_session_records_next (
+        session_id,
+        local_install_id,
+        source,
+        wind_down_run_id,
+        plan_id,
+        technique_id,
+        audio_cue_mode_id,
+        status,
+        started_at,
+        completed_at,
+        duration_seconds,
+        completed_breath_cycles,
+        completion_persisted_at,
+        elapsed_ms,
+        remaining_ms,
+        current_phase,
+        abandoned_at,
+        stop_reason,
+        updated_at
+      )
+      SELECT
+        session_id,
+        local_install_id,
+        source,
+        NULL,
+        plan_id,
+        technique_id,
+        audio_cue_mode_id,
+        status,
+        started_at,
+        completed_at,
+        duration_seconds,
+        completed_breath_cycles,
+        completion_persisted_at,
+        elapsed_ms,
+        remaining_ms,
+        current_phase,
+        abandoned_at,
+        stop_reason,
+        updated_at
+      FROM breath_session_records;
+
+      DROP TABLE breath_session_records;
+
+      ALTER TABLE breath_session_records_next RENAME TO breath_session_records;
+
+      CREATE INDEX breath_session_records_install_status_idx
+        ON breath_session_records (local_install_id, status, started_at);
+
+      CREATE INDEX breath_session_records_recovery_idx
+        ON breath_session_records (local_install_id, status, remaining_ms, updated_at);
+
+      CREATE INDEX breath_session_records_completion_resume_idx
+        ON breath_session_records (local_install_id, status, completed_at);
+
+      CREATE INDEX breath_session_records_wind_down_run_idx
+        ON breath_session_records (wind_down_run_id);
+
+      CREATE TABLE local_event_queue_next (
+        event_id TEXT PRIMARY KEY NOT NULL,
+        local_install_id TEXT NOT NULL REFERENCES local_install_identity(local_install_id) ON DELETE CASCADE,
+        event_name TEXT NOT NULL CHECK (
+          event_name IN (
+            'onboarding_started',
+            'onboarding_completed',
+            'first_breath_started',
+            'first_breath_completed',
+            'first_session_started',
+            'first_session_completed',
+            'breath_session_started',
+            'breath_session_completed',
+            'notification_permission_prompted',
+            'notification_permission_accepted',
+            'wind_down_started',
+            'wind_down_completed',
+            'audio_started',
+            'audio_failed',
+            'sync_failed'
+          )
+        ),
+        record_type TEXT NOT NULL CHECK (
+          record_type IN (
+            'onboarding_response',
+            'first_breath_demo_event',
+            'first_session_record',
+            'breath_session_record',
+            'post_session_reflection',
+            'notification_gate_state',
+            'wind_down_run'
+          )
+        ),
+        record_id TEXT NOT NULL,
+        payload_json TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'processing', 'succeeded', 'failed')),
+        attempt_count INTEGER NOT NULL DEFAULT 0 CHECK (attempt_count >= 0),
+        next_attempt_at TEXT,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+      );
+
+      INSERT INTO local_event_queue_next (
+        event_id,
+        local_install_id,
+        event_name,
+        record_type,
+        record_id,
+        payload_json,
+        status,
+        attempt_count,
+        next_attempt_at,
+        created_at,
+        updated_at
+      )
+      SELECT
+        event_id,
+        local_install_id,
+        event_name,
+        record_type,
+        record_id,
+        payload_json,
+        status,
+        attempt_count,
+        next_attempt_at,
+        created_at,
+        updated_at
+      FROM local_event_queue;
+
+      DROP TABLE local_event_queue;
+
+      ALTER TABLE local_event_queue_next RENAME TO local_event_queue;
+
+      CREATE INDEX local_event_queue_status_idx
+        ON local_event_queue (status, next_attempt_at, created_at);
+    `,
+  },
 ] as const satisfies readonly SQLiteMigration[];
 
 export async function runSqliteMigrations(

@@ -45,6 +45,7 @@ type BreathSessionRow = {
   readonly stop_reason?: string | null;
   readonly technique_id: string;
   readonly updated_at: string;
+  readonly wind_down_run_id: string | null;
 };
 
 type OptionalSourceFilterInput = {
@@ -63,6 +64,7 @@ export async function recordBreathSessionStartedLocally(
     startedRecord.sessionId,
     startedRecord.localInstallId,
     startedRecord.source,
+    startedRecord.windDownRunId ?? null,
     startedRecord.planId ?? null,
     startedRecord.techniqueId,
     startedRecord.audioCueModeId ?? null,
@@ -100,6 +102,7 @@ export async function saveBreathSessionDraftLocally(
     draftRecord.sessionId,
     draftRecord.localInstallId,
     draftRecord.source,
+    draftRecord.windDownRunId ?? null,
     draftRecord.planId ?? null,
     draftRecord.techniqueId,
     draftRecord.audioCueModeId ?? null,
@@ -129,6 +132,7 @@ export async function completeBreathSessionLocally(
     completedRecord.sessionId,
     completedRecord.localInstallId,
     completedRecord.source,
+    completedRecord.windDownRunId ?? null,
     completedRecord.planId ?? null,
     completedRecord.techniqueId,
     completedRecord.audioCueModeId ?? null,
@@ -166,6 +170,7 @@ export async function abandonBreathSessionLocally(
     abandonedRecord.sessionId,
     abandonedRecord.localInstallId,
     abandonedRecord.source,
+    abandonedRecord.windDownRunId ?? null,
     abandonedRecord.planId ?? null,
     abandonedRecord.techniqueId,
     abandonedRecord.audioCueModeId ?? null,
@@ -195,6 +200,7 @@ export async function loadRecoverableBreathSessionDraft(
         session_id,
         local_install_id,
         source,
+        wind_down_run_id,
         plan_id,
         technique_id,
         audio_cue_mode_id,
@@ -236,6 +242,7 @@ export async function loadRecoverableBreathSessionDraft(
     status: draftRow.status,
     techniqueId: draftRow.technique_id,
     updatedAt: draftRow.updated_at,
+    ...(draftRow.wind_down_run_id === null ? {} : { windDownRunId: draftRow.wind_down_run_id }),
   });
 }
 
@@ -250,6 +257,7 @@ export async function loadPendingBreathSessionCompletion(
         session_id,
         local_install_id,
         source,
+        wind_down_run_id,
         plan_id,
         technique_id,
         audio_cue_mode_id,
@@ -298,6 +306,9 @@ export async function loadPendingBreathSessionCompletion(
     status: completedRow.status,
     techniqueId: completedRow.technique_id,
     updatedAt: completedRow.updated_at,
+    ...(completedRow.wind_down_run_id === null
+      ? {}
+      : { windDownRunId: completedRow.wind_down_run_id }),
   });
 }
 
@@ -312,6 +323,7 @@ async function upsertBreathSessionRecord(
         session_id,
         local_install_id,
         source,
+        wind_down_run_id,
         plan_id,
         technique_id,
         audio_cue_mode_id,
@@ -328,9 +340,10 @@ async function upsertBreathSessionRecord(
         stop_reason,
         updated_at
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT(session_id) DO UPDATE SET
         source = excluded.source,
+        wind_down_run_id = excluded.wind_down_run_id,
         plan_id = excluded.plan_id,
         technique_id = excluded.technique_id,
         audio_cue_mode_id = excluded.audio_cue_mode_id,

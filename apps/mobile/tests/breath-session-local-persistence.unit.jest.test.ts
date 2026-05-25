@@ -53,6 +53,7 @@ describe("breath-session local persistence", () => {
         "install_0123456789abcdef",
         "breathe_tab",
         null,
+        null,
         "coherent-breathing",
         "gentle-bell",
         "started",

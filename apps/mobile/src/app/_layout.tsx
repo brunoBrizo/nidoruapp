@@ -1,4 +1,5 @@
 import "expo-dev-client";
+import "../global.css";
 
 import { typography } from "@nidoru/ui-tokens";
 import { useFonts } from "expo-font";

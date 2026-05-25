@@ -1,11 +1,11 @@
 # Graph Report - sleep-app  (2026-05-25)
 
 ## Corpus Check
-- 141 files · ~403,206 words
+- 148 files · ~425,351 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 429 nodes · 458 edges · 21 communities detected
+- 438 nodes · 460 edges · 21 communities detected
 - Extraction: 87% EXTRACTED · 13% INFERRED · 0% AMBIGUOUS · INFERRED: 59 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
@@ -45,14 +45,14 @@
 10. `createPersonalizedOnboardingPlan()` - 5 edges
 
 ## Surprising Connections (you probably didn't know these)
+- `getOnboardingPlanForGoal()` --calls--> `completeOnboardingPersonalizationLocally()`  [INFERRED]
+  packages/domain/src/index.ts → apps/mobile/src/onboarding/local-first-onboarding.ts
 - `canPromptForNotificationPermission()` --calls--> `evaluateGate()`  [INFERRED]
   packages/domain/src/index.ts → apps/mobile/src/notifications/notification-permission-gate-controller.tsx
 - `getNextEveningReminderDate()` --calls--> `reconcileEveningReminderSchedule()`  [INFERRED]
   packages/domain/src/index.ts → apps/mobile/src/notifications/notification-permission-service.ts
 - `fetch()` --calls--> `upsertPostValueRecords()`  [INFERRED]
   supabase/functions/foundation-health/index.ts → apps/mobile/src/paywall/post-value-supabase-auth.ts
-- `getOnboardingPlanForGoal()` --calls--> `completeOnboardingPersonalizationLocally()`  [INFERRED]
-  packages/domain/src/index.ts → apps/mobile/src/onboarding/local-first-onboarding.ts
 - `openMigratedLocalDatabase()` --calls--> `openDefaultLocalDatabase()`  [INFERRED]
   apps/mobile/src/storage/local-database.ts → apps/mobile/src/notifications/notification-permission-gate-controller.tsx
 
@@ -63,8 +63,8 @@ Cohesion: 0.1
 Nodes (24): clamp(), completeBreathSessionIfDue(), createBreathSessionController(), endBreathSessionEarly(), getBreathSessionSnapshot(), getCycleDurationMs(), getPhaseAtElapsedMs(), getSessionPhases() (+16 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.11
-Nodes (25): canPromptForNotificationPermission(), completeFirstSessionLocally(), createDefaultRandomSegment(), createLocalEventId(), createLocalReflectionId(), getLocalCalendarDayDifference(), insertLocalEventQueue(), insertNotificationPermissionEvent() (+17 more)
+Cohesion: 0.1
+Nodes (26): canPromptForNotificationPermission(), completeFirstSessionLocally(), completeOnboardingPersonalizationLocally(), createDefaultRandomSegment(), createLocalEventId(), createLocalReflectionId(), getLocalCalendarDayDifference(), insertLocalEventQueue() (+18 more)
 
 ### Community 2 - "Community 2"
 Cohesion: 0.13
@@ -79,8 +79,8 @@ Cohesion: 0.12
 Nodes (9): HomeBreathingOrb(), getHomeContentEntranceMotionConfig(), HomeEntrancePolish(), markRescueMeTapIfNeeded(), NotificationPermissionGateScreen(), splitHeadline(), markRescueMeHomeTap(), useReduceMotionEnabled() (+1 more)
 
 ### Community 5 - "Community 5"
-Cohesion: 0.17
-Nodes (12): clampEveningReminderMinuteOfDay(), createLocalDateAtMinuteOfDay(), createPersonalizedOnboardingPlan(), formatWindDownTime(), getInstructionDepthForFamiliarity(), getLocalMinuteOfDay(), getNextEveningReminderDate(), getOnboardingPlanForGoal() (+4 more)
+Cohesion: 0.18
+Nodes (11): clampEveningReminderMinuteOfDay(), createLocalDateAtMinuteOfDay(), createPersonalizedOnboardingPlan(), formatWindDownTime(), getInstructionDepthForFamiliarity(), getLocalMinuteOfDay(), getNextEveningReminderDate(), getOnboardingPlanForGoal() (+3 more)
 
 ### Community 6 - "Community 6"
 Cohesion: 0.18
@@ -120,11 +120,11 @@ Nodes (5): BreatheTechniqueAnchorScreen(), parseDurationSeconds(), parseFirstLau
 
 ### Community 15 - "Community 15"
 Cohesion: 0.5
-Nodes (3): TabLayout(), allowsIncompleteOnboardingForRoute(), parseFirstLaunch()
+Nodes (2): isDefaultPrevented(), onPress()
 
 ### Community 16 - "Community 16"
 Cohesion: 0.5
-Nodes (2): isDefaultPrevented(), onPress()
+Nodes (3): TabLayout(), allowsIncompleteOnboardingForRoute(), parseFirstLaunch()
 
 ### Community 17 - "Community 17"
 Cohesion: 0.5
@@ -143,7 +143,7 @@ Cohesion: 1.0
 Nodes (2): OnboardingRouteScreen(), parseOnboardingStage()
 
 ## Knowledge Gaps
-- **Thin community `Community 16`** (5 nodes): `getTabIndicatorMotionConfig()`, `isDefaultPrevented()`, `onLongPress()`, `onPress()`, `app-tab-bar.tsx`
+- **Thin community `Community 15`** (5 nodes): `getTabIndicatorMotionConfig()`, `isDefaultPrevented()`, `onLongPress()`, `onPress()`, `app-tab-bar.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 17`** (4 nodes): `assertCondition()`, `assertEquals()`, `index.test.ts`, `index.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
@@ -170,4 +170,4 @@ _Questions this graph is uniquely positioned to answer:_
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.1 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
-  _Cohesion score 0.11 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.1 - nodes in this community are weakly interconnected._

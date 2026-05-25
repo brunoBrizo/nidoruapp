@@ -1,5 +1,12 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 
 const { getSentryExpoConfig } = require("@sentry/react-native/metro");
+const { withNativewind } = require("nativewind/metro");
 
-module.exports = getSentryExpoConfig(__dirname);
+const config = getSentryExpoConfig(__dirname);
+
+module.exports = withNativewind(config, {
+  globalClassNamePolyfill: false,
+  inlineVariables: false,
+  typescriptEnvPath: "src/nativewind-env.d.ts",
+});

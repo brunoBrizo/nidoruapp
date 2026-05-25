@@ -6,6 +6,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { getAppEnvironment, isObservabilityProofModeEnabled } from "../observability/environment";
 import { capturePostHogProofEvent, posthogProofEventName } from "../observability/posthog";
 import { captureSentryProofError, sentryRelease } from "../observability/sentry";
+import { TailwindRuntimeProof } from "../tw/tailwind-runtime-proof";
 
 export default function ObservabilityProofScreen() {
   const [message, setMessage] = useState("No proof event sent yet.");
@@ -49,6 +50,7 @@ export default function ObservabilityProofScreen() {
           <Text style={styles.buttonText}>Send PostHog Test Event</Text>
         </Pressable>
         <Text style={styles.result}>{message}</Text>
+        <TailwindRuntimeProof />
       </View>
     </SafeAreaView>
   );
@@ -111,6 +113,7 @@ const styles = StyleSheet.create({
     fontFamily: typography.fontFamily.primary,
     fontSize: typography.scale.label.size,
     lineHeight: 18,
+    marginBottom: spacing.sm,
     marginTop: 8,
   },
 });

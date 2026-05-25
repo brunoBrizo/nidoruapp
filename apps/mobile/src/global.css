@@ -1,0 +1,112 @@
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
+@import "tailwindcss/utilities.css";
+
+@source "./**/*.{ts,tsx}";
+
+@theme {
+  --color-nidoru-dark-background: #0d0f1a;
+  --color-nidoru-dark-surface: #14172b;
+  --color-nidoru-dark-surface-raised: #1c2040;
+  --color-nidoru-dark-primary: #7c6fcd;
+  --color-nidoru-dark-primary-glow: #a89ce0;
+  --color-nidoru-dark-accent: #5ec4d4;
+  --color-nidoru-dark-accent-warm: #e8c97a;
+  --color-nidoru-dark-text-primary: #eef0ff;
+  --color-nidoru-dark-text-secondary: #8a8fa8;
+  --color-nidoru-dark-text-tertiary: #4a4e6a;
+  --color-nidoru-dark-danger: #ff6b6b;
+  --color-nidoru-dark-divider: #1e2236;
+  --color-nidoru-dark-sheet-handle: #2a2e4a;
+  --color-nidoru-light-background: #f7f5ff;
+  --color-nidoru-light-surface: #ffffff;
+  --color-nidoru-light-primary: #6b5ec4;
+  --color-nidoru-light-accent: #3bb8ca;
+  --color-nidoru-light-text-primary: #1a1b2e;
+  --color-nidoru-light-text-secondary: #5a607a;
+
+  --spacing-nidoru-base: 8px;
+  --spacing-nidoru-xs: 8px;
+  --spacing-nidoru-sm: 16px;
+  --spacing-nidoru-screen: 20px;
+  --spacing-nidoru-md: 24px;
+  --spacing-nidoru-lg: 32px;
+  --spacing-nidoru-xl: 40px;
+  --spacing-nidoru-xxl: 48px;
+  --spacing-nidoru-bottom-navigation: 80px;
+  --spacing-nidoru-bottom-sheet-handle-width: 32px;
+  --spacing-nidoru-bottom-sheet-handle-height: 4px;
+
+  --radius-nidoru-button: 14px;
+  --radius-nidoru-card: 20px;
+  --radius-nidoru-pill: 9999px;
+
+  --font-nidoru-primary: "Nunito";
+  --font-nidoru-data: "Inter";
+  --font-nidoru-primary-regular: "Nunito-400";
+  --font-nidoru-primary-semibold: "Nunito-600";
+  --font-nidoru-primary-bold: "Nunito-700";
+  --font-nidoru-primary-extrabold: "Nunito-800";
+  --font-nidoru-data-light: "Inter-300";
+  --font-nidoru-data-regular: "Inter-400";
+
+  --text-nidoru-display: 32px;
+  --text-nidoru-display--line-height: 40px;
+  --text-nidoru-display--font-weight: 800;
+  --text-nidoru-h1: 24px;
+  --text-nidoru-h1--line-height: 32px;
+  --text-nidoru-h1--font-weight: 700;
+  --text-nidoru-h2: 20px;
+  --text-nidoru-h2--line-height: 28px;
+  --text-nidoru-h2--font-weight: 600;
+  --text-nidoru-h3: 17px;
+  --text-nidoru-h3--line-height: 24px;
+  --text-nidoru-h3--font-weight: 600;
+  --text-nidoru-body-large: 16px;
+  --text-nidoru-body-large--line-height: 24px;
+  --text-nidoru-body: 15px;
+  --text-nidoru-body--line-height: 22px;
+  --text-nidoru-label: 13px;
+  --text-nidoru-label--line-height: 18px;
+  --text-nidoru-label--font-weight: 600;
+  --text-nidoru-caption: 12px;
+  --text-nidoru-caption--line-height: 16px;
+  --text-nidoru-timer: 48px;
+  --text-nidoru-timer--line-height: 56px;
+  --text-nidoru-timer--font-weight: 300;
+
+  --ease-nidoru-in: ease-in;
+  --ease-nidoru-out: ease-out;
+  --ease-nidoru-in-out: ease-in-out;
+}
+
+:root {
+  --nidoru-duration-screen-enter: 400ms;
+  --nidoru-duration-screen-exit: 300ms;
+  --nidoru-duration-progress-ring-update: 300ms;
+  --nidoru-duration-tab-active-indicator: 250ms;
+  --nidoru-duration-phase-label-crossfade-lead: 200ms;
+  --nidoru-duration-wind-down-transition: 5000ms;
+  --nidoru-duration-sleep-sound-ui-idle-fade: 30000ms;
+  --nidoru-duration-sleep-timer-fade-out: 120000ms;
+  --nidoru-breathing-orb-rest-scale: 1;
+  --nidoru-breathing-orb-inhale-scale: 1.18;
+}
+
+@media ios {
+  :root {
+    --font-sans: "Nunito-400";
+    --font-serif: ui-serif;
+    --font-mono: "Inter-400";
+    --font-rounded: "Nunito-700";
+  }
+}
+
+@media android {
+  :root {
+    --font-sans: "Nunito-400";
+    --font-serif: serif;
+    --font-mono: "Inter-400";
+    --font-rounded: "Nunito-700";
+  }
+}

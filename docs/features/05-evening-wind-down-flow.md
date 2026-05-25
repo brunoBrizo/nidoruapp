@@ -51,6 +51,7 @@ Evening Wind-Down is the anchor nightly ritual. One tap from Home sequences brea
 - [MVP Scope and Roadmap](../product/mvp-scope-and-roadmap.md)
 - [Onboarding and Retention](../ux/onboarding-retention.md)
 - [Navigation Architecture](../ux/navigation-architecture.md)
+- [Wind-Down UI Source Contract](../design/screens/wind-down/README.md)
 
 ## Engineering References
 

@@ -1,14 +1,55 @@
 import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 import { render, screen, within } from "@testing-library/react-native";
-import { AccessibilityInfo, StyleSheet } from "react-native";
+import { AccessibilityInfo } from "react-native";
 
 import { AppTabBar } from "../src/navigation/app-tab-bar";
 
+jest.mock("react-native-css", () => {
+  const React = jest.requireActual<typeof import("react")>("react");
+
+  return {
+    useCssElement: (Component: React.ElementType, props: Record<string, unknown>) =>
+      React.createElement(Component, props),
+    useNativeVariable: (variable: string) => `mocked-${variable}`,
+  };
+});
+
+jest.mock("lucide-react-native", () => {
+  const React = jest.requireActual<typeof import("react")>("react");
+  const { View } = jest.requireActual<typeof import("react-native")>("react-native");
+  const Icon = (props: Record<string, unknown>) => React.createElement(View, props);
+
+  return {
+    ChartColumn: Icon,
+    House: Icon,
+    Moon: Icon,
+    UserRound: Icon,
+    Wind: Icon,
+  };
+});
+
 const mockUsePathname = jest.fn(() => "/");
 
-jest.mock("expo-router", () => ({
-  usePathname: () => mockUsePathname(),
-}));
+jest.mock("expo-router", () => {
+  const React = jest.requireActual<typeof import("react")>("react");
+  const Link = Object.assign(
+    ({ children }: { readonly children?: React.ReactNode }) =>
+      React.createElement(React.Fragment, null, children),
+    {
+      Menu: ({ children }: { readonly children?: React.ReactNode }) =>
+        React.createElement(React.Fragment, null, children),
+      MenuAction: () => null,
+      Preview: () => null,
+      Trigger: ({ children }: { readonly children?: React.ReactNode }) =>
+        React.createElement(React.Fragment, null, children),
+    },
+  );
+
+  return {
+    Link,
+    usePathname: () => mockUsePathname(),
+  };
+});
 
 const routes = [
   { key: "home-key", name: "index" },
@@ -100,34 +141,56 @@ describe("AppTabBar", () => {
   it("matches the home.png tab shell frame and active indicator", () => {
     renderTabBar();
 
-    expect(StyleSheet.flatten(screen.getByTestId("app-tab-bar").props.style)).toEqual(
-      expect.objectContaining({
-        backgroundColor: "#0D0F1A",
-        minHeight: 84,
-        paddingHorizontal: 18,
-      }),
+    expect(screen.getByTestId("app-tab-bar").props.className).toEqual(
+      expect.stringContaining("h-[84px]"),
     );
-    expect(StyleSheet.flatten(screen.getByTestId("tab-active-indicator").props.style)).toEqual(
-      expect.objectContaining({
-        height: 4,
-        width: 42,
-      }),
+    expect(screen.getByTestId("app-tab-bar").props.className).toEqual(
+      expect.stringContaining("bg-[#0D0F1A]/85"),
+    );
+    expect(screen.getByTestId("app-tab-bar").props.className).toEqual(
+      expect.stringContaining("px-2 pt-2.5"),
+    );
+    expect(screen.getByTestId("tab-active-indicator").props.className).toEqual(
+      expect.stringContaining("h-0.5 w-8"),
     );
     for (const tab of ["home", "sleep", "breathe", "progress", "profile"]) {
-      expect(StyleSheet.flatten(screen.getByTestId(`tab-item-${tab}`).props.style)).toEqual(
-        expect.objectContaining({
-          flex: 1,
-          minWidth: 0,
-        }),
+      expect(screen.getByTestId(`tab-item-${tab}`).props.className).toEqual(
+        expect.stringContaining("flex-1 min-w-0"),
       );
-      expect(StyleSheet.flatten(screen.getByTestId(`tab-icon-frame-${tab}`).props.style)).toEqual(
-        expect.objectContaining({
-          alignItems: "center",
-          height: 24,
-          justifyContent: "center",
-          width: 24,
-        }),
+      expect(screen.getByTestId(`tab-icon-frame-${tab}`).props.className).toEqual(
+        expect.stringContaining("h-6 w-6 items-center justify-center"),
       );
     }
+  });
+
+  it("uses the Home handoff classes for the fixed global tab menu states", () => {
+    renderTabBar();
+
+    expect(screen.getByTestId("app-tab-bar").props.className).toEqual(
+      expect.stringContaining("h-[84px]"),
+    );
+    expect(screen.getByTestId("app-tab-bar").props.className).toEqual(
+      expect.stringContaining("bg-[#0D0F1A]/85"),
+    );
+    expect(screen.getByTestId("app-tab-bar").props.className).toEqual(
+      expect.stringContaining("backdrop-blur-2xl"),
+    );
+    expect(screen.getByTestId("app-tab-bar").props.className).toEqual(
+      expect.stringContaining("border-t border-white/[0.06]"),
+    );
+    expect(screen.getByTestId("app-tab-bar").props.className).toEqual(
+      expect.stringContaining("px-2 pt-2.5"),
+    );
+    expect(screen.getByTestId("tab-active-indicator").props.className).toEqual(
+      expect.stringContaining("bg-[#A89CE0] shadow-[0_0_8px_rgba(168,156,224,0.8)]"),
+    );
+    expect(screen.getByTestId("tab-icon-home")).toHaveProp("color", "#A89CE0");
+    expect(screen.getByTestId("tab-label-home").props.className).toEqual(
+      expect.stringContaining("text-[11px] font-semibold text-[#A89CE0]"),
+    );
+    expect(screen.getByTestId("tab-icon-sleep")).toHaveProp("color", "#A0A5C0");
+    expect(screen.getByTestId("tab-label-sleep").props.className).toEqual(
+      expect.stringContaining("text-xs font-normal text-[#A0A5C0]"),
+    );
   });
 });

@@ -70,10 +70,10 @@ describe("tab entry shells", () => {
     });
   });
 
-  it("renders the fixed five-tab bar without a Breathe active indicator or badges", () => {
+  it("renders the fixed five-tab bar with a Breathe active indicator and no badges", () => {
     renderTabBar(2);
 
-    expect(screen.queryByTestId("tab-active-indicator")).toBeNull();
+    expect(screen.getByTestId("tab-active-indicator")).toBeTruthy();
     expect(
       screen.getAllByRole("tab").map((tab) => within(tab).getByText(/.+/).props.children),
     ).toEqual([...tabLabels]);

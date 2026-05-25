@@ -6,6 +6,7 @@ import {
   Text as RNText,
   TextInput as RNTextInput,
   View as RNView,
+  Animated as ReactNativeAnimated,
 } from "react-native";
 import { useCssElement, useNativeVariable } from "react-native-css";
 import Reanimated from "react-native-reanimated";
@@ -32,6 +33,7 @@ const ReanimatedTextComponent: React.ElementType = Reanimated.Text;
 const ReanimatedScrollViewComponent: React.ElementType = Reanimated.ScrollView;
 const ReanimatedPressable = Reanimated.createAnimatedComponent(RNPressable);
 const ReanimatedPressableComponent: React.ElementType = ReanimatedPressable;
+const ReactNativeAnimatedViewComponent: React.ElementType = ReactNativeAnimated.View;
 
 export const useCSSVariable =
   process.env.EXPO_OS !== "web" ? useNativeVariable : (variable: string) => `var(${variable})`;
@@ -128,3 +130,14 @@ export const Animated = {
   Text: AnimatedText,
   View: AnimatedView,
 };
+
+export type ReactNativeAnimatedViewProps = React.ComponentPropsWithoutRef<
+  typeof ReactNativeAnimated.View
+> &
+  ClassNameProp;
+
+export const ReactNativeAnimatedView = React.forwardRef<unknown, ReactNativeAnimatedViewProps>(
+  (props, ref) =>
+    useCssElement(ReactNativeAnimatedViewComponent, { ...props, ref }, classNameMapping),
+);
+ReactNativeAnimatedView.displayName = "CSS(ReactNativeAnimated.View)";

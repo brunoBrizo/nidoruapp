@@ -41,6 +41,7 @@ Project-local skill rules:
 - Project-local skills live under `.agents/skills/` and are tracked in `skills-lock.json`.
 - When a task matches a project-local skill, prefer the exact local skill name over a similarly named global/plugin skill.
 - If the current Codex session does not list a local skill that exists in `.agents/skills/`, read `.agents/skills/<skill-name>/SKILL.md` directly and follow it.
+- Treat project-local skills installed from `expo/skills` as the authoritative Expo guidance for this app. When an Expo skill overlaps with a global/plugin/mobile skill, use the project-local Expo skill first and add the non-Expo skill only for a gap the Expo skill does not cover.
 - Keep routing specific: use the narrowest matching skill instead of loading broad adjacent skills.
 - Re-check `skills-lock.json` and `.agents/skills/` when updating this routing section because the local inventory can change between sessions.
 
@@ -54,10 +55,12 @@ Repo and source-of-truth routing:
 UI/frontend work:
 
 - For any task that creates, changes, or reviews UI, screens, components, visual styling, layout, or interaction details, always check the UI impact before completion.
-- For mobile UI/UX work, use project-local `ui-ux-pro-max` as the primary skill for mobile flow structure, layout, hierarchy, accessibility/touch checks, visual language, and cross-platform consistency.
+- For Expo mobile UI implementation, navigation, animations, native controls, tabs, icons, visual effects, safe-area behavior, and screen structure, use project-local `building-native-ui` as the primary skill.
+- For Tailwind, NativeWind, `react-native-css`, CSS-first styling, or migrating HTML/Tailwind screen references into Expo, use project-local `expo-tailwind-setup` before implementation.
+- For mobile UI/UX critique, visual direction, flow structure, hierarchy, accessibility/touch checks, and cross-platform product consistency, use project-local `ui-ux-pro-max` after `building-native-ui` when the task is design-evaluation heavy rather than implementation-only.
 - Add `make-interfaces-feel-better` only for polish passes involving typography, spacing, surfaces, motion, hit areas, optical alignment, empty states, or interaction feel.
 - Use `frontend-design` only for web UI, landing-page, artifact, or broad visual-direction work where `ui-ux-pro-max` is not the narrower fit.
-- Add `expo:building-native-ui` for Expo UI/navigation implementation, and add `vercel-react-native-skills` for React Native component, navigation, animation, native dependency, or implementation-pattern work.
+- Prefer `building-native-ui` over `vercel-react-native-skills` for React Native component, navigation, animation, native dependency, and implementation-pattern work in this Expo app. Add `vercel-react-native-skills` only when the Expo skills do not cover the specific React Native pattern.
 - Add `react-native-best-practices` only for performance-sensitive React Native work: JS/render cost, lists, images, native memory, bundle size, FPS, TTI, jank, profiling, or state subscription performance.
 - Use `imagegen-frontend-mobile` only when the requested output is a mobile app concept image, screen render, flow mockup, or visual direction artifact. Do not use it for code implementation.
 - Verify the rendered UI when feasible: use Browser/Playwright for local web targets, Expo/Test Android/iOS simulator tooling for mobile targets, or state exactly what blocked visual verification.
@@ -76,12 +79,16 @@ Security-sensitive work:
 
 Expo, mobile runtime, and React Native routing:
 
-- Use `expo:native-data-fetching` for API calls, auth flows, offline/local-first data, request lifecycles, and mobile data synchronization.
-- Use `expo:expo-api-routes` only when implementing or reviewing Expo Router API routes.
-- Use `expo:expo-deployment`, `expo:expo-cicd-workflows`, `expo:expo-dev-client`, or `expo:codex-expo-run-actions` for builds, EAS profiles, submissions, native dev clients, and CI/CD.
-- Use `expo:expo-module`, `expo:expo-ui-swift-ui`, `expo:expo-ui-jetpack-compose`, or `expo:use-dom` only for native module/bridge work or platform-native UI surfaces.
+- Use project-local Expo skills from `.agents/skills/` before similarly named global/plugin skills. These project-local Expo skills are installed from the official `expo/skills` source in `skills-lock.json`.
+- Use `building-native-ui` for Expo Router UI, screen structure, navigation, native controls, animations, tabs, visual effects, route conventions, and native UI implementation guidance.
+- Use `expo-tailwind-setup` for Tailwind CSS v4, NativeWind v5, `react-native-css`, CSS-enabled component wrappers, Tailwind theme setup, and Tailwind-based screen migration.
+- Use `native-data-fetching` for API calls, auth flows, offline/local-first data, request lifecycles, caching, mobile data synchronization, and Expo Router loaders.
+- Use `expo-api-routes` only when implementing or reviewing Expo Router API routes.
+- Use `expo-deployment`, `expo-cicd-workflows`, `expo-dev-client`, or `eas-update-insights` for builds, EAS profiles, submissions, native dev clients, CI/CD, OTA update health, and rollout monitoring.
+- Use `expo-module`, `expo-ui-swiftui`, `expo-ui-jetpack-compose`, `use-dom`, `add-app-clip`, or `expo-brownfield` only for native module/bridge work, platform-native UI surfaces, DOM/webview surfaces, App Clips, or brownfield/native integration.
+- Use `upgrading-expo` for Expo SDK upgrades, dependency alignment, React/New Architecture migrations, native tabs migrations, or Expo package deprecations.
 - Use `react-native-best-practices` for React Native runtime performance: JS/render work, lists, images, native memory, bundle size, FPS, TTI, jank, and profiling.
-- Use `vercel-react-native-skills` for implementation patterns and reviews around navigation, native dependencies, design-system components, pressables, lists, animations, Reanimated, and React Compiler constraints.
+- Use `vercel-react-native-skills` only as a fallback for implementation patterns not covered by the project-local Expo skills.
 - Use `test-android-apps:android-emulator-qa` or `test-android-apps:android-performance` when Android emulator proof, screenshots, logs, or device-performance evidence is required.
 
 Data, backend, hosting, and observability routing:
@@ -167,13 +174,14 @@ Web, frontend, and browser skills:
 
 Expo and mobile skills:
 
-- Expo UI/navigation: `expo:building-native-ui`
-- Expo API/data/auth/offline work: `expo:native-data-fetching`
-- Expo API routes: `expo:expo-api-routes`
-- Expo builds, deployment, and CI/CD: `expo:expo-deployment`, `expo:expo-cicd-workflows`, `expo:expo-dev-client`, `expo:codex-expo-run-actions`
-- Expo modules and native UI bridges: `expo:expo-module`, `expo:expo-ui-jetpack-compose`, `expo:expo-ui-swift-ui`, `expo:use-dom`
-- Expo styling/upgrades: `expo:expo-tailwind-setup`, `expo:upgrading-expo`
-- React Native implementation/performance: `vercel-react-native-skills` for implementation patterns, components, navigation, animations, and native dependencies; `react-native-best-practices` only for performance-sensitive lists, images, state subscriptions, bundle size, memory, FPS, TTI, profiling, and jank investigations
+- Expo UI/navigation: `building-native-ui`
+- Expo Tailwind/styling migration: `expo-tailwind-setup`
+- Expo API/data/auth/offline work: `native-data-fetching`
+- Expo API routes: `expo-api-routes`
+- Expo builds, deployment, CI/CD, and rollout health: `expo-deployment`, `expo-cicd-workflows`, `expo-dev-client`, `eas-update-insights`
+- Expo modules, native UI bridges, DOM surfaces, App Clips, and brownfield integration: `expo-module`, `expo-ui-jetpack-compose`, `expo-ui-swiftui`, `use-dom`, `add-app-clip`, `expo-brownfield`
+- Expo SDK/dependency upgrades: `upgrading-expo`
+- React Native implementation/performance: prefer the Expo skills above for implementation overlap; use `react-native-best-practices` only for performance-sensitive lists, images, state subscriptions, bundle size, memory, FPS, TTI, profiling, and jank investigations; use `vercel-react-native-skills` only for gaps not covered by official Expo skills
 - Android QA/performance: `test-android-apps:android-emulator-qa`, `test-android-apps:android-performance`
 
 Growth, launch, App Store, and monetization skills:

@@ -36,7 +36,7 @@ No stack can guarantee users never see lag. The decision is to keep the critical
 | Mobile app | Expo React Native with TypeScript and Expo Router |
 | Native build/release | EAS Build, EAS Submit, EAS Update |
 | Repository | pnpm workspace with Turborepo |
-| UI system | React Native StyleSheet, design tokens, Expo Font |
+| UI system | Tailwind CSS v4, NativeWind v5, `react-native-css`, CSS-enabled primitives, Expo Font |
 | Icons | Lucide React Native |
 | Animation | React Native Reanimated plus React Native SVG |
 | Audio playback | `expo-audio` with background playback enabled and device proof before broad UI work |
@@ -137,16 +137,17 @@ Responsibilities:
 
 ## UI And Design System
 
-Use React Native `StyleSheet`, design tokens, and small reusable primitives.
+Use Tailwind CSS v4 and NativeWind v5 through `react-native-css` for the whole Expo UI. Product design tokens remain the source of truth, exposed through the Tailwind theme and CSS variables, and screens should compose small CSS-enabled primitives rather than ad hoc styling objects.
 
 Required design implementation:
 
-- Colors, spacing, radius, elevation, and motion tokens come from [Design System](../design/design-system.md).
+- Colors, spacing, radius, elevation, and motion tokens come from [Design System](../design/design-system.md) and are expressed as Tailwind theme values/classes.
 - Nunito and Inter are loaded with Expo Font and bundled with the app.
 - Lucide React Native is the icon set.
 - Navigation labels always include text, not icon-only tabs.
 - App surfaces use the Midnight Indigo dark theme as the default night experience.
 - Morning mode uses the Dawn light palette where appropriate.
+- Mobile UI implementation uses the project-local `expo-tailwind-setup` skill for Tailwind, NativeWind, `react-native-css`, CSS-enabled wrappers, and HTML/Tailwind handoff migration guidance.
 
 Do not add a heavy cross-platform UI framework at project start. The product bible is custom, animation-heavy, and audio-centered; a generic component library would add surface area without owning the product's core interaction quality.
 

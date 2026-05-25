@@ -11,44 +11,31 @@ Glassmorphism requires a visual background to blur. Always ensure the card sits 
 
 ```typescript
 // components/GlassCard.tsx
-import { BlurView } from 'expo-blur';
-import { StyleSheet, View } from 'react-native';
+import { BlurView, View } from '@/tw';
+import { cn } from '@/tw/cn';
 
 interface GlassCardProps {
   intensity?: number;  // 15–35 for dark theme. 25 is the default sweet spot.
   children: React.ReactNode;
-  style?: object;
+  className?: string;
 }
 
-export function GlassCard({ intensity = 25, children, style }: GlassCardProps) {
+export function GlassCard({ intensity = 25, children, className }: GlassCardProps) {
   return (
     <BlurView
       intensity={intensity}
       tint="dark"
-      style={[styles.card, style]}
+      className={cn(
+        'overflow-hidden rounded-[20px] border border-[rgba(255,255,255,0.07)]',
+        className,
+      )}
     >
       {/* Inner gradient overlay for glass surface depth */}
-      <View style={styles.innerGradient} />
+      <View className="absolute inset-0 bg-[rgba(255,255,255,0.02)]" />
       {children}
     </BlurView>
   );
 }
-
-const styles = StyleSheet.create({
-  card: {
-    borderRadius: 20,
-    overflow: 'hidden',         // Required for BlurView on iOS
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.07)',  // Glass edge
-  },
-  innerGradient: {
-    ...StyleSheet.absoluteFillObject,
-    // Simulated top-to-bottom gradient: top is slightly lighter
-    // Use expo-linear-gradient in production:
-    // colors: ['rgba(255,255,255,0.04)', 'rgba(255,255,255,0.01)']
-    backgroundColor: 'rgba(255, 255, 255, 0.02)',
-  },
-});
 ```
 
 **Android fallback** (BlurView performs poorly on Android < 12):

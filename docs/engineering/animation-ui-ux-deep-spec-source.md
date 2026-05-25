@@ -262,21 +262,15 @@ Glassmorphism (frosted glass effect on cards) is a dominant 2025–2026 UI trend
 - Quick action chips (Rescue Me, Sound Mixer, Free Breathe) — frosted pills floating over the background
 - The sleep insight card — a glass panel that feels like looking at data through a window
 
-**Technical implementation in React Native:**
+**Technical implementation with NativeWind:**
 
 ```typescript
-// Using BlurView from expo-blur
-import { BlurView } from 'expo-blur';
+import { BlurView } from '@/tw';
 
 <BlurView
   intensity={25}         // 0–100: lower = more transparent, higher = more opaque blur
   tint="dark"           // 'dark' | 'light' | 'default'
-  style={{
-    borderRadius: 20,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',  // thin white border = glass edge
-  }}
+  className="overflow-hidden rounded-[20px] border border-[rgba(255,255,255,0.08)]"
 >
   {/* Card content */}
 </BlurView>
@@ -548,4 +542,3 @@ Build this animation system from Day 1. Do not ship an MVP with placeholder anim
 29. [Skeleton Screens 101 - NN/G](https://www.nngroup.com/articles/skeleton-screens/) - A skeleton screen is a design pattern used to indicate that a page is loading while providing users ...
 
 30. [Motion Matters: How Animation Elevates UX in 2025](https://medium.com/design-bootcamp/motion-matters-how-animation-elevates-ux-in-2025-b181adca68a9) - Motion is no longer just a decorative flourish it’s a vital ingredient in modern UX design. When use...
-

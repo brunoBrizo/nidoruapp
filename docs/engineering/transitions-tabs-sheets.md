@@ -43,7 +43,7 @@ The card that opens the session gets a `sharedElements` tag:
 
 // On the session screen root:
 <SharedElement id="session-card">
-  <View style={StyleSheet.absoluteFill} />
+  <View className="absolute inset-0" />
 </SharedElement>
 ```
 

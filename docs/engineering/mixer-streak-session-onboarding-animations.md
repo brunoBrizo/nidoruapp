@@ -144,7 +144,7 @@ const animatedProps = useAnimatedProps(() => ({
 <AnimatedTextInput
   animatedProps={animatedProps}
   editable={false}
-  style={styles.counterText}
+  className="font-rounded text-4xl text-cloud"
 />
 ```
 
@@ -184,7 +184,7 @@ import confettiAnimation from '../assets/lottie/checkmark-confetti.json';
   source={confettiAnimation}
   autoPlay
   loop={false}
-  style={{ width: 200, height: 200 }}
+  className="h-[200px] w-[200px]"
   onAnimationFinish={() => setLottieComplete(true)}
 />
 ```

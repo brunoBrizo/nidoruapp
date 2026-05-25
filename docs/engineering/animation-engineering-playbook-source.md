@@ -100,8 +100,7 @@ Layer 1 — Core circle:  Scale 1.0 → 1.12  ← the visible orb
 ```typescript
 // components/BreathingOrb.tsx
 import React, { useEffect, useRef } from 'react';
-import { View, StyleSheet } from 'react-native';
-import Animated, {
+import {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
@@ -111,6 +110,7 @@ import Animated, {
   Easing,
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
+import { AnimatedView, View } from '@/tw';
 import { EASE } from '../animations/easings';
 
 interface BreathTechnique {
@@ -212,35 +212,35 @@ export function BreathingOrb({
   }, [isRunning]);
 
   return (
-    <View style={styles.container}>
+    <View className="h-[220px] w-[220px] items-center justify-center">
       {/* Layer 5: Pulse ring */}
-      <Animated.View style={[styles.pulseRing, pulseStyle]} />
+      <AnimatedView
+        className="absolute h-[220px] w-[220px] rounded-full border-[1.5px] border-[rgba(168,156,224,0.5)] bg-transparent"
+        style={pulseStyle}
+      />
       {/* Layer 4: Outer glow */}
-      <Animated.View style={[styles.outerGlow, outerStyle]} />
+      <AnimatedView
+        className="absolute h-[220px] w-[220px] rounded-full bg-[rgba(168,156,224,0.08)]"
+        style={outerStyle}
+      />
       {/* Layer 3: Mid diffuse */}
-      <Animated.View style={[styles.midDiffuse, midStyle]} />
+      <AnimatedView
+        className="absolute h-[200px] w-[200px] rounded-full bg-[rgba(168,156,224,0.18)]"
+        style={midStyle}
+      />
       {/* Layer 2: Inner glow */}
-      <Animated.View style={[styles.innerGlow, innerStyle]} />
+      <AnimatedView
+        className="absolute h-[180px] w-[180px] rounded-full bg-[rgba(124,111,205,0.35)]"
+        style={innerStyle}
+      />
       {/* Layer 1: Core */}
-      <Animated.View style={[styles.core, coreStyle]} />
+      <AnimatedView
+        className="absolute h-[160px] w-[160px] rounded-full bg-[#7C6FCD]"
+        style={coreStyle}
+      />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container:  { width: 220, height: 220, alignItems: 'center', justifyContent: 'center' },
-  core:       { position: 'absolute', width: 160, height: 160, borderRadius: 80,
-                backgroundColor: '#7C6FCD' },
-  innerGlow:  { position: 'absolute', width: 180, height: 180, borderRadius: 90,
-                backgroundColor: 'rgba(124, 111, 205, 0.35)' },
-  midDiffuse: { position: 'absolute', width: 200, height: 200, borderRadius: 100,
-                backgroundColor: 'rgba(168, 156, 224, 0.18)' },
-  outerGlow:  { position: 'absolute', width: 220, height: 220, borderRadius: 110,
-                backgroundColor: 'rgba(168, 156, 224, 0.08)' },
-  pulseRing:  { position: 'absolute', width: 220, height: 220, borderRadius: 110,
-                borderWidth: 1.5, borderColor: 'rgba(168, 156, 224, 0.5)',
-                backgroundColor: 'transparent' },
-});
 ```
 
 ### Phase Text — Crossfade Transition
@@ -307,7 +307,7 @@ The card that opens the session gets a `sharedElements` tag:
 
 // On the session screen root:
 <SharedElement id="session-card">
-  <View style={StyleSheet.absoluteFill} />
+  <View className="absolute inset-0" />
 </SharedElement>
 ```
 
@@ -560,7 +560,7 @@ const animatedProps = useAnimatedProps(() => ({
 <AnimatedTextInput
   animatedProps={animatedProps}
   editable={false}
-  style={styles.counterText}
+  className="font-rounded text-4xl text-cloud"
 />
 ```
 
@@ -600,7 +600,7 @@ import confettiAnimation from '../assets/lottie/checkmark-confetti.json';
   source={confettiAnimation}
   autoPlay
   loop={false}
-  style={{ width: 200, height: 200 }}
+  className="h-[200px] w-[200px]"
   onAnimationFinish={() => setLottieComplete(true)}
 />
 ```
@@ -693,44 +693,31 @@ Glassmorphism requires a visual background to blur. Always ensure the card sits 
 
 ```typescript
 // components/GlassCard.tsx
-import { BlurView } from 'expo-blur';
-import { StyleSheet, View } from 'react-native';
+import { BlurView, View } from '@/tw';
+import { cn } from '@/tw/cn';
 
 interface GlassCardProps {
   intensity?: number;  // 15–35 for dark theme. 25 is the default sweet spot.
   children: React.ReactNode;
-  style?: object;
+  className?: string;
 }
 
-export function GlassCard({ intensity = 25, children, style }: GlassCardProps) {
+export function GlassCard({ intensity = 25, children, className }: GlassCardProps) {
   return (
     <BlurView
       intensity={intensity}
       tint="dark"
-      style={[styles.card, style]}
+      className={cn(
+        'overflow-hidden rounded-[20px] border border-[rgba(255,255,255,0.07)]',
+        className,
+      )}
     >
       {/* Inner gradient overlay for glass surface depth */}
-      <View style={styles.innerGradient} />
+      <View className="absolute inset-0 bg-[rgba(255,255,255,0.02)]" />
       {children}
     </BlurView>
   );
 }
-
-const styles = StyleSheet.create({
-  card: {
-    borderRadius: 20,
-    overflow: 'hidden',         // Required for BlurView on iOS
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.07)',  // Glass edge
-  },
-  innerGradient: {
-    ...StyleSheet.absoluteFillObject,
-    // Simulated top-to-bottom gradient: top is slightly lighter
-    // Use expo-linear-gradient in production:
-    // colors: ['rgba(255,255,255,0.04)', 'rgba(255,255,255,0.01)']
-    backgroundColor: 'rgba(255, 255, 255, 0.02)',
-  },
-});
 ```
 
 **Android fallback** (BlurView performs poorly on Android < 12):
@@ -1032,4 +1019,3 @@ export const DURATION = {
 11. [Recensies: Breathwrk: Breathing Exercises - AppWereld](https://www.appwereld.nl/app/breathwrk-breathing-exercises/1481804500/reviews/) - Lees de meningen van gebruikers over Breathwrk: Breathing Exercises uitgegeven door Peloton Interact...
 
 12. [‎Breathwrk: Breathing Exercises - Ratings & Reviews - App Store](https://apps.apple.com/us/app/breathwrk-breathing-exercises/id1481804500?see-all=reviews&platform=iphone) - Scam. 12/10/2025. Spiderisms. DO NOT DOWNLOAD!! DO NOT BUY!! STAY FAR AWAY!! THIS APP IS A MONEY-HUN...
-

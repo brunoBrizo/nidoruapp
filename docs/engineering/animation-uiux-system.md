@@ -201,21 +201,15 @@ Glassmorphism (frosted glass effect on cards) is a dominant 2025–2026 UI trend
 - Quick action chips (Rescue Me, Sound Mixer, Free Breathe) — frosted pills floating over the background
 - The sleep insight card — a glass panel that feels like looking at data through a window
 
-**Technical implementation in React Native:**
+**Technical implementation with NativeWind:**
 
 ```typescript
-// Using BlurView from expo-blur
-import { BlurView } from 'expo-blur';
+import { BlurView } from '@/tw';
 
 <BlurView
   intensity={25}         // 0–100: lower = more transparent, higher = more opaque blur
   tint="dark"           // 'dark' | 'light' | 'default'
-  style={{
-    borderRadius: 20,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',  // thin white border = glass edge
-  }}
+  className="overflow-hidden rounded-[20px] border border-[rgba(255,255,255,0.08)]"
 >
   {/* Card content */}
 </BlurView>

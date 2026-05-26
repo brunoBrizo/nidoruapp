@@ -1,15 +1,17 @@
-import { colors, radii, spacing, typography } from "@nidoru/ui-tokens";
-import { Link, type Href } from "expo-router";
+import type { Href } from "expo-router";
 import { ChevronRight } from "lucide-react-native";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+
+import { Link, Pressable, ScrollView, Text, View, cn } from "../tw";
 
 type ProgressStat = {
+  readonly id: "current-rhythm" | "sessions" | "breath-time";
   readonly value: string;
   readonly unit?: string;
   readonly label: string;
 };
 
 type ProgressCard = {
+  readonly id: "streak-calendar" | "weekly-summary" | "mood-history" | "sleep-trends";
   readonly title: string;
   readonly description: string;
   readonly href: Href;
@@ -17,31 +19,35 @@ type ProgressCard = {
 };
 
 const progressStats: readonly ProgressStat[] = [
-  { value: "8", unit: "days", label: "current rhythm" },
-  { value: "12", label: "sessions" },
-  { value: "48", unit: "min", label: "breath time" },
+  { id: "current-rhythm", value: "8", unit: "days", label: "current rhythm" },
+  { id: "sessions", value: "12", label: "sessions" },
+  { id: "breath-time", value: "48", unit: "min", label: "breath time" },
 ] as const;
 
 export const PROGRESS_DASHBOARD_CARDS = [
   {
+    id: "streak-calendar",
     title: "Streak calendar",
     description: "Missed days pause. They do not reset.",
     href: "/progress/streak-calendar",
     accessory: "week-strip",
   },
   {
+    id: "weekly-summary",
     title: "Weekly summary",
     description: "A gentle look at your last 7 nights.",
     href: "/progress/weekly-summary",
     accessory: "weekly-count",
   },
   {
+    id: "mood-history",
     title: "Mood history",
     description: "Morning check-ins over time.",
     href: "/progress/mood-history",
     accessory: "mood-tags",
   },
   {
+    id: "sleep-trends",
     title: "Sleep trends",
     description: "Patterns appear after a few check-ins.",
     href: "/progress/sleep-trends",
@@ -66,46 +72,77 @@ const moodTags = [
 ] as const;
 const trendBars = [12, 16, 14, 20, 16] as const;
 
+const progressCardClassName =
+  "min-h-[88px] justify-center overflow-hidden rounded-[20px] border border-transparent bg-[#14172B]/50 p-4 shadow-[inset_0_1px_0_rgba(238,240,255,0.05)] transition-transform duration-200 active:scale-[0.96]";
+
 export function ProgressScreen() {
   return (
     <ScrollView
-      style={styles.screen}
-      contentContainerStyle={styles.content}
+      className="flex-1 bg-[#0D0F1A]"
+      contentContainerClassName="px-5 pt-12 pb-[104px]"
       contentInsetAdjustmentBehavior="automatic"
+      testID="progress-screen"
     >
-      <View style={styles.header}>
-        <Text accessibilityRole="header" selectable style={styles.title}>
+      <View className="mb-6 gap-1">
+        <Text
+          accessibilityRole="header"
+          className="font-nidoru-primary-semibold text-[22px] leading-7 text-[#EEF0FF]"
+          selectable
+        >
           Progress
         </Text>
-        <Text selectable style={styles.subtitle}>
+        <Text className="font-nidoru-primary-regular text-sm leading-5 text-[#8A8FA8]" selectable>
           Small patterns, no pressure.
         </Text>
       </View>
 
-      <View style={styles.statRow}>
+      <View className="mb-8 flex-row gap-3" testID="progress-stat-row">
         {progressStats.map((stat) => (
-          <View key={stat.label} style={styles.statCard}>
-            <Text selectable style={styles.statValue}>
-              {stat.value}
-              {stat.unit ? <Text style={styles.statUnit}> {stat.unit}</Text> : null}
-            </Text>
-            <Text selectable style={styles.statLabel}>
-              {stat.label}
-            </Text>
-          </View>
+          <ProgressStatCard key={stat.id} stat={stat} />
         ))}
       </View>
 
-      <View style={styles.cardList}>
+      <View className="gap-3">
         {PROGRESS_DASHBOARD_CARDS.map((card) => (
-          <ProgressDashboardCard card={card} key={card.title} />
+          <ProgressDashboardCard card={card} key={card.id} />
         ))}
       </View>
     </ScrollView>
   );
 }
 
+function ProgressStatCard({ stat }: { readonly stat: ProgressStat }) {
+  return (
+    <View
+      className="min-h-[72px] min-w-0 flex-1 items-center justify-center rounded-[16px] bg-[#14172B]/50 p-3 text-center shadow-[inset_0_1px_0_rgba(238,240,255,0.05)]"
+      testID={`progress-stat-card-${stat.id}`}
+    >
+      <Text
+        className="text-center font-nidoru-data-regular text-[18px] font-semibold leading-6 text-[#EEF0FF] tabular-nums"
+        selectable
+        testID={`progress-stat-value-${stat.id}`}
+      >
+        {stat.value}
+        {stat.unit ? (
+          <Text className="font-nidoru-primary-semibold text-[13px] font-medium leading-[18px] text-[#8A8FA8]">
+            {" "}
+            {stat.unit}
+          </Text>
+        ) : null}
+      </Text>
+      <Text
+        className="mt-0.5 text-center font-nidoru-primary-regular text-xs leading-4 text-[#4A4E6A]"
+        selectable
+      >
+        {stat.label}
+      </Text>
+    </View>
+  );
+}
+
 function ProgressDashboardCard({ card }: { readonly card: ProgressCard }) {
+  const isPreviewStack = card.accessory === "week-strip" || card.accessory === "mood-tags";
+
   return (
     <Link asChild href={card.href}>
       <Pressable
@@ -114,28 +151,25 @@ function ProgressDashboardCard({ card }: { readonly card: ProgressCard }) {
         accessibilityRole="link"
       >
         {({ pressed }) => (
-          <View style={[styles.card, pressed ? styles.cardPressed : null]}>
-            {card.accessory === "week-strip" || card.accessory === "mood-tags" ? (
+          <View
+            className={cn(
+              progressCardClassName,
+              isPreviewStack ? "gap-3" : null,
+              pressed ? "scale-[0.96] bg-[#1C2040]/80" : null,
+            )}
+            testID={`progress-card-${card.id}`}
+          >
+            {isPreviewStack ? (
               <>
-                <View style={styles.cardHeader}>
-                  <View style={styles.cardCopy}>
-                    <Text style={styles.cardTitle}>{card.title}</Text>
-                    <Text style={styles.cardDescription}>{card.description}</Text>
-                  </View>
-                  <ChevronRight
-                    color={colors.dark.textTertiary.value}
-                    size={20}
-                    strokeWidth={1.7}
-                  />
+                <View className="w-full flex-row items-start justify-between gap-3">
+                  <ProgressCardCopy card={card} />
+                  <ProgressChevron />
                 </View>
                 {card.accessory === "week-strip" ? <WeekStrip /> : <MoodTags />}
               </>
             ) : (
-              <View style={styles.inlineCardHeader}>
-                <View style={styles.cardCopy}>
-                  <Text style={styles.cardTitle}>{card.title}</Text>
-                  <Text style={styles.cardDescription}>{card.description}</Text>
-                </View>
+              <View className="w-full flex-row items-center justify-between gap-4">
+                <ProgressCardCopy card={card} />
                 <InlineAccessory accessory={card.accessory} />
               </View>
             )}
@@ -146,33 +180,55 @@ function ProgressDashboardCard({ card }: { readonly card: ProgressCard }) {
   );
 }
 
-function InlineAccessory({ accessory }: { readonly accessory: ProgressCard["accessory"] }) {
+function ProgressCardCopy({ card }: { readonly card: ProgressCard }) {
   return (
-    <View style={styles.inlineAccessory}>
-      {accessory === "weekly-count" ? (
-        <Text selectable style={styles.weeklyCount}>
-          5 of 7 nights
-        </Text>
-      ) : null}
-      {accessory === "trend-bars" ? <TrendBars /> : null}
-      <ChevronRight color={colors.dark.textTertiary.value} size={20} strokeWidth={1.7} />
+    <View className="min-w-0 flex-1 gap-0.5">
+      <Text className="font-nidoru-primary-semibold text-base leading-[22px] text-[#EEF0FF]">
+        {card.title}
+      </Text>
+      <Text className="font-nidoru-primary-regular text-sm leading-5 text-[#8A8FA8]">
+        {card.description}
+      </Text>
     </View>
   );
 }
 
+function InlineAccessory({ accessory }: { readonly accessory: ProgressCard["accessory"] }) {
+  return (
+    <View className="shrink-0 flex-row items-center justify-end gap-2">
+      {accessory === "weekly-count" ? (
+        <Text
+          className="font-nidoru-data-regular text-[13px] leading-[18px] text-[#8A8FA8] tabular-nums"
+          selectable
+          testID="progress-weekly-count"
+        >
+          5 of 7 nights
+        </Text>
+      ) : null}
+      {accessory === "trend-bars" ? <TrendBars /> : null}
+      <ProgressChevron />
+    </View>
+  );
+}
+
+function ProgressChevron() {
+  return <ChevronRight color="#4A4E6A" size={20} strokeWidth={1.7} />;
+}
+
 function WeekStrip() {
   return (
-    <View accessibilityLabel="Rhythm week strip" style={styles.weekStrip}>
+    <View accessibilityLabel="Rhythm week strip" className="flex-row items-center gap-2 pt-1">
       {weekDots.map((state, index) => (
         <View
+          className={cn(
+            "h-6 w-6 rounded-full",
+            state === "complete" ? "bg-[#A89CE0]/90" : null,
+            state === "paused" ? "border-[1.5px] border-[#8A8FA8]/40" : null,
+            state === "today" ? "border-[1.5px] border-[#A89CE0]/60" : null,
+            state === "future" ? "border border-[#4A4E6A]/40" : null,
+          )}
           key={`${state}-${index}`}
-          style={[
-            styles.weekDot,
-            state === "complete" ? styles.weekDotComplete : null,
-            state === "paused" ? styles.weekDotPaused : null,
-            state === "today" ? styles.weekDotToday : null,
-            state === "future" ? styles.weekDotFuture : null,
-          ]}
+          testID={`progress-week-dot-${state}-${index}`}
         />
       ))}
     </View>
@@ -181,18 +237,22 @@ function WeekStrip() {
 
 function MoodTags() {
   return (
-    <View style={styles.moodTagRow}>
+    <View className="flex-row flex-nowrap gap-2 overflow-hidden pt-1">
       {moodTags.map((tag, index) => (
         <View
+          className={cn(
+            "rounded-[6px] border border-[#4A4E6A]/30 px-2 py-0.5",
+            tag.state === "active" ? "border-[#A89CE0]/20 bg-[#A89CE0]/15" : null,
+            tag.state === "faded" ? "opacity-50" : null,
+          )}
           key={`${tag.label}-${index}`}
-          style={[
-            styles.moodTag,
-            tag.state === "active" ? styles.moodTagActive : null,
-            tag.state === "faded" ? styles.moodTagFaded : null,
-          ]}
+          testID={`progress-mood-tag-${tag.state}-${index}`}
         >
           <Text
-            style={[styles.moodTagText, tag.state === "active" ? styles.moodTagTextActive : null]}
+            className={cn(
+              "font-nidoru-primary-semibold text-[11px] font-medium leading-[14px] text-[#8A8FA8]",
+              tag.state === "active" ? "text-[#A89CE0]" : null,
+            )}
           >
             {tag.label}
           </Text>
@@ -204,229 +264,19 @@ function MoodTags() {
 
 function TrendBars() {
   return (
-    <View accessibilityLabel="Sleep trend bars" style={styles.trendBars}>
+    <View
+      accessibilityLabel="Sleep trend bars"
+      className="h-5 flex-row items-end justify-center gap-1 pt-1 opacity-80"
+      testID="progress-trend-bars"
+    >
       {trendBars.map((height, index) => (
         <View
+          className={cn("w-1.5 rounded-t-[2px]", index === 3 ? "bg-[#7C6FCD]" : "bg-[#4A4E6A]")}
           key={`${height}-${index}`}
-          style={[styles.trendBar, { height }, index === 3 ? styles.trendBarActive : null]}
+          style={{ height }}
+          testID={`progress-trend-bar-${index === 3 ? "active" : "muted"}-${index}`}
         />
       ))}
     </View>
   );
 }
-
-const referenceColors = {
-  card: "rgba(20, 23, 43, 0.62)",
-  cardPressed: "rgba(28, 32, 64, 0.8)",
-  statLabel: colors.dark.textTertiary.value,
-  lavenderFill: "rgba(168, 156, 224, 0.9)",
-  lavenderOutline: "rgba(168, 156, 224, 0.6)",
-  mistOutline: "rgba(138, 143, 168, 0.4)",
-  hazeOutline: "rgba(74, 78, 106, 0.4)",
-  tagBorder: "rgba(74, 78, 106, 0.3)",
-  tagAccentBackground: "rgba(168, 156, 224, 0.15)",
-  tagAccentBorder: "rgba(168, 156, 224, 0.2)",
-} as const;
-
-const styles = StyleSheet.create({
-  screen: {
-    backgroundColor: colors.dark.background.value,
-    flex: 1,
-  },
-  content: {
-    gap: spacing.md,
-    paddingBottom: spacing.bottomNavigationHeight + spacing.sm,
-    paddingHorizontal: spacing.screenPadding,
-    paddingTop: spacing.xl + spacing.xs,
-  },
-  header: {
-    gap: 4,
-  },
-  title: {
-    color: colors.dark.textPrimary.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 22,
-    letterSpacing: 0,
-    lineHeight: 28,
-  },
-  subtitle: {
-    color: colors.dark.textSecondary.value,
-    fontFamily: typography.mobileFontFamily.primary.regular,
-    fontSize: 14,
-    lineHeight: 20,
-  },
-  statRow: {
-    flexDirection: "row",
-    gap: 12,
-  },
-  statCard: {
-    alignItems: "center",
-    backgroundColor: referenceColors.card,
-    borderRadius: 16,
-    boxShadow: "inset 0 1px 0 rgba(238, 240, 255, 0.05)",
-    flex: 1,
-    justifyContent: "center",
-    minHeight: 80,
-    minWidth: 0,
-    paddingHorizontal: 8,
-    paddingVertical: 10,
-  },
-  statValue: {
-    color: colors.dark.textPrimary.value,
-    fontFamily: typography.mobileFontFamily.data.regular,
-    fontSize: 18,
-    fontVariant: ["tabular-nums"],
-    lineHeight: 24,
-    textAlign: "center",
-  },
-  statUnit: {
-    color: colors.dark.textSecondary.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 13,
-    lineHeight: 18,
-  },
-  statLabel: {
-    color: referenceColors.statLabel,
-    fontFamily: typography.mobileFontFamily.primary.regular,
-    fontSize: 12,
-    lineHeight: 16,
-    marginTop: 1,
-    textAlign: "center",
-  },
-  cardList: {
-    gap: 12,
-  },
-  card: {
-    backgroundColor: referenceColors.card,
-    borderColor: "transparent",
-    borderRadius: radii.card,
-    borderWidth: 1,
-    boxShadow: "inset 0 1px 0 rgba(238, 240, 255, 0.05)",
-    gap: 12,
-    justifyContent: "center",
-    minHeight: 88,
-    overflow: "hidden",
-    padding: spacing.sm,
-    transform: [{ scale: 1 }],
-  },
-  cardPressed: {
-    backgroundColor: referenceColors.cardPressed,
-    transform: [{ scale: 0.96 }],
-  },
-  cardHeader: {
-    alignItems: "flex-start",
-    flexDirection: "row",
-    gap: 12,
-    justifyContent: "space-between",
-  },
-  inlineCardHeader: {
-    alignItems: "center",
-    flexDirection: "row",
-    gap: 12,
-    justifyContent: "space-between",
-  },
-  cardCopy: {
-    flex: 1,
-    gap: 2,
-    minWidth: 0,
-  },
-  cardTitle: {
-    color: colors.dark.textPrimary.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: typography.scale.bodyLarge.size,
-    letterSpacing: 0,
-    lineHeight: 22,
-  },
-  cardDescription: {
-    color: colors.dark.textSecondary.value,
-    fontFamily: typography.mobileFontFamily.primary.regular,
-    fontSize: 14,
-    lineHeight: 20,
-  },
-  inlineAccessory: {
-    alignItems: "center",
-    flexDirection: "row",
-    gap: 8,
-    justifyContent: "flex-end",
-  },
-  weeklyCount: {
-    color: colors.dark.textSecondary.value,
-    fontFamily: typography.mobileFontFamily.data.regular,
-    fontSize: 13,
-    fontVariant: ["tabular-nums"],
-    lineHeight: 18,
-  },
-  weekStrip: {
-    flexDirection: "row",
-    gap: 8,
-    paddingTop: 1,
-  },
-  weekDot: {
-    borderRadius: 9999,
-    height: 22,
-    width: 22,
-  },
-  weekDotComplete: {
-    backgroundColor: referenceColors.lavenderFill,
-  },
-  weekDotPaused: {
-    borderColor: referenceColors.mistOutline,
-    borderWidth: 1.5,
-  },
-  weekDotToday: {
-    borderColor: referenceColors.lavenderOutline,
-    borderWidth: 1.5,
-  },
-  weekDotFuture: {
-    borderColor: referenceColors.hazeOutline,
-    borderWidth: 1,
-  },
-  moodTagRow: {
-    flexDirection: "row",
-    flexWrap: "nowrap",
-    gap: 8,
-    overflow: "hidden",
-    paddingTop: 1,
-  },
-  moodTag: {
-    borderColor: referenceColors.tagBorder,
-    borderRadius: 6,
-    borderWidth: 1,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-  },
-  moodTagActive: {
-    backgroundColor: referenceColors.tagAccentBackground,
-    borderColor: referenceColors.tagAccentBorder,
-  },
-  moodTagFaded: {
-    opacity: 0.5,
-  },
-  moodTagText: {
-    color: colors.dark.textSecondary.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 11,
-    lineHeight: 14,
-  },
-  moodTagTextActive: {
-    color: colors.dark.primaryGlow.value,
-  },
-  trendBars: {
-    alignItems: "flex-end",
-    flexDirection: "row",
-    gap: 4,
-    height: 22,
-    justifyContent: "center",
-    opacity: 0.8,
-    paddingTop: 2,
-  },
-  trendBar: {
-    backgroundColor: colors.dark.textTertiary.value,
-    borderTopLeftRadius: 2,
-    borderTopRightRadius: 2,
-    width: 5,
-  },
-  trendBarActive: {
-    backgroundColor: colors.dark.primary.value,
-  },
-});

@@ -33,6 +33,7 @@ import {
   type BreathSessionController,
   type BreathSessionSnapshot,
 } from "../session/breath-session-runtime";
+import { breathHoldSafetyGuidance } from "../session/breath-hold-safety-guidance";
 
 export const RESCUE_ME_SCREEN_STATES = [
   "active-launch",
@@ -144,6 +145,8 @@ const rescueMeClassNames = {
   pauseOverlayActions: "mt-[42px] w-full items-center gap-[18px]",
   pauseOverlayCopy:
     "mt-3 text-center font-nidoru-primary-regular text-[15px] leading-[22px] tracking-normal text-[#8A8FA8]",
+  pauseOverlaySafetyCopy:
+    "mt-4 max-w-[292px] text-center font-nidoru-primary-regular text-[12px] leading-[18px] tracking-normal text-[#8A8FA8]/80",
   pauseOverlayGlow:
     "pointer-events-none absolute top-[34%] h-[180px] w-[180px] rounded-full bg-[#7C6FCD]/[0.13] shadow-[0_0_80px_rgba(124,111,205,0.3)]",
   pauseOverlayPrimaryAction:
@@ -1143,6 +1146,9 @@ function RescueMePauseOverlay({
       </Text>
       <Text className={rescueMeClassNames.pauseOverlayCopy} selectable>
         You can continue when you’re ready.
+      </Text>
+      <Text className={rescueMeClassNames.pauseOverlaySafetyCopy} selectable>
+        {breathHoldSafetyGuidance}
       </Text>
       <View className={rescueMeClassNames.pauseOverlayActions}>
         <Pressable

@@ -27,6 +27,7 @@ import Svg, {
 import { StatusBar } from "expo-status-bar";
 
 import { NidoruButton, OrbStage } from "../design-system";
+import { breathHoldSafetyGuidance } from "../session/breath-hold-safety-guidance";
 import { Pressable, Text, View, cn } from "../tw";
 
 export type WindDownActiveRoutineView = {
@@ -691,6 +692,14 @@ function BreathworkState({
               selectable
             >
               Coherent breathing for wind-down
+            </Text>
+          ) : null}
+          {!isDailyCalm ? (
+            <Text
+              className="max-w-[310px] text-center font-nidoru-primary-regular text-[12px] leading-[18px] text-[#8A8FA8]"
+              selectable
+            >
+              {breathHoldSafetyGuidance}
             </Text>
           ) : null}
         </View>

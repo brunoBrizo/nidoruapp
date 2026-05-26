@@ -71,6 +71,7 @@ import {
   recordBreathSessionStartedLocally,
   saveBreathSessionDraftLocally,
 } from "./breath-session-local-persistence";
+import { breathHoldSafetyGuidance, hasBreathHoldPhase } from "./breath-hold-safety-guidance";
 import {
   completeBreathSessionIfDue,
   createBreathSessionController,
@@ -254,6 +255,8 @@ const firstSessionClassNames = {
   rewardContinueButton:
     "h-14 w-full max-w-[342px] items-center justify-center rounded-2xl border border-[#1C2040] bg-[#1C2040] active:scale-[0.96]",
   rewardContinueText: "font-nidoru-primary-semibold text-[16px] leading-[22px] text-[#EEF0FF]",
+  safetyGuidance:
+    "max-w-[310px] text-center font-nidoru-primary-regular text-[12px] leading-[18px] text-[#8A8FA8]",
   screen: "flex-1 overflow-hidden bg-[#0D0F1A]",
   statusControl: "min-h-16 min-w-16 items-center justify-center gap-1.5 active:scale-[0.96]",
   statusIconCircle:
@@ -892,6 +895,7 @@ export function BreathSessionScreen({
   const selectedAudioMode = getAudioModeOption(audioMode);
   const hapticsActive = hapticsEnabled;
   const isPaused = snapshot.isPaused && !completionMode;
+  const showHoldSafetyGuidance = hasBreathHoldPhase(techniqueId);
 
   return (
     <View
@@ -912,6 +916,11 @@ export function BreathSessionScreen({
         <Text className={firstSessionClassNames.subtitle} selectable>
           {sessionLabel}
         </Text>
+        {showHoldSafetyGuidance ? (
+          <Text className={firstSessionClassNames.safetyGuidance} selectable>
+            {breathHoldSafetyGuidance}
+          </Text>
+        ) : null}
       </View>
 
       <View className={firstSessionClassNames.orbSection}>

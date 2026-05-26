@@ -41,6 +41,7 @@ const hapticsImpactAsync = Haptics.impactAsync as jest.MockedFunction<typeof Hap
 
 const forbiddenActiveSessionGatePattern =
   /account|paywall|permission|notification|microphone|health|subscribe|sign in|sync/i;
+const holdSafetyCopy = "Skip holds or stop if you feel dizzy, breathless, or uncomfortable.";
 
 const baseProps = {
   disableHaptics: true,
@@ -267,6 +268,7 @@ describe("FirstSessionScreen", () => {
 
     expect(screen.getByText("Let’s wind down.")).toBeTruthy();
     expect(screen.getByText("4-7-8 Sleep · 4 min")).toBeTruthy();
+    expect(screen.getByText(holdSafetyCopy)).toBeTruthy();
     expect(screen.getByText("Inhale")).toBeTruthy();
     expect(screen.getByText("04:00")).toBeTruthy();
     expect(screen.getByText("Bell")).toBeTruthy();
@@ -716,6 +718,7 @@ describe("BreathSessionScreen", () => {
 
     expect(screen.getByText("Let’s wind down.")).toBeTruthy();
     expect(screen.getByText("Coherent Breathing · 10 min")).toBeTruthy();
+    expect(screen.queryByText(holdSafetyCopy)).toBeNull();
     expect(screen.getByText("Inhale")).toBeTruthy();
     expect(screen.getByText("10:00")).toBeTruthy();
     expect(screen.getByText("Bell")).toBeTruthy();
@@ -724,6 +727,21 @@ describe("BreathSessionScreen", () => {
     expect(screen.queryByText("Nature")).toBeNull();
     expect(screen.getByText("Haptics")).toBeTruthy();
     expect(screen.getByLabelText("Pause session")).toBeTruthy();
+    expect(screen.queryByText(forbiddenActiveSessionGatePattern)).toBeNull();
+  });
+
+  it("shows hold-safety guidance for box breathing without adding a pre-session gate", () => {
+    render(
+      <BreathSessionScreen
+        {...baseBreathSessionProps}
+        durationSeconds={300}
+        techniqueId="box-breathing"
+      />,
+    );
+
+    expect(screen.getByText("Box Breathing · 5 min")).toBeTruthy();
+    expect(screen.getByText(holdSafetyCopy)).toBeTruthy();
+    expect(screen.getByTestId("first-session-orb")).toBeTruthy();
     expect(screen.queryByText(forbiddenActiveSessionGatePattern)).toBeNull();
   });
 

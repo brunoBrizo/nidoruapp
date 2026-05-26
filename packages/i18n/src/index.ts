@@ -56,6 +56,7 @@ const en = {
         label: "Nature ambient",
       },
     },
+    holdSafetyGuidance: "Skip holds or stop if you feel dizzy, breathless, or uncomfortable.",
   },
   session: {
     firstValueTitle: "Let's wind down",
@@ -143,6 +144,8 @@ const es = {
         label: "Ambiente natural",
       },
     },
+    holdSafetyGuidance:
+      "Omite las pausas o deten la sesion si sientes mareo, falta de aire o incomodidad.",
   },
   session: {
     firstValueTitle: "Vamos a bajar el ritmo",
@@ -222,6 +225,7 @@ const ptBR = {
         label: "Ambiente natural",
       },
     },
+    holdSafetyGuidance: "Pule as pausas ou pare se sentir tontura, falta de ar ou desconforto.",
   },
   session: {
     firstValueTitle: "Vamos desacelerar",

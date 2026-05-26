@@ -5,6 +5,8 @@ import { join } from "node:path";
 
 import { WindDownScreen } from "../src/wind-down/wind-down-screen";
 
+const holdSafetyCopy = "Skip holds or stop if you feel dizzy, breathless, or uncomfortable.";
+
 jest.mock("react-native-css", () => {
   const React = jest.requireActual<typeof import("react")>("react");
 
@@ -84,6 +86,7 @@ describe("WindDownScreen", () => {
     expect(screen.getByRole("header", { name: "Let's wind down." })).toBeTruthy();
     expect(screen.getByText("Inhale")).toBeTruthy();
     expect(screen.getByText("04:58")).toBeTruthy();
+    expect(screen.getByText(holdSafetyCopy)).toBeTruthy();
     expect(screen.getByText("Rain softly playing")).toBeTruthy();
     expect(screen.getByText("Swipe down to exit")).toBeTruthy();
     expect(screen.queryByRole("button")).toBeNull();

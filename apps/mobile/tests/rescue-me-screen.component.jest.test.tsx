@@ -61,6 +61,7 @@ import {
 
 const forbiddenSurfacePattern =
   /account|paywall|permission|choose|pick|setup|loading|spinner|network|medical|crisis|badge|streak|reward|ember/i;
+const holdSafetyCopy = "Skip holds or stop if you feel dizzy, breathless, or uncomfortable.";
 const rescueStartedAtMs = Date.parse("2026-05-23T05:00:00.000Z");
 const rescueSessionProps = {
   disableHaptics: true,
@@ -184,6 +185,7 @@ describe("RescueMeScreen", () => {
     expect(screen.getByRole("button", { name: "Pause Rescue Me session" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Haptics on" })).toBeTruthy();
     expect(screen.queryByText("You’re doing enough. Stay with the next breath.")).toBeNull();
+    expect(screen.queryByText(holdSafetyCopy)).toBeNull();
 
     fireEvent(screen.getByTestId("rescue-me-orb"), "layout", {
       nativeEvent: { layout: { height: 300, width: 300, x: 34, y: 170 } },
@@ -566,6 +568,7 @@ describe("RescueMeScreen", () => {
     expect(screen.getByTestId("rescue-me-pause-overlay")).toBeTruthy();
     expect(screen.getByText("Paused")).toBeTruthy();
     expect(screen.getByText("You can continue when you’re ready.")).toBeTruthy();
+    expect(screen.getByText(holdSafetyCopy)).toBeTruthy();
     expect(screen.getByRole("button", { name: "Resume Rescue Me session" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "End Rescue Me for now" })).toBeTruthy();
 

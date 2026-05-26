@@ -35,6 +35,11 @@ describe("home actions contract", () => {
       "Sounds",
       "Breathe",
     ]);
+    expect(homeQuickActions.map((action) => action.subtitle)).toEqual([
+      "Immediate",
+      "3 mixes",
+      "Just orb",
+    ]);
     expect(homeQuickActions.map((action) => action.routeTarget)).toEqual([
       "/rescue-me",
       "/sleep/sounds",

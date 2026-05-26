@@ -1,10 +1,10 @@
-import { colors } from "@nidoru/ui-tokens";
 import { useEffect, useRef } from "react";
-import { Animated, Easing, StyleSheet, View, type StyleProp, type ViewStyle } from "react-native";
+import { Animated, Easing, type StyleProp, type ViewStyle } from "react-native";
 import Svg, { Circle, Defs, LinearGradient, Stop } from "react-native-svg";
 
 import { RESTING_BREATHING_ORB_TEST_IDS } from "../breathing/breathing-orb";
 import { useReduceMotionPreference } from "../motion/use-reduce-motion-enabled";
+import { ReactNativeAnimatedView, View } from "../tw";
 
 export const HOME_ORB_MOTION = {
   corePulseDurationMs: 6000,
@@ -97,13 +97,15 @@ export function HomeBreathingOrb({
   return (
     <View
       accessibilityElementsHidden
+      className="h-28 w-[116px] items-center justify-center"
       importantForAccessibility="no-hide-descendants"
-      style={[styles.stage, style]}
+      style={style}
       testID={testID}
     >
-      <Animated.View
+      <ReactNativeAnimatedView
+        className="absolute h-[116px] w-[116px]"
         pointerEvents="none"
-        style={[styles.arcLayer, { transform: [{ rotate: spin }] }]}
+        style={{ transform: [{ rotate: spin }] }}
         testID="home-orb-arc-layer"
       >
         <Svg height={116} viewBox="0 0 100 100" width={116}>
@@ -113,7 +115,7 @@ export function HomeBreathingOrb({
             fill="none"
             opacity={0.15}
             r="48"
-            stroke={colors.dark.primary.value}
+            stroke="#7C6FCD"
             strokeWidth="0.5"
           />
           <Circle
@@ -122,7 +124,7 @@ export function HomeBreathingOrb({
             fill="none"
             opacity={0.7}
             r="48"
-            stroke={colors.dark.primary.value}
+            stroke="#7C6FCD"
             strokeDasharray="60 241.6"
             strokeDashoffset="0"
             strokeLinecap="round"
@@ -134,7 +136,7 @@ export function HomeBreathingOrb({
             fill="none"
             opacity={0.5}
             r="48"
-            stroke={colors.dark.primaryGlow.value}
+            stroke="#A89CE0"
             strokeDasharray="106 195.6"
             strokeDashoffset="-66"
             strokeLinecap="round"
@@ -146,44 +148,47 @@ export function HomeBreathingOrb({
             fill="none"
             opacity={0.4}
             r="48"
-            stroke={colors.dark.textSecondary.value}
+            stroke="#8A8FA8"
             strokeDasharray="117 184.6"
             strokeDashoffset="-178"
             strokeLinecap="round"
             strokeWidth="1.5"
           />
         </Svg>
-      </Animated.View>
+      </ReactNativeAnimatedView>
 
-      <Animated.View
+      <ReactNativeAnimatedView
+        className="absolute h-[84px] w-[84px] rounded-full border border-[#7C6FCD]/20"
         pointerEvents="none"
-        style={[
-          styles.pulseRing,
-          {
-            opacity: ringOpacity,
-            transform: [{ scale: ringScale }],
-          },
-        ]}
+        style={{
+          opacity: ringOpacity,
+          transform: [{ scale: ringScale }],
+        }}
         testID="home-orb-pulse-ring"
       />
-      <View style={styles.lavenderRing} testID={RESTING_BREATHING_ORB_TEST_IDS.middleRing} />
-      <Animated.View
-        style={[styles.softGlow, { opacity: glowOpacity }]}
+      <View
+        className="absolute h-[68px] w-[68px] rounded-full border border-[#A89CE0]/15 bg-[#7C6FCD]/5 shadow-[inset_0_0_12px_rgba(168,156,224,0.1)]"
+        testID={RESTING_BREATHING_ORB_TEST_IDS.middleRing}
+      />
+      <ReactNativeAnimatedView
+        className="absolute h-14 w-14 rounded-full bg-[#A89CE0]/40 shadow-[0_0_24px_rgba(168,156,224,0.4)]"
+        style={{ opacity: glowOpacity }}
         testID={RESTING_BREATHING_ORB_TEST_IDS.softGlow}
       />
-      <Animated.View
-        style={[styles.core, { opacity: coreOpacity, transform: [{ scale: coreScale }] }]}
+      <ReactNativeAnimatedView
+        className="absolute h-[42px] w-[42px] overflow-hidden rounded-full shadow-[0_0_24px_rgba(124,111,205,0.5)]"
+        style={{ opacity: coreOpacity, transform: [{ scale: coreScale }] }}
         testID={RESTING_BREATHING_ORB_TEST_IDS.core}
       >
         <Svg height={42} viewBox="0 0 42 42" width={42}>
           <Defs>
             <LinearGradient id="home-orb-core-gradient" x1="0" x2="1" y1="1" y2="0">
-              <Stop offset="0" stopColor={colors.dark.primary.value} stopOpacity="0.9" />
-              <Stop offset="1" stopColor={colors.dark.primaryGlow.value} stopOpacity="0.9" />
+              <Stop offset="0" stopColor="#7C6FCD" stopOpacity="0.9" />
+              <Stop offset="1" stopColor="#A89CE0" stopOpacity="0.9" />
             </LinearGradient>
             <LinearGradient id="home-orb-highlight-gradient" x1="0" x2="0" y1="0" y2="1">
-              <Stop offset="0" stopColor={colors.dark.textPrimary.value} stopOpacity="0.3" />
-              <Stop offset="1" stopColor={colors.dark.textPrimary.value} stopOpacity="0" />
+              <Stop offset="0" stopColor="#EEF0FF" stopOpacity="0.3" />
+              <Stop offset="1" stopColor="#EEF0FF" stopOpacity="0" />
             </LinearGradient>
           </Defs>
           <Circle cx="21" cy="21" fill="url(#home-orb-core-gradient)" r="21" />
@@ -195,55 +200,7 @@ export function HomeBreathingOrb({
             testID={RESTING_BREATHING_ORB_TEST_IDS.highlight}
           />
         </Svg>
-      </Animated.View>
+      </ReactNativeAnimatedView>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  stage: {
-    alignItems: "center",
-    height: 112,
-    justifyContent: "center",
-    width: 116,
-  },
-  arcLayer: {
-    height: 116,
-    position: "absolute",
-    width: 116,
-  },
-  pulseRing: {
-    borderColor: "rgba(124, 111, 205, 0.2)",
-    borderRadius: 42,
-    borderWidth: 1,
-    height: 84,
-    position: "absolute",
-    width: 84,
-  },
-  lavenderRing: {
-    backgroundColor: "rgba(124, 111, 205, 0.05)",
-    borderColor: "rgba(168, 156, 224, 0.15)",
-    borderRadius: 34,
-    borderWidth: 1,
-    boxShadow: "inset 0 0 12px rgba(168, 156, 224, 0.1)",
-    height: 68,
-    position: "absolute",
-    width: 68,
-  },
-  softGlow: {
-    backgroundColor: "rgba(168, 156, 224, 0.4)",
-    borderRadius: 28,
-    boxShadow: "0 0 24px rgba(168, 156, 224, 0.4)",
-    height: 56,
-    position: "absolute",
-    width: 56,
-  },
-  core: {
-    borderRadius: 21,
-    boxShadow: "0 0 24px rgba(124, 111, 205, 0.5)",
-    height: 42,
-    overflow: "hidden",
-    position: "absolute",
-    width: 42,
-  },
-});

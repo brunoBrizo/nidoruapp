@@ -85,7 +85,7 @@ export const homeQuickActions = [
   {
     id: "sounds",
     label: "Sounds",
-    subtitle: "Mixer",
+    subtitle: "3 mixes",
     ctaText: "Open Sounds",
     routeTarget: "/sleep/sounds",
     iconIntent: "music",
@@ -96,7 +96,7 @@ export const homeQuickActions = [
   {
     id: "breathe",
     label: "Breathe",
-    subtitle: "Just the orb",
+    subtitle: "Just orb",
     ctaText: "Start Breathe",
     routeTarget: "/breathe",
     iconIntent: "wind",
@@ -131,7 +131,7 @@ export const homePrimaryActions = {
   "evening-prep": {
     id: "evening-prep",
     label: "Evening Wind-Down",
-    subtitle: "4-7-8 breathing · 20 min sounds",
+    subtitle: "4-7-8 breathing · rain & low strings",
     ctaText: "Start now",
     routeTarget: "/breathe/evening-prep",
     iconIntent: "sunset",
@@ -140,7 +140,7 @@ export const homePrimaryActions = {
   "wind-down-flow": {
     id: "wind-down-flow",
     label: "Evening Wind-Down",
-    subtitle: "4-7-8 breathing · 20 min sounds",
+    subtitle: "4-7-8 breathing · rain & low strings",
     ctaText: "Start now",
     routeTarget: "/sleep/wind-down",
     iconIntent: "moon",

@@ -139,7 +139,7 @@ describe("AppTabBar", () => {
     expect(screen.queryByText("Sleep")).toBeNull();
   });
 
-  it("matches the home.png tab shell frame and active indicator", () => {
+  it("matches the Home handoff tab shell frame and active indicator", () => {
     renderTabBar();
 
     expect(screen.getByTestId("app-tab-bar").props.className).toEqual(

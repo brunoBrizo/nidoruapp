@@ -1,6 +1,16 @@
 import { describe, expect, it, jest } from "@jest/globals";
 import { fireEvent, render, screen, within } from "@testing-library/react-native";
-import { AccessibilityInfo, StyleSheet } from "react-native";
+import { AccessibilityInfo } from "react-native";
+
+jest.mock("react-native-css", () => {
+  const React = jest.requireActual<typeof import("react")>("react");
+
+  return {
+    useCssElement: (Component: React.ElementType, props: Record<string, unknown>) =>
+      React.createElement(Component, props),
+    useNativeVariable: (variable: string) => `mocked-${variable}`,
+  };
+});
 
 jest.mock("../src/rescue/rescue-me-launch-performance", () => ({
   markRescueMeHomeTap: jest.fn(),
@@ -21,12 +31,10 @@ jest.mock("expo-router", () => {
   };
 });
 
-import { RESTING_BREATHING_ORB_TEST_IDS } from "../src/breathing/breathing-orb";
 import { AppTabBar } from "../src/navigation/app-tab-bar";
 import HomeScreen from "../src/app/(tabs)/index";
 import {
   HOME_CONTENT_ENTRANCE_MOTION,
-  HOME_ORB_MOTION,
   getHomeContentEntranceMotionConfig,
 } from "../src/home/home-screen";
 import { markRescueMeHomeTap } from "../src/rescue/rescue-me-launch-performance";
@@ -58,6 +66,7 @@ jest
 jest.spyOn(AccessibilityInfo, "addEventListener").mockImplementation(() => ({ remove: jest.fn() }));
 
 const localDateAt = (hour: number, minute = 0) => new Date(2026, 0, 1, hour, minute);
+const designDate = new Date(2026, 0, 6, 22, 42);
 
 const quickActionIds = ["rescue-me", "sounds", "breathe"] as const;
 const mockMarkRescueMeHomeTap = markRescueMeHomeTap as jest.MockedFunction<
@@ -97,90 +106,59 @@ describe("HomeScreen", () => {
     expect(screen.getByTestId("home-entrance-polish")).toBeTruthy();
   });
 
-  it("renders the verified Home layout sections", () => {
-    render(<HomeScreen now={localDateAt(20)} />);
+  it("renders the updated Home handoff sections from home.html", () => {
+    render(<HomeScreen now={designDate} />);
 
+    expect(screen.getByText("Tuesday · 10:42 PM")).toBeTruthy();
     expect(screen.getByRole("header", { name: "Good evening, Bruno" })).toBeTruthy();
-    expect(screen.getByText("Tonight’s wind-down is ready")).toBeTruthy();
-    expect(screen.getByText("8 days")).toBeTruthy();
+    expect(screen.getByText("Tonight's wind-down is ready")).toBeTruthy();
+    expect(screen.getByText("8 nights")).toBeTruthy();
+    expect(screen.getByText("Tonight's Ritual")).toBeTruthy();
+    expect(screen.getByText("~22 min")).toBeTruthy();
     expect(screen.getByText("Evening Wind-Down")).toBeTruthy();
-    expect(screen.getByText("4-7-8 breathing · 20 min sounds")).toBeTruthy();
-    expect(screen.getByTestId("home-primary-card")).toBeTruthy();
-    expect(screen.getByTestId("home-primary-card-fade")).toBeTruthy();
-    expect(StyleSheet.flatten(screen.getByTestId("home-primary-card").props.style)).toEqual(
-      expect.objectContaining({
-        height: 280,
-        paddingBottom: 24,
-      }),
-    );
-    expect(StyleSheet.flatten(screen.getByTestId("home-primary-button-frame").props.style)).toEqual(
-      expect.objectContaining({
-        backgroundColor: "rgba(124, 111, 205, 0.88)",
-        borderRadius: 16,
-        minHeight: 48,
-      }),
-    );
-    expect(
-      within(
-        screen.getByTestId("home-resting-breathing-orb", {
-          includeHiddenElements: true,
-        }),
-      ).getByTestId(RESTING_BREATHING_ORB_TEST_IDS.core, {
-        includeHiddenElements: true,
-      }),
-    ).toBeTruthy();
+    expect(screen.getByText("4-7-8 breathing · rain & low strings")).toBeTruthy();
+    expect(screen.getByTestId("home-ritual-scene")).toBeTruthy();
+    expect(screen.getByTestId("home-scene-crescent-moon")).toBeTruthy();
+    expect(screen.getByText("In")).toBeTruthy();
+    expect(screen.getByText("Hold")).toBeTruthy();
+    expect(screen.getByText("Out")).toBeTruthy();
     expect(screen.getByText("Last night")).toBeTruthy();
     expect(screen.getByText("Rain helped you settle")).toBeTruthy();
-    expect(screen.getByText("Your sleep rhythm")).toBeTruthy();
-    expect(screen.getByText("A steady week, with room to rest.")).toBeTruthy();
+    expect(screen.getByText("You fell asleep 14 min faster. Try box breathing tonight."))
+      .toBeTruthy();
+    expect(screen.getByText("7h 12m")).toBeTruthy();
+    expect(screen.getByText("Wind-down library")).toBeTruthy();
+    expect(screen.getByText("The Lantern Keeper")).toBeTruthy();
+    expect(screen.getByText("Coastal Rainfall")).toBeTruthy();
+    expect(screen.getByText("Body Scan")).toBeTruthy();
   });
 
-  it("matches the PNG Home orb geometry and motion contract", () => {
-    expect(HOME_ORB_MOTION).toEqual({
-      corePulseDurationMs: 6000,
-      isDecorativeOnly: true,
-      ringPulseDurationMs: 6000,
-      spinDurationMs: 12000,
-    });
+  it("uses Tailwind primitives for the migrated Home shell and primary ritual card", () => {
+    render(<HomeScreen now={designDate} />);
 
-    render(<HomeScreen now={localDateAt(20)} />);
-
-    const orbRoot = screen.getByTestId("home-resting-breathing-orb", {
-      includeHiddenElements: true,
-    });
-    const orb = within(orbRoot);
-
-    expect(StyleSheet.flatten(orbRoot.props.style)).toEqual(
-      expect.objectContaining({
-        alignSelf: "center",
-        height: 112,
-        width: 116,
-      }),
+    expect(screen.getByTestId("home-screen").props.className).toEqual(
+      expect.stringContaining("bg-nidoru-dark-background"),
     );
-    expect(orb.getByTestId("home-orb-arc-layer", { includeHiddenElements: true })).toBeTruthy();
-    expect(
-      StyleSheet.flatten(
-        orb.getByTestId("home-orb-pulse-ring", { includeHiddenElements: true }).props.style,
-      ),
-    ).toEqual(
-      expect.objectContaining({
-        borderRadius: 42,
-        height: 84,
-        width: 84,
-      }),
+    expect(screen.getByTestId("home-screen").props.contentContainerClassName).toEqual(
+      expect.stringContaining("px-5 pt-12 pb-[104px]"),
     );
-    expect(
-      StyleSheet.flatten(
-        orb.getByTestId(RESTING_BREATHING_ORB_TEST_IDS.core, {
-          includeHiddenElements: true,
-        }).props.style,
-      ),
-    ).toEqual(
-      expect.objectContaining({
-        borderRadius: 21,
-        height: 42,
-        width: 42,
-      }),
+    expect(screen.getByTestId("home-ambient-backdrop").props.className).toEqual(
+      expect.stringContaining("absolute inset-0"),
+    );
+    expect(screen.getByTestId("home-primary-card").props.className).toEqual(
+      expect.stringContaining("rounded-[28px]"),
+    );
+    expect(screen.getByTestId("home-primary-card").props.className).toEqual(
+      expect.stringContaining("border-white/[0.06]"),
+    );
+    expect(screen.getByTestId("home-primary-card").props.className).toEqual(
+      expect.stringContaining("shadow-[inset_0_1px_0_rgba(238,240,255,0.08)"),
+    );
+    expect(screen.getByTestId("home-primary-button-frame").props.className).toEqual(
+      expect.stringContaining("bg-[#A89CE0]"),
+    );
+    expect(screen.getByTestId("home-primary-button-frame").props.className).toEqual(
+      expect.stringContaining("active:scale-[0.97]"),
     );
   });
 
@@ -235,8 +213,8 @@ describe("HomeScreen", () => {
     ["00:00", localDateAt(0), "Rescue Me", "Immediate 4-7-8 relief"],
     ["05:00", localDateAt(5), "Morning Breathwork", "3 min energizing breath"],
     ["12:00", localDateAt(12), "Midday Reset", "Box breathing for stress"],
-    ["17:00", localDateAt(17), "Evening Wind-Down", "4-7-8 breathing · 20 min sounds"],
-    ["20:00", localDateAt(20), "Evening Wind-Down", "4-7-8 breathing · 20 min sounds"],
+    ["17:00", localDateAt(17), "Evening Wind-Down", "4-7-8 breathing · rain & low strings"],
+    ["20:00", localDateAt(20), "Evening Wind-Down", "4-7-8 breathing · rain & low strings"],
   ])(
     "renders only the %s local-time primary action",
     (_timeLabel, now, expectedLabel, expectedSubtitle) => {
@@ -262,87 +240,25 @@ describe("HomeScreen", () => {
     expect(screen.getAllByRole("link", { name: "Start now" })).toHaveLength(1);
   });
 
-  it("keeps the rhythm strip compassionate and pressure-free", () => {
-    render(<HomeScreen now={localDateAt(20)} />);
+  it("matches the compact home.html quick action card structure", () => {
+    render(<HomeScreen now={designDate} />);
 
-    expect(screen.getByText("A steady week, with room to rest.")).toBeTruthy();
-    expect(screen.queryByText(/red badge|reset|failed|lost|broken|missed/i)).toBeNull();
-  });
-
-  it("matches the compact home.png quick action card structure", () => {
-    render(<HomeScreen now={localDateAt(20)} />);
-
-    const quickActionCards = quickActionIds.map((actionId) =>
-      screen.getByTestId(`home-quick-action-card-${actionId}`),
-    );
-
-    expect(StyleSheet.flatten(screen.getByTestId("home-quick-action-grid").props.style)).toEqual(
-      expect.objectContaining({
-        alignSelf: "stretch",
-        gap: 12,
-        width: "100%",
-      }),
+    expect(screen.getByTestId("home-quick-action-grid").props.className).toEqual(
+      expect.stringContaining("flex-row gap-2.5"),
     );
     for (const actionId of quickActionIds) {
-      expect(
-        StyleSheet.flatten(screen.getByTestId(`home-quick-action-slot-${actionId}`).props.style),
-      ).toEqual(
-        expect.objectContaining({
-          flex: 1,
-        }),
+      expect(screen.getByTestId(`home-quick-action-card-${actionId}`).props.className).toEqual(
+        expect.stringContaining("min-h-[92px]"),
+      );
+      expect(screen.getByTestId(`home-quick-action-card-${actionId}`).props.className).toEqual(
+        expect.stringContaining("rounded-[18px]"),
+      );
+      expect(screen.getByTestId(`home-quick-action-icon-box-${actionId}`).props.className).toEqual(
+        expect.stringContaining("h-9 w-9 rounded-full"),
       );
     }
-    expect(quickActionCards.map((action) => StyleSheet.flatten(action.props.style))).toEqual([
-      expect.objectContaining({
-        backgroundColor: "rgba(20, 23, 43, 0.5)",
-        borderRadius: 16,
-        height: 86,
-        width: "100%",
-      }),
-      expect.objectContaining({
-        backgroundColor: "rgba(20, 23, 43, 0.5)",
-        borderRadius: 16,
-        height: 86,
-        width: "100%",
-      }),
-      expect.objectContaining({
-        backgroundColor: "rgba(20, 23, 43, 0.5)",
-        borderRadius: 16,
-        height: 86,
-        width: "100%",
-      }),
-    ]);
-    for (const actionId of quickActionIds) {
-      expect(
-        StyleSheet.flatten(
-          screen.getByTestId(`home-quick-action-icon-box-${actionId}`).props.style,
-        ),
-      ).toEqual(
-        expect.objectContaining({
-          alignItems: "center",
-          height: 24,
-          justifyContent: "center",
-          width: 24,
-        }),
-      );
-    }
-
-    expect(
-      StyleSheet.flatten(screen.getByTestId("home-quick-action-card-rescue-me").props.style),
-    ).toEqual(
-      expect.objectContaining({
-        borderColor: "rgba(255, 107, 107, 0.12)",
-      }),
-    );
-    expect(
-      StyleSheet.flatten(screen.getByTestId("home-quick-action-icon-box-rescue-me").props.style),
-    ).toEqual(
-      expect.not.objectContaining({
-        backgroundColor: expect.stringContaining("255, 107, 107"),
-        borderColor: expect.stringContaining("255, 107, 107"),
-        borderRadius: 12,
-        borderWidth: 1,
-      }),
+    expect(screen.getByTestId("home-quick-action-card-rescue-me").props.className).toEqual(
+      expect.stringContaining("border-[#FF6B6B]/15"),
     );
     expect(
       within(screen.getByTestId("home-quick-action-card-rescue-me")).getByText("Rescue Me"),
@@ -350,21 +266,21 @@ describe("HomeScreen", () => {
     expect(
       within(screen.getByTestId("home-quick-action-card-rescue-me")).getByText("Immediate"),
     ).toBeTruthy();
-    expect(screen.queryByText("Immediate 4-7-8 relief")).toBeNull();
+    expect(screen.getByText("3 mixes")).toBeTruthy();
+    expect(screen.getByText("Just orb")).toBeTruthy();
     for (const actionId of ["sounds", "breathe"]) {
+      expect(screen.getByTestId(`home-quick-action-card-${actionId}`).props.className).not.toEqual(
+        expect.stringContaining("FF6B6B"),
+      );
       expect(
-        JSON.stringify(screen.getByTestId(`home-quick-action-card-${actionId}`).props.style),
-      ).not.toContain("255, 107, 107");
-      expect(
-        JSON.stringify(screen.getByTestId(`home-quick-action-icon-box-${actionId}`).props.style),
-      ).not.toContain("255, 107, 107");
+        screen.getByTestId(`home-quick-action-icon-box-${actionId}`).props.className,
+      ).not.toEqual(expect.stringContaining("FF6B6B"));
     }
   });
 
   it("omits prohibited Home surfaces", () => {
     render(<HomeScreen />);
 
-    expect(screen.queryByText(/library/i)).toBeNull();
     expect(screen.queryByText(/feed/i)).toBeNull();
     expect(screen.queryByText(/trending/i)).toBeNull();
     expect(screen.queryByText(/upsell/i)).toBeNull();

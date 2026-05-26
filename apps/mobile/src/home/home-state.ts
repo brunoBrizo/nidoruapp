@@ -14,6 +14,7 @@ export type HomeSummarySlot =
       readonly suggestion: string;
       readonly actionLabel: string;
       readonly routeTarget: HomeRouteTarget;
+      readonly durationText: string;
     }
   | {
       readonly kind: "check-in";
@@ -56,9 +57,10 @@ const lastNightSummary: HomeSummarySlot = {
   ratingText: "4/5",
   ratingAccessibilityLabel: "Sleep rating 4 out of 5",
   summary: "Rain helped you settle",
-  suggestion: "Box breathing may help tonight.",
+  suggestion: "You fell asleep 14 min faster. Try box breathing tonight.",
   actionLabel: "View insight",
   routeTarget: "/progress",
+  durationText: "7h 12m",
 };
 
 const missingCheckInSummary: HomeSummarySlot = {
@@ -74,7 +76,7 @@ const missingCheckInSummary: HomeSummarySlot = {
 const localFallbackRhythm: HomeRhythmState = {
   title: "Your sleep rhythm",
   meta: "This week",
-  streakText: "8 days",
+  streakText: "8 nights",
   accessibilityLabel:
     "Sleep rhythm strip for this week: five settled days, one rest day, and today in progress.",
   compassionateCopy: "A steady week, with room to rest.",

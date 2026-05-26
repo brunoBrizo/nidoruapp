@@ -8,7 +8,7 @@ const en = {
     primaryActionTitle: "Start tonight's wind-down",
     primaryActionSubtitle: "4 min breathwork + sleep sounds",
     rescueActionTitle: "Rescue Me",
-    rescueActionSubtitle: "Anxiety, panic, overwhelm",
+    rescueActionSubtitle: "Overwhelmed right now",
   },
   breath: {
     phaseInhale: "Inhale",
@@ -23,23 +23,23 @@ const en = {
       },
       "box-breathing": {
         name: "Box Breathing",
-        description: "A steady square cadence for anxiety, calm, and focus.",
-        primaryContext: "Anxiety and stress",
+        description: "A steady square cadence for calm, grounding, and focus.",
+        primaryContext: "Calm and focus",
       },
       "coherent-breathing": {
         name: "Coherent Breathing",
-        description: "A 5.5-second inhale and exhale practice for Daily Calm HRV training.",
-        primaryContext: "Daily Calm / HRV Training",
+        description: "A 5.5-second inhale and 5.5-second exhale practice for Daily Calm.",
+        primaryContext: "Daily Calm / steady practice",
       },
       "diaphragmatic-breathing": {
         name: "Diaphragmatic Breathing",
-        description: "A simple belly-breathing cadence for stress relief.",
-        primaryContext: "Stress relief",
+        description: "A simple belly-breathing cadence for a stress reset.",
+        primaryContext: "Stress reset",
       },
       "physiological-sigh": {
         name: "Physiological Sigh",
         description: "A double-inhale reset kept as a post-MVP replacement candidate.",
-        primaryContext: "Panic or acute stress",
+        primaryContext: "Short reset candidate",
       },
     },
     audioCueModes: {
@@ -95,7 +95,7 @@ const es = {
     primaryActionTitle: "Empieza tu descanso de hoy",
     primaryActionSubtitle: "4 min de respiracion + sonidos para dormir",
     rescueActionTitle: "Ayudame ahora",
-    rescueActionSubtitle: "Ansiedad, panico, agobio",
+    rescueActionSubtitle: "Abrumado ahora",
   },
   breath: {
     phaseInhale: "Inhala",
@@ -105,28 +105,28 @@ const es = {
     techniques: {
       "4-7-8-sleep": {
         name: "4-7-8 Sueno",
-        description: "Una cadencia para dormir y ayuda inmediata con exhalacion larga.",
+        description: "Una cadencia para antes de dormir y Ayudame ahora con exhalacion larga.",
         primaryContext: "Antes de dormir y Ayudame ahora",
       },
       "box-breathing": {
         name: "Respiracion en caja",
-        description: "Una cadencia cuadrada para ansiedad, calma y foco.",
-        primaryContext: "Ansiedad y estres",
+        description: "Una cadencia cuadrada para calma y foco.",
+        primaryContext: "Calma y foco",
       },
       "coherent-breathing": {
         name: "Respiracion coherente",
-        description: "Una practica de 5.5 segundos para inhalar y exhalar en Daily Calm y HRV.",
-        primaryContext: "Daily Calm / Entrenamiento HRV",
+        description: "Una practica de 5.5 segundos para inhalar y 5.5 para exhalar en Daily Calm.",
+        primaryContext: "Daily Calm / practica constante",
       },
       "diaphragmatic-breathing": {
         name: "Respiracion diafragmatica",
-        description: "Una respiracion abdominal simple para aliviar el estres.",
-        primaryContext: "Alivio del estres",
+        description: "Una respiracion abdominal simple para un reset de estres.",
+        primaryContext: "Reset de estres",
       },
       "physiological-sigh": {
         name: "Suspiro fisiologico",
         description: "Un reset de doble inhalacion conservado como candidato post-MVP.",
-        primaryContext: "Panico o estres agudo",
+        primaryContext: "Candidato a reset corto",
       },
     },
     audioCueModes: {
@@ -174,7 +174,7 @@ const ptBR = {
     primaryActionTitle: "Comece o descanso de hoje",
     primaryActionSubtitle: "4 min de respiracao + sons para dormir",
     rescueActionTitle: "Me ajuda agora",
-    rescueActionSubtitle: "Ansiedade, panico, sobrecarga",
+    rescueActionSubtitle: "Sobrecarregado agora",
   },
   breath: {
     phaseInhale: "Inspire",
@@ -184,28 +184,28 @@ const ptBR = {
     techniques: {
       "4-7-8-sleep": {
         name: "Sono 4-7-8",
-        description: "Uma cadencia para dormir e ajuda imediata com expiracao longa.",
+        description: "Uma cadencia para antes de dormir e Me ajuda agora com expiracao longa.",
         primaryContext: "Antes de dormir e Me ajuda agora",
       },
       "box-breathing": {
         name: "Respiracao em caixa",
-        description: "Uma cadencia quadrada para ansiedade, calma e foco.",
-        primaryContext: "Ansiedade e estresse",
+        description: "Uma cadencia quadrada para calma e foco.",
+        primaryContext: "Calma e foco",
       },
       "coherent-breathing": {
         name: "Respiracao coerente",
-        description: "Uma pratica de 5.5 segundos para inspirar e expirar em Daily Calm e HRV.",
-        primaryContext: "Daily Calm / Treino HRV",
+        description: "Uma pratica de 5.5 segundos para inspirar e 5.5 para expirar no Daily Calm.",
+        primaryContext: "Daily Calm / pratica constante",
       },
       "diaphragmatic-breathing": {
         name: "Respiracao diafragmatica",
-        description: "Uma respiracao abdominal simples para aliviar o estresse.",
-        primaryContext: "Alivio do estresse",
+        description: "Uma respiracao abdominal simples para um reset de estresse.",
+        primaryContext: "Reset de estresse",
       },
       "physiological-sigh": {
         name: "Suspiro fisiologico",
         description: "Um reset de dupla inspiracao mantido como candidato pos-MVP.",
-        primaryContext: "Panico ou estresse agudo",
+        primaryContext: "Candidato a reset curto",
       },
     },
     audioCueModes: {

@@ -10,6 +10,13 @@ const portuguesePrimaryAction: string = messages["pt-BR"].home.primaryActionTitl
 const portugueseBreathPhase: string = messages["pt-BR"].breath.phaseSecondInhale;
 const spanishNotificationGate: string = messages.es.notificationGate.primaryCta;
 const spanishSoftWhooshMode: string = messages.es.breath.audioCueModes.softWhoosh.label;
+const englishRescueSubtitle: "Overwhelmed right now" = messages.en.home.rescueActionSubtitle;
+const englishCoherentContext: "Daily Calm / steady practice" =
+  messages.en.breath.techniques["coherent-breathing"].primaryContext;
+const spanishBoxDescription: "Una cadencia cuadrada para calma y foco." =
+  messages.es.breath.techniques["box-breathing"].description;
+const portugueseDiaphragmaticContext: "Reset de estresse" =
+  messages["pt-BR"].breath.techniques["diaphragmatic-breathing"].primaryContext;
 
 // @ts-expect-error Missing required keys must fail locale coverage.
 const missingRequiredKeyLocale: LocaleMessages = {};
@@ -22,6 +29,10 @@ void portuguesePrimaryAction;
 void portugueseBreathPhase;
 void spanishNotificationGate;
 void spanishSoftWhooshMode;
+void englishRescueSubtitle;
+void englishCoherentContext;
+void spanishBoxDescription;
+void portugueseDiaphragmaticContext;
 void missingRequiredKeyLocale;
 
 if (normalizeLocale("pt-BR") !== "pt-BR") {

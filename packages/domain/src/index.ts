@@ -142,8 +142,8 @@ export const breathTechniques = {
     id: "box-breathing",
     name: "Box Breathing",
     displayName: "Box Breathing",
-    description: "A steady square cadence for anxiety, calm, and focus.",
-    primaryContext: "Anxiety and stress",
+    description: "A steady square cadence for calm, grounding, and focus.",
+    primaryContext: "Calm and focus",
     defaultDurationSeconds: 300,
     availability: "free",
     catalogStatus: "mvp",
@@ -170,8 +170,8 @@ export const breathTechniques = {
     id: "coherent-breathing",
     name: "Coherent Breathing",
     displayName: "Coherent Breathing",
-    description: "A 5.5-second inhale and exhale practice for Daily Calm HRV training.",
-    primaryContext: "Daily Calm / HRV Training",
+    description: "A 5.5-second inhale and 5.5-second exhale practice for Daily Calm.",
+    primaryContext: "Daily Calm / steady practice",
     defaultDurationSeconds: 600,
     availability: "free",
     catalogStatus: "mvp",
@@ -195,8 +195,8 @@ export const breathTechniques = {
     id: "diaphragmatic-breathing",
     name: "Diaphragmatic Breathing",
     displayName: "Diaphragmatic Breathing",
-    description: "A simple belly-breathing cadence for stress relief.",
-    primaryContext: "Stress relief",
+    description: "A simple belly-breathing cadence for a stress reset.",
+    primaryContext: "Stress reset",
     defaultDurationSeconds: 300,
     availability: "free",
     catalogStatus: "mvp",
@@ -221,7 +221,7 @@ export const breathTechniques = {
     name: "Physiological Sigh",
     displayName: "Physiological Sigh",
     description: "A double-inhale reset kept as a post-MVP replacement candidate.",
-    primaryContext: "Panic or acute stress",
+    primaryContext: "Short reset candidate",
     defaultDurationSeconds: 180,
     availability: "free",
     catalogStatus: "post_mvp",
@@ -593,7 +593,7 @@ export const onboardingGoalOptions = [
   },
   {
     value: "anxiety",
-    label: "Ease anxiety",
+    label: "Calm my mind",
     planId: "anxiety_relief",
   },
   {
@@ -704,7 +704,7 @@ export const onboardingPlans = {
   },
   anxiety_relief: {
     id: "anxiety_relief",
-    label: "Anxiety Relief",
+    label: "Calm Mind",
     summary: "A steady box-breathing session to make the next breath easier.",
     firstSession: {
       techniqueId: "box-breathing",
@@ -716,7 +716,7 @@ export const onboardingPlans = {
   stress_reset: {
     id: "stress_reset",
     label: "Stress Reset",
-    summary: "A steady diaphragmatic session for stress relief.",
+    summary: "A steady diaphragmatic session for a stress reset.",
     firstSession: {
       techniqueId: "diaphragmatic-breathing",
       durationSeconds: 240,

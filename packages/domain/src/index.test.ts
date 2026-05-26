@@ -2,6 +2,7 @@ import {
   breathAudioCueModeIds,
   breathAudioCueModes,
   breathSessionDurationBounds,
+  breathTechniqueIds,
   breathTechniques,
   breathworkFamiliarityOptions,
   canPromptForNotificationPermission,
@@ -46,6 +47,13 @@ function assertCondition(condition: boolean, message: string): void {
   if (!condition) {
     throw new Error(message);
   }
+}
+
+function assertNoAuditRiskPublicCopy(values: readonly string[]): void {
+  const auditRiskPattern = /\b(anxiety|panic|hrv)\b|stress\s+relief/i;
+  const exposedValue = values.find((value) => auditRiskPattern.test(value));
+
+  assertEquals(exposedValue, undefined);
 }
 
 const rescueTechnique = breathTechniques["4-7-8-sleep"];
@@ -122,7 +130,7 @@ assertEquals(
       defaultDurationSeconds: 300,
       availability: "free",
       catalogStatus: "mvp",
-      primaryContext: "Anxiety and stress",
+      primaryContext: "Calm and focus",
       sessionRoles: ["anxiety_calm", "focus"],
       startupRequirements: {
         auth: false,
@@ -147,7 +155,7 @@ assertEquals(
       defaultDurationSeconds: 600,
       availability: "free",
       catalogStatus: "mvp",
-      primaryContext: "Daily Calm / HRV Training",
+      primaryContext: "Daily Calm / steady practice",
       sessionRoles: ["regular_practice", "evening_wind_down", "daily_practice_hrv"],
       startupRequirements: {
         auth: false,
@@ -171,7 +179,7 @@ assertEquals(
       defaultDurationSeconds: 300,
       availability: "free",
       catalogStatus: "mvp",
-      primaryContext: "Stress relief",
+      primaryContext: "Stress reset",
       sessionRoles: ["stress_reset"],
       startupRequirements: {
         auth: false,
@@ -190,6 +198,32 @@ assertEquals(
       },
     },
   ],
+);
+assertNoAuditRiskPublicCopy([
+  ...breathTechniqueIds.flatMap((techniqueId) => {
+    const technique = breathTechniques[techniqueId];
+
+    return [technique.name, technique.displayName, technique.description, technique.primaryContext];
+  }),
+  ...onboardingGoalOptions.map((option) => option.label),
+  ...windDownContextGoalOptions.flatMap((option) => [option.label, option.subtitle]),
+  ...Object.values(onboardingPlans).flatMap((plan) => [
+    plan.label,
+    plan.summary,
+    plan.firstSession.title,
+  ]),
+]);
+assertEquals(
+  {
+    goalValue: onboardingGoalOptions.find((option) => option.planId === "anxiety_relief")?.value,
+    planId: onboardingPlans.anxiety_relief.id,
+    sessionRole: breathTechniques["box-breathing"].sessionRoles[0],
+  },
+  {
+    goalValue: "anxiety",
+    planId: "anxiety_relief",
+    sessionRole: "anxiety_calm",
+  },
 );
 assertEquals(
   mvpBreathTechniqueIds.map((techniqueId) => [techniqueId, breathTechniques[techniqueId].phases]),
@@ -294,7 +328,7 @@ assertEquals(
   onboardingGoalOptions.map((option) => [option.value, option.label, option.planId]),
   [
     ["sleep", "Sleep better", "sleep_focused"],
-    ["anxiety", "Ease anxiety", "anxiety_relief"],
+    ["anxiety", "Calm my mind", "anxiety_relief"],
     ["stress", "Reset stress", "stress_reset"],
     ["curiosity", "Just exploring", "general_wellness"],
   ],
@@ -487,7 +521,7 @@ assertEquals(
   }),
   {
     id: "anxiety_relief",
-    label: "Anxiety Relief",
+    label: "Calm Mind",
     summary: "A steady box-breathing session to make the next breath easier.",
     greeting: "Riley, your first session is ready",
     firstSession: {

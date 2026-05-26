@@ -10,6 +10,8 @@ import {
   morningCheckInSchema,
   mvpBreathTechniqueIdSchema,
   notificationGateEligibilitySchema,
+  onboardingGoalSchema,
+  onboardingPlanIdSchema,
   onboardingResponseSchema,
   postSessionReflectionSchema,
 } from "@nidoru/validation";
@@ -94,6 +96,22 @@ assertCondition(
 assertCondition(
   !breathTechniqueIdSchema.safeParse("unknown-technique").success,
   "Unknown technique ids must be rejected.",
+);
+assertCondition(
+  onboardingGoalSchema.safeParse("anxiety").success,
+  "Existing onboarding goal IDs must remain valid internal storage values.",
+);
+assertCondition(
+  !onboardingGoalSchema.safeParse("calm_my_mind").success,
+  "Updated public copy must not create a new persisted onboarding goal ID.",
+);
+assertCondition(
+  onboardingPlanIdSchema.safeParse("anxiety_relief").success,
+  "Existing onboarding plan IDs must remain valid internal storage values.",
+);
+assertCondition(
+  !onboardingPlanIdSchema.safeParse("calm_mind").success,
+  "Updated public copy must not create a new persisted onboarding plan ID.",
 );
 assertCondition(
   breathSessionPhaseNameSchema.safeParse("second-inhale").success,

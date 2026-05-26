@@ -209,6 +209,7 @@ describe("HomeScreen", () => {
 
     expect(lastNightCardClassName).toEqual(expect.stringContaining("rounded-[22px]"));
     expect(lastNightCardClassName).toEqual(expect.stringContaining("border-white/[0.06]"));
+    expect(lastNightCardClassName).toEqual(expect.stringContaining("bg-[#14172B]/60"));
     expect(lastNightCardClassName).not.toEqual(expect.stringContaining("bg-[#14172B]/70"));
     expect(screen.getByTestId("home-last-night-card-backdrop")).toBeTruthy();
     expect(screen.getByTestId("home-last-night-card-base-gradient")).toBeTruthy();
@@ -218,12 +219,17 @@ describe("HomeScreen", () => {
         expect.objectContaining({
           offset: "0",
           stopColor: "#5EC4D4",
-          stopOpacity: "0.035",
+          stopOpacity: "0.08",
+        }),
+        expect.objectContaining({
+          offset: "0.6",
+          stopColor: "#5EC4D4",
+          stopOpacity: "0",
         }),
         expect.objectContaining({
           offset: "0",
           stopColor: "#5EC4D4",
-          stopOpacity: "0.05",
+          stopOpacity: "0.1",
         }),
       ]),
     );

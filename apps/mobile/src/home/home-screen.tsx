@@ -708,7 +708,7 @@ function SleepInsightCard({
     <View
       className={cn(
         "relative overflow-hidden rounded-[22px] border border-white/[0.06] p-4 active:scale-[0.98]",
-        isLastNight ? null : "bg-[#14172B]/70",
+        isLastNight ? "bg-[#14172B]/60" : "bg-[#14172B]/70",
       )}
       testID={isLastNight ? "home-last-night-card" : undefined}
     >
@@ -809,19 +809,19 @@ function LastNightCardBackdrop() {
       <Svg height="100%" preserveAspectRatio="none" viewBox="0 0 390 156" width="100%">
         <Defs>
           <LinearGradient id="home-last-night-card-bg" x1="0" x2="1" y1="0" y2="1">
-            <Stop offset="0" stopColor="#5EC4D4" stopOpacity="0.035" />
-            <Stop offset="0.6" stopColor="#14172B" stopOpacity="0.6" />
-            <Stop offset="1" stopColor="#14172B" stopOpacity="0.6" />
+            <Stop offset="0" stopColor="#5EC4D4" stopOpacity="0.08" />
+            <Stop offset="0.6" stopColor="#5EC4D4" stopOpacity="0" />
+            <Stop offset="1" stopColor="#5EC4D4" stopOpacity="0" />
           </LinearGradient>
           <RadialGradient
             cx="390"
             cy="0"
             gradientUnits="userSpaceOnUse"
             id="home-last-night-card-glow"
-            r="104"
+            r="128"
           >
-            <Stop offset="0" stopColor="#5EC4D4" stopOpacity="0.05" />
-            <Stop offset="0.45" stopColor="#5EC4D4" stopOpacity="0.018" />
+            <Stop offset="0" stopColor="#5EC4D4" stopOpacity="0.1" />
+            <Stop offset="0.45" stopColor="#5EC4D4" stopOpacity="0.04" />
             <Stop offset="1" stopColor="#5EC4D4" stopOpacity="0" />
           </RadialGradient>
         </Defs>

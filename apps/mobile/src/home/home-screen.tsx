@@ -809,7 +809,7 @@ function LastNightCardBackdrop() {
       <Svg height="100%" preserveAspectRatio="none" viewBox="0 0 390 156" width="100%">
         <Defs>
           <LinearGradient id="home-last-night-card-bg" x1="0" x2="1" y1="0" y2="1">
-            <Stop offset="0" stopColor="#5EC4D4" stopOpacity="0.08" />
+            <Stop offset="0" stopColor="#5EC4D4" stopOpacity="0.035" />
             <Stop offset="0.6" stopColor="#14172B" stopOpacity="0.6" />
             <Stop offset="1" stopColor="#14172B" stopOpacity="0.6" />
           </LinearGradient>
@@ -818,10 +818,10 @@ function LastNightCardBackdrop() {
             cy="0"
             gradientUnits="userSpaceOnUse"
             id="home-last-night-card-glow"
-            r="128"
+            r="104"
           >
-            <Stop offset="0" stopColor="#5EC4D4" stopOpacity="0.12" />
-            <Stop offset="0.45" stopColor="#5EC4D4" stopOpacity="0.06" />
+            <Stop offset="0" stopColor="#5EC4D4" stopOpacity="0.05" />
+            <Stop offset="0.45" stopColor="#5EC4D4" stopOpacity="0.018" />
             <Stop offset="1" stopColor="#5EC4D4" stopOpacity="0" />
           </RadialGradient>
         </Defs>

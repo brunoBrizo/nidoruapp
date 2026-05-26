@@ -1,6 +1,7 @@
 import { describe, expect, it, jest } from "@jest/globals";
 import { fireEvent, render, screen, within } from "@testing-library/react-native";
 import { AccessibilityInfo } from "react-native";
+import { Stop } from "react-native-svg";
 
 jest.mock("react-native-css", () => {
   const React = jest.requireActual<typeof import("react")>("react");
@@ -212,6 +213,20 @@ describe("HomeScreen", () => {
     expect(screen.getByTestId("home-last-night-card-backdrop")).toBeTruthy();
     expect(screen.getByTestId("home-last-night-card-base-gradient")).toBeTruthy();
     expect(screen.getByTestId("home-last-night-card-cyan-glow")).toBeTruthy();
+    expect(screen.UNSAFE_getAllByType(Stop).map((node) => node.props)).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          offset: "0",
+          stopColor: "#5EC4D4",
+          stopOpacity: "0.035",
+        }),
+        expect.objectContaining({
+          offset: "0",
+          stopColor: "#5EC4D4",
+          stopOpacity: "0.05",
+        }),
+      ]),
+    );
     expect(screen.getByTestId("home-last-night-rating").props.className).toEqual(
       expect.stringContaining("gap-1"),
     );

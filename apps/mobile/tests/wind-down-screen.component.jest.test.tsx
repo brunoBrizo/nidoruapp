@@ -88,9 +88,19 @@ describe("WindDownScreen", () => {
     expect(screen.getByText("Swipe down to exit")).toBeTruthy();
     expect(screen.queryByRole("button")).toBeNull();
     expect(screen.queryByRole("link")).toBeNull();
-    expect(screen.getByTestId("wind-down-active-orb").props.className).toContain("h-[280px]");
-    expect(screen.getByTestId("wind-down-active-orb").props.className).toContain("w-[280px]");
+    expect(screen.getByTestId("wind-down-active-orb").props.className).toContain("h-[340px]");
+    expect(screen.getByTestId("wind-down-active-orb").props.className).toContain("w-[340px]");
     expect(screen.getByText("04:58").props.className).toContain("tabular-nums");
+  });
+
+  it("keeps the sleep-sound timer halo at the accepted PNG scale", () => {
+    render(<WindDownScreen state="ambient_handoff" />);
+
+    const timer = screen.getByText("29:58");
+
+    expect(timer.props.className).toContain("text-[55px]");
+    expect(screen.getByTestId("wind-down-timer-halo").props.className).toContain("h-[210px]");
+    expect(screen.getByTestId("wind-down-timer-halo").props.className).toContain("w-[210px]");
   });
 
   it("renders a calm slow-bootstrap fallback without a spinner-heavy modal", () => {

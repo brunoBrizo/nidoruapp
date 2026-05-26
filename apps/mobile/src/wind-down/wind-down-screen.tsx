@@ -673,7 +673,7 @@ function BreathworkState({
 
   return (
     <WindDownFrame stateId={state}>
-      <View className="flex-1 px-7 pt-[78px]">
+      <View className="flex-1 px-7 pt-[48px]">
         <View className="items-center gap-2">
           <Text
             accessibilityRole="header"
@@ -698,7 +698,7 @@ function BreathworkState({
         <View
           className={cn(
             "flex-1 items-center justify-center",
-            isDailyCalm ? "min-h-[430px]" : "min-h-[420px]",
+            isDailyCalm ? "min-h-[450px]" : "min-h-[440px]",
           )}
         >
           <OrbStage
@@ -706,40 +706,40 @@ function BreathworkState({
             accessibilityLabel={`${activeRoutine.phaseLabel} breathing phase`}
             accessibilityRole="image"
             className={cn(
-              "relative h-[280px] w-[280px]",
-              isDailyCalm ? "h-[300px] w-[300px]" : null,
+              "relative h-[340px] w-[340px]",
+              isDailyCalm ? "h-[340px] w-[340px]" : null,
             )}
             isDecorative={false}
             testID="wind-down-active-orb"
           >
             <View
               className={cn(
-                "absolute h-[280px] w-[280px] rounded-full border border-[#A89CE0]/15 bg-[#7C6FCD]/[0.08]",
-                isDailyCalm ? "h-[300px] w-[300px]" : null,
+                "absolute h-[340px] w-[340px] rounded-full border border-[#A89CE0]/15 bg-[#7C6FCD]/[0.08]",
+                isDailyCalm ? "h-[340px] w-[340px]" : null,
               )}
             />
             <View
               className={cn(
-                "absolute h-[232px] w-[232px] rounded-full border border-[#A89CE0]/15 bg-[#7C6FCD]/[0.16]",
-                isDailyCalm ? "h-[244px] w-[244px]" : null,
+                "absolute h-[282px] w-[282px] rounded-full border border-[#A89CE0]/15 bg-[#7C6FCD]/[0.16]",
+                isDailyCalm ? "h-[282px] w-[282px]" : null,
               )}
             />
             <View
               className={cn(
-                "absolute h-[182px] w-[182px] rounded-full border border-[#A89CE0]/25 bg-[#7C6FCD]/25",
-                isDailyCalm ? "h-[196px] w-[196px]" : null,
+                "absolute h-[224px] w-[224px] rounded-full border border-[#A89CE0]/25 bg-[#7C6FCD]/25",
+                isDailyCalm ? "h-[224px] w-[224px]" : null,
               )}
             />
-            <View className="absolute h-[156px] w-[156px] items-center justify-center overflow-hidden rounded-full border border-white/20 bg-[#4C427D]/95 shadow-[0_0_46px_rgba(124,111,205,0.42)]">
-              <View className="absolute h-[136px] w-[136px] rounded-full bg-white/[0.07]" />
+            <View className="absolute h-[184px] w-[184px] items-center justify-center overflow-hidden rounded-full border border-white/20 bg-[#4C427D]/95 shadow-[0_0_54px_rgba(124,111,205,0.42)]">
+              <View className="absolute h-[160px] w-[160px] rounded-full bg-white/[0.07]" />
               <Text
-                className="font-nidoru-primary-semibold text-[32px] leading-[38px] text-[#EEF0FF]"
+                className="font-nidoru-primary-semibold text-[34px] leading-[40px] text-[#EEF0FF]"
                 selectable={false}
               >
                 {activeRoutine.phaseLabel}
               </Text>
               <Text
-                className="mt-1.5 font-nidoru-data-regular text-lg leading-7 tracking-[0.18em] text-[#EEF0FF]/85 tabular-nums"
+                className="mt-1.5 font-nidoru-data-regular text-[20px] leading-7 tracking-[0.18em] text-[#EEF0FF]/85 tabular-nums"
                 selectable
               >
                 {formatRemainingTime(activeRoutine.remainingSeconds)}
@@ -777,14 +777,20 @@ function BreathworkState({
 
 function TimerHalo({ value }: { readonly value: string }) {
   return (
-    <View className="h-[168px] w-[168px] items-center justify-center rounded-full border border-[#7C6FCD]/25 bg-[#0D0F1A]/20 shadow-[0_0_42px_rgba(124,111,205,0.12)]">
+    <View
+      className="h-[210px] w-[210px] items-center justify-center rounded-full border border-[#7C6FCD]/25 bg-[#0D0F1A]/20 shadow-[0_0_48px_rgba(124,111,205,0.12)]"
+      testID="wind-down-timer-halo"
+    >
       <Text
-        className="font-nidoru-data-light text-[43px] leading-[52px] text-[#EEF0FF] tabular-nums"
+        className="font-nidoru-data-light text-[55px] leading-[66px] text-[#EEF0FF] tabular-nums"
         selectable
       >
         {value}
       </Text>
-      <Text className="font-nidoru-primary-regular text-xs leading-4 text-[#4A4E6A]" selectable>
+      <Text
+        className="font-nidoru-primary-regular text-[13px] leading-[18px] text-[#4A4E6A]"
+        selectable
+      >
         remaining
       </Text>
     </View>

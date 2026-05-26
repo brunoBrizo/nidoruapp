@@ -1,4 +1,5 @@
 import {
+  getNoHoldFallbackTechniqueId,
   resolveWindDownRoutine,
   type WindDownContextGoal,
   type WindDownRoutine,
@@ -45,6 +46,7 @@ type WindDownBootstrap = {
 type WindDownRouteSession = WindDownBootstrap & {
   readonly activeRoutine: WindDownActiveRoutineView;
   readonly ambientTimerDurationSeconds: number;
+  readonly routine: WindDownRoutine;
   readonly runId: string;
 };
 
@@ -105,6 +107,32 @@ function WindDownLiveRoute() {
     [],
   );
 
+  const switchSessionToNoHoldFallback = useCallback((session: WindDownRouteSession) => {
+    setRouteState((currentState) => {
+      if (currentState.status !== "session" || currentState.session.runId !== session.runId) {
+        return currentState;
+      }
+
+      const fallbackRoutine = resolveWindDownRoutine({
+        preferNoHoldBreathwork: true,
+        selectedGoal: session.routine.contextGoal,
+      }).routine;
+      const activeRoutine = createActiveRoutineView(fallbackRoutine, {
+        isNoHoldFallback:
+          fallbackRoutine.breathwork.techniqueId !== session.routine.breathwork.techniqueId,
+      });
+
+      return {
+        session: {
+          ...currentState.session,
+          activeRoutine,
+        },
+        status: "session",
+        visualState: activeRoutine.uiState,
+      };
+    });
+  }, []);
+
   const startRoutine = useCallback(
     async ({
       bootstrap,
@@ -144,6 +172,7 @@ function WindDownLiveRoute() {
           ...bootstrap,
           activeRoutine,
           ambientTimerDurationSeconds: resolution.routine.ambient.timerDurationSeconds,
+          routine: resolution.routine,
           runId,
         },
         status: "session",
@@ -202,6 +231,7 @@ function WindDownLiveRoute() {
                 rememberedResolution.routine.ambient.timerDurationSeconds,
               database: localDatabase,
               localInstallId,
+              routine: rememberedResolution.routine,
               runId,
             },
             status: "session",
@@ -362,6 +392,9 @@ function WindDownLiveRoute() {
             updatedAt: stoppedAt,
           }).finally(() => moveSession(session, "completion"));
         }}
+        onUseNoHoldFallback={() => {
+          switchSessionToNoHoldFallback(session);
+        }}
         onWake={() => {
           moveSession(session, "tap_to_wake");
         }}
@@ -408,12 +441,18 @@ function createWindDownLocalPersistenceDatabase(
   };
 }
 
-function createActiveRoutineView(routine: WindDownRoutine): WindDownActiveRoutineView {
+function createActiveRoutineView(
+  routine: WindDownRoutine,
+  options: { readonly isNoHoldFallback?: boolean } = {},
+): WindDownActiveRoutineView {
   return {
     breathworkDurationSeconds: routine.breathwork.durationSeconds,
     phaseLabel: "Inhale",
     remainingSeconds: routine.breathwork.durationSeconds,
+    isNoHoldFallback: options.isNoHoldFallback === true,
+    noHoldFallbackTechniqueId: getNoHoldFallbackTechniqueId(routine.breathwork.techniqueId),
     soundLabel: routine.ambient.soundLabel,
+    techniqueId: routine.breathwork.techniqueId,
     uiState: routine.breathwork.uiState,
   };
 }

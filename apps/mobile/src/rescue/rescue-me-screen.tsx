@@ -4,6 +4,7 @@ import type {
   CompletedBreathSessionRecord,
   RecoverableBreathSessionDraft,
 } from "@nidoru/validation";
+import { getNoHoldFallbackTechniqueId, type BreathTechniqueId } from "@nidoru/domain";
 import { StatusBar } from "expo-status-bar";
 import { Bell, Pause, Play, Vibrate } from "lucide-react-native";
 import type { ReactNode } from "react";
@@ -68,6 +69,8 @@ type RescueMeActiveSessionScreenProps = {
   readonly disableHaptics?: boolean;
   readonly hasExistingLocalRecord?: boolean;
   readonly initialCompletionMode?: RescueMeCompletionMode;
+  readonly initialDurationSeconds?: number;
+  readonly initialTechniqueId?: BreathTechniqueId;
   readonly localInstallId: string;
   readonly onContinueWithSound?: () => void;
   readonly onReturnHome?: () => void;
@@ -85,13 +88,16 @@ type RescueMeController = BreathSessionController<{
   readonly sessionId: string;
   readonly source: "rescue_me";
   readonly startedAtMs: number;
-  readonly targetBreathCycles: typeof rescueMeBreathCycles;
-  readonly techniqueId: typeof rescueMeTechniqueId;
-  readonly totalDurationSeconds: typeof rescueMeDurationSeconds;
+  readonly targetBreathCycles?: typeof rescueMeBreathCycles;
+  readonly techniqueId: BreathTechniqueId;
+  readonly totalDurationSeconds: number;
 }>;
 
 const rescueMeTechniqueId = "4-7-8-sleep";
+const rescueMeNoHoldTechniqueId =
+  getNoHoldFallbackTechniqueId(rescueMeTechniqueId) ?? "diaphragmatic-breathing";
 const rescueMeDurationSeconds = 209;
+const rescueMeNoHoldDurationSeconds = 180;
 const rescueMeBreathCycles = 5;
 const rescueMeTickIntervalMs = 1000;
 const rescueMeDraftPersistIntervalMs = 15000;
@@ -153,6 +159,10 @@ const rescueMeClassNames = {
     "min-h-12 min-w-[180px] flex-row items-center justify-center gap-2 rounded-[13px] bg-[#7C6FCD] px-5 active:scale-[0.96] transition-transform duration-200",
   pauseOverlayPrimaryText:
     "text-center font-nidoru-primary-semibold text-sm leading-[18px] tracking-normal text-[#EEF0FF]",
+  pauseOverlayFallbackAction:
+    "min-h-[44px] min-w-[190px] items-center justify-center rounded-[13px] border border-[#7C6FCD]/25 px-4 active:scale-[0.98] transition-transform duration-200",
+  pauseOverlayFallbackText:
+    "text-center font-nidoru-primary-semibold text-[13px] leading-[18px] tracking-normal text-[#EEF0FF]/90",
   pauseOverlaySecondaryAction:
     "min-h-[44px] min-w-[140px] items-center justify-center px-3 active:scale-[0.98] transition-transform duration-200",
   pauseOverlaySecondaryText:
@@ -174,6 +184,8 @@ const rescueMeClassNames = {
     "mt-2.5 text-center font-nidoru-primary-regular text-[11px] leading-[14px] tracking-normal text-[#8A8FA8]",
   soundPauseButton:
     "mt-[58px] h-[50px] w-[50px] min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-[#7C6FCD]/[0.34] bg-[#1C2040]/[0.64] shadow-[0_0_24px_rgba(124,111,205,0.12)] active:scale-[0.96] transition-transform duration-200",
+  sessionModeLabel:
+    "mt-3 text-center font-nidoru-primary-semibold text-[12px] leading-[16px] tracking-normal text-[#A89CE0]/85",
   timer:
     "text-center font-nidoru-data-regular text-[17px] leading-6 tracking-[3px] text-[#8A8FA8]/80 tabular-nums",
 } as const;
@@ -284,6 +296,8 @@ export function RescueMeActiveSessionScreen({
   disableHaptics = false,
   hasExistingLocalRecord = false,
   initialCompletionMode,
+  initialDurationSeconds,
+  initialTechniqueId,
   localInstallId,
   onContinueWithSound = () => undefined,
   onReturnHome = () => undefined,
@@ -306,11 +320,18 @@ export function RescueMeActiveSessionScreen({
   const reduceMotionPreference = useReduceMotionPreference();
   const reduceMotionEnabled =
     reduceMotionPreference.isResolved && reduceMotionPreference.reduceMotionEnabled;
+  const initialRescueMeTechniqueId = normalizeRescueMeTechniqueId(initialTechniqueId);
+  const initialRescueMeDurationSeconds = normalizeRescueMeDurationSeconds(
+    initialDurationSeconds,
+    initialRescueMeTechniqueId,
+  );
   const controllerRef = useRef<RescueMeController>(
     createRescueMeController({
+      durationSeconds: initialRescueMeDurationSeconds,
       localInstallId,
       sessionId,
       startedAtMs,
+      techniqueId: initialRescueMeTechniqueId,
     }),
   );
   const [controller, setController] = useState(controllerRef.current);
@@ -326,6 +347,7 @@ export function RescueMeActiveSessionScreen({
   const hasPersistedFinalDraftRef = useRef(false);
   const isPersistingTerminalStateRef = useRef(false);
   const lastDraftPersistedAtMs = useRef<number | undefined>(undefined);
+  const startPersistenceRef = useRef<Promise<void>>(Promise.resolve());
   const hasRecordedOrbVisibleRef = useRef(false);
   const recordOrbVisibleOnce = useCallback(() => {
     if (hasRecordedOrbVisibleRef.current) {
@@ -361,18 +383,21 @@ export function RescueMeActiveSessionScreen({
 
     hasPersistedSessionStartRef.current = true;
     captureRescueMeAnalyticsEvent("rescue_me_started");
+    const currentController = controllerRef.current;
 
-    void persistBreathSessionStarted({
+    startPersistenceRef.current = persistBreathSessionStarted({
       audioCueModeId: rescueMeAudioCueModeId,
       currentPhaseName: snapshot.phaseName,
-      durationSeconds: rescueMeDurationSeconds,
+      durationSeconds: currentController.totalDurationSeconds,
       localInstallId,
       sessionId,
       source: "rescue_me",
-      startedAt: new Date(startedAtMs).toISOString(),
+      startedAt: new Date(currentController.startedAtMs).toISOString(),
       status: "started",
-      techniqueId: rescueMeTechniqueId,
-    }).catch(() => undefined);
+      techniqueId: currentController.techniqueId,
+    })
+      .then(() => undefined)
+      .catch(() => undefined);
   }, [localInstallId, persistBreathSessionStarted, sessionId, snapshot.phaseName, startedAtMs]);
 
   useEffect(() => {
@@ -479,6 +504,29 @@ export function RescueMeActiveSessionScreen({
     setSnapshot(getBreathSessionSnapshot(resumed, observedAtMs));
   };
 
+  const switchToNoHoldFallback = () => {
+    if (controllerRef.current.techniqueId === rescueMeNoHoldTechniqueId) {
+      return;
+    }
+
+    const observedAtMs = Date.now();
+    const fallbackController = createRescueMeController({
+      durationSeconds: rescueMeNoHoldDurationSeconds,
+      localInstallId,
+      sessionId,
+      startedAtMs: observedAtMs,
+      techniqueId: rescueMeNoHoldTechniqueId,
+    });
+    const nextSnapshot = getBreathSessionSnapshot(fallbackController, observedAtMs);
+
+    controllerRef.current = fallbackController;
+    lastDraftPersistedAtMs.current = undefined;
+    hasPersistedFinalDraftRef.current = false;
+    setController(fallbackController);
+    setSnapshot(nextSnapshot);
+    void startPersistenceRef.current.finally(() => persistDraftForSnapshot(nextSnapshot));
+  };
+
   const endSessionEarly = () => {
     if (isPersistingTerminalStateRef.current) {
       return;
@@ -518,6 +566,8 @@ export function RescueMeActiveSessionScreen({
       {completionMode === "completed" ? (
         <CompletionState
           compact={isCompactHeight}
+          completedCycleCount={snapshot.completedBreathCycles || rescueMeBreathCycles}
+          isNoHoldFallback={controller.techniqueId === rescueMeNoHoldTechniqueId}
           onContinueWithSound={onContinueWithSound}
           onReturnHome={onReturnHome}
         />
@@ -526,6 +576,7 @@ export function RescueMeActiveSessionScreen({
           <ActiveSessionRuntimeState
             compact={isCompactHeight}
             hapticsEnabled={hapticsEnabled}
+            isNoHoldFallback={controller.techniqueId === rescueMeNoHoldTechniqueId}
             onPause={pauseSession}
             onToggleHaptics={() => {
               if (!disableHaptics) {
@@ -537,7 +588,15 @@ export function RescueMeActiveSessionScreen({
             snapshot={snapshot}
           />
           {snapshot.isPaused ? (
-            <RescueMePauseOverlay onEnd={endSessionEarly} onResume={resumeSession} />
+            <RescueMePauseOverlay
+              onEnd={endSessionEarly}
+              onResume={resumeSession}
+              onUseNoHoldFallback={
+                controller.techniqueId === rescueMeNoHoldTechniqueId
+                  ? undefined
+                  : switchToNoHoldFallback
+              }
+            />
           ) : null}
         </>
       )}
@@ -640,6 +699,7 @@ function ActiveSessionState({
 function ActiveSessionRuntimeState({
   compact,
   hapticsEnabled,
+  isNoHoldFallback,
   onPause,
   onOrbLayout,
   onToggleHaptics,
@@ -648,6 +708,7 @@ function ActiveSessionRuntimeState({
 }: {
   readonly compact: boolean;
   readonly hapticsEnabled: boolean;
+  readonly isNoHoldFallback: boolean;
   readonly onPause: () => void;
   readonly onOrbLayout?: (() => void) | undefined;
   readonly onToggleHaptics: () => void;
@@ -681,6 +742,11 @@ function ActiveSessionRuntimeState({
         >
           {formatRemainingTime(snapshot.remainingSeconds)}
         </Text>
+        {isNoHoldFallback ? (
+          <Text className={rescueMeClassNames.sessionModeLabel} selectable>
+            No-hold breathing
+          </Text>
+        ) : null}
       </View>
 
       {config.showReassurance ? (
@@ -867,13 +933,22 @@ function ControlButton({
 
 function CompletionState({
   compact,
+  completedCycleCount = rescueMeBreathCycles,
+  isNoHoldFallback = false,
   onContinueWithSound = () => undefined,
   onReturnHome = () => undefined,
 }: {
   readonly compact: boolean;
+  readonly completedCycleCount?: number;
+  readonly isNoHoldFallback?: boolean;
   readonly onContinueWithSound?: () => void;
   readonly onReturnHome?: () => void;
 }) {
+  const title = isNoHoldFallback ? "No-hold breathing complete." : "That took courage to start.";
+  const copy = isNoHoldFallback
+    ? `You completed ${completedCycleCount} no-hold breath cycles.`
+    : "You completed 5 breath cycles.";
+
   return (
     <View
       className={cn(
@@ -883,10 +958,10 @@ function CompletionState({
     >
       <MiniOrb />
       <Text accessibilityRole="header" className={rescueMeClassNames.completionTitle} selectable>
-        That took courage to start.
+        {title}
       </Text>
       <Text className={rescueMeClassNames.completionCopy} selectable>
-        You completed 5 breath cycles.
+        {copy}
       </Text>
       <Pressable
         accessibilityLabel="Continue with a calming sound"
@@ -1134,9 +1209,11 @@ function ReturnHomeButton({ onPress = () => undefined }: { readonly onPress?: ()
 function RescueMePauseOverlay({
   onEnd,
   onResume,
+  onUseNoHoldFallback,
 }: {
   readonly onEnd: () => void;
   readonly onResume: () => void;
+  readonly onUseNoHoldFallback?: (() => void) | undefined;
 }) {
   return (
     <View className={rescueMeClassNames.pauseOverlay} testID="rescue-me-pause-overlay">
@@ -1162,6 +1239,18 @@ function RescueMePauseOverlay({
             Resume
           </Text>
         </Pressable>
+        {onUseNoHoldFallback ? (
+          <Pressable
+            accessibilityLabel="Switch to no-hold breathing"
+            accessibilityRole="button"
+            className={rescueMeClassNames.pauseOverlayFallbackAction}
+            onPress={onUseNoHoldFallback}
+          >
+            <Text className={rescueMeClassNames.pauseOverlayFallbackText} selectable={false}>
+              Switch to no-hold breathing
+            </Text>
+          </Pressable>
+        ) : null}
         <Pressable
           accessibilityLabel="End Rescue Me for now"
           accessibilityRole="button"
@@ -1178,22 +1267,29 @@ function RescueMePauseOverlay({
 }
 
 function createRescueMeController({
+  durationSeconds = rescueMeDurationSeconds,
   localInstallId,
   sessionId,
   startedAtMs,
+  techniqueId = rescueMeTechniqueId,
 }: {
+  readonly durationSeconds?: number;
   readonly localInstallId: string;
   readonly sessionId: string;
   readonly startedAtMs: number;
+  readonly techniqueId?: BreathTechniqueId;
 }): RescueMeController {
+  const targetBreathCycles =
+    techniqueId === rescueMeTechniqueId ? rescueMeBreathCycles : undefined;
+
   return createBreathSessionController({
     localInstallId,
     sessionId,
     source: "rescue_me",
     startedAtMs,
-    targetBreathCycles: rescueMeBreathCycles,
-    techniqueId: rescueMeTechniqueId,
-    totalDurationSeconds: rescueMeDurationSeconds,
+    ...(targetBreathCycles === undefined ? {} : { targetBreathCycles }),
+    techniqueId,
+    totalDurationSeconds: durationSeconds,
   }) as RescueMeController;
 }
 
@@ -1205,7 +1301,7 @@ function createRescueMeDraftRecord(
     audioCueModeId: rescueMeAudioCueModeId,
     completedBreathCycles: snapshot.completedBreathCycles,
     currentPhaseName: snapshot.phaseName,
-    durationSeconds: rescueMeDurationSeconds,
+    durationSeconds: controller.totalDurationSeconds,
     elapsedDurationMs: snapshot.elapsedDurationMs,
     localInstallId: controller.localInstallId,
     remainingDurationMs: snapshot.remainingDurationMs,
@@ -1213,9 +1309,34 @@ function createRescueMeDraftRecord(
     source: "rescue_me",
     startedAt: new Date(controller.startedAtMs).toISOString(),
     status: "draft",
-    techniqueId: rescueMeTechniqueId,
+    techniqueId: controller.techniqueId,
     updatedAt: new Date(snapshot.observedAtMs).toISOString(),
   };
+}
+
+function normalizeRescueMeTechniqueId(
+  techniqueId: BreathTechniqueId | undefined,
+): BreathTechniqueId {
+  return techniqueId === rescueMeNoHoldTechniqueId
+    ? rescueMeNoHoldTechniqueId
+    : rescueMeTechniqueId;
+}
+
+function normalizeRescueMeDurationSeconds(
+  durationSeconds: number | undefined,
+  techniqueId: BreathTechniqueId,
+): number {
+  if (
+    typeof durationSeconds === "number" &&
+    Number.isInteger(durationSeconds) &&
+    durationSeconds > 0
+  ) {
+    return durationSeconds;
+  }
+
+  return techniqueId === rescueMeNoHoldTechniqueId
+    ? rescueMeNoHoldDurationSeconds
+    : rescueMeDurationSeconds;
 }
 
 function getRuntimeActiveStateConfig(snapshot: BreathSessionSnapshot): ActiveStateConfig {

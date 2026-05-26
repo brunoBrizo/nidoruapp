@@ -579,6 +579,71 @@ describe("RescueMeScreen", () => {
     });
   });
 
+  it("switches a paused Rescue Me session into a no-hold fallback and persists it", async () => {
+    jest.useFakeTimers();
+    jest.setSystemTime(rescueStartedAtMs);
+    const persistBreathSessionDraft = jest.fn(() => Promise.resolve());
+    const persistBreathSessionCompletion = jest.fn(() => Promise.resolve());
+
+    render(
+      <RescueMeActiveSessionScreen
+        {...rescueSessionProps}
+        persistBreathSessionCompletion={persistBreathSessionCompletion}
+        persistBreathSessionDraft={persistBreathSessionDraft}
+      />,
+    );
+
+    fireEvent.press(screen.getByRole("button", { name: "Pause Rescue Me session" }));
+    expect(screen.getByText(holdSafetyCopy)).toBeTruthy();
+
+    fireEvent.press(screen.getByRole("button", { name: "Switch to no-hold breathing" }));
+
+    await waitFor(() => {
+      expect(screen.queryByTestId("rescue-me-pause-overlay")).toBeNull();
+    });
+    expect(screen.getByText("No-hold breathing")).toBeTruthy();
+    expect(screen.getByText("03:00")).toBeTruthy();
+    expect(persistBreathSessionDraft).toHaveBeenCalledWith(
+      expect.objectContaining({
+        currentPhaseName: "inhale",
+        durationSeconds: 180,
+        elapsedDurationMs: 0,
+        remainingDurationMs: 180_000,
+        source: "rescue_me",
+        status: "draft",
+        techniqueId: "diaphragmatic-breathing",
+      }),
+    );
+
+    await act(async () => {
+      jest.advanceTimersByTime(4_000);
+      await Promise.resolve();
+    });
+
+    expect(screen.getByLabelText("Exhale breathing phase")).toBeTruthy();
+    expect(screen.queryByText("Hold")).toBeNull();
+
+    await act(async () => {
+      jest.advanceTimersByTime(176_000);
+      await Promise.resolve();
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText("No-hold breathing complete.")).toBeTruthy();
+    });
+    expect(screen.getByText("You completed 18 no-hold breath cycles.")).toBeTruthy();
+    expect(persistBreathSessionCompletion).toHaveBeenCalledWith(
+      expect.objectContaining({
+        completedBreathCycles: 18,
+        durationSeconds: 180,
+        remainingDurationMs: 0,
+        source: "rescue_me",
+        status: "completed",
+        techniqueId: "diaphragmatic-breathing",
+      }),
+    );
+  });
+
   it("persists a neutral Rescue Me partial stop before returning home", async () => {
     jest.useFakeTimers();
     jest.setSystemTime(rescueStartedAtMs);

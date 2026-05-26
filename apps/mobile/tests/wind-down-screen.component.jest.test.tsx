@@ -76,7 +76,10 @@ describe("WindDownScreen", () => {
           breathworkDurationSeconds: 300,
           phaseLabel: "Inhale",
           remainingSeconds: 298,
+          isNoHoldFallback: false,
+          noHoldFallbackTechniqueId: "diaphragmatic-breathing",
           soundLabel: "Rain",
+          techniqueId: "4-7-8-sleep",
           uiState: "active_winddown",
         }}
         state="active"
@@ -87,13 +90,63 @@ describe("WindDownScreen", () => {
     expect(screen.getByText("Inhale")).toBeTruthy();
     expect(screen.getByText("04:58")).toBeTruthy();
     expect(screen.getByText(holdSafetyCopy)).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Switch to no-hold breathing" })).toBeTruthy();
     expect(screen.getByText("Rain softly playing")).toBeTruthy();
     expect(screen.getByText("Swipe down to exit")).toBeTruthy();
-    expect(screen.queryByRole("button")).toBeNull();
     expect(screen.queryByRole("link")).toBeNull();
     expect(screen.getByTestId("wind-down-active-orb").props.className).toContain("h-[340px]");
     expect(screen.getByTestId("wind-down-active-orb").props.className).toContain("w-[340px]");
     expect(screen.getByText("04:58").props.className).toContain("tabular-nums");
+  });
+
+  it("uses one quiet action to enter no-hold Wind-Down breathing from safety copy", () => {
+    const onUseNoHoldFallback = jest.fn();
+
+    render(
+      <WindDownScreen
+        activeRoutine={{
+          breathworkDurationSeconds: 300,
+          phaseLabel: "Inhale",
+          remainingSeconds: 298,
+          isNoHoldFallback: false,
+          noHoldFallbackTechniqueId: "diaphragmatic-breathing",
+          soundLabel: "Rain",
+          techniqueId: "4-7-8-sleep",
+          uiState: "active_winddown",
+        }}
+        onUseNoHoldFallback={onUseNoHoldFallback}
+        state="active"
+      />,
+    );
+
+    fireEvent.press(screen.getByRole("button", { name: "Switch to no-hold breathing" }));
+
+    expect(onUseNoHoldFallback).toHaveBeenCalledTimes(1);
+    expect(screen.queryByText(/choose a technique|pick a technique|treatment/i)).toBeNull();
+  });
+
+  it("renders no-hold Wind-Down breathing without hold guidance or a technique picker", () => {
+    render(
+      <WindDownScreen
+        activeRoutine={{
+          breathworkDurationSeconds: 300,
+          phaseLabel: "Inhale",
+          remainingSeconds: 298,
+          isNoHoldFallback: true,
+          noHoldFallbackTechniqueId: null,
+          soundLabel: "Rain",
+          techniqueId: "diaphragmatic-breathing",
+          uiState: "active_winddown",
+        }}
+        state="active"
+      />,
+    );
+
+    expect(screen.getByRole("header", { name: "No-hold breathing" })).toBeTruthy();
+    expect(screen.getByText("Diaphragmatic breathing for wind-down")).toBeTruthy();
+    expect(screen.queryByText(holdSafetyCopy)).toBeNull();
+    expect(screen.queryByRole("button", { name: "Switch to no-hold breathing" })).toBeNull();
+    expect(screen.queryByText(/panic|anxiety|insomnia|medical/i)).toBeNull();
   });
 
   it("keeps the sleep-sound timer halo at the accepted PNG scale", () => {

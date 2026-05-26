@@ -292,6 +292,46 @@ describe("WindDownRoute", () => {
       restoreFetch();
     }
   });
+
+  it("switches remembered hold-based Wind-Down breathing to the no-hold fallback for tonight only", async () => {
+    mockLoadRememberedWindDownContextChoiceLocally.mockResolvedValue({
+      contextGoal: "fall_asleep_faster",
+      localInstallId: "install_0123456789abcdef",
+      routineId: "wind_down_sleep_starter",
+      selectedAt: "2026-05-24T23:18:00.000Z",
+    });
+
+    render(<WindDownRoute />);
+
+    await act(async () => {
+      await flushPromises();
+    });
+
+    expect(screen.getByRole("button", { name: "Switch to no-hold breathing" })).toBeTruthy();
+
+    await act(async () => {
+      fireEvent.press(screen.getByRole("button", { name: "Switch to no-hold breathing" }));
+      await flushPromises();
+    });
+
+    expect(screen.getByRole("header", { name: "No-hold breathing" })).toBeTruthy();
+    expect(screen.getByText("Diaphragmatic breathing for wind-down")).toBeTruthy();
+    expect(mockSaveRememberedWindDownContextChoiceLocally).not.toHaveBeenCalled();
+
+    await act(async () => {
+      jest.advanceTimersByTime(300_000);
+      await flushPromises();
+    });
+
+    expect(screen.getByTestId("wind-down-state-transition_card")).toBeTruthy();
+    expect(mockSaveWindDownStepProgressLocally).toHaveBeenCalledWith(
+      expect.any(Object),
+      expect.objectContaining({
+        recoveryState: "transition_card",
+        status: "breath_completed",
+      }),
+    );
+  });
 });
 
 function mockFetchOffline() {

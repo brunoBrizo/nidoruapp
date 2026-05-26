@@ -171,6 +171,54 @@ describe("RescueMeSessionRoute", () => {
     });
   });
 
+  it("recovers a no-hold Rescue Me draft with its fallback technique and duration", async () => {
+    const observedAtMs = Date.parse("2026-05-23T06:10:00.000Z");
+    const database = {
+      getFirstAsync: jest.fn(),
+      runAsync: jest.fn(),
+    };
+
+    jest.useFakeTimers();
+    jest.setSystemTime(observedAtMs);
+    mockOpenMigratedLocalDatabase.mockResolvedValue(database);
+    mockGetOrCreateLocalInstallIdentity.mockResolvedValue("install_0123456789abcdef");
+    mockLoadRecoverableBreathSessionDraft.mockResolvedValue({
+      audioCueModeId: "gentle-bell",
+      completedBreathCycles: 4,
+      currentPhaseName: "exhale",
+      durationSeconds: 180,
+      elapsedDurationMs: 45_000,
+      localInstallId: "install_0123456789abcdef",
+      remainingDurationMs: 135_000,
+      sessionId: "session_rescuenohold123",
+      source: "rescue_me",
+      startedAt: "2026-05-23T06:09:15.000Z",
+      status: "draft",
+      techniqueId: "diaphragmatic-breathing",
+      updatedAt: "2026-05-23T06:09:59.000Z",
+    });
+
+    render(<RescueMeSessionRoute />);
+
+    await act(async () => {
+      await flushPromises();
+    });
+
+    const [activeProps] = mockRescueMeActiveSessionScreen.mock.calls.at(-1) ?? [];
+
+    expect(activeProps).toEqual(
+      expect.objectContaining({
+        hasExistingLocalRecord: true,
+        initialDurationSeconds: 180,
+        initialTechniqueId: "diaphragmatic-breathing",
+        localInstallId: "install_0123456789abcdef",
+        sessionId: "session_rescuenohold123",
+      }),
+    );
+    expect(activeProps?.startedAtMs).toBeGreaterThanOrEqual(observedAtMs - 45_000);
+    expect(activeProps?.startedAtMs).toBeLessThan(observedAtMs - 44_000);
+  });
+
   it("starts a fresh Rescue Me session instead of restoring an old completed session", async () => {
     const observedAtMs = Date.parse("2026-05-23T06:15:00.000Z");
     const database = {
@@ -212,10 +260,10 @@ describe("RescueMeSessionRoute", () => {
     expect(activeProps).toEqual(
       expect.objectContaining({
         hasExistingLocalRecord: false,
-        initialCompletionMode: undefined,
         localInstallId: "install_0123456789abcdef",
       }),
     );
+    expect(activeProps).not.toHaveProperty("initialCompletionMode");
     expect(activeProps?.sessionId).toMatch(/^session_[A-Za-z0-9_-]{8,64}$/);
     expect(activeProps?.sessionId).not.toBe("session_completedrescueme");
     expect(activeProps?.startedAtMs).toBe(observedAtMs);

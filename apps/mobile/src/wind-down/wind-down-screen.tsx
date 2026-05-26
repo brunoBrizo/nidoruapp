@@ -1,5 +1,6 @@
 import {
   windDownContextGoalOptions,
+  type BreathTechniqueId,
   type WindDownContextGoal,
   type WindDownRoutineUiState,
 } from "@nidoru/domain";
@@ -34,7 +35,10 @@ export type WindDownActiveRoutineView = {
   readonly breathworkDurationSeconds: number;
   readonly phaseLabel: string;
   readonly remainingSeconds: number;
+  readonly isNoHoldFallback: boolean;
+  readonly noHoldFallbackTechniqueId: BreathTechniqueId | null;
   readonly soundLabel: string;
+  readonly techniqueId: BreathTechniqueId;
   readonly uiState: Extract<WindDownRoutineUiState, "active_winddown" | "daily_calm">;
 };
 
@@ -60,6 +64,7 @@ type WindDownSessionHandlers = {
   readonly onFadeNow?: () => void;
   readonly onSkipForTonight?: () => void;
   readonly onStop?: () => void;
+  readonly onUseNoHoldFallback?: () => void;
   readonly onWake?: () => void;
 };
 
@@ -80,7 +85,10 @@ const defaultActiveRoutine = {
   breathworkDurationSeconds: 300,
   phaseLabel: "Inhale",
   remainingSeconds: 298,
+  isNoHoldFallback: false,
+  noHoldFallbackTechniqueId: "diaphragmatic-breathing",
   soundLabel: "Rain",
+  techniqueId: "4-7-8-sleep",
   uiState: "active_winddown",
 } as const satisfies WindDownActiveRoutineView;
 
@@ -88,6 +96,8 @@ const dailyCalmRoutine = {
   ...defaultActiveRoutine,
   breathworkDurationSeconds: 600,
   remainingSeconds: 582,
+  noHoldFallbackTechniqueId: null,
+  techniqueId: "coherent-breathing",
   uiState: "daily_calm",
 } as const satisfies WindDownActiveRoutineView;
 
@@ -192,6 +202,7 @@ export function WindDownScreen(props: WindDownScreenProps) {
         activeRoutine={
           props.activeRoutine ?? (state === "daily_calm" ? dailyCalmRoutine : defaultActiveRoutine)
         }
+        onUseNoHoldFallback={props.onUseNoHoldFallback}
         state={state}
       />
     );
@@ -664,13 +675,26 @@ function WindDownContextOption({
 
 function BreathworkState({
   activeRoutine,
+  onUseNoHoldFallback,
   state,
 }: {
   readonly activeRoutine: WindDownActiveRoutineView;
+  readonly onUseNoHoldFallback?: (() => void) | undefined;
   readonly state: Extract<WindDownVisualStateId, "active_winddown" | "daily_calm">;
 }) {
   const isDailyCalm = state === "daily_calm";
-  const title = isDailyCalm ? "Daily Calm" : "Let's wind down.";
+  const title = activeRoutine.isNoHoldFallback
+    ? "No-hold breathing"
+    : isDailyCalm
+      ? "Daily Calm"
+      : "Let's wind down.";
+  const subtitle = activeRoutine.isNoHoldFallback
+    ? "Diaphragmatic breathing for wind-down"
+    : isDailyCalm
+      ? "Coherent breathing for wind-down"
+      : null;
+  const canUseNoHoldFallback =
+    !activeRoutine.isNoHoldFallback && activeRoutine.noHoldFallbackTechniqueId !== null;
 
   return (
     <WindDownFrame stateId={state}>
@@ -691,16 +715,39 @@ function BreathworkState({
               className="text-center font-nidoru-primary-regular text-sm leading-5 text-[#8A8FA8]"
               selectable
             >
-              Coherent breathing for wind-down
+              {subtitle}
             </Text>
           ) : null}
-          {!isDailyCalm ? (
+          {activeRoutine.isNoHoldFallback ? (
+            <Text
+              className="text-center font-nidoru-primary-regular text-sm leading-5 text-[#8A8FA8]"
+              selectable
+            >
+              {subtitle}
+            </Text>
+          ) : null}
+          {!isDailyCalm && !activeRoutine.isNoHoldFallback ? (
             <Text
               className="max-w-[310px] text-center font-nidoru-primary-regular text-[12px] leading-[18px] text-[#8A8FA8]"
               selectable
             >
               {breathHoldSafetyGuidance}
             </Text>
+          ) : null}
+          {canUseNoHoldFallback ? (
+            <Pressable
+              accessibilityLabel="Switch to no-hold breathing"
+              accessibilityRole="button"
+              className="min-h-11 min-w-[190px] items-center justify-center rounded-full border border-[#7C6FCD]/30 px-4 active:scale-[0.96]"
+              onPress={onUseNoHoldFallback}
+            >
+              <Text
+                className="font-nidoru-primary-semibold text-[13px] leading-[18px] text-[#EEF0FF]/88"
+                selectable={false}
+              >
+                Switch to no-hold breathing
+              </Text>
+            </Pressable>
           ) : null}
         </View>
 

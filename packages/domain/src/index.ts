@@ -248,6 +248,21 @@ export const breathTechniques = {
   },
 } as const satisfies Record<string, BreathTechnique>;
 
+export const breathTechniqueNoHoldFallbacks = {
+  "4-7-8-sleep": "diaphragmatic-breathing",
+  "box-breathing": "diaphragmatic-breathing",
+} as const satisfies Partial<Record<MvpBreathTechniqueId, MvpBreathTechniqueId>>;
+
+export function getNoHoldFallbackTechniqueId(
+  techniqueId: BreathTechniqueId,
+): MvpBreathTechniqueId | null {
+  return (
+    breathTechniqueNoHoldFallbacks[
+      techniqueId as keyof typeof breathTechniqueNoHoldFallbacks
+    ] ?? null
+  );
+}
+
 export const launchSoundIds = [
   "light-rain",
   "heavy-rain",
@@ -471,6 +486,7 @@ export const windDownRoutines = {
 export type WindDownRoutineSelectionSource = "selected_goal" | "remembered_goal" | "default";
 
 export type WindDownRoutineResolutionInput = {
+  readonly preferNoHoldBreathwork?: boolean;
   readonly rememberedGoal?: WindDownContextGoal | null;
   readonly selectedGoal?: WindDownContextGoal | null;
 };
@@ -493,6 +509,7 @@ export function parseWindDownContextGoalInput(value: unknown): WindDownContextGo
 }
 
 export function resolveWindDownRoutine({
+  preferNoHoldBreathwork,
   rememberedGoal,
   selectedGoal,
 }: WindDownRoutineResolutionInput = {}): WindDownRoutineResolution {
@@ -501,7 +518,10 @@ export function resolveWindDownRoutine({
       selectionSource: "selected_goal",
       maxTapsFromHome: 2,
       requiresQuickContextCheck: false,
-      routine: windDownRoutines[selectedGoal],
+      routine: resolveNoHoldWindDownBreathwork(
+        windDownRoutines[selectedGoal],
+        preferNoHoldBreathwork,
+      ),
     };
   }
 
@@ -510,7 +530,10 @@ export function resolveWindDownRoutine({
       selectionSource: "remembered_goal",
       maxTapsFromHome: 1,
       requiresQuickContextCheck: false,
-      routine: windDownRoutines[rememberedGoal],
+      routine: resolveNoHoldWindDownBreathwork(
+        windDownRoutines[rememberedGoal],
+        preferNoHoldBreathwork,
+      ),
     };
   }
 
@@ -518,7 +541,34 @@ export function resolveWindDownRoutine({
     selectionSource: "default",
     maxTapsFromHome: 2,
     requiresQuickContextCheck: true,
-    routine: windDownRoutines.fall_asleep_faster,
+    routine: resolveNoHoldWindDownBreathwork(
+      windDownRoutines.fall_asleep_faster,
+      preferNoHoldBreathwork,
+    ),
+  };
+}
+
+function resolveNoHoldWindDownBreathwork(
+  routine: WindDownRoutine,
+  preferNoHoldBreathwork: boolean | undefined,
+): WindDownRoutine {
+  if (!preferNoHoldBreathwork) {
+    return routine;
+  }
+
+  const fallbackTechniqueId = getNoHoldFallbackTechniqueId(routine.breathwork.techniqueId);
+
+  if (!fallbackTechniqueId) {
+    return routine;
+  }
+
+  return {
+    ...routine,
+    breathwork: {
+      ...routine.breathwork,
+      techniqueId: fallbackTechniqueId,
+      uiState: "active_winddown",
+    },
   };
 }
 

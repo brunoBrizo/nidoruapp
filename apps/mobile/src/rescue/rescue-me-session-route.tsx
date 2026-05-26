@@ -1,5 +1,6 @@
 import { useRouter } from "expo-router";
 import * as Linking from "expo-linking";
+import type { BreathTechniqueId } from "@nidoru/domain";
 import { useEffect, useState } from "react";
 
 import {
@@ -18,6 +19,8 @@ type RescueMeRouteConfig = {
   readonly database?: BreathSessionLocalPersistenceDatabase;
   readonly hasExistingLocalRecord?: boolean;
   readonly initialCompletionMode?: "completed";
+  readonly initialDurationSeconds?: number;
+  readonly initialTechniqueId?: BreathTechniqueId;
   readonly localInstallId: string;
   readonly sessionId: string;
   readonly startedAtMs: number;
@@ -44,6 +47,12 @@ export function RescueMeSessionRoute() {
           }).then((draft) => ({
             database: localDatabase,
             hasExistingLocalRecord: Boolean(draft),
+            ...(draft
+              ? {
+                  initialDurationSeconds: draft.durationSeconds,
+                  initialTechniqueId: draft.techniqueId,
+                }
+              : {}),
             localInstallId,
             sessionId: draft?.sessionId ?? createRescueMeSessionId(),
             startedAtMs: draft ? Date.now() - draft.elapsedDurationMs : Date.now(),
@@ -72,7 +81,15 @@ export function RescueMeSessionRoute() {
 
   return (
     <RescueMeActiveSessionScreen
-      initialCompletionMode={sessionConfig.initialCompletionMode}
+      {...(sessionConfig.initialCompletionMode === undefined
+        ? {}
+        : { initialCompletionMode: sessionConfig.initialCompletionMode })}
+      {...(sessionConfig.initialDurationSeconds === undefined
+        ? {}
+        : { initialDurationSeconds: sessionConfig.initialDurationSeconds })}
+      {...(sessionConfig.initialTechniqueId === undefined
+        ? {}
+        : { initialTechniqueId: sessionConfig.initialTechniqueId })}
       hasExistingLocalRecord={sessionConfig.hasExistingLocalRecord === true}
       localInstallId={sessionConfig.localInstallId}
       onContinueWithSound={() => {

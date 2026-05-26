@@ -2,6 +2,7 @@ import {
   breathAudioCueModeIds,
   breathAudioCueModes,
   breathSessionDurationBounds,
+  breathTechniqueNoHoldFallbacks,
   breathTechniqueIds,
   breathTechniques,
   breathworkFamiliarityOptions,
@@ -13,6 +14,7 @@ import {
   eveningReminderNotificationContent,
   eveningReminderWindow,
   firstBreathDemo,
+  getNoHoldFallbackTechniqueId,
   getNextEveningReminderDate,
   getOnboardingPlanForGoal,
   hasOpenedInReminderSuppressionWindow,
@@ -270,6 +272,30 @@ assertCondition(
   breathTechniques["physiological-sigh"].conflictNote.includes("Feature Deep Specs"),
   "Physiological Sigh conflict must stay explicit in catalog metadata.",
 );
+assertEquals(breathTechniqueNoHoldFallbacks, {
+  "4-7-8-sleep": "diaphragmatic-breathing",
+  "box-breathing": "diaphragmatic-breathing",
+});
+assertEquals(getNoHoldFallbackTechniqueId("4-7-8-sleep"), "diaphragmatic-breathing");
+assertEquals(getNoHoldFallbackTechniqueId("box-breathing"), "diaphragmatic-breathing");
+assertEquals(getNoHoldFallbackTechniqueId("coherent-breathing"), null);
+for (const [holdTechniqueId, fallbackTechniqueId] of Object.entries(
+  breathTechniqueNoHoldFallbacks,
+)) {
+  const holdTechnique = breathTechniques[holdTechniqueId as keyof typeof breathTechniques];
+  const fallbackTechnique =
+    breathTechniques[fallbackTechniqueId as keyof typeof breathTechniques];
+
+  assertCondition(
+    holdTechnique.phases.some((phase) => phase.name === "hold"),
+    `${holdTechniqueId} must remain a hold-based technique if it has a no-hold fallback.`,
+  );
+  assertEquals(fallbackTechnique.catalogStatus, "mvp");
+  assertCondition(
+    !fallbackTechnique.phases.some((phase) => phase.name === "hold"),
+    `${fallbackTechniqueId} must not include hold phases.`,
+  );
+}
 assertEquals(breathSessionDurationBounds, {
   minSeconds: 1,
   maxSeconds: 1800,

@@ -1,13 +1,12 @@
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator } from "react-native";
 
+import { NidoruLoadingScreen } from "../design-system";
 import { getOrCreateLocalInstallIdentity } from "../onboarding/local-first-onboarding";
 import { captureSyncFailureDeferred } from "../observability/deferred-capture";
 import { createPrivacySafeSyncFailureContext } from "../observability/sync-observability";
 import { openMigratedLocalDatabase } from "../storage/local-database";
 import { syncPostValueLocalRecords, type PostValueSyncDatabase } from "../sync/post-value-sync";
-import { View } from "../tw";
 import {
   linkPostValueAccount,
   loadPostRewardPaywallEligibility,
@@ -148,9 +147,11 @@ export function PostValueAccountPaywallRouteScreen() {
 
   if (routeState.status === "loading") {
     return (
-      <View className="flex-1 items-center justify-center bg-[#0D0F1A]">
-        <ActivityIndicator color="#7C6FCD" />
-      </View>
+      <NidoruLoadingScreen
+        caption="Preparing your progress"
+        label="Loading account options"
+        testID="post-value-paywall-loading"
+      />
     );
   }
 

@@ -5,6 +5,7 @@ import React from "react";
 import {
   GlassCard,
   MidnightScrollScreen,
+  NidoruLoadingScreen,
   NidoruButton,
   NidoruSegmentedControl,
   NidoruText,
@@ -51,6 +52,25 @@ describe("Nidoru Tailwind design-system primitives", () => {
     expect(screen.getByTestId("timer-copy").props.className).toEqual(
       expect.stringContaining("tabular-nums"),
     );
+  });
+
+  it("provides a shared calm loading surface without a generic spinner contract", () => {
+    render(
+      <NidoruLoadingScreen
+        caption="Preparing your progress"
+        label="Loading account options"
+        testID="loading-screen"
+      />,
+    );
+
+    expect(screen.getByTestId("loading-screen").props.className).toEqual(
+      expect.stringContaining("bg-nidoru-dark-background"),
+    );
+    expect(screen.getByTestId("loading-screen-orb").props.className).toEqual(
+      expect.stringContaining("rounded-full bg-nidoru-dark-primary-glow/80"),
+    );
+    expect(screen.getByRole("text", { name: "Loading account options" })).toBeTruthy();
+    expect(screen.getByText("Preparing your progress")).toBeTruthy();
   });
 
   it("provides button, segmented control, and surface primitives with accessible state classes", () => {

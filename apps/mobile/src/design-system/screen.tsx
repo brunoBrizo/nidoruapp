@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { ScrollView, View, cn, type ScrollViewProps, type ViewProps } from "../tw";
+import { ScrollView, Text, View, cn, type ScrollViewProps, type ViewProps } from "../tw";
 
 type ChildrenProp = {
   readonly children?: ReactNode;
@@ -62,4 +62,49 @@ export function DimOverlay({ className, ...props }: ViewProps) {
 
 export function BottomTabSpacer({ className, ...props }: ViewProps) {
   return <View className={cn("h-[104px]", className)} pointerEvents="none" {...props} />;
+}
+
+type NidoruLoadingScreenProps = Omit<MidnightScreenProps, "children"> & {
+  readonly caption?: string;
+  readonly label?: string;
+};
+
+export function NidoruLoadingScreen({
+  caption,
+  className,
+  label = "Loading",
+  testID,
+  ...props
+}: NidoruLoadingScreenProps) {
+  return (
+    <MidnightScreen
+      className={cn("items-center justify-center px-nidoru-screen", className)}
+      testID={testID}
+      {...props}
+    >
+      <View className="items-center gap-4">
+        <View
+          className="h-12 w-12 rounded-full bg-nidoru-dark-primary-glow/80 shadow-[0_0_32px_rgba(168,156,224,0.45)]"
+          testID={testID ? `${testID}-orb` : undefined}
+        />
+        <View className="items-center gap-1">
+          <Text
+            accessibilityRole="text"
+            className="font-nidoru-primary-semibold text-nidoru-body text-nidoru-dark-text-primary"
+            selectable
+          >
+            {label}
+          </Text>
+          {caption ? (
+            <Text
+              className="font-nidoru-primary-regular text-nidoru-caption text-nidoru-dark-text-secondary"
+              selectable
+            >
+              {caption}
+            </Text>
+          ) : null}
+        </View>
+      </View>
+    </MidnightScreen>
+  );
 }

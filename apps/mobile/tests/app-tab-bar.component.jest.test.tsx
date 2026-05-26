@@ -195,6 +195,31 @@ describe("AppTabBar", () => {
     );
   });
 
+  it("uses the Solar icon set from the Home HTML handoff", () => {
+    renderTabBar();
+
+    expect(screen.getByTestId("tab-icon-home")).toHaveProp(
+      "accessibilityLabel",
+      "solar:home-smile-bold",
+    );
+    expect(screen.getByTestId("tab-icon-sleep")).toHaveProp(
+      "accessibilityLabel",
+      "solar:moon-sleep-linear",
+    );
+    expect(screen.getByTestId("tab-icon-breathe")).toHaveProp(
+      "accessibilityLabel",
+      "solar:wind-linear",
+    );
+    expect(screen.getByTestId("tab-icon-progress")).toHaveProp(
+      "accessibilityLabel",
+      "solar:chart-linear",
+    );
+    expect(screen.getByTestId("tab-icon-profile")).toHaveProp(
+      "accessibilityLabel",
+      "solar:user-linear",
+    );
+  });
+
   it("keeps each tab item at the Home handoff 64px width with press scale feedback", () => {
     renderTabBar();
 

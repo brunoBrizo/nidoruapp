@@ -1,5 +1,5 @@
 import { usePathname } from "expo-router";
-import { ChartColumn, House, Moon, UserRound, Wind, type LucideIcon } from "lucide-react-native";
+import type { ElementType } from "react";
 import { useEffect, useRef, useState } from "react";
 import { Animated, Easing } from "react-native";
 
@@ -11,6 +11,13 @@ import {
 } from "../design-system";
 import { appShellTabs, type AppShellTabId } from "../home/home-actions";
 import { useReduceMotionEnabled } from "../motion/use-reduce-motion-enabled";
+import {
+  SolarChartLinearIcon,
+  SolarHomeSmileBoldIcon,
+  SolarMoonSleepLinearIcon,
+  SolarUserLinearIcon,
+  SolarWindLinearIcon,
+} from "./solar-tab-icons";
 
 const routeNameByTabId: Record<AppShellTabId, string> = {
   home: "index",
@@ -20,12 +27,20 @@ const routeNameByTabId: Record<AppShellTabId, string> = {
   profile: "profile",
 };
 
-const iconByTabId: Record<AppShellTabId, LucideIcon> = {
-  home: House,
-  sleep: Moon,
-  breathe: Wind,
-  progress: ChartColumn,
-  profile: UserRound,
+const iconByTabId: Record<
+  AppShellTabId,
+  ElementType<{
+    readonly color?: string;
+    readonly size?: number;
+    readonly strokeWidth?: number;
+    readonly testID?: string;
+  }>
+> = {
+  home: SolarHomeSmileBoldIcon,
+  sleep: SolarMoonSleepLinearIcon,
+  breathe: SolarWindLinearIcon,
+  progress: SolarChartLinearIcon,
+  profile: SolarUserLinearIcon,
 };
 
 export const TAB_ACTIVE_INDICATOR_MOTION = {

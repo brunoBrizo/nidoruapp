@@ -1,11 +1,12 @@
-import { colors, motion, spacing, typography } from "@nidoru/ui-tokens";
+import { motion } from "@nidoru/ui-tokens";
 import * as Haptics from "expo-haptics";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Animated, Easing, StyleSheet, View } from "react-native";
+import { Animated, Easing } from "react-native";
 
 import { RestingBreathingOrb } from "../breathing/breathing-orb";
 import { useReduceMotionPreference } from "../motion/use-reduce-motion-enabled";
+import { ReactNativeAnimatedText, ReactNativeAnimatedView, View, cn } from "../tw";
 
 export const FIRST_BREATH_DEMO_COPY = {
   exhale: "And out.",
@@ -29,6 +30,10 @@ export const FIRST_BREATH_DEMO_AUTO_ADVANCE_DELAY_MS = 1800;
 const FIRST_BREATH_DEMO_ORB_REST_SCALE = 1.55;
 const FIRST_BREATH_DEMO_ORB_INHALE_SCALE =
   FIRST_BREATH_DEMO_ORB_REST_SCALE * motion.breathingOrb.inhaleScale;
+const FIRST_BREATH_DEMO_PHASE_TEXT_CLASS_NAME =
+  "max-w-[280px] text-center font-nidoru-primary-semibold text-[23px] leading-[30px] text-[#EEF0FF]/[0.92]";
+const FIRST_BREATH_DEMO_COMPLETION_TEXT_CLASS_NAME =
+  "font-nidoru-primary-bold text-[22px] leading-[30px] text-nidoru-dark-text-primary";
 
 type FirstBreathDemoBreathPhase = "inhale" | "exhale";
 type FirstBreathDemoPhaseId =
@@ -311,33 +316,30 @@ export function FirstBreathDemoScreen({
   }, [currentPhase.cycle, currentPhase.phase, isComplete]);
 
   return (
-    <View style={styles.screen} testID="first-breath-demo-screen">
+    <View className="flex-1 bg-nidoru-dark-background" testID="first-breath-demo-screen">
       <StatusBar style="light" />
-      <Animated.View
+      <ReactNativeAnimatedView
         accessibilityLabel={accessibilityLabel}
-        style={[
-          styles.content,
-          {
-            opacity: contentProgress,
-            transform: [{ translateY: contentTranslateY }],
-          },
-        ]}
+        className="flex-1 items-center justify-center gap-nidoru-xxl px-nidoru-screen pb-nidoru-lg"
+        style={{
+          opacity: contentProgress,
+          transform: [{ translateY: contentTranslateY }],
+        }}
         testID="first-breath-demo-content"
       >
-        <View style={styles.orbStage}>
-          <Animated.View
+        <View className="h-[240px] w-[240px] items-center justify-center">
+          <ReactNativeAnimatedView
+            className="absolute h-[224px] w-[224px] rounded-full bg-[#A89CE0]/[0.32] shadow-[0_0_56px_rgba(168,156,224,0.34)]"
             pointerEvents="none"
-            style={[
-              styles.orbGlow,
-              {
-                opacity: glowOpacity,
-                transform: [{ scale: glowScale }],
-              },
-            ]}
+            style={{
+              opacity: glowOpacity,
+              transform: [{ scale: glowScale }],
+            }}
             testID="first-breath-demo-orb-glow"
           />
-          <Animated.View
-            style={[styles.orbScale, { transform: [{ scale: orbScale }] }]}
+          <ReactNativeAnimatedView
+            className="h-[180px] w-[180px] items-center justify-center"
+            style={{ transform: [{ scale: orbScale }] }}
             testID="first-breath-demo-orb-scale"
           >
             <RestingBreathingOrb
@@ -345,35 +347,35 @@ export function FirstBreathDemoScreen({
               isDecorative={false}
               testID="first-breath-demo-orb"
             />
-          </Animated.View>
+          </ReactNativeAnimatedView>
         </View>
 
-        <View style={styles.labelStack} testID="first-breath-demo-phase-label">
+        <View
+          className="min-h-[68px] w-full items-center justify-center"
+          testID="first-breath-demo-phase-label"
+        >
           {phaseLabel.previous ? (
-            <Animated.Text
+            <ReactNativeAnimatedText
+              className={cn(FIRST_BREATH_DEMO_PHASE_TEXT_CLASS_NAME, "absolute")}
               selectable
-              style={[
-                styles.phaseText,
-                styles.previousPhaseText,
-                { opacity: previousLabelOpacity },
-              ]}
+              style={{ opacity: previousLabelOpacity }}
             >
               {phaseLabel.previous}
-            </Animated.Text>
+            </ReactNativeAnimatedText>
           ) : null}
-          <Animated.Text
+          <ReactNativeAnimatedText
             accessibilityRole={isComplete ? "header" : undefined}
+            className={cn(
+              FIRST_BREATH_DEMO_PHASE_TEXT_CLASS_NAME,
+              isComplete ? FIRST_BREATH_DEMO_COMPLETION_TEXT_CLASS_NAME : null,
+            )}
             selectable
-            style={[
-              styles.phaseText,
-              isComplete && styles.completionText,
-              { opacity: phaseLabel.previous ? labelProgress : 1 },
-            ]}
+            style={{ opacity: phaseLabel.previous ? labelProgress : 1 }}
           >
             {phaseLabel.current}
-          </Animated.Text>
+          </ReactNativeAnimatedText>
         </View>
-      </Animated.View>
+      </ReactNativeAnimatedView>
     </View>
   );
 }
@@ -394,62 +396,3 @@ async function triggerFirstBreathHaptic(
     // Haptics must never block or interrupt the local-first breath demo.
   }
 }
-
-const styles = StyleSheet.create({
-  screen: {
-    backgroundColor: colors.dark.background.value,
-    flex: 1,
-  },
-  content: {
-    alignItems: "center",
-    flex: 1,
-    gap: spacing.xxl,
-    justifyContent: "center",
-    paddingBottom: spacing.lg,
-    paddingHorizontal: spacing.screenPadding,
-  },
-  orbStage: {
-    alignItems: "center",
-    height: 240,
-    justifyContent: "center",
-    width: 240,
-  },
-  orbGlow: {
-    backgroundColor: "rgba(168, 156, 224, 0.32)",
-    borderRadius: 112,
-    boxShadow: "0 0 56px rgba(168, 156, 224, 0.34)",
-    height: 224,
-    position: "absolute",
-    width: 224,
-  },
-  orbScale: {
-    alignItems: "center",
-    height: 180,
-    justifyContent: "center",
-    width: 180,
-  },
-  labelStack: {
-    alignItems: "center",
-    justifyContent: "center",
-    minHeight: 68,
-    width: "100%",
-  },
-  phaseText: {
-    color: "rgba(238, 240, 255, 0.92)",
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 23,
-    letterSpacing: 0,
-    lineHeight: 30,
-    maxWidth: 280,
-    textAlign: "center",
-  },
-  previousPhaseText: {
-    position: "absolute",
-  },
-  completionText: {
-    color: colors.dark.textPrimary.value,
-    fontFamily: typography.mobileFontFamily.primary.bold,
-    fontSize: 22,
-    lineHeight: 30,
-  },
-});

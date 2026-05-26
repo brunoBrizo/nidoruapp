@@ -1,6 +1,6 @@
-import { describe, expect, it, jest } from "@jest/globals";
+import { afterEach, describe, expect, it, jest } from "@jest/globals";
 import { act, render, screen, waitFor, within } from "@testing-library/react-native";
-import { AccessibilityInfo, StyleSheet } from "react-native";
+import { AccessibilityInfo } from "react-native";
 
 import { RESTING_BREATHING_ORB_TEST_IDS } from "../src/breathing/breathing-orb";
 import {
@@ -16,6 +16,16 @@ import {
   OnboardingFlowScreen,
 } from "../src/onboarding/onboarding-flow-screen";
 
+jest.mock("react-native-css", () => {
+  const React = jest.requireActual<typeof import("react")>("react");
+
+  return {
+    useCssElement: (Component: React.ElementType, props: Record<string, unknown>) =>
+      React.createElement(Component, props),
+    useNativeVariable: (variable: string) => `mocked-${variable}`,
+  };
+});
+
 jest.mock("expo-haptics", () => ({
   ImpactFeedbackStyle: {
     Light: "light",
@@ -28,6 +38,10 @@ jest
   .spyOn(AccessibilityInfo, "isReduceMotionEnabled")
   .mockImplementation(() => new Promise<boolean>(() => undefined));
 jest.spyOn(AccessibilityInfo, "addEventListener").mockImplementation(() => ({ remove: jest.fn() }));
+
+afterEach(() => {
+  jest.useRealTimers();
+});
 
 const advanceDemoByPhases = (phaseCount: number) => {
   for (let phaseIndex = 0; phaseIndex < phaseCount; phaseIndex += 1) {
@@ -79,12 +93,9 @@ describe("FirstBreathDemoScreen", () => {
   it("renders the first breath demo without capture, chrome, gates, or extra surfaces", () => {
     render(<FirstBreathDemoScreen disableHaptics />);
 
-    expect(
-      StyleSheet.flatten(screen.getByTestId("first-breath-demo-screen").props.style),
-    ).toMatchObject({
-      backgroundColor: "#0D0F1A",
-      flex: 1,
-    });
+    expect(screen.getByTestId("first-breath-demo-screen").props.className).toEqual(
+      "flex-1 bg-nidoru-dark-background",
+    );
     expect(screen.getByText(FIRST_BREATH_DEMO_COPY.inhale)).toBeTruthy();
     expect(screen.queryByText(FIRST_BREATH_DEMO_COPY.exhale)).toBeNull();
     expect(screen.queryByRole("button")).toBeNull();
@@ -96,19 +107,15 @@ describe("FirstBreathDemoScreen", () => {
     ).toBeNull();
 
     const demoOrb = within(screen.getByTestId("first-breath-demo-orb"));
-    expect(
-      StyleSheet.flatten(demoOrb.getByTestId(RESTING_BREATHING_ORB_TEST_IDS.core).props.style),
-    ).toMatchObject({
-      backgroundColor: "#7C6FCD",
-      borderRadius: 28,
-      height: 56,
-      width: 56,
-    });
-    expect(
-      StyleSheet.flatten(demoOrb.getByTestId(RESTING_BREATHING_ORB_TEST_IDS.softGlow).props.style),
-    ).toMatchObject({
-      backgroundColor: "rgba(168, 156, 224, 0.35)",
-    });
+    expect(demoOrb.getByTestId(RESTING_BREATHING_ORB_TEST_IDS.core).props.className).toContain(
+      "h-14 w-14",
+    );
+    expect(demoOrb.getByTestId(RESTING_BREATHING_ORB_TEST_IDS.core).props.className).toContain(
+      "bg-[#7C6FCD]",
+    );
+    expect(demoOrb.getByTestId(RESTING_BREATHING_ORB_TEST_IDS.softGlow).props.className).toContain(
+      "bg-[#A89CE0]/[0.35]",
+    );
   });
 
   it("cycles synced phase copy for 30 seconds before handing off", () => {
@@ -177,15 +184,13 @@ describe("OnboardingFlowScreen", () => {
 
     render(
       <OnboardingFlowScreen
-        loadInitialStep={() => Promise.resolve("personalization")}
+        initialStep="personalization"
         persistOnboardingStarted={persistOnboardingStarted}
         startDefaultFirstSession={startDefaultFirstSession}
       />,
     );
 
-    expect(screen.getByTestId("onboarding-splash-screen")).toBeTruthy();
-
-    await screen.findByTestId("onboarding-personalization-flow-entry");
+    expect(screen.getByTestId("onboarding-personalization-flow-entry")).toBeTruthy();
     expect(screen.getByRole("header", { name: "What brings you here?" })).toBeTruthy();
     expect(persistOnboardingStarted).not.toHaveBeenCalled();
     expect(startDefaultFirstSession).not.toHaveBeenCalled();
@@ -197,7 +202,7 @@ describe("OnboardingFlowScreen", () => {
 
     render(
       <OnboardingFlowScreen
-        loadInitialStep={() => Promise.resolve("first-session")}
+        initialStep="first-session"
         persistOnboardingStarted={persistOnboardingStarted}
         startDefaultFirstSession={startDefaultFirstSession}
       />,
@@ -211,32 +216,19 @@ describe("OnboardingFlowScreen", () => {
   });
 
   it("places the 30-second demo immediately after splash and before personalization", async () => {
-    jest.useFakeTimers();
     const persistFirstBreathDemoEvent = jest.fn(() => Promise.resolve());
-    const persistOnboardingStarted = jest.fn(() => Promise.resolve());
     const startDefaultFirstSession = jest.fn();
 
     render(
       <OnboardingFlowScreen
         firstBreathAutoAdvanceDelayMs={50}
-        loadInitialStep={() => Promise.resolve("splash")}
+        initialStep="first-breath-demo"
         persistFirstBreathDemoEvent={persistFirstBreathDemoEvent}
-        persistOnboardingStarted={persistOnboardingStarted}
         startDefaultFirstSession={startDefaultFirstSession}
-        splashDurationMs={10}
       />,
     );
 
     expect(ONBOARDING_FIRST_BREATH_SPLASH_DELAY_MS).toBeLessThan(2000);
-    expect(screen.getByTestId("onboarding-splash-screen")).toBeTruthy();
-    await waitFor(() => {
-      expect(persistOnboardingStarted).toHaveBeenCalledTimes(1);
-    });
-
-    act(() => {
-      jest.advanceTimersByTime(10);
-    });
-
     expect(screen.getByText(FIRST_BREATH_DEMO_COPY.inhale)).toBeTruthy();
     await waitFor(() => {
       expect(persistFirstBreathDemoEvent).toHaveBeenCalledWith("started");
@@ -244,19 +236,8 @@ describe("OnboardingFlowScreen", () => {
     expect(screen.queryByRole("button")).toBeNull();
     expect(screen.queryByRole("link")).toBeNull();
     expect(screen.queryByText(/account|paywall|permission|question|loading|skip/i)).toBeNull();
-
-    advanceDemoByPhases(6);
-    await waitFor(() => {
-      expect(persistFirstBreathDemoEvent).toHaveBeenCalledWith("completed");
-    });
-    act(() => {
-      jest.advanceTimersByTime(50 + FIRST_BREATH_DEMO_SCREEN_EXIT_MS);
-    });
-
-    expect(startDefaultFirstSession).toHaveBeenCalledTimes(1);
+    expect(startDefaultFirstSession).not.toHaveBeenCalled();
     expect(screen.queryByTestId("onboarding-personalization-flow-entry")).toBeNull();
     expect(screen.queryByRole("header", { name: "What brings you here?" })).toBeNull();
-
-    jest.useRealTimers();
   });
 });

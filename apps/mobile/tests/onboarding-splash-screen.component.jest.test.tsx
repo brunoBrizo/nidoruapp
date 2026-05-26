@@ -1,6 +1,6 @@
 import { describe, expect, it, jest } from "@jest/globals";
 import { render, screen, within } from "@testing-library/react-native";
-import { AccessibilityInfo, StyleSheet } from "react-native";
+import { AccessibilityInfo } from "react-native";
 
 import { RESTING_BREATHING_ORB_TEST_IDS } from "../src/breathing/breathing-orb";
 import {
@@ -9,6 +9,16 @@ import {
   OnboardingSplashScreen,
   getOnboardingSplashOrbPulseConfig,
 } from "../src/onboarding/onboarding-splash-screen";
+
+jest.mock("react-native-css", () => {
+  const React = jest.requireActual<typeof import("react")>("react");
+
+  return {
+    useCssElement: (Component: React.ElementType, props: Record<string, unknown>) =>
+      React.createElement(Component, props),
+    useNativeVariable: (variable: string) => `mocked-${variable}`,
+  };
+});
 
 jest
   .spyOn(AccessibilityInfo, "isReduceMotionEnabled")
@@ -19,17 +29,13 @@ describe("OnboardingSplashScreen", () => {
   it("renders the splash-only first screen without capture or loading chrome", () => {
     render(<OnboardingSplashScreen />);
 
-    expect(
-      StyleSheet.flatten(screen.getByTestId("onboarding-splash-screen").props.style),
-    ).toMatchObject({
-      backgroundColor: ONBOARDING_SPLASH_BACKGROUND_COLOR,
-      flex: 1,
-    });
-    expect(
-      StyleSheet.flatten(screen.getByTestId("onboarding-splash-wordmark").props.style),
-    ).toMatchObject({
-      fontFamily: "Nunito-600",
-    });
+    expect(ONBOARDING_SPLASH_BACKGROUND_COLOR).toBe("#0D0F1A");
+    expect(screen.getByTestId("onboarding-splash-screen").props.className).toEqual(
+      "flex-1 bg-nidoru-dark-background",
+    );
+    expect(screen.getByTestId("onboarding-splash-wordmark").props.className).toContain(
+      "font-nidoru-primary-semibold",
+    );
     expect(screen.getByRole("header", { name: "nidoru" })).toBeTruthy();
     expect(screen.queryByText("Nidoru")).toBeNull();
     expect(
@@ -43,24 +49,18 @@ describe("OnboardingSplashScreen", () => {
     render(<OnboardingSplashScreen />);
 
     const splashOrb = within(screen.getByTestId("onboarding-splash-resting-orb"));
-    const coreStyle = StyleSheet.flatten(
-      splashOrb.getByTestId(RESTING_BREATHING_ORB_TEST_IDS.core).props.style,
+    expect(splashOrb.getByTestId(RESTING_BREATHING_ORB_TEST_IDS.core).props.className).toContain(
+      "h-14 w-14",
     );
-    const glowStyle = StyleSheet.flatten(
-      splashOrb.getByTestId(RESTING_BREATHING_ORB_TEST_IDS.softGlow).props.style,
+    expect(splashOrb.getByTestId(RESTING_BREATHING_ORB_TEST_IDS.core).props.className).toContain(
+      "bg-[#7C6FCD]",
     );
-
-    expect(coreStyle).toMatchObject({
-      backgroundColor: "#7C6FCD",
-      borderRadius: 28,
-      height: 56,
-      width: 56,
-    });
-    expect(glowStyle).toMatchObject({
-      backgroundColor: "rgba(168, 156, 224, 0.35)",
-      height: 68,
-      width: 68,
-    });
+    expect(splashOrb.getByTestId(RESTING_BREATHING_ORB_TEST_IDS.softGlow).props.className).toEqual(
+      expect.stringContaining("h-[68px] w-[68px]"),
+    );
+    expect(splashOrb.getByTestId(RESTING_BREATHING_ORB_TEST_IDS.softGlow).props.className).toEqual(
+      expect.stringContaining("bg-[#A89CE0]/[0.35]"),
+    );
     expect(splashOrb.getByTestId(RESTING_BREATHING_ORB_TEST_IDS.outerRing)).toBeTruthy();
     expect(splashOrb.getByTestId(RESTING_BREATHING_ORB_TEST_IDS.middleRing)).toBeTruthy();
     expect(splashOrb.getByTestId(RESTING_BREATHING_ORB_TEST_IDS.highlight)).toBeTruthy();

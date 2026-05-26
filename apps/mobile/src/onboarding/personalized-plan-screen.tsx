@@ -1,5 +1,5 @@
 import type { PersonalizedOnboardingPlan, PersonalizedPlanAnswerRowId } from "@nidoru/domain";
-import { colors, motion, spacing, typography } from "@nidoru/ui-tokens";
+import { colors, motion } from "@nidoru/ui-tokens";
 import {
   AudioLines,
   CircleUserRound,
@@ -10,11 +10,12 @@ import {
   Wind,
 } from "lucide-react-native";
 import { useContext, useEffect, useRef, useState, type ReactNode } from "react";
-import { Animated, Easing, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Animated, Easing } from "react-native";
 import { SafeAreaInsetsContext } from "react-native-safe-area-context";
 
 import { useReduceMotionPreference } from "../motion/use-reduce-motion-enabled";
 import { CardFade } from "../surfaces/card-fade";
+import { Pressable, ReactNativeAnimatedView, ScrollView, Text, View, cn } from "../tw";
 
 export const PERSONALIZED_PLAN_SCREEN_EXIT_MS = motion.duration.screenExitMs;
 
@@ -139,82 +140,95 @@ export function PersonalizedPlanScreen({
   };
 
   return (
-    <View style={styles.screen} testID="personalized-plan-screen">
-      <Animated.View
-        style={[
-          styles.stage,
-          {
-            opacity: entranceProgress,
-            transform: [{ translateY: screenTranslateY }],
-          },
-        ]}
+    <View className="flex-1 bg-nidoru-dark-background" testID="personalized-plan-screen">
+      <ReactNativeAnimatedView
+        className="flex-1"
+        style={{
+          opacity: entranceProgress,
+          transform: [{ translateY: screenTranslateY }],
+        }}
       >
         <ScrollView
           bounces={false}
-          contentContainerStyle={[
-            styles.scrollContent,
-            {
-              paddingBottom: spacing.lg,
-              paddingTop: Math.max(safeAreaInsets.top - 8, 44),
-            },
-          ]}
+          contentContainerClassName="flex-grow justify-start px-[18px]"
+          contentContainerStyle={{
+            paddingBottom: 32,
+            paddingTop: Math.max(safeAreaInsets.top - 8, 44),
+          }}
           contentInsetAdjustmentBehavior="automatic"
           showsVerticalScrollIndicator={false}
         >
-          <View style={styles.readyPill}>
-            <View style={styles.readyDot} />
-            <Text selectable style={styles.readyPillText}>
+          <View className="mb-[66px] min-h-[30px] flex-row items-center self-center rounded-full border border-nidoru-dark-divider bg-[#14172B]/60 px-3">
+            <View className="h-1.5 w-1.5 rounded-full bg-nidoru-dark-primary" />
+            <Text
+              className="ml-2 font-nidoru-primary-semibold text-xs leading-[17px] text-nidoru-dark-text-secondary"
+              selectable
+            >
               {statusLabel}
             </Text>
           </View>
 
-          <View style={styles.titleBlock}>
-            <Text accessibilityRole="header" selectable style={styles.title}>
+          <View className="mb-6 items-center gap-1.5">
+            <Text
+              accessibilityRole="header"
+              className="text-center font-nidoru-primary-semibold text-2xl leading-[30px] text-nidoru-dark-text-primary"
+              selectable
+            >
               Your plan
             </Text>
-            <Text selectable style={styles.planLabel}>
+            <Text
+              className="text-center font-nidoru-primary-semibold text-[15px] leading-5 text-nidoru-dark-primary-glow"
+              selectable
+            >
               {plan.label}
             </Text>
           </View>
 
-          <View style={styles.planCard} testID="personalized-plan-card">
+          <View
+            className="relative min-h-[224px] overflow-hidden rounded-[28px] border border-[#7C6FCD]/[0.24] bg-nidoru-dark-surface p-6 shadow-[0_16px_40px_rgba(0,0,0,0.4)]"
+            style={{ borderCurve: "continuous" }}
+            testID="personalized-plan-card"
+          >
             <CardFade testID="personalized-plan-card-fade" variant="personalized-plan" />
-            <View style={styles.planCardContent}>
-              <View style={styles.sessionHeaderRow}>
-                <View style={styles.planOrb}>
-                  <Animated.View
-                    style={[
-                      styles.planOrbGlow,
-                      {
-                        opacity: reduceMotionEnabled ? 0.32 : orbGlowOpacity,
-                        transform: [{ scale: reduceMotionEnabled ? 1 : orbGlowScale }],
-                      },
-                    ]}
+            <View className="z-10 gap-6">
+              <View className="flex-row gap-4">
+                <View className="mt-px h-12 w-12 items-center justify-center">
+                  <ReactNativeAnimatedView
+                    className="absolute h-[58px] w-[58px] rounded-full bg-[#A89CE0]/25"
+                    style={{
+                      opacity: reduceMotionEnabled ? 0.32 : orbGlowOpacity,
+                      transform: [{ scale: reduceMotionEnabled ? 1 : orbGlowScale }],
+                    }}
                   />
-                  <Animated.View
-                    style={[
-                      styles.planOrbCore,
-                      {
-                        transform: [{ scale: reduceMotionEnabled ? 1 : orbCoreScale }],
-                      },
-                    ]}
+                  <ReactNativeAnimatedView
+                    className="absolute h-[34px] w-[34px] rounded-full bg-nidoru-dark-primary shadow-[0_0_18px_rgba(168,156,224,0.58)]"
+                    style={{ transform: [{ scale: reduceMotionEnabled ? 1 : orbCoreScale }] }}
                   />
-                  <View style={styles.planOrbHighlight} />
+                  <View className="absolute h-[22px] w-[22px] rounded-full bg-[#EEF0FF]/[0.72]" />
                 </View>
-                <View style={styles.sessionCopy}>
-                  <Text selectable style={styles.sessionEyebrow}>
+                <View className="flex-1 gap-1.5">
+                  <Text
+                    className="font-nidoru-primary-semibold text-[13px] leading-[18px] text-nidoru-dark-primary-glow"
+                    selectable
+                  >
                     {sessionEyebrow}
                   </Text>
-                  <Text selectable style={styles.sessionTitle}>
+                  <Text
+                    className="font-nidoru-primary-semibold text-xl leading-[25px] text-nidoru-dark-text-primary"
+                    selectable
+                  >
                     {plan.firstSession.title}
                   </Text>
-                  <Text selectable style={styles.sessionSubtitle}>
+                  <Text
+                    className="font-nidoru-primary-regular text-sm leading-[21px] text-nidoru-dark-text-secondary"
+                    selectable
+                  >
                     {plan.firstSession.subtitle}
                   </Text>
                 </View>
               </View>
 
-              <View style={styles.chipRow}>
+              <View className="flex-row flex-wrap gap-2">
                 <PlanChip
                   icon={<Clock3 color={colors.dark.primaryGlow.value} size={14} />}
                   label={`${Math.round(plan.firstSession.durationSeconds / 60)} min`}
@@ -231,23 +245,33 @@ export function PersonalizedPlanScreen({
             </View>
           </View>
 
-          <View style={styles.answerCard} testID="personalized-plan-answer-card">
-            <View style={styles.answerHeader}>
+          <View
+            className="mt-4 gap-[14px] rounded-[24px] border border-nidoru-dark-divider bg-[#14172B]/[0.62] p-4"
+            style={{ borderCurve: "continuous" }}
+            testID="personalized-plan-answer-card"
+          >
+            <View className="flex-row items-center gap-2">
               <ListChecks color={colors.dark.primary.value} size={16} />
-              <Text selectable style={styles.answerHeaderText}>
+              <Text
+                className="font-nidoru-primary-semibold text-xs uppercase leading-4 text-nidoru-dark-text-secondary"
+                selectable
+              >
                 Based on your answers
               </Text>
             </View>
-            <View style={styles.answerRows}>
+            <View className="gap-3">
               {plan.answerRows.map((row) => {
                 const Icon = answerRowIcons[row.id];
 
                 return (
-                  <View key={row.id} style={styles.answerRow}>
-                    <View style={styles.answerIconSlot}>
+                  <View className="flex-row items-center gap-3" key={row.id}>
+                    <View className="w-5 items-center">
                       <Icon color={colors.dark.primary.value} size={18} />
                     </View>
-                    <Text selectable style={styles.answerText}>
+                    <Text
+                      className="flex-1 font-nidoru-primary-semibold text-sm leading-5 text-[#EEF0FF]/[0.82]"
+                      selectable
+                    >
                       {row.label}
                     </Text>
                   </View>
@@ -258,272 +282,43 @@ export function PersonalizedPlanScreen({
         </ScrollView>
 
         <View
-          style={[
-            styles.footer,
-            {
-              paddingBottom: Math.max(safeAreaInsets.bottom + 16, 40),
-            },
-          ]}
+          className="bg-nidoru-dark-background px-[18px] pt-4"
+          style={{ paddingBottom: Math.max(safeAreaInsets.bottom + 16, 40) }}
         >
           <Pressable
             accessibilityRole="button"
+            className={cn(
+              "h-[54px] w-full items-center justify-center rounded-[18px] border border-[#A89CE0]/[0.24] bg-[#4C427D] shadow-[0_8px_20px_rgba(0,0,0,0.22)] active:scale-[0.98]",
+              isExiting ? "opacity-[0.72]" : null,
+            )}
             disabled={isExiting}
             onPress={continueWithPlan}
+            style={{ borderCurve: "continuous" }}
             testID="personalized-plan-cta"
-            style={({ pressed }) => [
-              styles.startButton,
-              pressed && !isExiting ? styles.startButtonPressed : null,
-              isExiting ? styles.startButtonDisabled : null,
-            ]}
           >
-            <Text selectable={false} style={styles.startButtonText}>
+            <Text
+              className="font-nidoru-primary-semibold text-base leading-[22px] text-nidoru-dark-text-primary"
+              selectable={false}
+            >
               {ctaLabel}
             </Text>
           </Pressable>
         </View>
-      </Animated.View>
+      </ReactNativeAnimatedView>
     </View>
   );
 }
 
 function PlanChip({ icon, label }: { readonly icon: ReactNode; readonly label: string }) {
   return (
-    <View style={styles.chip}>
+    <View className="min-h-[30px] flex-row items-center rounded-full border border-[#7C6FCD]/[0.32] bg-[#14172B]/80 px-3">
       {icon}
-      <Text selectable style={styles.chipText}>
+      <Text
+        className="ml-1.5 font-nidoru-primary-semibold text-[13px] leading-[18px] text-[#EEF0FF]/90"
+        selectable
+      >
         {label}
       </Text>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  screen: {
-    backgroundColor: colors.dark.background.value,
-    flex: 1,
-  },
-  stage: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    justifyContent: "flex-start",
-    paddingHorizontal: 18,
-  },
-  readyPill: {
-    alignItems: "center",
-    alignSelf: "center",
-    backgroundColor: "rgba(20, 23, 43, 0.6)",
-    borderColor: colors.dark.divider.value,
-    borderRadius: 999,
-    borderWidth: 1,
-    flexDirection: "row",
-    gap: 8,
-    marginBottom: 66,
-    minHeight: 30,
-    paddingHorizontal: 12,
-  },
-  readyDot: {
-    backgroundColor: colors.dark.primary.value,
-    borderRadius: 3,
-    height: 6,
-    width: 6,
-  },
-  readyPillText: {
-    color: colors.dark.textSecondary.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 12,
-    letterSpacing: 0,
-    lineHeight: 17,
-  },
-  titleBlock: {
-    alignItems: "center",
-    gap: 6,
-    marginBottom: 24,
-  },
-  title: {
-    color: colors.dark.textPrimary.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 24,
-    letterSpacing: 0,
-    lineHeight: 30,
-    textAlign: "center",
-  },
-  planLabel: {
-    color: colors.dark.primaryGlow.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 15,
-    letterSpacing: 0,
-    lineHeight: 20,
-    textAlign: "center",
-  },
-  planCard: {
-    backgroundColor: colors.dark.surface.value,
-    borderColor: "rgba(124, 111, 205, 0.24)",
-    borderCurve: "continuous",
-    borderRadius: 28,
-    borderWidth: 1,
-    boxShadow: "0 16px 40px rgba(0, 0, 0, 0.4)",
-    minHeight: 224,
-    overflow: "hidden",
-    padding: 24,
-  },
-  planCardContent: {
-    gap: 24,
-    zIndex: 1,
-  },
-  sessionHeaderRow: {
-    flexDirection: "row",
-    gap: 16,
-  },
-  planOrb: {
-    alignItems: "center",
-    height: 48,
-    justifyContent: "center",
-    marginTop: 1,
-    width: 48,
-  },
-  planOrbGlow: {
-    backgroundColor: "rgba(168, 156, 224, 0.25)",
-    borderRadius: 29,
-    height: 58,
-    position: "absolute",
-    width: 58,
-  },
-  planOrbCore: {
-    backgroundColor: colors.dark.primary.value,
-    borderRadius: 17,
-    boxShadow: "0 0 18px rgba(168, 156, 224, 0.58)",
-    height: 34,
-    position: "absolute",
-    width: 34,
-  },
-  planOrbHighlight: {
-    backgroundColor: "rgba(238, 240, 255, 0.72)",
-    borderRadius: 11,
-    height: 22,
-    position: "absolute",
-    width: 22,
-  },
-  sessionCopy: {
-    flex: 1,
-    gap: 6,
-  },
-  sessionEyebrow: {
-    color: colors.dark.primaryGlow.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 13,
-    letterSpacing: 0,
-    lineHeight: 18,
-  },
-  sessionTitle: {
-    color: colors.dark.textPrimary.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 20,
-    letterSpacing: 0,
-    lineHeight: 25,
-  },
-  sessionSubtitle: {
-    color: colors.dark.textSecondary.value,
-    fontFamily: typography.mobileFontFamily.primary.regular,
-    fontSize: 14,
-    letterSpacing: 0,
-    lineHeight: 21,
-  },
-  chipRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-  },
-  chip: {
-    alignItems: "center",
-    backgroundColor: "rgba(20, 23, 43, 0.8)",
-    borderColor: "rgba(124, 111, 205, 0.32)",
-    borderRadius: 999,
-    borderWidth: 1,
-    flexDirection: "row",
-    gap: 6,
-    minHeight: 30,
-    paddingHorizontal: 12,
-  },
-  chipText: {
-    color: "rgba(238, 240, 255, 0.9)",
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 13,
-    letterSpacing: 0,
-    lineHeight: 18,
-  },
-  answerCard: {
-    backgroundColor: "rgba(20, 23, 43, 0.62)",
-    borderColor: colors.dark.divider.value,
-    borderCurve: "continuous",
-    borderRadius: 24,
-    borderWidth: 1,
-    gap: 14,
-    marginTop: 16,
-    padding: 16,
-  },
-  answerHeader: {
-    alignItems: "center",
-    flexDirection: "row",
-    gap: 8,
-  },
-  answerHeaderText: {
-    color: colors.dark.textSecondary.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 12,
-    letterSpacing: 0,
-    lineHeight: 16,
-    textTransform: "uppercase",
-  },
-  answerRows: {
-    gap: 12,
-  },
-  answerRow: {
-    alignItems: "center",
-    flexDirection: "row",
-    gap: 12,
-  },
-  answerIconSlot: {
-    alignItems: "center",
-    width: 20,
-  },
-  answerText: {
-    color: "rgba(238, 240, 255, 0.82)",
-    flex: 1,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 14,
-    letterSpacing: 0,
-    lineHeight: 20,
-  },
-  footer: {
-    backgroundColor: colors.dark.background.value,
-    paddingHorizontal: 18,
-    paddingTop: 16,
-  },
-  startButton: {
-    alignItems: "center",
-    backgroundColor: "#4C427D",
-    borderColor: "rgba(168, 156, 224, 0.24)",
-    borderCurve: "continuous",
-    borderRadius: 18,
-    borderWidth: 1,
-    boxShadow: "0 8px 20px rgba(0, 0, 0, 0.22)",
-    height: 54,
-    justifyContent: "center",
-    width: "100%",
-  },
-  startButtonPressed: {
-    transform: [{ scale: 0.98 }],
-  },
-  startButtonDisabled: {
-    opacity: 0.72,
-  },
-  startButtonText: {
-    color: colors.dark.textPrimary.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 16,
-    letterSpacing: 0,
-    lineHeight: 22,
-  },
-});

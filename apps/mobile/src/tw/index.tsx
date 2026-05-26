@@ -34,6 +34,7 @@ const ReanimatedScrollViewComponent: React.ElementType = Reanimated.ScrollView;
 const ReanimatedPressable = Reanimated.createAnimatedComponent(RNPressable);
 const ReanimatedPressableComponent: React.ElementType = ReanimatedPressable;
 const ReactNativeAnimatedViewComponent: React.ElementType = ReactNativeAnimated.View;
+const ReactNativeAnimatedTextComponent: React.ElementType = ReactNativeAnimated.Text;
 
 export const useCSSVariable =
   process.env.EXPO_OS !== "web" ? useNativeVariable : (variable: string) => `var(${variable})`;
@@ -141,3 +142,14 @@ export const ReactNativeAnimatedView = React.forwardRef<unknown, ReactNativeAnim
     useCssElement(ReactNativeAnimatedViewComponent, { ...props, ref }, classNameMapping),
 );
 ReactNativeAnimatedView.displayName = "CSS(ReactNativeAnimated.View)";
+
+export type ReactNativeAnimatedTextProps = React.ComponentPropsWithoutRef<
+  typeof ReactNativeAnimated.Text
+> &
+  ClassNameProp;
+
+export const ReactNativeAnimatedText = React.forwardRef<unknown, ReactNativeAnimatedTextProps>(
+  (props, ref) =>
+    useCssElement(ReactNativeAnimatedTextComponent, { ...props, ref }, classNameMapping),
+);
+ReactNativeAnimatedText.displayName = "CSS(ReactNativeAnimated.Text)";

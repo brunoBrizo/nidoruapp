@@ -1,6 +1,7 @@
 import { colors } from "@nidoru/ui-tokens";
-import { StyleSheet, View } from "react-native";
 import Svg, { Circle, Defs, LinearGradient, RadialGradient, Rect, Stop } from "react-native-svg";
+
+import { View } from "../tw";
 
 type FadeStop = {
   readonly offset: string;
@@ -270,7 +271,7 @@ export function CardFade({ testID, variant }: CardFadeProps) {
   const rightEdgeId = `${variant}-card-right-edge`;
 
   return (
-    <View pointerEvents="none" style={styles.layer} testID={testID}>
+    <View className="absolute inset-0 z-0" pointerEvents="none" testID={testID}>
       <Svg height="100%" preserveAspectRatio="none" viewBox={config.viewBox} width="100%">
         <Defs>
           {config.wash ? (
@@ -346,10 +347,3 @@ function renderStops(id: string, stops: readonly FadeStop[]) {
     />
   ));
 }
-
-const styles = StyleSheet.create({
-  layer: {
-    ...StyleSheet.absoluteFillObject,
-    zIndex: 0,
-  },
-});

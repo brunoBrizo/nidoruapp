@@ -1,10 +1,19 @@
 import { createPersonalizedOnboardingPlan } from "@nidoru/domain";
-import { colors } from "@nidoru/ui-tokens";
 import { describe, expect, it, jest } from "@jest/globals";
 import { act, fireEvent, render, screen } from "@testing-library/react-native";
-import { AccessibilityInfo, StyleSheet } from "react-native";
+import { AccessibilityInfo } from "react-native";
 
 import { PersonalizedPlanScreen } from "../src/onboarding/personalized-plan-screen";
+
+jest.mock("react-native-css", () => {
+  const React = jest.requireActual<typeof import("react")>("react");
+
+  return {
+    useCssElement: (Component: React.ElementType, props: Record<string, unknown>) =>
+      React.createElement(Component, props),
+    useNativeVariable: (variable: string) => `mocked-${variable}`,
+  };
+});
 
 jest
   .spyOn(AccessibilityInfo, "isReduceMotionEnabled")
@@ -51,23 +60,25 @@ describe("PersonalizedPlanScreen", () => {
     expect(screen.queryByText("Saved locally")).toBeNull();
     expect(screen.queryByText(/create account|sign in|paywall|subscribe|notification/i)).toBeNull();
 
-    expect(StyleSheet.flatten(screen.getByTestId("personalized-plan-card").props.style)).toEqual(
-      expect.objectContaining({
-        backgroundColor: colors.dark.surface.value,
-        borderRadius: 28,
-        minHeight: 224,
-        padding: 24,
-      }),
+    expect(screen.getByTestId("personalized-plan-card").props.className).toContain(
+      "min-h-[224px]",
     );
+    expect(screen.getByTestId("personalized-plan-card").props.className).toContain(
+      "rounded-[28px]",
+    );
+    expect(screen.getByTestId("personalized-plan-card").props.className).toContain(
+      "bg-nidoru-dark-surface",
+    );
+    expect(screen.getByTestId("personalized-plan-card").props.className).toContain("p-6");
     expect(screen.getByTestId("personalized-plan-card-fade")).toBeTruthy();
-    expect(
-      StyleSheet.flatten(screen.getByTestId("personalized-plan-answer-card").props.style),
-    ).toEqual(
-      expect.objectContaining({
-        borderRadius: 24,
-        marginTop: 16,
-        padding: 16,
-      }),
+    expect(screen.getByTestId("personalized-plan-answer-card").props.className).toEqual(
+      expect.stringContaining("mt-4"),
+    );
+    expect(screen.getByTestId("personalized-plan-answer-card").props.className).toEqual(
+      expect.stringContaining("rounded-[24px]"),
+    );
+    expect(screen.getByTestId("personalized-plan-answer-card").props.className).toEqual(
+      expect.stringContaining("p-4"),
     );
 
     fireEvent.press(screen.getByRole("button", { name: "Let’s start" }));

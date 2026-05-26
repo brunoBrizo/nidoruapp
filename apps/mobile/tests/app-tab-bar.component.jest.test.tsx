@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 import { render, screen, within } from "@testing-library/react-native";
-import { AccessibilityInfo, StyleSheet } from "react-native";
+import { AccessibilityInfo } from "react-native";
 
 import { AppTabBar } from "../src/navigation/app-tab-bar";
 import { TabPlaceholderScreen } from "../src/navigation/tab-placeholder-screen";
@@ -187,25 +187,11 @@ describe("AppTabBar", () => {
     );
     expect(screen.getByTestId("tab-icon-home")).toHaveProp("color", "#A89CE0");
     expect(screen.getByTestId("tab-label-home").props.className).toEqual(
-      expect.stringContaining("text-[11px] font-semibold text-[#A89CE0]"),
-    );
-    expect(StyleSheet.flatten(screen.getByTestId("tab-label-home").props.style)).toEqual(
-      expect.objectContaining({
-        color: "#A89CE0",
-        fontSize: 11,
-        lineHeight: 14,
-      }),
+      expect.stringContaining("text-[11px] font-semibold leading-[14px] text-[#A89CE0]"),
     );
     expect(screen.getByTestId("tab-icon-sleep")).toHaveProp("color", "#A0A5C0");
     expect(screen.getByTestId("tab-label-sleep").props.className).toEqual(
-      expect.stringContaining("text-xs font-normal text-[#A0A5C0]"),
-    );
-    expect(StyleSheet.flatten(screen.getByTestId("tab-label-sleep").props.style)).toEqual(
-      expect.objectContaining({
-        color: "#A0A5C0",
-        fontSize: 12,
-        lineHeight: 16,
-      }),
+      expect.stringContaining("text-xs font-normal leading-4 text-[#A0A5C0]"),
     );
   });
 
@@ -216,11 +202,11 @@ describe("AppTabBar", () => {
       const label = screen.getByTestId(`tab-label-${tab}`);
 
       expect(label.props.className).toEqual(expect.stringContaining("h-4 text-center"));
-      expect(StyleSheet.flatten(label.props.style)).toEqual(
-        expect.objectContaining({
-          color: tab === "home" ? "#A89CE0" : "#A0A5C0",
-          fontSize: tab === "home" ? 11 : 12,
-        }),
+      expect(label.props.className).toEqual(
+        expect.stringContaining(tab === "home" ? "text-[11px]" : "text-xs"),
+      );
+      expect(label.props.className).toEqual(
+        expect.stringContaining(tab === "home" ? "text-[#A89CE0]" : "text-[#A0A5C0]"),
       );
     }
   });

@@ -1,5 +1,6 @@
-import { colors } from "@nidoru/ui-tokens";
-import { StyleSheet, View, type StyleProp, type ViewStyle } from "react-native";
+import type { StyleProp, ViewStyle } from "react-native";
+
+import { View } from "../tw";
 
 export const RESTING_BREATHING_ORB_TEST_IDS = {
   core: "resting-breathing-orb-core",
@@ -27,72 +28,32 @@ export function RestingBreathingOrb({
       accessibilityElementsHidden={isDecorative}
       accessibilityLabel={isDecorative ? undefined : accessibilityLabel}
       accessibilityRole={isDecorative ? undefined : "image"}
+      className="h-28 w-28 items-center justify-center"
       importantForAccessibility={isDecorative ? "no-hide-descendants" : "auto"}
-      style={[styles.orbStage, style]}
+      style={style}
       testID={testID}
     >
       <View
-        style={[styles.orbRing, styles.orbOuterRing]}
+        className="absolute h-28 w-28 rounded-full border border-[#7C6FCD]/[0.42]"
         testID={RESTING_BREATHING_ORB_TEST_IDS.outerRing}
       />
       <View
-        style={[styles.orbRing, styles.orbMiddleRing]}
+        className="absolute h-20 w-20 rounded-full border border-[#A89CE0]/[0.24] bg-[#7C6FCD]/[0.08]"
         testID={RESTING_BREATHING_ORB_TEST_IDS.middleRing}
       />
-      <View style={styles.orbSoftGlow} testID={RESTING_BREATHING_ORB_TEST_IDS.softGlow} />
-      <View style={styles.orbCore} testID={RESTING_BREATHING_ORB_TEST_IDS.core}>
-        <View style={styles.orbHighlight} testID={RESTING_BREATHING_ORB_TEST_IDS.highlight} />
+      <View
+        className="absolute h-[68px] w-[68px] rounded-full bg-[#A89CE0]/[0.35] shadow-[0_0_24px_rgba(168,156,224,0.4)]"
+        testID={RESTING_BREATHING_ORB_TEST_IDS.softGlow}
+      />
+      <View
+        className="h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-[#7C6FCD] shadow-[0_0_24px_rgba(124,111,205,0.5)]"
+        testID={RESTING_BREATHING_ORB_TEST_IDS.core}
+      >
+        <View
+          className="h-9 w-9 rounded-full bg-[#EEF0FF]/[0.34]"
+          testID={RESTING_BREATHING_ORB_TEST_IDS.highlight}
+        />
       </View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  orbStage: {
-    alignItems: "center",
-    height: 112,
-    justifyContent: "center",
-  },
-  orbRing: {
-    position: "absolute",
-  },
-  orbOuterRing: {
-    borderColor: "rgba(124, 111, 205, 0.42)",
-    borderRadius: 56,
-    borderWidth: 1,
-    height: 112,
-    width: 112,
-  },
-  orbMiddleRing: {
-    backgroundColor: "rgba(124, 111, 205, 0.08)",
-    borderColor: "rgba(168, 156, 224, 0.24)",
-    borderRadius: 40,
-    borderWidth: 1,
-    height: 80,
-    width: 80,
-  },
-  orbSoftGlow: {
-    backgroundColor: "rgba(168, 156, 224, 0.35)",
-    borderRadius: 34,
-    boxShadow: "0 0 24px rgba(168, 156, 224, 0.4)",
-    height: 68,
-    position: "absolute",
-    width: 68,
-  },
-  orbCore: {
-    alignItems: "center",
-    backgroundColor: colors.dark.primary.value,
-    borderRadius: 28,
-    boxShadow: "0 0 24px rgba(124, 111, 205, 0.5)",
-    height: 56,
-    justifyContent: "center",
-    overflow: "hidden",
-    width: 56,
-  },
-  orbHighlight: {
-    backgroundColor: "rgba(238, 240, 255, 0.34)",
-    borderRadius: 18,
-    height: 36,
-    width: 36,
-  },
-});

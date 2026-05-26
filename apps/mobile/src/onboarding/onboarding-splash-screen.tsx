@@ -1,10 +1,11 @@
-import { colors, spacing, typography } from "@nidoru/ui-tokens";
+import { colors } from "@nidoru/ui-tokens";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useRef } from "react";
-import { Animated, Easing, StyleSheet, Text, View } from "react-native";
+import { Animated, Easing } from "react-native";
 
 import { RestingBreathingOrb } from "../breathing/breathing-orb";
 import { useReduceMotionPreference } from "../motion/use-reduce-motion-enabled";
+import { ReactNativeAnimatedView, Text, View, cn } from "../tw";
 
 export const ONBOARDING_SPLASH_BACKGROUND_COLOR = colors.dark.background.value;
 
@@ -62,11 +63,12 @@ export function OnboardingSplashScreen({ useWordmarkFont = true }: OnboardingSpl
   }, [pulseConfig.durationMs, pulseProgress, reduceMotionPreference.isResolved]);
 
   return (
-    <View style={styles.screen} testID="onboarding-splash-screen">
+    <View className="flex-1 bg-nidoru-dark-background" testID="onboarding-splash-screen">
       <StatusBar style="light" />
-      <View style={styles.content}>
-        <Animated.View
-          style={[styles.orbPulse, { transform: [{ scale: orbScale }] }]}
+      <View className="flex-1 items-center justify-center px-nidoru-screen pb-[72px]">
+        <ReactNativeAnimatedView
+          className="items-center justify-center"
+          style={{ transform: [{ scale: orbScale }] }}
           testID="onboarding-splash-orb-pulse"
         >
           <RestingBreathingOrb
@@ -74,11 +76,14 @@ export function OnboardingSplashScreen({ useWordmarkFont = true }: OnboardingSpl
             isDecorative={false}
             testID="onboarding-splash-resting-orb"
           />
-        </Animated.View>
+        </ReactNativeAnimatedView>
         <Text
           accessibilityRole="header"
+          className={cn(
+            "mt-nidoru-lg text-center text-[30px] leading-[38px] text-[#EEF0FF]/[0.86]",
+            useWordmarkFont ? "font-nidoru-primary-semibold" : null,
+          )}
           selectable
-          style={[styles.wordmark, useWordmarkFont && styles.wordmarkFont]}
           testID="onboarding-splash-wordmark"
         >
           nidoru
@@ -87,32 +92,3 @@ export function OnboardingSplashScreen({ useWordmarkFont = true }: OnboardingSpl
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  screen: {
-    backgroundColor: ONBOARDING_SPLASH_BACKGROUND_COLOR,
-    flex: 1,
-  },
-  content: {
-    alignItems: "center",
-    flex: 1,
-    justifyContent: "center",
-    paddingBottom: 72,
-    paddingHorizontal: spacing.screenPadding,
-  },
-  orbPulse: {
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  wordmark: {
-    color: "rgba(238, 240, 255, 0.86)",
-    fontSize: 30,
-    letterSpacing: 0,
-    lineHeight: 38,
-    marginTop: spacing.lg,
-    textAlign: "center",
-  },
-  wordmarkFont: {
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-  },
-});

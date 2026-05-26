@@ -62,6 +62,22 @@ describe("Tailwind migration guardrails", () => {
     expect(paywallRouteSource).not.toMatch(/\bstyles\./);
   });
 
+  it("keeps onboarding closeout surfaces on Tailwind wrappers instead of legacy StyleSheet styling", () => {
+    for (const sourcePath of [
+      "src/breathing/breathing-orb.tsx",
+      "src/onboarding/first-breath-demo-screen.tsx",
+      "src/onboarding/onboarding-splash-screen.tsx",
+      "src/onboarding/personalized-plan-screen.tsx",
+      "src/surfaces/card-fade.tsx",
+    ]) {
+      const source = readMobileSource(sourcePath);
+
+      expect(source).toContain("className=");
+      expect(source).toMatch(/from "\.\.\/tw"|from "\.\.\/\.\.\/tw"/);
+      expect(source).not.toMatch(/StyleSheet\.create|styles\./);
+    }
+  });
+
   it("keeps retained non-product surfaces on approved Tailwind primitives", () => {
     const observabilityProofSource = readMobileSource("src/app/observability-proof.tsx");
     const paywallRouteSource = readMobileSource("src/paywall/post-value-account-paywall-route.tsx");

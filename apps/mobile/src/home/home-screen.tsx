@@ -14,7 +14,16 @@ import {
 } from "lucide-react-native";
 import { useEffect, useMemo, useRef, type ReactNode } from "react";
 import { Animated, Easing } from "react-native";
-import Svg, { Circle, Defs, LinearGradient, Path, Pattern, Rect, Stop } from "react-native-svg";
+import Svg, {
+  Circle,
+  Defs,
+  LinearGradient,
+  Path,
+  Pattern,
+  RadialGradient,
+  Rect,
+  Stop,
+} from "react-native-svg";
 
 import { useReduceMotionPreference } from "../motion/use-reduce-motion-enabled";
 import { markRescueMeHomeTap } from "../rescue/rescue-me-launch-performance";
@@ -213,10 +222,10 @@ export function HomeScreen({
   const timestamp = useMemo(() => formatHomeTimestamp(now), [now]);
 
   return (
-    <View className="flex-1 bg-nidoru-dark-background" testID="home-root">
+    <View className="flex-1 bg-[#0D0F1A]" testID="home-root">
       <HomeAmbientBackdrop />
       <ScrollView
-        className="relative z-10 flex-1 bg-nidoru-dark-background"
+        className="relative z-10 flex-1"
         contentContainerClassName="gap-4 px-5 pt-12 pb-[104px]"
         contentInsetAdjustmentBehavior="automatic"
         testID="home-screen"
@@ -367,32 +376,90 @@ export function HomeScreen({
 
 function HomeAmbientBackdrop() {
   return (
-    <View className="absolute inset-0" pointerEvents="none" testID="home-ambient-backdrop">
-      <Svg height="100%" opacity={0.08} width="100%">
+    <View
+      className="absolute inset-0 overflow-hidden"
+      pointerEvents="none"
+      testID="home-ambient-backdrop"
+    >
+      <Svg
+        height="100%"
+        preserveAspectRatio="none"
+        testID="home-backdrop-svg"
+        viewBox="0 0 390 844"
+        width="100%"
+      >
         <Defs>
-          <Pattern height="6" id="home-dot-grid" patternUnits="userSpaceOnUse" width="6">
-            <Circle cx="1" cy="1" fill="#EEF0FF" r="0.45" />
+          <RadialGradient
+            cx="90"
+            cy="42"
+            gradientUnits="userSpaceOnUse"
+            id="home-backdrop-top-left-glow"
+            r="275"
+          >
+            <Stop offset="0" stopColor="#7C6FCD" stopOpacity="0.25" />
+            <Stop offset="0.45" stopColor="#7C6FCD" stopOpacity="0.12" />
+            <Stop offset="1" stopColor="#7C6FCD" stopOpacity="0" />
+          </RadialGradient>
+          <RadialGradient
+            cx="444"
+            cy="310"
+            gradientUnits="userSpaceOnUse"
+            id="home-backdrop-right-glow"
+            r="265"
+          >
+            <Stop offset="0" stopColor="#5EC4D4" stopOpacity="0.15" />
+            <Stop offset="0.48" stopColor="#5EC4D4" stopOpacity="0.07" />
+            <Stop offset="1" stopColor="#5EC4D4" stopOpacity="0" />
+          </RadialGradient>
+          <RadialGradient
+            cx="76"
+            cy="624"
+            gradientUnits="userSpaceOnUse"
+            id="home-backdrop-bottom-left-glow"
+            r="250"
+          >
+            <Stop offset="0" stopColor="#A89CE0" stopOpacity="0.15" />
+            <Stop offset="0.5" stopColor="#A89CE0" stopOpacity="0.07" />
+            <Stop offset="1" stopColor="#A89CE0" stopOpacity="0" />
+          </RadialGradient>
+          <RadialGradient
+            cx="195"
+            cy="0"
+            gradientUnits="userSpaceOnUse"
+            id="home-backdrop-vignette"
+            r="680"
+          >
+            <Stop offset="0" stopColor="#000000" stopOpacity="0" />
+            <Stop offset="0.4" stopColor="#000000" stopOpacity="0" />
+            <Stop offset="1" stopColor="#000000" stopOpacity="0.5" />
+          </RadialGradient>
+          <Pattern height="3" id="home-dot-grid" patternUnits="userSpaceOnUse" width="3">
+            <Circle cx="1" cy="1" fill="#FFFFFF" fillOpacity="0.6" r="1" />
           </Pattern>
         </Defs>
-        <Rect fill="url(#home-dot-grid)" height="100%" width="100%" />
+        <Rect
+          fill="#0D0F1A"
+          height="844"
+          testID="home-backdrop-base-color"
+          width="390"
+        />
+        <Rect fill="url(#home-backdrop-top-left-glow)" height="844" width="390" />
+        <Rect fill="url(#home-backdrop-right-glow)" height="844" width="390" />
+        <Rect fill="url(#home-backdrop-bottom-left-glow)" height="844" width="390" />
+        <Rect
+          fill="url(#home-dot-grid)"
+          height="844"
+          opacity="0.05"
+          testID="home-backdrop-dot-grid"
+          width="390"
+        />
+        <Rect
+          fill="url(#home-backdrop-vignette)"
+          height="844"
+          testID="home-backdrop-vignette"
+          width="390"
+        />
       </Svg>
-      <View className="absolute -left-20 -top-32 h-[340px] w-[340px] rounded-full bg-[#7C6FCD]/10" />
-      <View className="absolute -right-24 top-40 h-[300px] w-[300px] rounded-full bg-[#5EC4D4]/10" />
-      <View className="absolute -left-16 bottom-20 h-[280px] w-[280px] rounded-full bg-[#A89CE0]/10" />
-      <View className="absolute inset-0 opacity-[0.05]" testID="home-particle-noise">
-        <Svg height="100%" width="100%">
-          {Array.from({ length: 32 }).map((_, index) => (
-            <Circle
-              cx={`${(index * 23) % 100}%`}
-              cy={`${(index * 37) % 100}%`}
-              fill="#EEF0FF"
-              key={index}
-              r="0.7"
-            />
-          ))}
-        </Svg>
-      </View>
-      <View className="absolute inset-0 bg-black/20" />
     </View>
   );
 }

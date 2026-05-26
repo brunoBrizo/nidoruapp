@@ -136,7 +136,10 @@ describe("HomeScreen", () => {
   it("uses Tailwind primitives for the migrated Home shell and primary ritual card", () => {
     render(<HomeScreen now={designDate} />);
 
-    expect(screen.getByTestId("home-screen").props.className).toEqual(
+    expect(screen.getByTestId("home-root").props.className).toEqual(
+      expect.stringContaining("bg-[#0D0F1A]"),
+    );
+    expect(screen.getByTestId("home-screen").props.className).not.toEqual(
       expect.stringContaining("bg-nidoru-dark-background"),
     );
     expect(screen.getByTestId("home-screen").props.contentContainerClassName).toEqual(
@@ -145,6 +148,10 @@ describe("HomeScreen", () => {
     expect(screen.getByTestId("home-ambient-backdrop").props.className).toEqual(
       expect.stringContaining("absolute inset-0"),
     );
+    expect(screen.getByTestId("home-backdrop-svg")).toBeTruthy();
+    expect(screen.getByTestId("home-backdrop-base-color")).toBeTruthy();
+    expect(screen.getByTestId("home-backdrop-dot-grid")).toBeTruthy();
+    expect(screen.getByTestId("home-backdrop-vignette")).toBeTruthy();
     expect(screen.getByTestId("home-primary-card").props.className).toEqual(
       expect.stringContaining("rounded-[28px]"),
     );

@@ -499,6 +499,11 @@ export function OnboardingPersonalizationFlowScreen({
 
   return (
     <View className="flex-1 bg-nidoru-dark-background" testID="onboarding-question-shell">
+      <View
+        className="absolute inset-0"
+        pointerEvents="none"
+        testID="onboarding-personalization-flow-entry"
+      />
       <StatusBar hidden />
       <ScrollView
         bounces={false}

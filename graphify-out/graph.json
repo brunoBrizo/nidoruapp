@@ -261,7 +261,7 @@
       "source_file": "packages/domain/src/index.ts",
       "source_location": "L907",
       "id": "index_canpromptfornotificationpermission",
-      "community": 1,
+      "community": 2,
       "norm_label": "canpromptfornotificationpermission()"
     },
     {
@@ -720,7 +720,7 @@
       "source_file": "apps/mobile/tests/sqlite-migrations.test.ts",
       "source_location": "L1",
       "id": "apps_mobile_tests_sqlite_migrations_test_ts",
-      "community": 5,
+      "community": 6,
       "norm_label": "sqlite-migrations.test.ts"
     },
     {
@@ -729,7 +729,7 @@
       "source_file": "apps/mobile/tests/sqlite-migrations.test.ts",
       "source_location": "L7",
       "id": "sqlite_migrations_test_assertequals",
-      "community": 5,
+      "community": 6,
       "norm_label": "assertequals()"
     },
     {
@@ -738,7 +738,7 @@
       "source_file": "apps/mobile/tests/sqlite-migrations.test.ts",
       "source_location": "L13",
       "id": "sqlite_migrations_test_assertcondition",
-      "community": 5,
+      "community": 6,
       "norm_label": "assertcondition()"
     },
     {
@@ -747,7 +747,7 @@
       "source_file": "apps/mobile/tests/sqlite-migrations.test.ts",
       "source_location": "L19",
       "id": "sqlite_migrations_test_assertrejects",
-      "community": 5,
+      "community": 6,
       "norm_label": "assertrejects()"
     },
     {
@@ -756,7 +756,7 @@
       "source_file": "apps/mobile/tests/sqlite-migrations.test.ts",
       "source_location": "L35",
       "id": "sqlite_migrations_test_sqliteclidatabase",
-      "community": 5,
+      "community": 6,
       "norm_label": "sqliteclidatabase"
     },
     {
@@ -765,7 +765,7 @@
       "source_file": "apps/mobile/tests/sqlite-migrations.test.ts",
       "source_location": "L36",
       "id": "sqlite_migrations_test_sqliteclidatabase_constructor",
-      "community": 5,
+      "community": 6,
       "norm_label": ".constructor()"
     },
     {
@@ -774,7 +774,7 @@
       "source_file": "apps/mobile/tests/sqlite-migrations.test.ts",
       "source_location": "L38",
       "id": "sqlite_migrations_test_sqliteclidatabase_execasync",
-      "community": 5,
+      "community": 6,
       "norm_label": ".execasync()"
     },
     {
@@ -783,7 +783,7 @@
       "source_file": "apps/mobile/tests/sqlite-migrations.test.ts",
       "source_location": "L42",
       "id": "sqlite_migrations_test_sqliteclidatabase_getallasync",
-      "community": 5,
+      "community": 6,
       "norm_label": ".getallasync()"
     },
     {
@@ -792,7 +792,7 @@
       "source_file": "apps/mobile/tests/sqlite-migrations.test.ts",
       "source_location": "L53",
       "id": "sqlite_migrations_test_createdatabase",
-      "community": 5,
+      "community": 6,
       "norm_label": "createdatabase()"
     },
     {
@@ -801,7 +801,7 @@
       "source_file": "apps/mobile/tests/sqlite-migrations.test.ts",
       "source_location": "L66",
       "id": "sqlite_migrations_test_runsqlite",
-      "community": 5,
+      "community": 6,
       "norm_label": "runsqlite()"
     },
     {
@@ -1467,7 +1467,7 @@
       "source_file": "apps/mobile/src/app/observability-proof.tsx",
       "source_location": "L1",
       "id": "apps_mobile_src_app_observability_proof_tsx",
-      "community": 6,
+      "community": 5,
       "norm_label": "observability-proof.tsx"
     },
     {
@@ -1476,7 +1476,7 @@
       "source_file": "apps/mobile/src/app/observability-proof.tsx",
       "source_location": "L15",
       "id": "observability_proof_capturesentry",
-      "community": 6,
+      "community": 5,
       "norm_label": "capturesentry()"
     },
     {
@@ -1485,7 +1485,7 @@
       "source_file": "apps/mobile/src/app/observability-proof.tsx",
       "source_location": "L20",
       "id": "observability_proof_captureposthog",
-      "community": 6,
+      "community": 5,
       "norm_label": "captureposthog()"
     },
     {
@@ -2250,7 +2250,7 @@
       "source_file": "apps/mobile/src/observability/sentry.ts",
       "source_location": "L1",
       "id": "apps_mobile_src_observability_sentry_ts",
-      "community": 6,
+      "community": 5,
       "norm_label": "sentry.ts"
     },
     {
@@ -2259,7 +2259,7 @@
       "source_file": "apps/mobile/src/observability/sentry.ts",
       "source_location": "L18",
       "id": "sentry_initializesentry",
-      "community": 6,
+      "community": 5,
       "norm_label": "initializesentry()"
     },
     {
@@ -2268,7 +2268,7 @@
       "source_file": "apps/mobile/src/observability/sentry.ts",
       "source_location": "L53",
       "id": "sentry_issentryconfigured",
-      "community": 6,
+      "community": 5,
       "norm_label": "issentryconfigured()"
     },
     {
@@ -2277,7 +2277,7 @@
       "source_file": "apps/mobile/src/observability/sentry.ts",
       "source_location": "L57",
       "id": "sentry_capturesentryprooferror",
-      "community": 6,
+      "community": 5,
       "norm_label": "capturesentryprooferror()"
     },
     {
@@ -2286,7 +2286,7 @@
       "source_file": "apps/mobile/src/observability/sentry.ts",
       "source_location": "L80",
       "id": "sentry_addsentrybreadcrumb",
-      "community": 6,
+      "community": 5,
       "norm_label": "addsentrybreadcrumb()"
     },
     {
@@ -2295,7 +2295,7 @@
       "source_file": "apps/mobile/src/observability/sentry.ts",
       "source_location": "L99",
       "id": "sentry_withsentryroot",
-      "community": 6,
+      "community": 5,
       "norm_label": "withsentryroot()"
     },
     {
@@ -2322,7 +2322,7 @@
       "source_file": "apps/mobile/src/observability/environment.ts",
       "source_location": "L1",
       "id": "apps_mobile_src_observability_environment_ts",
-      "community": 6,
+      "community": 5,
       "norm_label": "environment.ts"
     },
     {
@@ -2331,7 +2331,7 @@
       "source_file": "apps/mobile/src/observability/environment.ts",
       "source_location": "L3",
       "id": "environment_getappenvironment",
-      "community": 6,
+      "community": 5,
       "norm_label": "getappenvironment()"
     },
     {
@@ -2340,7 +2340,7 @@
       "source_file": "apps/mobile/src/observability/environment.ts",
       "source_location": "L13",
       "id": "environment_isnonproductionenvironment",
-      "community": 6,
+      "community": 5,
       "norm_label": "isnonproductionenvironment()"
     },
     {
@@ -2349,7 +2349,7 @@
       "source_file": "apps/mobile/src/observability/environment.ts",
       "source_location": "L17",
       "id": "environment_isobservabilityproofmodeenabled",
-      "community": 6,
+      "community": 5,
       "norm_label": "isobservabilityproofmodeenabled()"
     },
     {
@@ -2358,7 +2358,7 @@
       "source_file": "apps/mobile/src/observability/posthog.ts",
       "source_location": "L1",
       "id": "apps_mobile_src_observability_posthog_ts",
-      "community": 6,
+      "community": 5,
       "norm_label": "posthog.ts"
     },
     {
@@ -2367,7 +2367,7 @@
       "source_file": "apps/mobile/src/observability/posthog.ts",
       "source_location": "L104",
       "id": "posthog_isposthogconfigured",
-      "community": 6,
+      "community": 5,
       "norm_label": "isposthogconfigured()"
     },
     {
@@ -2376,7 +2376,7 @@
       "source_file": "apps/mobile/src/observability/posthog.ts",
       "source_location": "L108",
       "id": "posthog_isapprovedanalyticseventname",
-      "community": 6,
+      "community": 5,
       "norm_label": "isapprovedanalyticseventname()"
     },
     {
@@ -2385,7 +2385,7 @@
       "source_file": "apps/mobile/src/observability/posthog.ts",
       "source_location": "L114",
       "id": "posthog_createprivacysafeanalyticsproperties",
-      "community": 6,
+      "community": 5,
       "norm_label": "createprivacysafeanalyticsproperties()"
     },
     {
@@ -2394,7 +2394,7 @@
       "source_file": "apps/mobile/src/observability/posthog.ts",
       "source_location": "L144",
       "id": "posthog_captureexplicitevent",
-      "community": 6,
+      "community": 5,
       "norm_label": "captureexplicitevent()"
     },
     {
@@ -2403,7 +2403,7 @@
       "source_file": "apps/mobile/src/observability/posthog.ts",
       "source_location": "L167",
       "id": "posthog_captureanalyticsevent",
-      "community": 6,
+      "community": 5,
       "norm_label": "captureanalyticsevent()"
     },
     {
@@ -2412,7 +2412,7 @@
       "source_file": "apps/mobile/src/observability/posthog.ts",
       "source_location": "L174",
       "id": "posthog_captureposthogproofevent",
-      "community": 6,
+      "community": 5,
       "norm_label": "captureposthogproofevent()"
     },
     {
@@ -2484,7 +2484,7 @@
       "source_file": "apps/mobile/src/storage/local-database.ts",
       "source_location": "L1",
       "id": "apps_mobile_src_storage_local_database_ts",
-      "community": 5,
+      "community": 6,
       "norm_label": "local-database.ts"
     },
     {
@@ -2493,7 +2493,7 @@
       "source_file": "apps/mobile/src/storage/local-database.ts",
       "source_location": "L9",
       "id": "local_database_openmigratedlocaldatabase",
-      "community": 5,
+      "community": 6,
       "norm_label": "openmigratedlocaldatabase()"
     },
     {
@@ -2502,7 +2502,7 @@
       "source_file": "apps/mobile/src/storage/local-database.ts",
       "source_location": "L27",
       "id": "local_database_openandmigratelocaldatabase",
-      "community": 5,
+      "community": 6,
       "norm_label": "openandmigratelocaldatabase()"
     },
     {
@@ -2511,7 +2511,7 @@
       "source_file": "apps/mobile/src/storage/sqlite-migrations.ts",
       "source_location": "L1",
       "id": "apps_mobile_src_storage_sqlite_migrations_ts",
-      "community": 5,
+      "community": 6,
       "norm_label": "sqlite-migrations.ts"
     },
     {
@@ -2520,7 +2520,7 @@
       "source_file": "apps/mobile/src/storage/sqlite-migrations.ts",
       "source_location": "L635",
       "id": "sqlite_migrations_runsqlitemigrations",
-      "community": 5,
+      "community": 6,
       "norm_label": "runsqlitemigrations()"
     },
     {
@@ -2529,7 +2529,7 @@
       "source_file": "apps/mobile/src/storage/sqlite-migrations.ts",
       "source_location": "L667",
       "id": "sqlite_migrations_validatemigrations",
-      "community": 5,
+      "community": 6,
       "norm_label": "validatemigrations()"
     },
     {
@@ -2538,7 +2538,7 @@
       "source_file": "apps/mobile/src/storage/sqlite-migrations.ts",
       "source_location": "L693",
       "id": "sqlite_migrations_applymigration",
-      "community": 5,
+      "community": 6,
       "norm_label": "applymigration()"
     },
     {
@@ -3294,7 +3294,7 @@
       "source_file": "apps/mobile/src/notifications/notification-permission-gate-controller.tsx",
       "source_location": "L1",
       "id": "apps_mobile_src_notifications_notification_permission_gate_controller_tsx",
-      "community": 5,
+      "community": 1,
       "norm_label": "notification-permission-gate-controller.tsx"
     },
     {
@@ -3303,7 +3303,7 @@
       "source_file": "apps/mobile/src/notifications/notification-permission-gate-controller.tsx",
       "source_location": "L40",
       "id": "notification_permission_gate_controller_getdefaultnow",
-      "community": 5,
+      "community": 1,
       "norm_label": "getdefaultnow()"
     },
     {
@@ -3312,7 +3312,7 @@
       "source_file": "apps/mobile/src/notifications/notification-permission-gate-controller.tsx",
       "source_location": "L41",
       "id": "notification_permission_gate_controller_opendefaultlocaldatabase",
-      "community": 5,
+      "community": 1,
       "norm_label": "opendefaultlocaldatabase()"
     },
     {
@@ -3733,7 +3733,7 @@
       "label": "submitError()",
       "file_type": "code",
       "source_file": "apps/mobile/src/onboarding/onboarding-flow-screen.tsx",
-      "source_location": "L586",
+      "source_location": "L591",
       "id": "onboarding_flow_screen_submiterror",
       "community": 2,
       "norm_label": "submiterror()"
@@ -3742,7 +3742,7 @@
       "label": "cn()",
       "file_type": "code",
       "source_file": "apps/mobile/src/onboarding/onboarding-flow-screen.tsx",
-      "source_location": "L843",
+      "source_location": "L848",
       "id": "onboarding_flow_screen_cn",
       "community": 2,
       "norm_label": "cn()"
@@ -3751,7 +3751,7 @@
       "label": "OnboardingContinueButton()",
       "file_type": "code",
       "source_file": "apps/mobile/src/onboarding/onboarding-flow-screen.tsx",
-      "source_location": "L1346",
+      "source_location": "L1351",
       "id": "onboarding_flow_screen_onboardingcontinuebutton",
       "community": 2,
       "norm_label": "onboardingcontinuebutton()"
@@ -3760,7 +3760,7 @@
       "label": "padTimeNumber()",
       "file_type": "code",
       "source_file": "apps/mobile/src/onboarding/onboarding-flow-screen.tsx",
-      "source_location": "L1398",
+      "source_location": "L1403",
       "id": "onboarding_flow_screen_padtimenumber",
       "community": 2,
       "norm_label": "padtimenumber()"
@@ -4039,7 +4039,7 @@
       "label": "BreathSessionRouteScreen()",
       "file_type": "code",
       "source_file": "apps/mobile/src/session/first-session-screen.tsx",
-      "source_location": "L174",
+      "source_location": "L276",
       "id": "first_session_screen_breathsessionroutescreen",
       "community": 0,
       "norm_label": "breathsessionroutescreen()"
@@ -4048,7 +4048,7 @@
       "label": "FirstSessionRouteScreen()",
       "file_type": "code",
       "source_file": "apps/mobile/src/session/first-session-screen.tsx",
-      "source_location": "L328",
+      "source_location": "L430",
       "id": "first_session_screen_firstsessionroutescreen",
       "community": 0,
       "norm_label": "firstsessionroutescreen()"
@@ -4057,7 +4057,7 @@
       "label": "FirstSessionScreen()",
       "file_type": "code",
       "source_file": "apps/mobile/src/session/first-session-screen.tsx",
-      "source_location": "L332",
+      "source_location": "L434",
       "id": "first_session_screen_firstsessionscreen",
       "community": 0,
       "norm_label": "firstsessionscreen()"
@@ -4066,7 +4066,7 @@
       "label": "pauseSession()",
       "file_type": "code",
       "source_file": "apps/mobile/src/session/first-session-screen.tsx",
-      "source_location": "L745",
+      "source_location": "L847",
       "id": "first_session_screen_pausesession",
       "community": 0,
       "norm_label": "pausesession()"
@@ -4075,7 +4075,7 @@
       "label": "resumeSession()",
       "file_type": "code",
       "source_file": "apps/mobile/src/session/first-session-screen.tsx",
-      "source_location": "L752",
+      "source_location": "L854",
       "id": "first_session_screen_resumesession",
       "community": 0,
       "norm_label": "resumesession()"
@@ -4084,7 +4084,7 @@
       "label": "endSessionEarly()",
       "file_type": "code",
       "source_file": "apps/mobile/src/session/first-session-screen.tsx",
-      "source_location": "L758",
+      "source_location": "L860",
       "id": "first_session_screen_endsessionearly",
       "community": 0,
       "norm_label": "endsessionearly()"
@@ -4093,19 +4093,10 @@
       "label": "setReflectionError()",
       "file_type": "code",
       "source_file": "apps/mobile/src/session/first-session-screen.tsx",
-      "source_location": "L1097",
+      "source_location": "L1212",
       "id": "first_session_screen_setreflectionerror",
       "community": 0,
       "norm_label": "setreflectionerror()"
-    },
-    {
-      "label": "selectedFeeling()",
-      "file_type": "code",
-      "source_file": "apps/mobile/src/session/first-session-screen.tsx",
-      "source_location": "L1153",
-      "id": "first_session_screen_selectedfeeling",
-      "community": 0,
-      "norm_label": "selectedfeeling()"
     },
     {
       "label": "breath-session-runtime.ts",
@@ -6873,8 +6864,8 @@
       "source_file": "apps/mobile/src/onboarding/onboarding-flow-screen.tsx",
       "source_location": "L665",
       "weight": 1.0,
-      "_src": "onboarding_flow_screen_submiterror",
-      "_tgt": "deferred_capture_captureanalyticseventdeferred",
+      "_src": "deferred_capture_captureanalyticseventdeferred",
+      "_tgt": "onboarding_flow_screen_submiterror",
       "source": "deferred_capture_captureanalyticseventdeferred",
       "target": "onboarding_flow_screen_submiterror"
     },
@@ -6945,8 +6936,8 @@
       "source_file": "apps/mobile/src/onboarding/onboarding-flow-screen.tsx",
       "source_location": "L659",
       "weight": 1.0,
-      "_src": "onboarding_flow_screen_submiterror",
-      "_tgt": "local_install_identity_getorcreatelocalinstallidentity",
+      "_src": "local_install_identity_getorcreatelocalinstallidentity",
+      "_tgt": "onboarding_flow_screen_submiterror",
       "source": "local_install_identity_getorcreatelocalinstallidentity",
       "target": "onboarding_flow_screen_submiterror"
     },
@@ -8889,8 +8880,8 @@
       "source_file": "apps/mobile/src/onboarding/onboarding-flow-screen.tsx",
       "source_location": "L661",
       "weight": 1.0,
-      "_src": "onboarding_flow_screen_submiterror",
-      "_tgt": "local_first_onboarding_completeonboardingpersonalizationlocally",
+      "_src": "local_first_onboarding_completeonboardingpersonalizationlocally",
+      "_tgt": "onboarding_flow_screen_submiterror",
       "source": "local_first_onboarding_completeonboardingpersonalizationlocally",
       "target": "onboarding_flow_screen_submiterror"
     },
@@ -9066,7 +9057,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/onboarding/onboarding-flow-screen.tsx",
-      "source_location": "L586",
+      "source_location": "L591",
       "weight": 1.0,
       "_src": "apps_mobile_src_onboarding_onboarding_flow_screen_tsx",
       "_tgt": "onboarding_flow_screen_submiterror",
@@ -9078,7 +9069,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/onboarding/onboarding-flow-screen.tsx",
-      "source_location": "L1174",
+      "source_location": "L1179",
       "weight": 1.0,
       "_src": "apps_mobile_src_onboarding_onboarding_flow_screen_tsx",
       "_tgt": "onboarding_flow_screen_cn",
@@ -9090,7 +9081,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/onboarding/onboarding-flow-screen.tsx",
-      "source_location": "L1346",
+      "source_location": "L1351",
       "weight": 1.0,
       "_src": "apps_mobile_src_onboarding_onboarding_flow_screen_tsx",
       "_tgt": "onboarding_flow_screen_onboardingcontinuebutton",
@@ -9102,7 +9093,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/onboarding/onboarding-flow-screen.tsx",
-      "source_location": "L1398",
+      "source_location": "L1403",
       "weight": 1.0,
       "_src": "apps_mobile_src_onboarding_onboarding_flow_screen_tsx",
       "_tgt": "onboarding_flow_screen_padtimenumber",
@@ -9114,7 +9105,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/onboarding/onboarding-flow-screen.tsx",
-      "source_location": "L1395",
+      "source_location": "L1400",
       "weight": 1.0,
       "_src": "onboarding_flow_screen_onboardingcontinuebutton",
       "_tgt": "onboarding_flow_screen_padtimenumber",
@@ -9618,7 +9609,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/session/first-session-screen.tsx",
-      "source_location": "L174",
+      "source_location": "L276",
       "weight": 1.0,
       "_src": "apps_mobile_src_session_first_session_screen_tsx",
       "_tgt": "first_session_screen_breathsessionroutescreen",
@@ -9630,7 +9621,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/session/first-session-screen.tsx",
-      "source_location": "L328",
+      "source_location": "L430",
       "weight": 1.0,
       "_src": "apps_mobile_src_session_first_session_screen_tsx",
       "_tgt": "first_session_screen_firstsessionroutescreen",
@@ -9642,7 +9633,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/session/first-session-screen.tsx",
-      "source_location": "L332",
+      "source_location": "L434",
       "weight": 1.0,
       "_src": "apps_mobile_src_session_first_session_screen_tsx",
       "_tgt": "first_session_screen_firstsessionscreen",
@@ -9654,7 +9645,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/session/first-session-screen.tsx",
-      "source_location": "L745",
+      "source_location": "L847",
       "weight": 1.0,
       "_src": "apps_mobile_src_session_first_session_screen_tsx",
       "_tgt": "first_session_screen_pausesession",
@@ -9666,7 +9657,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/session/first-session-screen.tsx",
-      "source_location": "L752",
+      "source_location": "L854",
       "weight": 1.0,
       "_src": "apps_mobile_src_session_first_session_screen_tsx",
       "_tgt": "first_session_screen_resumesession",
@@ -9678,7 +9669,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/session/first-session-screen.tsx",
-      "source_location": "L758",
+      "source_location": "L860",
       "weight": 1.0,
       "_src": "apps_mobile_src_session_first_session_screen_tsx",
       "_tgt": "first_session_screen_endsessionearly",
@@ -9690,24 +9681,12 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/session/first-session-screen.tsx",
-      "source_location": "L1097",
+      "source_location": "L1212",
       "weight": 1.0,
       "_src": "apps_mobile_src_session_first_session_screen_tsx",
       "_tgt": "first_session_screen_setreflectionerror",
       "source": "apps_mobile_src_session_first_session_screen_tsx",
       "target": "first_session_screen_setreflectionerror",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/mobile/src/session/first-session-screen.tsx",
-      "source_location": "L1153",
-      "weight": 1.0,
-      "_src": "apps_mobile_src_session_first_session_screen_tsx",
-      "_tgt": "first_session_screen_selectedfeeling",
-      "source": "apps_mobile_src_session_first_session_screen_tsx",
-      "target": "first_session_screen_selectedfeeling",
       "confidence_score": 1.0
     },
     {

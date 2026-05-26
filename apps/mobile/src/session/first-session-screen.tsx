@@ -5,7 +5,7 @@ import {
   type BreathTechniqueId,
   type OnboardingPlanId,
 } from "@nidoru/domain";
-import { colors, motion, spacing, typography } from "@nidoru/ui-tokens";
+import { colors, motion } from "@nidoru/ui-tokens";
 import type {
   AbandonedFirstSessionRecord,
   AbandonedBreathSessionRecord,
@@ -30,8 +30,8 @@ import {
   Wind,
 } from "lucide-react-native";
 import { useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
-import { AppState, Pressable, StyleSheet, Text, View, type AppStateStatus } from "react-native";
-import Animated, {
+import { AppState, type AppStateStatus } from "react-native";
+import {
   Easing,
   useAnimatedStyle,
   useSharedValue,
@@ -46,6 +46,8 @@ import {
   createActiveSessionAudioController,
   type ActiveSessionAudioController,
 } from "../audio/active-session-audio-controller";
+import { NidoruButton, NidoruIconButton } from "../design-system/interaction";
+import { OrbStage } from "../design-system/orb";
 import {
   abandonFirstSessionLocally,
   completeFirstSessionLocally,
@@ -60,6 +62,7 @@ import {
 import { useReduceMotionPreference } from "../motion/use-reduce-motion-enabled";
 import { captureAnalyticsEventDeferred } from "../observability/deferred-capture";
 import { openMigratedLocalDatabase } from "../storage/local-database";
+import { Animated, Pressable, Text, View, cn } from "../tw";
 import {
   abandonBreathSessionLocally,
   completeBreathSessionLocally,
@@ -170,6 +173,105 @@ const audioModeOptions = [
   readonly id: BreathAudioCueModeId;
   readonly label: string;
 }[];
+
+const firstSessionClassNames = {
+  audioModeIconCircle: "h-7 w-7 items-center justify-center rounded-[14px] bg-white/[0.04]",
+  audioModeIconSelected: "bg-[#A89CE0]/10",
+  audioModeLabel: "flex-1 font-nidoru-primary-semibold text-[11px] text-[#8A8FA8]",
+  audioModeLabelSelected: "text-[#EEF0FF]",
+  audioModeOption:
+    "min-h-[52px] w-full flex-row items-center gap-3 rounded-2xl border border-[#1C2040] bg-[#111430]/80 px-3.5 active:scale-[0.96]",
+  audioModeOptionSelected:
+    "border-[#A89CE0]/50 bg-[#1C2040] shadow-[0_0_16px_rgba(124,111,205,0.2)]",
+  audioPickerBackdrop: "absolute inset-0",
+  audioPickerCopy:
+    "mb-3.5 text-center font-nidoru-primary-regular text-[13px] leading-[18px] text-[#8A8FA8]",
+  audioPickerHandle: "mb-3.5 h-1 w-9 rounded-full bg-[#A89CE0]/35",
+  audioPickerLayer: "absolute inset-0 justify-end bg-[#0D0F1A]/60 p-5",
+  audioPickerOptions: "w-full gap-2.5",
+  audioPickerSheet:
+    "w-full items-center rounded-3xl border border-[#1C2040] bg-[#0D0F1A] px-4 pb-[18px] pt-3 shadow-[0_-10px_38px_rgba(4,6,16,0.48)]",
+  audioPickerTitle: "mb-1.5 font-nidoru-primary-semibold text-[18px] leading-[24px] text-[#EEF0FF]",
+  backgroundGlow:
+    "pointer-events-none absolute left-[-30px] top-[150px] h-[440px] w-[440px] rounded-full bg-[#0F1230] opacity-[0.34]",
+  continueButton:
+    "min-h-14 w-full flex-row items-center justify-center gap-2 rounded-full border border-[#7C6FCD]/40 bg-[#1C2040] shadow-[0_0_22px_rgba(124,111,205,0.22)] active:scale-[0.96]",
+  continueButtonText: "font-nidoru-primary-semibold text-[16px] leading-[22px] text-[#EEF0FF]",
+  controlDisabled: "opacity-[0.45]",
+  controlsArea: "gap-4",
+  core: "absolute h-[150px] w-[150px] items-center justify-center overflow-hidden rounded-full bg-[#7C6FCD] shadow-[0_0_44px_rgba(124,111,205,0.42)]",
+  coreAtmosphere: "h-[108px] w-[108px] rounded-full bg-[#EEF0FF]/[0.14]",
+  endForNowButton: "min-h-12 items-center justify-center active:scale-[0.98]",
+  endForNowText: "font-nidoru-primary-semibold text-[16px] leading-[22px] text-[#8A8FA8]",
+  footer:
+    "relative z-10 flex-row items-center justify-between bg-gradient-to-t from-[#0D0F1A] via-[#0D0F1A] to-transparent px-7 pb-7 pt-4",
+  header: "relative z-10 items-center gap-[7px] px-6 pb-4 pt-16 text-center",
+  innerGlow: "absolute h-[200px] w-[200px] rounded-full bg-[#7C6FCD]/20",
+  midDiffusion:
+    "absolute h-[220px] w-[220px] rounded-full bg-[#A89CE0]/30 shadow-[0_0_32px_rgba(168,156,224,0.22)]",
+  orbSection: "relative z-10 min-h-[400px] flex-1 items-center justify-center",
+  orbStage: "h-[260px] w-[260px] items-center justify-center",
+  orbStagePaused: "opacity-30 scale-[0.85]",
+  outerRing:
+    "absolute h-[240px] w-[240px] rounded-full border-[1.5px] border-[#A89CE0]/25 border-t-[#A89CE0]/40",
+  overlay: "absolute inset-0 z-40 items-center justify-center bg-[#0D0F1A] px-8",
+  overlayActions: "w-full max-w-[280px] gap-3",
+  overlayCopy: "mb-[34px] font-nidoru-primary-regular text-[14px] leading-[20px] text-[#8A8FA8]",
+  overlayEyebrow:
+    "mb-2 font-nidoru-primary-semibold text-[13px] leading-[18px] tracking-wide text-[#A4AAC4]",
+  overlayGlow:
+    "pointer-events-none absolute h-[240px] w-[240px] rounded-full bg-[#7C6FCD]/5 shadow-[0_0_86px_rgba(124,111,205,0.2)]",
+  overlayTitle: "mb-2 font-nidoru-primary-semibold text-[24px] leading-[30px] text-[#EEF0FF]",
+  pauseButton:
+    "h-14 w-14 items-center justify-center rounded-full border border-[#1C2040] bg-[#14172B] active:scale-[0.96]",
+  phaseLabel: "absolute font-nidoru-primary-semibold text-[20px] leading-[26px] text-[#EEF0FF]",
+  preparingCenter: "flex-1 items-center justify-center gap-2",
+  pulseRing: "absolute h-[150px] w-[150px] rounded-full border-[1.5px] border-[#EEF0FF]/40",
+  reflectionButton:
+    "min-h-14 w-full flex-row items-center justify-between rounded-[16px] border border-[#1C2040] bg-[#14172B] px-5 active:scale-[0.96]",
+  reflectionButtons: "mb-6 w-full max-w-[320px] gap-3.5",
+  reflectionButtonSelected:
+    "border-[#7C6FCD]/50 bg-[#1C2040] shadow-[0_0_14px_rgba(124,111,205,0.18)]",
+  reflectionButtonText: "font-nidoru-primary-semibold text-[16px] leading-[22px] text-[#EEF0FF]",
+  reflectionCheckCircle:
+    "h-6 w-6 items-center justify-center rounded-full border-[1.5px] border-[#2A2E50]",
+  reflectionCheckSelected: "border-transparent shadow-[0_0_10px_rgba(168,156,224,0.42)]",
+  reflectionContent: "relative z-10 w-full -translate-y-7 items-center justify-center px-6",
+  reflectionCopy:
+    "max-w-[290px] text-center font-nidoru-primary-regular text-[14px] leading-[21px] text-[#A4AAC4]",
+  reflectionError:
+    "mt-4 max-w-[300px] text-center font-nidoru-primary-semibold text-[13px] leading-[18px] text-nidoru-dark-danger",
+  reflectionEyebrow:
+    "font-nidoru-primary-semibold text-[13px] leading-[18px] tracking-wide text-[#A4AAC4]",
+  reflectionEyebrowRow: "mb-3 flex-row items-center justify-center gap-2",
+  reflectionFadeLayer: "absolute inset-0",
+  reflectionOverlay:
+    "absolute inset-0 z-50 items-center justify-center overflow-hidden bg-[#0D0F1A]",
+  reflectionTitle:
+    "mb-8 text-center font-nidoru-primary-semibold text-[28px] leading-[34px] tracking-normal text-[#EEF0FF]",
+  rewardActionWrap: "absolute bottom-8 left-0 right-0 items-center px-6",
+  rewardContinueButton:
+    "h-14 w-full max-w-[342px] items-center justify-center rounded-2xl border border-[#1C2040] bg-[#1C2040] active:scale-[0.96]",
+  rewardContinueText: "font-nidoru-primary-semibold text-[16px] leading-[22px] text-[#EEF0FF]",
+  screen: "flex-1 overflow-hidden bg-[#0D0F1A]",
+  statusControl: "min-h-16 min-w-16 items-center justify-center gap-1.5 active:scale-[0.96]",
+  statusIconCircle:
+    "h-12 w-12 items-center justify-center rounded-full border border-[#1C2040] bg-[#14172B]",
+  statusIconCircleActive: "border-[#7C6FCD]/50",
+  statusLabel: "font-nidoru-primary-semibold text-[13px] text-[#8A8FA8]",
+  statusLabelActive: "text-[#A89CE0]",
+  subtitle: "font-nidoru-primary-regular text-[14px] leading-[20px] text-[#8A8FA8]",
+  timer:
+    "absolute bottom-[22px] font-nidoru-data-regular text-[16px] leading-[22px] tracking-[3px] text-[#8A8FA8]/80 tabular-nums",
+  title: "font-nidoru-primary-semibold text-[16px] leading-[22px] text-[#EEF0FF]",
+} as const;
+
+const reflectionTransitionFrameStyle = {
+  alignItems: "center",
+  flex: 1,
+  justifyContent: "center",
+  width: "100%",
+} as const;
 
 export function BreathSessionRouteScreen({
   durationSeconds,
@@ -792,77 +894,91 @@ export function BreathSessionScreen({
 
   return (
     <View
-      style={[
-        styles.screen,
-        {
-          paddingBottom: Math.max(safeAreaInsets.bottom, 0),
-          paddingTop: Math.max(safeAreaInsets.top, 0),
-        },
-      ]}
+      className={firstSessionClassNames.screen}
+      style={{
+        paddingBottom: Math.max(safeAreaInsets.bottom, 0),
+        paddingTop: Math.max(safeAreaInsets.top, 0),
+      }}
       testID="first-session-screen"
     >
       <StatusBar hidden />
-      <View pointerEvents="none" style={styles.backgroundGlow} />
+      <View className={firstSessionClassNames.backgroundGlow} pointerEvents="none" />
 
-      <View style={styles.header}>
-        <Text accessibilityRole="header" selectable style={styles.title}>
+      <View className={firstSessionClassNames.header} testID="first-session-header">
+        <Text accessibilityRole="header" className={firstSessionClassNames.title} selectable>
           Let’s wind down.
         </Text>
-        <Text selectable style={styles.subtitle}>
+        <Text className={firstSessionClassNames.subtitle} selectable>
           {sessionLabel}
         </Text>
       </View>
 
-      <View style={styles.orbSection}>
-        <Animated.View
+      <View className={firstSessionClassNames.orbSection}>
+        <OrbStage
           accessibilityHint="Guides the current breath phase."
           accessibilityLabel={`${phaseLabels[snapshot.phaseName]} breathing phase`}
           accessibilityRole="image"
-          style={[styles.orbStage, isPaused ? styles.orbStagePaused : null]}
+          className={cn(
+            firstSessionClassNames.orbStage,
+            isPaused ? firstSessionClassNames.orbStagePaused : null,
+          )}
+          isDecorative={false}
           testID="first-session-orb"
         >
           {reduceMotionEnabled ? null : (
             <Animated.View
-              style={[styles.outerRing, outerGlowAnimatedStyle]}
+              className={firstSessionClassNames.outerRing}
+              style={outerGlowAnimatedStyle}
               testID="first-session-orb-outer-ring"
             />
           )}
           <Animated.View
-            style={[styles.innerGlow, innerGlowAnimatedStyle]}
+            className={firstSessionClassNames.innerGlow}
+            style={innerGlowAnimatedStyle}
             testID="first-session-orb-inner-glow"
           />
           <Animated.View
-            style={[styles.midDiffusion, midDiffusionAnimatedStyle]}
+            className={firstSessionClassNames.midDiffusion}
+            style={midDiffusionAnimatedStyle}
             testID="first-session-orb-mid-diffusion"
           />
-          <Animated.View style={[styles.core, coreAnimatedStyle]} testID="first-session-orb-core">
-            <View style={styles.coreAtmosphere} />
+          <Animated.View
+            className={firstSessionClassNames.core}
+            style={coreAnimatedStyle}
+            testID="first-session-orb-core"
+          >
+            <View className={firstSessionClassNames.coreAtmosphere} />
           </Animated.View>
           {reduceMotionEnabled ? null : (
             <Animated.View
               pointerEvents="none"
-              style={[styles.pulseRing, pulseAnimatedStyle]}
+              className={firstSessionClassNames.pulseRing}
+              style={pulseAnimatedStyle}
               testID="first-session-orb-pulse-ring"
             />
           )}
-          <Animated.Text selectable={false} style={[styles.phaseLabel, labelAnimatedStyle]}>
+          <Animated.Text
+            className={firstSessionClassNames.phaseLabel}
+            selectable={false}
+            style={labelAnimatedStyle}
+          >
             {phaseLabels[snapshot.phaseName]}
           </Animated.Text>
-        </Animated.View>
+        </OrbStage>
 
         <Text
           accessibilityLabel={`Time remaining ${formatAccessibleRemainingTime(
             snapshot.remainingSeconds,
           )}`}
+          className={firstSessionClassNames.timer}
           selectable
-          style={styles.timer}
         >
           {formatRemainingTime(snapshot.remainingSeconds)}
         </Text>
       </View>
 
-      <View style={styles.controlsArea}>
-        <View style={styles.footer}>
+      <View className={firstSessionClassNames.controlsArea}>
+        <View className={firstSessionClassNames.footer} testID="first-session-footer">
           <ControlButton
             active
             activeLabel={selectedAudioMode.accessibilityLabel}
@@ -873,24 +989,23 @@ export function BreathSessionScreen({
             onPress={() => {
               setAudioPickerVisible(true);
             }}
+            testID="first-session-audio-control"
           >
             <AudioModeIcon color={colors.dark.textSecondary.value} mode={audioMode} />
           </ControlButton>
 
-          <Pressable
+          <NidoruIconButton
             accessibilityHint="Pauses this breathing session."
             accessibilityLabel="Pause session"
-            accessibilityRole="button"
             disabled={Boolean(completionMode)}
+            className={cn(
+              firstSessionClassNames.pauseButton,
+              completionMode ? firstSessionClassNames.controlDisabled : null,
+            )}
             onPress={pauseSession}
-            style={({ pressed }) => [
-              styles.pauseButton,
-              pressed && !completionMode ? styles.controlPressed : null,
-              completionMode ? styles.controlDisabled : null,
-            ]}
           >
             <Pause color={colors.dark.textSecondary.value} size={24} strokeWidth={1.5} />
-          </Pressable>
+          </NidoruIconButton>
 
           <ControlButton
             active={hapticsActive}
@@ -953,13 +1068,13 @@ function FirstSessionPreparingScreen({ techniqueId }: { readonly techniqueId: Br
   const technique = breathTechniques[techniqueId];
 
   return (
-    <View style={styles.screen}>
-      <View pointerEvents="none" style={styles.backgroundGlow} />
-      <View style={styles.preparingCenter}>
-        <Text accessibilityRole="header" selectable style={styles.title}>
+    <View className={firstSessionClassNames.screen}>
+      <View className={firstSessionClassNames.backgroundGlow} pointerEvents="none" />
+      <View className={firstSessionClassNames.preparingCenter}>
+        <Text accessibilityRole="header" className={firstSessionClassNames.title} selectable>
           Let’s wind down.
         </Text>
-        <Text selectable style={styles.subtitle}>
+        <Text className={firstSessionClassNames.subtitle} selectable>
           {technique.name}
         </Text>
       </View>
@@ -979,40 +1094,40 @@ function PauseOverlay({
   readonly sessionLabel: string;
 }) {
   return (
-    <View style={styles.overlay} testID="first-session-pause-overlay">
-      <View pointerEvents="none" style={styles.overlayGlow} />
-      <Text selectable style={styles.overlayEyebrow}>
+    <View className={firstSessionClassNames.overlay} testID="first-session-pause-overlay">
+      <View className={firstSessionClassNames.overlayGlow} pointerEvents="none" />
+      <Text className={firstSessionClassNames.overlayEyebrow} selectable>
         {sessionLabel} · {formatRemainingTime(remainingSeconds, false)} left
       </Text>
-      <Text accessibilityRole="header" selectable style={styles.overlayTitle}>
+      <Text accessibilityRole="header" className={firstSessionClassNames.overlayTitle} selectable>
         Paused
       </Text>
-      <Text selectable style={styles.overlayCopy}>
+      <Text className={firstSessionClassNames.overlayCopy} selectable>
         You can continue when you’re ready.
       </Text>
-      <View style={styles.overlayActions}>
-        <Pressable
+      <View className={firstSessionClassNames.overlayActions}>
+        <NidoruButton
           accessibilityHint="Returns to the current breath phase."
           accessibilityLabel="Resume session"
-          accessibilityRole="button"
+          className={firstSessionClassNames.continueButton}
           onPress={onResume}
-          style={({ pressed }) => [styles.continueButton, pressed ? styles.controlPressed : null]}
+          variant="secondary"
         >
-          <Text selectable={false} style={styles.continueButtonText}>
+          <Text className={firstSessionClassNames.continueButtonText} selectable={false}>
             Continue
           </Text>
-        </Pressable>
-        <Pressable
+        </NidoruButton>
+        <NidoruButton
           accessibilityHint="Saves this session as ended without showing the reflection step."
           accessibilityLabel="End session for now"
-          accessibilityRole="button"
+          className={firstSessionClassNames.endForNowButton}
           onPress={onEnd}
-          style={({ pressed }) => [styles.endForNowButton, pressed ? styles.endPressed : null]}
+          variant="ghost"
         >
-          <Text selectable={false} style={styles.endForNowText}>
+          <Text className={firstSessionClassNames.endForNowText} selectable={false}>
             End for now
           </Text>
-        </Pressable>
+        </NidoruButton>
       </View>
     </View>
   );
@@ -1111,75 +1226,93 @@ function ReflectionOverlay({
   };
 
   return (
-    <Animated.View
-      style={[styles.reflectionOverlay, overlayAnimatedStyle]}
+    <View
+      className={firstSessionClassNames.reflectionOverlay}
       testID="first-session-reflection-overlay"
     >
-      <ReflectionAmbientFade />
-      <View style={styles.reflectionContent}>
-        <Animated.View style={[styles.reflectionEyebrowRow, eyebrowAnimatedStyle]}>
-          <CheckCircle
-            color={colors.dark.primaryGlow.value}
-            fill={colors.dark.primaryGlow.value}
-            size={16}
-            strokeWidth={0}
-          />
-          <Text selectable style={styles.reflectionEyebrow}>
-            {completionEyebrow}
-          </Text>
-        </Animated.View>
-
-        <Animated.Text
-          accessibilityRole="header"
-          selectable
-          style={[styles.reflectionTitle, titleAnimatedStyle]}
-        >
-          How do you feel?
-        </Animated.Text>
-
-        <Animated.View style={[styles.reflectionButtons, optionsAnimatedStyle]}>
-          {reflectionOptions.map((option) => (
-            <ReflectionButton
-              key={option.value}
-              isSelected={selectedFeeling === option.value}
-              label={option.label}
-              onPress={() => {
-                selectFeeling(option.value);
-              }}
+      <Animated.View style={[reflectionTransitionFrameStyle, overlayAnimatedStyle]}>
+        <ReflectionAmbientFade />
+        <View className={firstSessionClassNames.reflectionContent}>
+          <Animated.View
+            className={firstSessionClassNames.reflectionEyebrowRow}
+            style={eyebrowAnimatedStyle}
+          >
+            <CheckCircle
+              color={colors.dark.primaryGlow.value}
+              fill={colors.dark.primaryGlow.value}
+              size={16}
+              strokeWidth={0}
             />
-          ))}
-        </Animated.View>
+            <Text className={firstSessionClassNames.reflectionEyebrow} selectable>
+              {completionEyebrow}
+            </Text>
+          </Animated.View>
+
+          <Animated.Text
+            accessibilityRole="header"
+            className={firstSessionClassNames.reflectionTitle}
+            selectable
+            style={titleAnimatedStyle}
+          >
+            How do you feel?
+          </Animated.Text>
+
+          <Animated.View
+            className={firstSessionClassNames.reflectionButtons}
+            style={optionsAnimatedStyle}
+            testID="first-session-reflection-options"
+          >
+            {reflectionOptions.map((option) => (
+              <ReflectionButton
+                key={option.value}
+                isSelected={selectedFeeling === option.value}
+                label={option.label}
+                onPress={() => {
+                  selectFeeling(option.value);
+                }}
+              />
+            ))}
+          </Animated.View>
+
+          {selectedFeeling ? (
+            <Animated.Text
+              className={firstSessionClassNames.reflectionCopy}
+              selectable
+              style={scienceAnimatedStyle}
+            >
+              Deep breathing shifts your nervous system into rest mode.
+            </Animated.Text>
+          ) : null}
+
+          {reflectionError ? (
+            <Text
+              accessibilityRole="alert"
+              className={firstSessionClassNames.reflectionError}
+              selectable
+            >
+              {reflectionError}
+            </Text>
+          ) : null}
+        </View>
 
         {selectedFeeling ? (
-          <Animated.Text selectable style={[styles.reflectionCopy, scienceAnimatedStyle]}>
-            Deep breathing shifts your nervous system into rest mode.
-          </Animated.Text>
-        ) : null}
-
-        {reflectionError ? (
-          <Text accessibilityRole="alert" selectable style={styles.reflectionError}>
-            {reflectionError}
-          </Text>
-        ) : null}
-      </View>
-
-      {selectedFeeling ? (
-        <Animated.View style={[styles.rewardActionWrap, continueAnimatedStyle]}>
-          <Pressable
-            accessibilityRole="button"
-            onPress={onRewardMomentComplete}
-            style={({ pressed }) => [
-              styles.rewardContinueButton,
-              pressed ? styles.controlPressed : null,
-            ]}
+          <Animated.View
+            className={firstSessionClassNames.rewardActionWrap}
+            style={continueAnimatedStyle}
           >
-            <Text selectable={false} style={styles.rewardContinueText}>
-              Continue
-            </Text>
-          </Pressable>
-        </Animated.View>
-      ) : null}
-    </Animated.View>
+            <NidoruButton
+              className={firstSessionClassNames.rewardContinueButton}
+              onPress={onRewardMomentComplete}
+              variant="secondary"
+            >
+              <Text className={firstSessionClassNames.rewardContinueText} selectable={false}>
+                Continue
+              </Text>
+            </NidoruButton>
+          </Animated.View>
+        ) : null}
+      </Animated.View>
+    </View>
   );
 }
 
@@ -1196,18 +1329,20 @@ function ReflectionButton({
     <Pressable
       accessibilityRole="button"
       accessibilityState={{ selected: isSelected }}
+      className={cn(
+        firstSessionClassNames.reflectionButton,
+        isSelected ? firstSessionClassNames.reflectionButtonSelected : null,
+      )}
       onPress={onPress}
-      style={({ pressed }) => [
-        styles.reflectionButton,
-        isSelected ? styles.reflectionButtonSelected : null,
-        pressed ? styles.controlPressed : null,
-      ]}
     >
-      <Text selectable={false} style={styles.reflectionButtonText}>
+      <Text className={firstSessionClassNames.reflectionButtonText} selectable={false}>
         {label}
       </Text>
       <View
-        style={[styles.reflectionCheckCircle, isSelected ? styles.reflectionCheckSelected : null]}
+        className={cn(
+          firstSessionClassNames.reflectionCheckCircle,
+          isSelected ? firstSessionClassNames.reflectionCheckSelected : null,
+        )}
       >
         {isSelected ? (
           <CheckCircle
@@ -1232,8 +1367,8 @@ function useFadeUpAnimatedStyle(progress: SharedValue<number>, reduceMotionEnabl
 function ReflectionAmbientFade() {
   return (
     <View
+      className={firstSessionClassNames.reflectionFadeLayer}
       pointerEvents="none"
-      style={styles.reflectionFadeLayer}
       testID="first-session-reflection-fade"
     >
       <Svg height="100%" preserveAspectRatio="none" viewBox="0 0 390 844" width="100%">
@@ -1286,26 +1421,30 @@ function AudioModePicker({
   return (
     <View
       accessibilityViewIsModal
+      className={firstSessionClassNames.audioPickerLayer}
       importantForAccessibility="yes"
-      style={styles.audioPickerLayer}
       testID="first-session-audio-picker"
     >
       <Pressable
         accessibilityHint="Closes audio cue options."
         accessibilityLabel="Close audio mode picker"
         accessibilityRole="button"
+        className={firstSessionClassNames.audioPickerBackdrop}
         onPress={onDismiss}
-        style={styles.audioPickerBackdrop}
       />
-      <View style={styles.audioPickerSheet}>
-        <View style={styles.audioPickerHandle} />
-        <Text accessibilityRole="header" selectable style={styles.audioPickerTitle}>
+      <View className={firstSessionClassNames.audioPickerSheet}>
+        <View className={firstSessionClassNames.audioPickerHandle} />
+        <Text
+          accessibilityRole="header"
+          className={firstSessionClassNames.audioPickerTitle}
+          selectable
+        >
           Audio cues
         </Text>
-        <Text selectable style={styles.audioPickerCopy}>
+        <Text className={firstSessionClassNames.audioPickerCopy} selectable>
           Choose the sound layer for breath phase guidance.
         </Text>
-        <View style={styles.audioPickerOptions}>
+        <View className={firstSessionClassNames.audioPickerOptions}>
           {audioModeOptions.map((option) => (
             <AudioModeOptionButton
               key={option.id}
@@ -1351,20 +1490,27 @@ function AudioModeOptionButton({
       accessibilityLabel={accessibilityLabel}
       accessibilityRole="button"
       accessibilityState={{ selected: isSelected }}
+      className={cn(
+        firstSessionClassNames.audioModeOption,
+        isSelected ? firstSessionClassNames.audioModeOptionSelected : null,
+      )}
       onPress={onPress}
-      style={({ pressed }) => [
-        styles.audioModeOption,
-        isSelected ? styles.audioModeOptionSelected : null,
-        pressed ? styles.controlPressed : null,
-      ]}
     >
-      <View style={[styles.audioModeIconCircle, isSelected ? styles.audioModeIconSelected : null]}>
+      <View
+        className={cn(
+          firstSessionClassNames.audioModeIconCircle,
+          isSelected ? firstSessionClassNames.audioModeIconSelected : null,
+        )}
+      >
         <AudioModeIcon color={iconColor} mode={mode} />
       </View>
       <Text
+        className={cn(
+          firstSessionClassNames.audioModeLabel,
+          isSelected ? firstSessionClassNames.audioModeLabelSelected : null,
+        )}
         numberOfLines={1}
         selectable={false}
-        style={[styles.audioModeLabel, isSelected ? styles.audioModeLabelSelected : null]}
       >
         {label}
       </Text>
@@ -1400,6 +1546,7 @@ function ControlButton({
   inactiveLabel,
   label,
   onPress,
+  testID,
 }: {
   readonly accessibilityHint: string;
   readonly active: boolean;
@@ -1409,6 +1556,7 @@ function ControlButton({
   readonly inactiveLabel: string;
   readonly label: string;
   readonly onPress: () => void;
+  readonly testID?: string;
 }) {
   const shouldShowAccent = active && activeTone === "accent";
 
@@ -1418,17 +1566,24 @@ function ControlButton({
       accessibilityLabel={active ? activeLabel : inactiveLabel}
       accessibilityRole="button"
       accessibilityState={{ selected: active }}
+      className={firstSessionClassNames.statusControl}
       onPress={onPress}
-      style={({ pressed }) => [styles.statusControl, pressed ? styles.controlPressed : null]}
+      testID={testID}
     >
       <View
-        style={[styles.statusIconCircle, shouldShowAccent ? styles.statusIconCircleActive : null]}
+        className={cn(
+          firstSessionClassNames.statusIconCircle,
+          shouldShowAccent ? firstSessionClassNames.statusIconCircleActive : null,
+        )}
       >
         {children}
       </View>
       <Text
+        className={cn(
+          firstSessionClassNames.statusLabel,
+          shouldShowAccent ? firstSessionClassNames.statusLabelActive : null,
+        )}
         selectable={false}
-        style={[styles.statusLabel, shouldShowAccent ? styles.statusLabelActive : null]}
       >
         {label}
       </Text>
@@ -1654,470 +1809,3 @@ function createFirstSessionId() {
 
   return `session_${paddedSegment}`;
 }
-
-const styles = StyleSheet.create({
-  backgroundGlow: {
-    backgroundColor: "#0F1230",
-    borderRadius: 220,
-    height: 440,
-    left: -30,
-    opacity: 0.34,
-    position: "absolute",
-    top: 150,
-    width: 440,
-  },
-  audioModeIconCircle: {
-    alignItems: "center",
-    backgroundColor: "rgba(255, 255, 255, 0.04)",
-    borderRadius: 14,
-    height: 28,
-    justifyContent: "center",
-    width: 28,
-  },
-  audioModeIconSelected: {
-    backgroundColor: "rgba(168, 156, 224, 0.12)",
-  },
-  audioModeLabel: {
-    color: colors.dark.textSecondary.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 11,
-    textAlign: "center",
-    width: "100%",
-  },
-  audioModeLabelSelected: {
-    color: colors.dark.textPrimary.value,
-  },
-  audioModeOption: {
-    alignItems: "center",
-    backgroundColor: "rgba(17, 20, 48, 0.82)",
-    borderColor: colors.dark.divider.value,
-    borderRadius: 16,
-    borderWidth: 1,
-    flexDirection: "row",
-    gap: 12,
-    minHeight: 52,
-    paddingHorizontal: 14,
-    width: "100%",
-  },
-  audioModeOptionSelected: {
-    backgroundColor: colors.dark.surfaceRaised.value,
-    borderColor: "rgba(168, 156, 224, 0.48)",
-    boxShadow: "0 0 16px rgba(124, 111, 205, 0.2)",
-  },
-  audioPickerBackdrop: {
-    bottom: 0,
-    left: 0,
-    position: "absolute",
-    right: 0,
-    top: 0,
-  },
-  audioPickerCopy: {
-    color: colors.dark.textSecondary.value,
-    fontFamily: typography.mobileFontFamily.primary.regular,
-    fontSize: 13,
-    lineHeight: 18,
-    marginBottom: 14,
-    textAlign: "center",
-  },
-  audioPickerHandle: {
-    alignSelf: "center",
-    backgroundColor: "rgba(168, 156, 224, 0.35)",
-    borderRadius: 999,
-    height: 4,
-    marginBottom: 14,
-    width: 36,
-  },
-  audioPickerLayer: {
-    backgroundColor: "rgba(13, 15, 26, 0.62)",
-    bottom: 0,
-    justifyContent: "flex-end",
-    left: 0,
-    padding: 20,
-    position: "absolute",
-    right: 0,
-    top: 0,
-  },
-  audioPickerOptions: {
-    gap: 10,
-    width: "100%",
-  },
-  audioPickerSheet: {
-    alignItems: "center",
-    backgroundColor: colors.dark.background.value,
-    borderColor: colors.dark.divider.value,
-    borderRadius: 24,
-    borderWidth: 1,
-    boxShadow: "0 -10px 38px rgba(4, 6, 16, 0.48)",
-    paddingBottom: 18,
-    paddingHorizontal: 16,
-    paddingTop: 12,
-    width: "100%",
-  },
-  audioPickerTitle: {
-    color: colors.dark.textPrimary.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 18,
-    marginBottom: 5,
-  },
-  controlDisabled: {
-    opacity: 0.45,
-  },
-  controlPressed: {
-    opacity: 0.78,
-    transform: [{ scale: 0.96 }],
-  },
-  controlsArea: {
-    gap: spacing.sm,
-  },
-  continueButton: {
-    alignItems: "center",
-    backgroundColor: colors.dark.surfaceRaised.value,
-    borderColor: "rgba(124, 111, 205, 0.42)",
-    borderRadius: 999,
-    borderWidth: 1,
-    boxShadow: "0 0 22px rgba(124, 111, 205, 0.22)",
-    flexDirection: "row",
-    gap: spacing.xs,
-    justifyContent: "center",
-    minHeight: 56,
-    width: "100%",
-  },
-  continueButtonText: {
-    color: colors.dark.textPrimary.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 16,
-  },
-  core: {
-    alignItems: "center",
-    backgroundColor: colors.dark.primary.value,
-    borderRadius: 75,
-    boxShadow: "0 0 44px rgba(124, 111, 205, 0.42)",
-    height: 150,
-    justifyContent: "center",
-    overflow: "hidden",
-    position: "absolute",
-    width: 150,
-  },
-  coreAtmosphere: {
-    backgroundColor: "rgba(238, 240, 255, 0.14)",
-    borderRadius: 54,
-    height: 108,
-    width: 108,
-  },
-  endForNowButton: {
-    alignItems: "center",
-    justifyContent: "center",
-    minHeight: 48,
-  },
-  endForNowText: {
-    color: colors.dark.textSecondary.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 16,
-  },
-  endPressed: {
-    opacity: 0.8,
-    transform: [{ scale: 0.98 }],
-  },
-  footer: {
-    alignItems: "center",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingBottom: 28,
-    paddingHorizontal: 28,
-    paddingTop: spacing.sm,
-  },
-  header: {
-    alignItems: "center",
-    gap: 7,
-    paddingHorizontal: spacing.md,
-    paddingTop: 42,
-  },
-  innerGlow: {
-    backgroundColor: "rgba(124, 111, 205, 0.2)",
-    borderRadius: 100,
-    height: 200,
-    position: "absolute",
-    width: 200,
-  },
-  midDiffusion: {
-    backgroundColor: "rgba(168, 156, 224, 0.3)",
-    borderRadius: 110,
-    boxShadow: "0 0 32px rgba(168, 156, 224, 0.22)",
-    height: 220,
-    position: "absolute",
-    width: 220,
-  },
-  orbSection: {
-    alignItems: "center",
-    flex: 1,
-    justifyContent: "center",
-    minHeight: 400,
-  },
-  orbStage: {
-    alignItems: "center",
-    height: 260,
-    justifyContent: "center",
-    width: 260,
-  },
-  orbStagePaused: {
-    opacity: 0.3,
-    transform: [{ scale: 0.85 }],
-  },
-  outerRing: {
-    borderColor: "rgba(168, 156, 224, 0.24)",
-    borderRadius: 120,
-    borderTopColor: "rgba(168, 156, 224, 0.42)",
-    borderWidth: 1.5,
-    height: 240,
-    position: "absolute",
-    width: 240,
-  },
-  overlay: {
-    alignItems: "center",
-    backgroundColor: colors.dark.background.value,
-    bottom: 0,
-    justifyContent: "center",
-    left: 0,
-    paddingHorizontal: spacing.lg,
-    position: "absolute",
-    right: 0,
-    top: 0,
-  },
-  overlayActions: {
-    gap: spacing.sm,
-    maxWidth: 280,
-    width: "100%",
-  },
-  overlayCopy: {
-    color: colors.dark.textSecondary.value,
-    fontFamily: typography.mobileFontFamily.primary.regular,
-    fontSize: 14,
-    marginBottom: spacing.lg + 2,
-  },
-  overlayEyebrow: {
-    color: "#A4AAC4",
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 13,
-    marginBottom: spacing.xs,
-  },
-  overlayGlow: {
-    backgroundColor: "rgba(124, 111, 205, 0.05)",
-    borderRadius: 120,
-    boxShadow: "0 0 86px rgba(124, 111, 205, 0.2)",
-    height: 240,
-    position: "absolute",
-    width: 240,
-  },
-  overlayTitle: {
-    color: colors.dark.textPrimary.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 24,
-    marginBottom: spacing.xs,
-  },
-  pauseButton: {
-    alignItems: "center",
-    backgroundColor: colors.dark.surface.value,
-    borderColor: colors.dark.divider.value,
-    borderRadius: 28,
-    borderWidth: 1,
-    height: 56,
-    justifyContent: "center",
-    width: 56,
-  },
-  phaseLabel: {
-    color: colors.dark.textPrimary.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 20,
-    position: "absolute",
-  },
-  preparingCenter: {
-    alignItems: "center",
-    flex: 1,
-    gap: spacing.xs,
-    justifyContent: "center",
-  },
-  pulseRing: {
-    borderColor: "rgba(238, 240, 255, 0.38)",
-    borderRadius: 75,
-    borderWidth: 1.5,
-    height: 150,
-    position: "absolute",
-    width: 150,
-  },
-  reflectionButton: {
-    alignItems: "center",
-    backgroundColor: colors.dark.surface.value,
-    borderColor: colors.dark.divider.value,
-    borderRadius: 16,
-    borderWidth: 1,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    minHeight: 56,
-    paddingHorizontal: 20,
-    width: "100%",
-  },
-  reflectionButtons: {
-    gap: 14,
-    marginBottom: spacing.md,
-    maxWidth: 320,
-    width: "100%",
-  },
-  reflectionButtonSelected: {
-    backgroundColor: colors.dark.surfaceRaised.value,
-    borderColor: "rgba(124, 111, 205, 0.48)",
-    boxShadow: "0 0 14px rgba(124, 111, 205, 0.18)",
-  },
-  reflectionButtonText: {
-    color: colors.dark.textPrimary.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 16,
-  },
-  reflectionCheckCircle: {
-    alignItems: "center",
-    borderColor: "#2A2E50",
-    borderRadius: 12,
-    borderWidth: 1.5,
-    height: 24,
-    justifyContent: "center",
-    width: 24,
-  },
-  reflectionCheckSelected: {
-    borderColor: "transparent",
-    boxShadow: "0 0 10px rgba(168, 156, 224, 0.42)",
-  },
-  reflectionContent: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: spacing.md,
-    position: "relative",
-    transform: [{ translateY: -28 }],
-    width: "100%",
-  },
-  reflectionCopy: {
-    color: "#A4AAC4",
-    fontFamily: typography.mobileFontFamily.primary.regular,
-    fontSize: 14,
-    lineHeight: 21,
-    maxWidth: 290,
-    textAlign: "center",
-  },
-  reflectionError: {
-    color: colors.dark.danger.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 13,
-    lineHeight: 18,
-    marginTop: spacing.sm,
-    maxWidth: 300,
-    textAlign: "center",
-  },
-  reflectionEyebrow: {
-    color: "#A4AAC4",
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 13,
-  },
-  reflectionEyebrowRow: {
-    alignItems: "center",
-    flexDirection: "row",
-    gap: spacing.xs,
-    marginBottom: 12,
-  },
-  reflectionOverlay: {
-    alignItems: "center",
-    backgroundColor: colors.dark.background.value,
-    bottom: 0,
-    justifyContent: "center",
-    left: 0,
-    overflow: "hidden",
-    position: "absolute",
-    right: 0,
-    top: 0,
-  },
-  reflectionFadeLayer: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  reflectionTitle: {
-    color: colors.dark.textPrimary.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 28,
-    letterSpacing: 0,
-    marginBottom: spacing.lg,
-    textAlign: "center",
-  },
-  rewardActionWrap: {
-    alignItems: "center",
-    bottom: 32,
-    left: 0,
-    paddingHorizontal: 24,
-    position: "absolute",
-    right: 0,
-  },
-  rewardContinueButton: {
-    alignItems: "center",
-    backgroundColor: colors.dark.surfaceRaised.value,
-    borderColor: colors.dark.surfaceRaised.value,
-    borderRadius: 16,
-    borderWidth: 1,
-    height: 56,
-    justifyContent: "center",
-    maxWidth: 342,
-    width: "100%",
-  },
-  rewardContinueText: {
-    color: colors.dark.textPrimary.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 16,
-  },
-  screen: {
-    backgroundColor: colors.dark.background.value,
-    flex: 1,
-    overflow: "hidden",
-  },
-  statusControl: {
-    alignItems: "center",
-    gap: 6,
-    justifyContent: "center",
-    minHeight: 64,
-    minWidth: 64,
-  },
-  statusIconCircle: {
-    alignItems: "center",
-    backgroundColor: colors.dark.surface.value,
-    borderColor: colors.dark.divider.value,
-    borderRadius: 24,
-    borderWidth: 1,
-    height: 48,
-    justifyContent: "center",
-    width: 48,
-  },
-  statusIconCircleActive: {
-    borderColor: "rgba(124, 111, 205, 0.48)",
-  },
-  statusLabel: {
-    color: colors.dark.textSecondary.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 13,
-  },
-  statusLabelActive: {
-    color: colors.dark.primaryGlow.value,
-  },
-  subtitle: {
-    color: colors.dark.textSecondary.value,
-    fontFamily: typography.mobileFontFamily.primary.regular,
-    fontSize: 14,
-  },
-  timer: {
-    bottom: 22,
-    color: colors.dark.textSecondary.value,
-    fontFamily: typography.mobileFontFamily.data.regular,
-    fontSize: 16,
-    fontVariant: ["tabular-nums"],
-    letterSpacing: 3,
-    opacity: 0.82,
-    position: "absolute",
-  },
-  title: {
-    color: colors.dark.textPrimary.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 16,
-  },
-});

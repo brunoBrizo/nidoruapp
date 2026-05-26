@@ -30,4 +30,13 @@ describe("Tailwind migration guardrails", () => {
     expect(source).not.toContain("StyleSheet.create");
     expect(source).not.toContain("styles.");
   });
+
+  it("keeps the first guided session screen migrated to Tailwind base UI styling", () => {
+    const source = readMobileSource("src/session/first-session-screen.tsx");
+
+    expect(source).toContain('from "../tw"');
+    expect(source).toContain("className=");
+    expect(source).not.toContain("StyleSheet.create");
+    expect(source).not.toMatch(/\bstyles\./);
+  });
 });

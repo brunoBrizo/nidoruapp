@@ -280,6 +280,32 @@ describe("FirstSessionScreen", () => {
     expect(screen.queryByText(forbiddenActiveSessionGatePattern)).toBeNull();
   });
 
+  it("wires migrated shell, active controls, pause, and reflection surfaces through stable nodes", async () => {
+    jest.useFakeTimers();
+    jest.setSystemTime(baseProps.startedAtMs);
+
+    render(<FirstSessionScreen {...baseProps} durationSeconds={1} />);
+
+    expect(screen.getByTestId("first-session-screen")).toBeTruthy();
+    expect(screen.getByTestId("first-session-header")).toBeTruthy();
+    expect(screen.getByTestId("first-session-footer")).toBeTruthy();
+    expect(screen.getByTestId("first-session-audio-control")).toBeTruthy();
+
+    fireEvent.press(screen.getByLabelText("Pause session"));
+    expect(screen.getByTestId("first-session-pause-overlay")).toBeTruthy();
+    fireEvent.press(screen.getByRole("button", { name: "Resume session" }));
+
+    await act(async () => {
+      jest.advanceTimersByTime(1000);
+      await Promise.resolve();
+    });
+    await screen.findByText("How do you feel?");
+    expect(screen.getByTestId("first-session-reflection-overlay")).toBeTruthy();
+    expect(screen.getByTestId("first-session-reflection-options")).toBeTruthy();
+
+    jest.useRealTimers();
+  });
+
   it("opens a compact audio picker and switches modes without pausing the controller", () => {
     render(<FirstSessionScreen {...baseProps} />);
 

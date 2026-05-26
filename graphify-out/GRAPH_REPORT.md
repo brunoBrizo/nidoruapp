@@ -1,11 +1,11 @@
 # Graph Report - sleep-app  (2026-05-26)
 
 ## Corpus Check
-- 158 files · ~428,125 words
+- 158 files · ~427,654 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 477 nodes · 493 edges · 20 communities detected
+- 476 nodes · 492 edges · 20 communities detected
 - Extraction: 87% EXTRACTED · 13% INFERRED · 0% AMBIGUOUS · INFERRED: 62 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
@@ -52,8 +52,8 @@
   supabase/functions/foundation-health/index.ts → apps/mobile/src/paywall/post-value-supabase-auth.ts
 - `getOnboardingPlanForGoal()` --calls--> `completeOnboardingPersonalizationLocally()`  [INFERRED]
   packages/domain/src/index.ts → apps/mobile/src/onboarding/local-first-onboarding.ts
-- `createClient()` --calls--> `createPostValueSupabaseClient()`  [INFERRED]
-  apps/mobile/tests/post-value-sync.unit.jest.test.ts → apps/mobile/src/paywall/post-value-supabase-auth.ts
+- `openMigratedLocalDatabase()` --calls--> `openDefaultLocalDatabase()`  [INFERRED]
+  apps/mobile/src/storage/local-database.ts → apps/mobile/src/notifications/notification-permission-gate-controller.tsx
 
 ## Communities
 
@@ -62,12 +62,12 @@ Cohesion: 0.1
 Nodes (24): clamp(), completeBreathSessionIfDue(), createBreathSessionController(), endBreathSessionEarly(), getBreathSessionSnapshot(), getCycleDurationMs(), getPhaseAtElapsedMs(), getSessionPhases() (+16 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.12
-Nodes (24): canPromptForNotificationPermission(), completeFirstSessionLocally(), createDefaultRandomSegment(), createLocalEventId(), createLocalReflectionId(), getLocalCalendarDayDifference(), insertLocalEventQueue(), insertNotificationPermissionEvent() (+16 more)
+Cohesion: 0.11
+Nodes (24): completeFirstSessionLocally(), createDefaultRandomSegment(), createLocalEventId(), createLocalReflectionId(), getLocalCalendarDayDifference(), insertLocalEventQueue(), insertNotificationPermissionEvent(), loadNotificationGateReadiness() (+16 more)
 
 ### Community 2 - "Community 2"
-Cohesion: 0.12
-Nodes (15): clampEveningReminderMinuteOfDay(), createLocalDateAtMinuteOfDay(), createPersonalizedOnboardingPlan(), formatWindDownTime(), getInstructionDepthForFamiliarity(), getLocalMinuteOfDay(), getNextEveningReminderDate(), getOnboardingPlanForGoal() (+7 more)
+Cohesion: 0.11
+Nodes (16): canPromptForNotificationPermission(), clampEveningReminderMinuteOfDay(), createLocalDateAtMinuteOfDay(), createPersonalizedOnboardingPlan(), formatWindDownTime(), getInstructionDepthForFamiliarity(), getLocalMinuteOfDay(), getNextEveningReminderDate() (+8 more)
 
 ### Community 3 - "Community 3"
 Cohesion: 0.11
@@ -78,12 +78,12 @@ Cohesion: 0.13
 Nodes (12): fetch(), createPostValueSupabaseAuthenticator(), createPostValueSupabaseClient(), createPostValueSyncHttpError(), createSupabaseHeaders(), createSupabaseServiceUrl(), createSupabaseStorageKey(), isAllowedPostValueSyncTarget() (+4 more)
 
 ### Community 5 - "Community 5"
-Cohesion: 0.15
-Nodes (10): openAndMigrateLocalDatabase(), openMigratedLocalDatabase(), openDefaultLocalDatabase(), applyMigration(), runSqliteMigrations(), assertCondition(), assertRejects(), runSqlite() (+2 more)
-
-### Community 6 - "Community 6"
 Cohesion: 0.14
 Nodes (11): getAppEnvironment(), isNonProductionEnvironment(), isObservabilityProofModeEnabled(), capturePostHog(), captureSentry(), captureAnalyticsEvent(), captureExplicitEvent(), capturePostHogProofEvent() (+3 more)
+
+### Community 6 - "Community 6"
+Cohesion: 0.18
+Nodes (9): openAndMigrateLocalDatabase(), openMigratedLocalDatabase(), applyMigration(), runSqliteMigrations(), assertCondition(), assertRejects(), runSqlite(), SqliteCliDatabase (+1 more)
 
 ### Community 7 - "Community 7"
 Cohesion: 0.29
@@ -150,9 +150,9 @@ Nodes (2): OnboardingRouteScreen(), parseOnboardingStage()
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `requestNotificationPermissionFromGate()` connect `Community 1` to `Community 6`?**
+- **Why does `requestNotificationPermissionFromGate()` connect `Community 1` to `Community 5`?**
   _High betweenness centrality (0.018) - this node is a cross-community bridge._
-- **Why does `captureAnalyticsEvent()` connect `Community 6` to `Community 1`?**
+- **Why does `captureAnalyticsEvent()` connect `Community 5` to `Community 1`?**
   _High betweenness centrality (0.016) - this node is a cross-community bridge._
 - **Why does `submitError()` connect `Community 2` to `Community 9`, `Community 12`?**
   _High betweenness centrality (0.016) - this node is a cross-community bridge._
@@ -163,4 +163,4 @@ _Questions this graph is uniquely positioned to answer:_
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.1 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
-  _Cohesion score 0.12 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.11 - nodes in this community are weakly interconnected._

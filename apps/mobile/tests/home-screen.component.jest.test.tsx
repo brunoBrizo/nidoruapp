@@ -277,12 +277,12 @@ describe("HomeScreen", () => {
       expect.stringContaining("flex-row gap-2.5"),
     );
     for (const actionId of quickActionIds) {
-      expect(screen.getByTestId(`home-quick-action-card-${actionId}`).props.className).toEqual(
-        expect.stringContaining("min-h-[92px]"),
-      );
-      expect(screen.getByTestId(`home-quick-action-card-${actionId}`).props.className).toEqual(
-        expect.stringContaining("rounded-[18px]"),
-      );
+      const cardClassName = screen.getByTestId(`home-quick-action-card-${actionId}`).props
+        .className;
+
+      expect(cardClassName).toEqual(expect.stringContaining("min-h-[92px]"));
+      expect(cardClassName).toEqual(expect.stringContaining("rounded-[18px]"));
+      expect(cardClassName.split(/\s+/)).toContain("border");
       expect(screen.getByTestId(`home-quick-action-icon-box-${actionId}`).props.className).toEqual(
         expect.stringContaining("h-9 w-9 rounded-full"),
       );

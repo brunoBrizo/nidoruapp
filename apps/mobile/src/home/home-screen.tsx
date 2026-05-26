@@ -347,7 +347,7 @@ export function HomeScreen({
                   >
                     <View
                       className={cn(
-                        "min-h-[92px] items-center justify-center gap-2 rounded-[18px] bg-[#14172B]/70 px-2 py-3.5 active:scale-[0.96]",
+                        "min-h-[92px] items-center justify-center gap-2 rounded-[18px] border bg-[#14172B]/70 px-2 py-3.5 active:scale-[0.96]",
                         toneClasses.card,
                       )}
                       testID={`home-quick-action-card-${action.id}`}

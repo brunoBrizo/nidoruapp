@@ -1,5 +1,6 @@
 import {
   getNoHoldFallbackTechniqueId,
+  parseWindDownContextGoalInput,
   resolveWindDownRoutine,
   type WindDownContextGoal,
   type WindDownRoutine,
@@ -51,10 +52,12 @@ type WindDownRouteSession = WindDownBootstrap & {
 };
 
 export function WindDownRoute() {
-  const visualProofState = parseVisualProofState(useLocalSearchParams().windDownState);
+  const params = useLocalSearchParams();
+  const visualProofState = parseVisualProofState(params.windDownState);
+  const visualProofGoal = parseVisualProofGoal(params.windDownGoal);
 
   if (__DEV__ && visualProofState) {
-    return <WindDownVisualProofRoute state={visualProofState} />;
+    return <WindDownVisualProofRoute goal={visualProofGoal} state={visualProofState} />;
   }
 
   return <WindDownLiveRoute />;
@@ -424,12 +427,26 @@ function WindDownLiveRoute() {
   return <WindDownScreen state="preparing" />;
 }
 
-function WindDownVisualProofRoute({ state }: { readonly state: WindDownVisualStateId }) {
+function WindDownVisualProofRoute({
+  goal,
+  state,
+}: {
+  readonly goal: WindDownContextGoal | null;
+  readonly state: WindDownVisualStateId;
+}) {
   if (state === "quick_context") {
     return <WindDownScreen onSelectGoal={() => undefined} state="quick_context" />;
   }
 
-  return <WindDownScreen state={state} />;
+  const activeRoutine = goal
+    ? createActiveRoutineView(resolveWindDownRoutine({ selectedGoal: goal }).routine)
+    : undefined;
+
+  return activeRoutine ? (
+    <WindDownScreen activeRoutine={activeRoutine} state={state} />
+  ) : (
+    <WindDownScreen state={state} />
+  );
 }
 
 function createWindDownLocalPersistenceDatabase(
@@ -447,6 +464,11 @@ function createActiveRoutineView(
 ): WindDownActiveRoutineView {
   return {
     breathworkDurationSeconds: routine.breathwork.durationSeconds,
+    bodyCue: {
+      eyebrow: routine.bodyCue.eyebrow,
+      title: routine.bodyCue.title,
+      subtitle: routine.bodyCue.subtitle,
+    },
     phaseLabel: "Inhale",
     remainingSeconds: routine.breathwork.durationSeconds,
     isNoHoldFallback: options.isNoHoldFallback === true,
@@ -478,6 +500,10 @@ function parseVisualProofState(value: unknown): WindDownVisualStateId | null {
   return windDownVisualProofStates.includes(candidate as WindDownVisualStateId)
     ? (candidate as WindDownVisualStateId)
     : null;
+}
+
+function parseVisualProofGoal(value: unknown): WindDownContextGoal | null {
+  return parseWindDownContextGoalInput(Array.isArray(value) ? value[0] : value);
 }
 
 function createWindDownRunId(): string {

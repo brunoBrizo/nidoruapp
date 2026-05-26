@@ -6,6 +6,11 @@ import { join } from "node:path";
 import { WindDownScreen } from "../src/wind-down/wind-down-screen";
 
 const holdSafetyCopy = "Skip holds or stop if you feel dizzy, breathless, or uncomfortable.";
+const defaultBodyCue = {
+  eyebrow: "BODY RELAXATION",
+  title: "Soften your shoulders.",
+  subtitle: "Let the weight of the day drop a little.",
+} as const;
 
 jest.mock("react-native-css", () => {
   const React = jest.requireActual<typeof import("react")>("react");
@@ -29,6 +34,11 @@ describe("WindDownScreen", () => {
       "Starts 4-7-8 breath with sleep sounds and remembers this Wind-Down goal.",
     );
     expect(screen.getByRole("button", { name: "Calm racing thoughts" })).toBeTruthy();
+    expect(screen.getByText("Box breathing · body scan")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Calm racing thoughts" })).toHaveProp(
+      "accessibilityHint",
+      "Starts Box breathing with body scan and remembers this Wind-Down goal.",
+    );
     expect(screen.getByRole("button", { name: "Wake up fewer times" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Skip" })).toHaveProp(
       "accessibilityHint",
@@ -36,6 +46,7 @@ describe("WindDownScreen", () => {
     );
     expect(screen.queryByRole("textbox")).toBeNull();
     expect(screen.queryByText(/account|paywall|notification|permission|loading/i)).toBeNull();
+    expect(screen.queryByText("Box breathing · body relax")).toBeNull();
   });
 
   it("keeps the quick context choices as the only primary decision controls", () => {
@@ -74,6 +85,7 @@ describe("WindDownScreen", () => {
       <WindDownScreen
         activeRoutine={{
           breathworkDurationSeconds: 300,
+          bodyCue: defaultBodyCue,
           phaseLabel: "Inhale",
           remainingSeconds: 298,
           isNoHoldFallback: false,
@@ -106,6 +118,7 @@ describe("WindDownScreen", () => {
       <WindDownScreen
         activeRoutine={{
           breathworkDurationSeconds: 300,
+          bodyCue: defaultBodyCue,
           phaseLabel: "Inhale",
           remainingSeconds: 298,
           isNoHoldFallback: false,
@@ -130,6 +143,7 @@ describe("WindDownScreen", () => {
       <WindDownScreen
         activeRoutine={{
           breathworkDurationSeconds: 300,
+          bodyCue: defaultBodyCue,
           phaseLabel: "Inhale",
           remainingSeconds: 298,
           isNoHoldFallback: true,

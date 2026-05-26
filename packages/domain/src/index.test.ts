@@ -283,8 +283,7 @@ for (const [holdTechniqueId, fallbackTechniqueId] of Object.entries(
   breathTechniqueNoHoldFallbacks,
 )) {
   const holdTechnique = breathTechniques[holdTechniqueId as keyof typeof breathTechniques];
-  const fallbackTechnique =
-    breathTechniques[fallbackTechniqueId as keyof typeof breathTechniques];
+  const fallbackTechnique = breathTechniques[fallbackTechniqueId as keyof typeof breathTechniques];
 
   assertCondition(
     holdTechnique.phases.some((phase) => phase.name === "hold"),
@@ -403,7 +402,7 @@ assertEquals(
   windDownContextGoalOptions.map((option) => [option.value, option.label, option.subtitle]),
   [
     ["fall_asleep_faster", "Fall asleep faster", "4-7-8 breath · sleep sounds"],
-    ["calm_racing_thoughts", "Calm racing thoughts", "Box breathing · body relax"],
+    ["calm_racing_thoughts", "Calm racing thoughts", "Box breathing · body scan"],
     ["wake_up_fewer_times", "Wake up fewer times", "Daily Calm · longer audio"],
   ],
 );
@@ -446,6 +445,9 @@ assertEquals(resolveWindDownRoutine().routine, {
   bodyCue: {
     durationSeconds: 120,
     uiState: "body_cue",
+    eyebrow: "BODY RELAXATION",
+    title: "Soften your shoulders.",
+    subtitle: "Let the weight of the day drop a little.",
   },
   ambient: {
     soundId: "light-rain",
@@ -479,6 +481,9 @@ assertEquals(resolveWindDownRoutine({ selectedGoal: "calm_racing_thoughts" }), {
     bodyCue: {
       durationSeconds: 120,
       uiState: "body_cue",
+      eyebrow: "BODY SCAN",
+      title: "Give your busy mind a body scan.",
+      subtitle: "Move from forehead to feet, then release the tension.",
     },
     ambient: {
       soundId: "light-rain",
@@ -492,6 +497,17 @@ assertEquals(resolveWindDownRoutine({ selectedGoal: "calm_racing_thoughts" }), {
     startupRequirements: windDownStartupRequirements,
   },
 });
+assertEquals(resolveWindDownRoutine({ selectedGoal: "calm_racing_thoughts" }).routine.breathwork, {
+  techniqueId: "box-breathing",
+  durationSeconds: 300,
+  uiState: "active_winddown",
+});
+assertCondition(
+  !/insomnia treatment|anxiety relief|panic relief|CBT-I/i.test(
+    JSON.stringify(resolveWindDownRoutine({ selectedGoal: "calm_racing_thoughts" }).routine),
+  ),
+  "Wind-Down busy-mind routine must avoid clinical treatment labels.",
+);
 assertEquals(resolveWindDownRoutine({ selectedGoal: "wake_up_fewer_times" }).routine.breathwork, {
   techniqueId: "coherent-breathing",
   durationSeconds: 600,

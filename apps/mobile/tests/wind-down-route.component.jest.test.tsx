@@ -100,6 +100,21 @@ describe("WindDownRoute", () => {
     expect(mockOpenMigratedLocalDatabase).not.toHaveBeenCalled();
   });
 
+  it("renders the dev-only busy-mind body cue proof state without bootstrapping local storage", () => {
+    mockUseLocalSearchParams.mockReturnValue({
+      windDownGoal: "calm_racing_thoughts",
+      windDownState: "body_cue",
+    });
+
+    render(<WindDownRoute />);
+
+    expect(screen.getByTestId("wind-down-state-body_cue")).toBeTruthy();
+    expect(screen.getByText("BODY SCAN")).toBeTruthy();
+    expect(screen.getByRole("header", { name: "Give your busy mind a body scan." })).toBeTruthy();
+    expect(screen.getByText("Move from forehead to feet, then release the tension.")).toBeTruthy();
+    expect(mockOpenMigratedLocalDatabase).not.toHaveBeenCalled();
+  });
+
   it("renders a calm fallback before local bootstrap resolves", () => {
     const { fetchMock, restoreFetch } = mockFetchOffline();
     mockOpenMigratedLocalDatabase.mockReturnValue(new Promise(() => undefined));
@@ -152,6 +167,47 @@ describe("WindDownRoute", () => {
       );
       expect(screen.queryByText("What’s your goal tonight?")).toBeNull();
       expect(screen.getByRole("header", { name: "Let's wind down." })).toBeTruthy();
+      expect(fetchMock).not.toHaveBeenCalled();
+    } finally {
+      restoreFetch();
+    }
+  });
+
+  it("routes the remembered racing-thoughts branch into a body-scan body cue", async () => {
+    const { fetchMock, restoreFetch } = mockFetchOffline();
+    mockLoadRememberedWindDownContextChoiceLocally.mockResolvedValue({
+      contextGoal: "calm_racing_thoughts",
+      localInstallId: "install_0123456789abcdef",
+      routineId: "wind_down_racing_thoughts",
+      selectedAt: "2026-05-24T23:18:00.000Z",
+    });
+
+    try {
+      render(<WindDownRoute />);
+
+      await act(async () => {
+        await flushPromises();
+      });
+
+      await act(async () => {
+        jest.advanceTimersByTime(300_000);
+        await flushPromises();
+      });
+
+      await act(async () => {
+        jest.advanceTimersByTime(5_000);
+        await flushPromises();
+      });
+
+      expect(screen.getByTestId("wind-down-state-body_cue")).toBeTruthy();
+      expect(screen.getByText("BODY SCAN")).toBeTruthy();
+      expect(screen.getByRole("header", { name: "Give your busy mind a body scan." })).toBeTruthy();
+      expect(
+        screen.getByText("Move from forehead to feet, then release the tension."),
+      ).toBeTruthy();
+      expect(
+        screen.queryByText(/insomnia treatment|anxiety relief|panic relief|CBT-I/i),
+      ).toBeNull();
       expect(fetchMock).not.toHaveBeenCalled();
     } finally {
       restoreFetch();

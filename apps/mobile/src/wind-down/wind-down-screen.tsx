@@ -1,6 +1,7 @@
 import {
   windDownContextGoalOptions,
   type BreathTechniqueId,
+  type WindDownBodyCueStep,
   type WindDownContextGoal,
   type WindDownRoutineUiState,
 } from "@nidoru/domain";
@@ -33,6 +34,7 @@ import { Pressable, Text, View, cn } from "../tw";
 
 export type WindDownActiveRoutineView = {
   readonly breathworkDurationSeconds: number;
+  readonly bodyCue: Pick<WindDownBodyCueStep, "eyebrow" | "title" | "subtitle">;
   readonly phaseLabel: string;
   readonly remainingSeconds: number;
   readonly isNoHoldFallback: boolean;
@@ -83,6 +85,11 @@ type WindDownScreenProps =
 
 const defaultActiveRoutine = {
   breathworkDurationSeconds: 300,
+  bodyCue: {
+    eyebrow: "BODY RELAXATION",
+    title: "Soften your shoulders.",
+    subtitle: "Let the weight of the day drop a little.",
+  },
   phaseLabel: "Inhale",
   remainingSeconds: 298,
   isNoHoldFallback: false,
@@ -250,6 +257,8 @@ export function WindDownScreen(props: WindDownScreenProps) {
   }
 
   if (state === "body_cue") {
+    const bodyCue = props.activeRoutine?.bodyCue ?? defaultActiveRoutine.bodyCue;
+
     return (
       <WindDownFrame stateId="body_cue">
         <View className="flex-1 justify-between px-nidoru-screen pt-[82px] pb-[34px]">
@@ -261,20 +270,20 @@ export function WindDownScreen(props: WindDownScreenProps) {
               className="font-nidoru-data-regular text-[11px] uppercase leading-4 tracking-[0.22em] text-[#4A4E6A]"
               selectable
             >
-              BODY RELAXATION
+              {bodyCue.eyebrow}
             </Text>
             <Text
               accessibilityRole="header"
               className="font-nidoru-primary-semibold text-[25px] leading-[32px] text-[#EEF0FF]"
               selectable
             >
-              Soften your shoulders.
+              {bodyCue.title}
             </Text>
             <Text
               className="font-nidoru-primary-regular text-sm leading-5 text-[#8A8FA8]"
               selectable
             >
-              Let the weight of the day drop a little.
+              {bodyCue.subtitle}
             </Text>
           </View>
           <View className="items-center gap-24">

@@ -257,9 +257,8 @@ export function getNoHoldFallbackTechniqueId(
   techniqueId: BreathTechniqueId,
 ): MvpBreathTechniqueId | null {
   return (
-    breathTechniqueNoHoldFallbacks[
-      techniqueId as keyof typeof breathTechniqueNoHoldFallbacks
-    ] ?? null
+    breathTechniqueNoHoldFallbacks[techniqueId as keyof typeof breathTechniqueNoHoldFallbacks] ??
+    null
   );
 }
 
@@ -320,7 +319,7 @@ export const windDownContextGoalOptions = [
   {
     value: "calm_racing_thoughts",
     label: "Calm racing thoughts",
-    subtitle: "Box breathing · body relax",
+    subtitle: "Box breathing · body scan",
   },
   {
     value: "wake_up_fewer_times",
@@ -384,6 +383,9 @@ export type WindDownTransitionStep = {
 export type WindDownBodyCueStep = {
   readonly durationSeconds: 120;
   readonly uiState: "body_cue";
+  readonly eyebrow: string;
+  readonly title: string;
+  readonly subtitle: string;
 };
 
 export type WindDownAmbientStep = {
@@ -423,6 +425,17 @@ const defaultWindDownTransition = {
 const defaultWindDownBodyCue = {
   durationSeconds: 120,
   uiState: "body_cue",
+  eyebrow: "BODY RELAXATION",
+  title: "Soften your shoulders.",
+  subtitle: "Let the weight of the day drop a little.",
+} as const satisfies WindDownBodyCueStep;
+
+const busyMindWindDownBodyCue = {
+  durationSeconds: 120,
+  uiState: "body_cue",
+  eyebrow: "BODY SCAN",
+  title: "Give your busy mind a body scan.",
+  subtitle: "Move from forehead to feet, then release the tension.",
 } as const satisfies WindDownBodyCueStep;
 
 const defaultWindDownAmbient = {
@@ -460,7 +473,7 @@ export const windDownRoutines = {
       uiState: "active_winddown",
     },
     transition: defaultWindDownTransition,
-    bodyCue: defaultWindDownBodyCue,
+    bodyCue: busyMindWindDownBodyCue,
     ambient: defaultWindDownAmbient,
     startupRequirements: windDownStartupRequirements,
   },

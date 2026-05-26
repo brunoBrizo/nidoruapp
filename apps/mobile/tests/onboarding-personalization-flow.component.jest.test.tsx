@@ -35,7 +35,7 @@ function continueToNextQuestion() {
 }
 
 function answerThroughBreathworkQuestion() {
-  fireEvent.press(screen.getByText("Ease anxiety"));
+  fireEvent.press(screen.getByText("Calm my mind"));
   continueToNextQuestion();
 
   expect(screen.getByText("2 of 5")).toBeTruthy();
@@ -125,7 +125,7 @@ describe("OnboardingPersonalizationFlowScreen", () => {
       });
     });
     expect(screen.getByText("Riley, your follow-up plan is ready")).toBeTruthy();
-    expect(screen.getByText("Anxiety Relief")).toBeTruthy();
+    expect(screen.getByText("Calm Mind")).toBeTruthy();
     expect(screen.getByText("Light guidance")).toBeTruthy();
     expect(screen.getByText("Wind-down around 9:30 PM")).toBeTruthy();
     expect(screen.getByText("Breathwork familiar")).toBeTruthy();

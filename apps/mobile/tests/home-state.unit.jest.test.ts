@@ -14,7 +14,8 @@ describe("home overview state", () => {
       ratingText: "4/5",
       ratingAccessibilityLabel: "Sleep rating 4 out of 5",
       summary: "Rain helped you settle",
-      suggestion: "You fell asleep 14 min faster. Try box breathing tonight.",
+      suggestion:
+        "Your highest-rated nights often include a short breathing session. Try box breathing tonight.",
       actionLabel: "View insight",
       routeTarget: "/progress",
       durationText: "7h 12m",

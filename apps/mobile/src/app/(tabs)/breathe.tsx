@@ -52,7 +52,7 @@ export const BREATHE_TECHNIQUE_LIBRARY = [
     durationMinutes: 10,
     rhythmLabel: "5.5 in · 5.5 out",
     categoryCopy: {
-      calm: "Daily Calm / HRV Training.",
+      calm: "Steady Daily Calm practice.",
       energy: "Steady energy without strain.",
       focus: "Even rhythm for concentration.",
       sleep: "Smooth, steady rhythm.",
@@ -65,7 +65,7 @@ export const BREATHE_TECHNIQUE_LIBRARY = [
     durationMinutes: 5,
     rhythmLabel: "4 in · 4 hold · 4 out · 4 hold",
     categoryCopy: {
-      calm: "A square rhythm for stress.",
+      calm: "A square rhythm for calm.",
       energy: "Clear the fog before you move.",
       focus: "Counted breath for attention.",
     },
@@ -77,7 +77,7 @@ export const BREATHE_TECHNIQUE_LIBRARY = [
     durationMinutes: 5,
     rhythmLabel: "4 in · 6 out",
     categoryCopy: {
-      calm: "Belly breathing for stress.",
+      calm: "Belly breathing reset.",
     },
   },
 ] as const satisfies readonly BreatheTechniqueLibraryItem[];

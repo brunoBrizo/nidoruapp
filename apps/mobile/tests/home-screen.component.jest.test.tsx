@@ -145,8 +145,12 @@ describe("HomeScreen", () => {
     expect(screen.getByText("Out")).toBeTruthy();
     expect(screen.getByText("Last night")).toBeTruthy();
     expect(screen.getByText("Rain helped you settle")).toBeTruthy();
-    expect(screen.getByTestId("home-last-night-suggestion")).toBeTruthy();
-    expect(screen.getByText("14 min")).toBeTruthy();
+    expect(
+      screen.getByText(
+        "Your highest-rated nights often include a short breathing session. Try box breathing tonight.",
+      ),
+    ).toBeTruthy();
+    expect(screen.queryByText("14 min")).toBeNull();
     expect(screen.getByText("7h 12m")).toBeTruthy();
     expect(screen.getByText("Wind-down library")).toBeTruthy();
     expect(screen.getByText("The Lantern Keeper")).toBeTruthy();
@@ -262,12 +266,8 @@ describe("HomeScreen", () => {
     expect(screen.getByTestId("home-last-night-rating-text").props.className).toEqual(
       expect.stringContaining("ml-1"),
     );
-    expect(screen.getByTestId("home-last-night-highlight-duration").props.className).toEqual(
-      expect.stringContaining("text-[#EEF0FF]"),
-    );
-    expect(screen.getByTestId("home-last-night-suggestion-line-break").props.children).toBe(
-      "\ntonight.",
-    );
+    expect(screen.queryByTestId("home-last-night-highlight-duration")).toBeNull();
+    expect(screen.queryByTestId("home-last-night-suggestion-line-break")).toBeNull();
     expect(screen.getByTestId("home-last-night-action-row").props.className).not.toEqual(
       expect.stringContaining("min-h-8"),
     );
@@ -278,7 +278,7 @@ describe("HomeScreen", () => {
 
     expect(screen.getByRole("link", { name: "Rescue Me quick action" })).toHaveProp(
       "accessibilityHint",
-      "Starts the Rescue Me anchor immediately.",
+      "Opens the Rescue Me anchor.",
     );
     expect(screen.getByRole("link", { name: "Sounds quick action" })).toHaveProp(
       "accessibilityHint",
@@ -329,9 +329,9 @@ describe("HomeScreen", () => {
   });
 
   it.each([
-    ["00:00", localDateAt(0), "Rescue Me", "Immediate 4-7-8 relief"],
+    ["00:00", localDateAt(0), "Rescue Me", "Urgent breathwork support"],
     ["05:00", localDateAt(5), "Morning Breathwork", "3 min energizing breath"],
-    ["12:00", localDateAt(12), "Midday Reset", "Box breathing for stress"],
+    ["12:00", localDateAt(12), "Midday Reset", "Box breathing reset"],
     ["17:00", localDateAt(17), "Evening Wind-Down", "4-7-8 breathing · rain & low strings"],
     ["20:00", localDateAt(20), "Evening Wind-Down", "4-7-8 breathing · rain & low strings"],
   ])(
@@ -387,7 +387,7 @@ describe("HomeScreen", () => {
       within(screen.getByTestId("home-quick-action-card-rescue-me")).getByText("Rescue Me"),
     ).toBeTruthy();
     expect(
-      within(screen.getByTestId("home-quick-action-card-rescue-me")).getByText("Immediate"),
+      within(screen.getByTestId("home-quick-action-card-rescue-me")).getByText("Right now"),
     ).toBeTruthy();
     expect(screen.getByText("3 mixes")).toBeTruthy();
     expect(screen.getByText("Just orb")).toBeTruthy();

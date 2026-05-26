@@ -199,6 +199,10 @@ describe("tab entry shells", () => {
     expect(screen.getByTestId("breathe-box-breathing-card-fade")).toBeTruthy();
     expect(screen.getByTestId("breathe-coherent-breathing-card-fade")).toBeTruthy();
     expect(screen.getByTestId("breathe-diaphragmatic-breathing-card-fade")).toBeTruthy();
+    expect(screen.getByText("A square rhythm for calm.")).toBeTruthy();
+    expect(screen.getByText("Steady Daily Calm practice.")).toBeTruthy();
+    expect(screen.getByText("Belly breathing reset.")).toBeTruthy();
+    expect(screen.queryByText(/hrv training|stress relief|anxiety/i)).toBeNull();
 
     fireEvent.press(screen.getByRole("button", { name: "Energy" }));
 
@@ -253,12 +257,12 @@ describe("tab entry shells", () => {
     expect(screen.queryByRole("link", { name: "Free Breathe" })).toBeNull();
   });
 
-  it("keeps Rescue Me separate from Daily Calm HRV copy", () => {
+  it("keeps Rescue Me separate from Daily Calm training copy", () => {
     const { unmount } = render(<RescueMeAnchorScreen />);
 
     expect(screen.getByTestId("rescue-me-screen-active-launch")).toBeTruthy();
     expect(screen.getByLabelText("Inhale breathing phase")).toBeTruthy();
-    expect(screen.queryByText(/daily calm|hrv training/i)).toBeNull();
+    expect(screen.queryByText(/daily calm|hrv/i)).toBeNull();
     expect(screen.queryByText(/setup|technique|choose|account|paywall|permission/i)).toBeNull();
 
     unmount();

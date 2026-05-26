@@ -74,12 +74,12 @@ export const homeQuickActions = [
   {
     id: "rescue-me",
     label: "Rescue Me",
-    subtitle: "Immediate",
+    subtitle: "Right now",
     ctaText: "Start Rescue Me",
     routeTarget: "/rescue-me",
     iconIntent: "heart",
     isDistressUrgent: true,
-    accessibilityHint: "Starts the Rescue Me anchor immediately.",
+    accessibilityHint: "Opens the Rescue Me anchor.",
     tapsFromHome: 1,
   },
   {
@@ -122,7 +122,7 @@ export const homePrimaryActions = {
   "midday-reset": {
     id: "midday-reset",
     label: "Midday Reset",
-    subtitle: "Box breathing for stress",
+    subtitle: "Box breathing reset",
     ctaText: "Start now",
     routeTarget: "/breathe/box-breathing?durationSeconds=300",
     iconIntent: "refresh",
@@ -149,7 +149,7 @@ export const homePrimaryActions = {
   "rescue-me": {
     id: "rescue-me",
     label: "Rescue Me",
-    subtitle: "Immediate 4-7-8 relief",
+    subtitle: "Urgent breathwork support",
     ctaText: "Start now",
     routeTarget: "/rescue-me",
     iconIntent: "heart",
@@ -168,8 +168,8 @@ export const coreFeatureReachability = [
   { id: "sound-mixer", label: "Sound Mixer", routeTarget: "/sleep/sounds", tapsFromHome: 1 },
   { id: "breathe", label: "Breathe", routeTarget: "/breathe", tapsFromHome: 1 },
   {
-    id: "daily-calm-hrv-training",
-    label: "Daily Calm / HRV Training",
+    id: "daily-calm-steady-practice",
+    label: "Daily Calm / steady practice",
     routeTarget: "/breathe/coherent-breathing?durationSeconds=600",
     tapsFromHome: 2,
   },

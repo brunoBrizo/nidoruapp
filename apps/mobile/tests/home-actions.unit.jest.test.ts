@@ -36,7 +36,7 @@ describe("home actions contract", () => {
       "Breathe",
     ]);
     expect(homeQuickActions.map((action) => action.subtitle)).toEqual([
-      "Immediate",
+      "Right now",
       "3 mixes",
       "Just orb",
     ]);

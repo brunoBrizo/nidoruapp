@@ -1,6 +1,7 @@
 import {
   breathworkFamiliarityOptions,
   createPersonalizedOnboardingPlan,
+  onboardingGoalOptions,
   onboardingPlans,
   onboardingQuestionLimit,
   sleepBaselineOptions,
@@ -118,6 +119,10 @@ type GoalTile = {
   readonly value: OnboardingGoal;
 };
 
+const onboardingGoalLabelByValue = Object.fromEntries(
+  onboardingGoalOptions.map((option) => [option.value, option.label]),
+) as Record<OnboardingGoal, string>;
+
 const QUESTION_ORDER = [
   "goal",
   "sleep_baseline",
@@ -130,25 +135,25 @@ const GOAL_TILES: readonly GoalTile[] = [
   {
     description: "Wind down tonight.",
     icon: Moon,
-    label: "Sleep better",
+    label: onboardingGoalLabelByValue.sleep,
     value: "sleep",
   },
   {
     description: "Find steadier breath.",
     icon: Wind,
-    label: "Ease anxiety",
+    label: onboardingGoalLabelByValue.anxiety,
     value: "anxiety",
   },
   {
     description: "Let the day settle.",
     icon: Leaf,
-    label: "Reset stress",
+    label: onboardingGoalLabelByValue.stress,
     value: "stress",
   },
   {
     description: "Start simple.",
     icon: Sparkles,
-    label: "Just exploring",
+    label: onboardingGoalLabelByValue.curiosity,
     value: "curiosity",
   },
 ] as const;

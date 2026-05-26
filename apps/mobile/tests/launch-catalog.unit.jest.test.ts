@@ -7,8 +7,10 @@ describe("launch catalog", () => {
     expect(launchSoundIds).toContain("light-rain");
   });
 
-  it("defines coherent breathing as the Daily Calm HRV cadence", () => {
-    expect(breathTechniques["coherent-breathing"].primaryContext).toBe("Daily Calm / HRV Training");
+  it("defines coherent breathing as the Daily Calm steady cadence", () => {
+    expect(breathTechniques["coherent-breathing"].primaryContext).toBe(
+      "Daily Calm / steady practice",
+    );
     expect(breathTechniques["coherent-breathing"].phases).toEqual([
       { name: "inhale", durationMs: 5500 },
       { name: "exhale", durationMs: 5500 },

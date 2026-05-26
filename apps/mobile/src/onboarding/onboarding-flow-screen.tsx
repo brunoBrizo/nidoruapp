@@ -14,7 +14,8 @@ import type {
   PersonalizedOnboardingPlan,
   SleepBaseline,
 } from "@nidoru/domain";
-import { colors, motion, spacing, typography } from "@nidoru/ui-tokens";
+import { colors, motion } from "@nidoru/ui-tokens";
+import { StatusBar } from "expo-status-bar";
 import { useRouter, type Href } from "expo-router";
 import {
   CircleDot,
@@ -26,17 +27,9 @@ import {
   UserRound,
   Wind,
 } from "lucide-react-native";
+import type { ComponentProps, ReactNode } from "react";
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import {
-  Animated,
-  Easing,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { Animated, Easing } from "react-native";
 import { SafeAreaInsetsContext } from "react-native-safe-area-context";
 
 import {
@@ -56,6 +49,7 @@ import { PersonalizedPlanScreen } from "./personalized-plan-screen";
 import { useReduceMotionPreference } from "../motion/use-reduce-motion-enabled";
 import { captureAnalyticsEventDeferred } from "../observability/deferred-capture";
 import { openMigratedLocalDatabase } from "../storage/local-database";
+import { Pressable, ReactNativeAnimatedView, ScrollView, Text, TextInput, View, cn } from "../tw";
 
 export const ONBOARDING_FIRST_BREATH_SPLASH_DELAY_MS = 1200;
 export const ONBOARDING_PERSONALIZATION_QUESTION_COUNT = onboardingQuestionLimit;
@@ -504,39 +498,36 @@ export function OnboardingPersonalizationFlowScreen({
   }
 
   return (
-    <View style={styles.screen} testID="onboarding-personalization-flow-entry">
+    <View className="flex-1 bg-nidoru-dark-background" testID="onboarding-question-shell">
+      <StatusBar hidden />
       <ScrollView
         bounces={false}
-        contentContainerStyle={[
-          styles.scrollContent,
-          {
-            minHeight: "100%",
-            paddingBottom: Math.max(safeAreaInsets.bottom + spacing.lg, 48),
-            paddingTop: Math.max(safeAreaInsets.top + 28, 56),
-          },
-        ]}
-        contentInsetAdjustmentBehavior="automatic"
+        className="flex-1 bg-nidoru-dark-background"
+        contentContainerClassName="min-h-full bg-nidoru-dark-background"
+        contentInsetAdjustmentBehavior="never"
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
         testID="onboarding-personalization-scroll"
       >
-        <Animated.View
-          style={[
-            styles.questionScreen,
-            {
-              opacity: entryProgress,
-              transform: [{ translateY: contentTranslateY }],
-            },
-          ]}
+        <ReactNativeAnimatedView
+          className="flex-1 px-6"
+          style={{
+            opacity: entryProgress,
+            paddingBottom: Math.max(safeAreaInsets.bottom + 32, 48),
+            paddingTop: 56,
+            transform: [{ translateY: contentTranslateY }],
+          }}
+          testID="onboarding-question-content"
         >
           <QuestionHeader
             currentQuestionIndex={currentQuestionIndex}
             isOpeningQuestion={currentQuestionId === "goal"}
+            questionId={currentQuestionId}
             subtitle={currentCopy.subtitle}
             title={currentCopy.title}
           />
 
-          <View style={styles.questionBody}>
+          <View className="flex-1 pt-2.5">
             {currentQuestionId === "goal" ? (
               <GoalQuestion
                 selectedGoal={answers.goal}
@@ -591,40 +582,27 @@ export function OnboardingPersonalizationFlowScreen({
             ) : null}
           </View>
 
-          <View style={styles.footer}>
+          <View className="mt-auto gap-2.5 pt-8">
             {submitError ? (
-              <Text accessibilityRole="alert" selectable style={styles.errorText}>
+              <Text
+                accessibilityRole="alert"
+                className="font-nidoru-primary-semibold text-[13px] leading-[18px] text-nidoru-dark-danger"
+                selectable
+              >
                 {submitError}
               </Text>
             ) : null}
 
-            <Pressable
-              accessibilityRole="button"
-              accessibilityState={{ disabled: !canContinue }}
+            <OnboardingContinueButton
               disabled={!canContinue}
+              hiddenUntilReady={currentQuestionId === "goal"}
+              isLoading={isSubmitting}
               onPress={() => {
                 void completeOrAdvance();
               }}
-              style={({ pressed }) => [
-                styles.continueButton,
-                isLastQuestion && answers.displayName.trim().length > 0 && styles.primaryButton,
-                !canContinue && styles.disabledButton,
-                pressed && canContinue ? styles.ctaPressed : null,
-              ]}
-            >
-              <Text
-                selectable={false}
-                style={[
-                  styles.continueButtonText,
-                  !canContinue && styles.disabledButtonText,
-                  isLastQuestion &&
-                    answers.displayName.trim().length > 0 &&
-                    styles.primaryButtonText,
-                ]}
-              >
-                {isSubmitting ? "Saving" : "Continue"}
-              </Text>
-            </Pressable>
+              primary={isLastQuestion && answers.displayName.trim().length > 0}
+              testID="onboarding-continue-cta"
+            />
 
             {isLastQuestion ? (
               <Pressable
@@ -643,18 +621,28 @@ export function OnboardingPersonalizationFlowScreen({
                     startedAt,
                   });
                 }}
-                style={({ pressed }) => [
-                  styles.skipButton,
-                  pressed && !isSubmitting ? styles.skipButtonPressed : null,
-                ]}
+                className={cn(
+                  "h-11 items-center justify-center rounded-[20px] active:scale-[0.98]",
+                  answers.displayName.trim().length > 0
+                    ? "text-nidoru-dark-text-tertiary"
+                    : "text-nidoru-dark-text-secondary",
+                )}
               >
-                <Text selectable={false} style={styles.skipButtonText}>
+                <Text
+                  className={cn(
+                    "font-nidoru-primary-semibold text-base leading-[22px]",
+                    answers.displayName.trim().length > 0
+                      ? "text-nidoru-dark-text-tertiary"
+                      : "text-nidoru-dark-text-secondary",
+                  )}
+                  selectable={false}
+                >
                   Skip for now
                 </Text>
               </Pressable>
             ) : null}
           </View>
-        </Animated.View>
+        </ReactNativeAnimatedView>
       </ScrollView>
     </View>
   );
@@ -815,50 +803,86 @@ async function submitSkippedName({
 function QuestionHeader({
   currentQuestionIndex,
   isOpeningQuestion,
+  questionId,
   subtitle,
   title,
 }: {
   readonly currentQuestionIndex: number;
   readonly isOpeningQuestion: boolean;
+  readonly questionId: OnboardingPersonalizationQuestionId;
   readonly subtitle: string;
   readonly title: string;
 }) {
   return (
-    <View style={styles.header}>
-      <View style={styles.progressRow}>
+    <View className="pb-6">
+      <View className="mb-8 w-full flex-row items-center justify-between">
         <View
           accessibilityElementsHidden
+          className="w-24 flex-row items-center gap-1.5"
           importantForAccessibility="no-hide-descendants"
-          style={styles.progressTrack}
+          testID="onboarding-progress-track"
         >
           {QUESTION_ORDER.map((questionId, index) => (
-            <View
+            <ProgressSegment
+              currentQuestionIndex={currentQuestionIndex}
+              index={index}
               key={questionId}
-              style={[
-                styles.progressSegment,
-                index <= currentQuestionIndex && styles.progressSegmentActive,
-                index === currentQuestionIndex &&
-                  currentQuestionIndex === QUESTION_ORDER.length - 1 &&
-                  styles.progressSegmentCurrentFinal,
-              ]}
+              questionId={questionId}
             />
           ))}
         </View>
-        <Text selectable style={styles.progressText}>
+        <Text
+          className="font-nidoru-primary-regular text-[13px] leading-[18px] text-nidoru-dark-text-secondary"
+          selectable
+        >
           {currentQuestionIndex + 1} of {ONBOARDING_PERSONALIZATION_QUESTION_COUNT}
         </Text>
       </View>
       <Text
         accessibilityRole="header"
+        className={cn(
+          "mb-3 font-nidoru-primary-semibold tracking-normal text-nidoru-dark-text-primary",
+          isOpeningQuestion ? "text-[28px] leading-[34px]" : "text-2xl leading-[30px]",
+        )}
         selectable
-        style={[styles.title, isOpeningQuestion && styles.openingTitle]}
       >
         {title}
       </Text>
-      <Text selectable style={styles.subtitle}>
+      <Text
+        className={cn(
+          "font-nidoru-primary-regular tracking-normal text-nidoru-dark-text-secondary",
+          questionId === "breathwork_familiarity" ? "text-[15px]" : "text-base",
+          isOpeningQuestion ? "leading-[24px]" : "leading-[23px]",
+        )}
+        selectable
+      >
         {subtitle}
       </Text>
     </View>
+  );
+}
+
+function ProgressSegment({
+  currentQuestionIndex,
+  index,
+  questionId,
+}: {
+  readonly currentQuestionIndex: number;
+  readonly index: number;
+  readonly questionId: OnboardingPersonalizationQuestionId;
+}) {
+  const isCurrentFinal =
+    index === currentQuestionIndex && currentQuestionIndex === QUESTION_ORDER.length - 1;
+  const isActive = index <= currentQuestionIndex;
+
+  return (
+    <View
+      className={cn(
+        "h-1 flex-1 rounded-full",
+        isCurrentFinal ? "bg-[#EEF0FF]" : isActive ? "bg-[#A89CE0]" : "bg-[#232743]",
+      )}
+      testID={`onboarding-progress-segment-${questionId}`}
+    />
   );
 }
 
@@ -870,45 +894,51 @@ function GoalQuestion({
   readonly setSelectedGoal: (goal: OnboardingGoal) => void;
 }) {
   return (
-    <View style={styles.goalGrid}>
+    <View className="flex-1 flex-row flex-wrap content-start gap-4">
       {GOAL_TILES.map((tile) => {
         const Icon = tile.icon;
         const isSelected = selectedGoal === tile.value;
 
         return (
-          <Pressable
+          <OnboardingSelectionTile
             accessibilityHint={tile.description}
             accessibilityLabel={`${tile.label}. ${tile.description}`}
-            accessibilityRole="button"
             accessibilityState={{ selected: isSelected }}
+            className={cn(
+              "min-h-[145px] grow basis-[47.2%] flex-col p-5",
+              isSelected
+                ? "border-[#A89CE0]/35 bg-[#1A1E36] shadow-[inset_0_0_0_1px_rgba(168,156,224,0.25),0_8px_20px_rgba(168,156,224,0.08)]"
+                : null,
+            )}
             key={tile.value}
             onPress={() => {
               setSelectedGoal(tile.value);
             }}
-            style={({ pressed }) => [
-              styles.goalTile,
-              isSelected && styles.selectedGoalTile,
-              pressed ? styles.tilePressed : null,
-            ]}
           >
-            <View style={[styles.goalIconCircle, isSelected && styles.selectedIconCircle]}>
+            <SelectionIconCircle selected={isSelected}>
               <Icon
                 color={isSelected ? colors.dark.primaryGlow.value : colors.dark.textSecondary.value}
                 size={23}
               />
-            </View>
-            <View style={styles.goalCopy}>
-              <Text selectable={false} style={styles.goalTileTitle}>
+            </SelectionIconCircle>
+            <View className="mt-6 gap-1">
+              <Text
+                className="font-nidoru-primary-semibold text-base leading-[22px] text-nidoru-dark-text-primary"
+                selectable={false}
+              >
                 {tile.label}
               </Text>
               <Text
+                className={cn(
+                  "font-nidoru-primary-regular text-[13px] leading-[18px] text-nidoru-dark-text-secondary",
+                  isSelected ? "text-[#B5B9D1]" : null,
+                )}
                 selectable={false}
-                style={[styles.goalTileSubtitle, isSelected && styles.selectedSubcopy]}
               >
                 {tile.description}
               </Text>
             </View>
-          </Pressable>
+          </OnboardingSelectionTile>
         );
       })}
     </View>
@@ -923,9 +953,12 @@ function SleepBaselineQuestion({
   readonly setSelectedBaseline: (baseline: SleepBaseline) => void;
 }) {
   return (
-    <View style={styles.scaleCard}>
-      <View pointerEvents="none" style={styles.scaleTrack} />
-      <View style={styles.scaleRow}>
+    <OnboardingQuestionCard className="min-h-[162px] items-center px-4 pb-5 pt-8">
+      <View
+        className="absolute left-[10%] right-[10%] top-[55px] h-[2px] rounded-full bg-[#232743]"
+        pointerEvents="none"
+      />
+      <View className="z-10 w-full flex-row justify-between">
         {sleepBaselineOptions.map((option) => {
           const isSelected = selectedBaseline === option.value;
 
@@ -935,23 +968,36 @@ function SleepBaselineQuestion({
               accessibilityLabel={`Sleep baseline ${option.value}, ${option.label}`}
               accessibilityRole="button"
               accessibilityState={{ selected: isSelected }}
+              className="min-h-[72px] min-w-[52px] items-center gap-2 active:scale-[0.95]"
               key={option.value}
               onPress={() => {
                 setSelectedBaseline(option.value);
               }}
-              style={({ pressed }) => [styles.scalePoint, pressed ? styles.scalePressed : null]}
             >
-              <View style={[styles.scaleBubble, isSelected && styles.scaleBubbleSelected]}>
+              <View
+                className={cn(
+                  "h-[46px] w-[46px] items-center justify-center rounded-full bg-[#1C2040]",
+                  isSelected
+                    ? "scale-[1.12] border border-[#A89CE0]/50 shadow-[0_0_22px_rgba(168,156,224,0.35),0_8px_20px_rgba(124,111,205,0.15)]"
+                    : null,
+                )}
+              >
                 <Text
+                  className={cn(
+                    "font-nidoru-data-regular text-xl leading-6 text-nidoru-dark-text-secondary tabular-nums",
+                    isSelected ? "text-nidoru-dark-text-primary" : null,
+                  )}
                   selectable={false}
-                  style={[styles.scaleNumber, isSelected && styles.scaleNumberSelected]}
                 >
                   {option.value}
                 </Text>
               </View>
               <Text
+                className={cn(
+                  "text-center font-nidoru-primary-regular text-xs leading-[15px] text-nidoru-dark-text-secondary",
+                  isSelected ? "text-[#A89CE0]" : null,
+                )}
                 selectable={false}
-                style={[styles.scaleLabel, isSelected && styles.scaleLabelSelected]}
               >
                 {option.label}
               </Text>
@@ -959,11 +1005,14 @@ function SleepBaselineQuestion({
           );
         })}
       </View>
-      <View style={styles.cardDivider} />
-      <Text selectable style={styles.scaleSummary}>
+      <OnboardingCardDivider className="mb-3 mt-6" />
+      <Text
+        className="font-nidoru-primary-semibold text-sm leading-5 text-nidoru-dark-text-primary"
+        selectable
+      >
         {SLEEP_SUMMARY_BY_VALUE[selectedBaseline]}
       </Text>
-    </View>
+    </OnboardingQuestionCard>
   );
 }
 
@@ -983,8 +1032,8 @@ function WindDownTimeQuestion({
   const nextHour = normalizedHour === 12 ? 1 : normalizedHour + 1;
 
   return (
-    <View style={styles.timeCard}>
-      <View style={styles.presetRow}>
+    <OnboardingQuestionCard className="min-h-[333px] items-center px-4 pb-6 pt-7">
+      <View className="z-20 mb-8 w-full flex-row items-center justify-center gap-3">
         {windDownTimePresets.map((preset) => {
           const isSelected = selectedMinutes === preset.value;
 
@@ -992,19 +1041,23 @@ function WindDownTimeQuestion({
             <Pressable
               accessibilityRole="button"
               accessibilityState={{ selected: isSelected }}
+              className={cn(
+                "min-h-9 min-w-[82px] items-center justify-center rounded-full bg-[#1C2040] px-3 active:scale-[0.96]",
+                isSelected
+                  ? "border border-[#A89CE0]/50 shadow-[inset_0_0_0_1px_rgba(168,156,224,0.22),0_4px_12px_rgba(124,111,205,0.15)]"
+                  : "border border-transparent",
+              )}
               key={preset.value}
               onPress={() => {
                 setSelectedMinutes(preset.value);
               }}
-              style={({ pressed }) => [
-                styles.presetButton,
-                isSelected && styles.presetButtonSelected,
-                pressed ? styles.presetPressed : null,
-              ]}
             >
               <Text
+                className={cn(
+                  "font-nidoru-primary-semibold text-sm leading-[18px] text-nidoru-dark-text-secondary",
+                  isSelected ? "text-nidoru-dark-text-primary" : null,
+                )}
                 selectable={false}
-                style={[styles.presetText, isSelected && styles.presetTextSelected]}
               >
                 {preset.label}
               </Text>
@@ -1016,42 +1069,63 @@ function WindDownTimeQuestion({
       <View
         accessibilityLabel={`Selected wind-down time ${formatWindDownTime(selectedMinutes)}`}
         accessibilityRole="adjustable"
-        style={styles.timeWheel}
+        className="relative h-[180px] w-full max-w-[260px] flex-row items-center justify-center overflow-hidden rounded-[20px]"
       >
-        <View style={styles.timeHighlightBand} />
-        <View style={styles.timeFadeTop} />
-        <View style={styles.timeFadeBottom} />
-        <View style={styles.timeColumn}>
+        <View className="absolute inset-x-0 top-[60px] h-[60px] rounded-[16px] border border-[#A89CE0]/20 bg-[#1C2040] shadow-[inset_0_0_0_1px_rgba(168,156,224,0.12),0_8px_20px_rgba(124,111,205,0.10)]" />
+        <View
+          className="absolute inset-x-0 top-0 z-20 h-[60px] bg-[#14172B]/85"
+          pointerEvents="none"
+        />
+        <View
+          className="absolute inset-x-0 bottom-0 z-20 h-[60px] bg-[#14172B]/85"
+          pointerEvents="none"
+        />
+        <View className="z-10 w-[54px] items-center gap-[22px]">
           <TimeWheelValue dimmed value={padTimeNumber(previousHour)} />
           <TimeWheelValue large value={padTimeNumber(normalizedHour)} />
           <TimeWheelValue dimmed value={padTimeNumber(nextHour)} />
         </View>
-        <Text selectable={false} style={styles.timeColon}>
+        <Text
+          className="z-10 mx-[14px] pb-1 font-nidoru-data-light text-[30px] leading-10 text-nidoru-dark-text-secondary tabular-nums"
+          selectable={false}
+        >
           :
         </Text>
-        <View style={styles.timeColumn}>
+        <View className="z-10 w-[54px] items-center gap-[22px]">
           <TimeWheelValue dimmed value={padTimeNumber(previousMinute)} />
           <TimeWheelValue large value={padTimeNumber(selectedMinute)} />
           <TimeWheelValue dimmed value={padTimeNumber(nextMinute)} />
         </View>
-        <View style={styles.periodColumn}>
-          <Text selectable={false} style={styles.periodHidden}>
+        <View className="z-10 w-[46px] items-center gap-[22px]">
+          <Text
+            className="h-6 font-nidoru-data-regular text-lg leading-6 text-nidoru-dark-text-secondary opacity-0"
+            selectable={false}
+          >
             PM
           </Text>
-          <Text selectable={false} style={styles.periodText}>
+          <Text
+            className="h-12 font-nidoru-data-regular text-xl leading-[48px] text-[#EEF0FF]/90"
+            selectable={false}
+          >
             PM
           </Text>
-          <Text selectable={false} style={styles.periodHidden}>
+          <Text
+            className="h-6 font-nidoru-data-regular text-lg leading-6 text-nidoru-dark-text-secondary opacity-0"
+            selectable={false}
+          >
             AM
           </Text>
         </View>
       </View>
 
-      <View style={styles.timeDivider} />
-      <Text selectable style={styles.timeCaption}>
+      <OnboardingCardDivider className="mb-4 mt-8" />
+      <Text
+        className="font-nidoru-primary-semibold text-[15px] leading-5 text-nidoru-dark-text-secondary"
+        selectable
+      >
         Usually around {formatWindDownTime(selectedMinutes)}
       </Text>
-    </View>
+    </OnboardingQuestionCard>
   );
 }
 
@@ -1066,8 +1140,12 @@ function TimeWheelValue({
 }) {
   return (
     <Text
+      className={cn(
+        "text-center font-nidoru-data-light tracking-normal text-[#EEF0FF]/90 tabular-nums",
+        large ? "h-12 text-[38px] leading-[48px]" : null,
+        dimmed ? "h-6 font-nidoru-data-regular text-[22px] leading-6 text-[#A0A5C0]" : null,
+      )}
       selectable={false}
-      style={[styles.timeValue, dimmed && styles.timeValueDimmed, large && styles.timeValueLarge]}
     >
       {value}
     </Text>
@@ -1082,43 +1160,49 @@ function BreathworkFamiliarityQuestion({
   readonly setSelectedFamiliarity: (familiarity: BreathworkFamiliarity) => void;
 }) {
   return (
-    <View style={styles.choiceStack}>
+    <View className="gap-4">
       {breathworkFamiliarityOptions.map((option) => {
         const optionCopy = BREATHWORK_CARD_COPY[option.value];
         const Icon = optionCopy.icon;
         const isSelected = selectedFamiliarity === option.value;
 
         return (
-          <Pressable
+          <OnboardingSelectionTile
             accessibilityHint={optionCopy.description}
             accessibilityLabel={`${optionCopy.label}. ${optionCopy.description}`}
-            accessibilityRole="button"
             accessibilityState={{ selected: isSelected }}
+            className={cn(
+              "min-h-[84px] w-full flex-row items-start gap-[18px] rounded-[20px] p-5",
+              isSelected
+                ? "border-[#A89CE0]/30 bg-[#16192E] shadow-[0_8px_24px_-8px_rgba(168,156,224,0.20)]"
+                : null,
+            )}
             key={option.value}
             onPress={() => {
               setSelectedFamiliarity(option.value);
             }}
-            style={({ pressed }) => [
-              styles.choiceCard,
-              isSelected && styles.choiceCardSelected,
-              pressed ? styles.tilePressed : null,
-            ]}
           >
-            <View style={[styles.choiceIconCircle, isSelected && styles.selectedIconCircle]}>
+            <SelectionIconCircle className="mt-0" selected={isSelected}>
               <Icon
                 color={isSelected ? colors.dark.primaryGlow.value : colors.dark.textTertiary.value}
                 size={24}
               />
-            </View>
-            <View style={styles.choiceCopy}>
-              <Text selectable={false} style={styles.choiceLabel}>
+            </SelectionIconCircle>
+            <View className="flex-1 gap-1.5 pt-0.5">
+              <Text
+                className="font-nidoru-primary-semibold text-[17px] leading-[22px] text-nidoru-dark-text-primary"
+                selectable={false}
+              >
                 {optionCopy.label}
               </Text>
-              <Text selectable={false} style={styles.choiceDescription}>
+              <Text
+                className="font-nidoru-primary-regular text-sm leading-[18px] text-nidoru-dark-text-secondary"
+                selectable={false}
+              >
                 {optionCopy.description}
               </Text>
             </View>
-          </Pressable>
+          </OnboardingSelectionTile>
         );
       })}
     </View>
@@ -1135,8 +1219,8 @@ function DisplayNameQuestion({
   readonly value: string;
 }) {
   return (
-    <View style={styles.nameStack}>
-      <View style={[styles.inputShell, nameError && styles.inputShellError]}>
+    <View className="gap-3.5 pt-10">
+      <TextInputShell hasError={Boolean(nameError)}>
         <UserRound color={colors.dark.textTertiary.value} size={22} />
         <TextInput
           accessibilityHint="Optional. Used only to personalize greetings."
@@ -1148,22 +1232,158 @@ function DisplayNameQuestion({
           placeholder="Name"
           placeholderTextColor={colors.dark.textTertiary.value}
           spellCheck={false}
-          style={styles.nameInput}
+          className="min-h-11 flex-1 p-0 font-nidoru-primary-regular text-lg leading-6 text-nidoru-dark-text-primary"
           value={value}
         />
-      </View>
+      </TextInputShell>
       {nameError ? (
-        <Text accessibilityRole="alert" selectable style={styles.errorText}>
+        <Text
+          accessibilityRole="alert"
+          className="font-nidoru-primary-semibold text-[13px] leading-[18px] text-nidoru-dark-danger"
+          selectable
+        >
           {nameError}
         </Text>
       ) : null}
-      <View style={styles.privacyLine}>
+      <View className="flex-row items-center gap-2 px-2">
         <ShieldCheck color={colors.dark.textTertiary.value} size={16} />
-        <Text selectable style={styles.privacyText}>
+        <Text
+          className="font-nidoru-primary-regular text-sm leading-[18px] text-nidoru-dark-text-secondary"
+          selectable
+        >
           Only used to personalize greetings.
         </Text>
       </View>
     </View>
+  );
+}
+
+function OnboardingQuestionCard({
+  children,
+  className,
+}: {
+  readonly children: ReactNode;
+  readonly className?: string;
+}) {
+  return (
+    <View
+      className={cn(
+        "relative rounded-[32px] bg-[#14172B] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.02)]",
+        className,
+      )}
+    >
+      {children}
+    </View>
+  );
+}
+
+function OnboardingSelectionTile({
+  children,
+  className,
+  ...props
+}: ComponentProps<typeof Pressable>) {
+  return (
+    <Pressable
+      accessibilityRole="button"
+      className={cn(
+        "will-change-variable overflow-hidden rounded-[24px] border border-transparent bg-[#14172B] active:scale-[0.96]",
+        "transition-all duration-300 ease-out",
+        className,
+      )}
+      {...props}
+    >
+      {children}
+    </Pressable>
+  );
+}
+
+function SelectionIconCircle({
+  children,
+  className,
+  selected,
+}: {
+  readonly children: ReactNode;
+  readonly className?: string;
+  readonly selected: boolean;
+}) {
+  return (
+    <View
+      className={cn(
+        "will-change-variable h-11 w-11 items-center justify-center rounded-full bg-[#1C2040]",
+        selected ? "bg-[#7C6FCD]/20 shadow-[0_0_16px_rgba(124,111,205,0.22)]" : null,
+        className,
+      )}
+    >
+      {children}
+    </View>
+  );
+}
+
+function TextInputShell({
+  children,
+  hasError,
+}: {
+  readonly children: ReactNode;
+  readonly hasError: boolean;
+}) {
+  return (
+    <View
+      className={cn(
+        "h-16 flex-row items-center gap-3 rounded-[20px] border bg-[#14172B] px-5",
+        "focus-within:bg-[#1C2040] focus-within:shadow-[0_0_16px_rgba(168,156,224,0.12)]",
+        hasError ? "border-nidoru-dark-danger/55" : "border-transparent",
+      )}
+    >
+      {children}
+    </View>
+  );
+}
+
+function OnboardingCardDivider({ className }: { readonly className?: string }) {
+  return <View className={cn("h-px w-[80%] bg-[#232743] opacity-75", className)} />;
+}
+
+function OnboardingContinueButton({
+  disabled,
+  hiddenUntilReady,
+  isLoading,
+  onPress,
+  primary,
+  testID,
+}: {
+  readonly disabled: boolean;
+  readonly hiddenUntilReady: boolean;
+  readonly isLoading: boolean;
+  readonly onPress: () => void;
+  readonly primary: boolean;
+  readonly testID?: string;
+}) {
+  const visuallyHidden = disabled && hiddenUntilReady;
+
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityState={{ disabled }}
+      className={cn(
+        "h-[52px] w-full items-center justify-center rounded-[20px] active:scale-[0.98]",
+        "transition-all duration-300 ease-out",
+        primary ? "bg-[#7C6FCD] shadow-[0_8px_20px_rgba(124,111,205,0.25)]" : "bg-[#1C2040]",
+        visuallyHidden ? "translate-y-4 opacity-0" : "translate-y-0 opacity-100",
+      )}
+      disabled={disabled}
+      onPress={onPress}
+      testID={testID}
+    >
+      <Text
+        className={cn(
+          "font-nidoru-primary-semibold text-base leading-[22px]",
+          disabled && !visuallyHidden ? "text-[#8A8FA8]/50" : "text-nidoru-dark-text-primary",
+        )}
+        selectable={false}
+      >
+        {isLoading ? "Saving" : "Continue"}
+      </Text>
+    </Pressable>
   );
 }
 
@@ -1178,529 +1398,3 @@ function formatWindDownTime(minutesAfterMidnight: number): string {
 function padTimeNumber(value: number): string {
   return value.toString().padStart(2, "0");
 }
-
-const styles = StyleSheet.create({
-  screen: {
-    backgroundColor: colors.dark.background.value,
-    flex: 1,
-  },
-  scrollContent: {
-    backgroundColor: colors.dark.background.value,
-    flexGrow: 1,
-    paddingHorizontal: 24,
-  },
-  questionScreen: {
-    flex: 1,
-  },
-  header: {
-    paddingHorizontal: 0,
-    paddingBottom: spacing.md,
-  },
-  progressRow: {
-    alignItems: "center",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: spacing.lg,
-  },
-  progressTrack: {
-    alignItems: "center",
-    flexDirection: "row",
-    gap: 5,
-    width: 86,
-  },
-  progressSegment: {
-    backgroundColor: "#232743",
-    borderRadius: 999,
-    flex: 1,
-    height: 4,
-  },
-  progressSegmentActive: {
-    backgroundColor: colors.dark.primaryGlow.value,
-  },
-  progressSegmentCurrentFinal: {
-    backgroundColor: colors.dark.textPrimary.value,
-  },
-  progressText: {
-    color: colors.dark.textSecondary.value,
-    fontFamily: typography.mobileFontFamily.primary.regular,
-    fontSize: 13,
-    letterSpacing: 0,
-    lineHeight: 18,
-  },
-  title: {
-    color: colors.dark.textPrimary.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 24,
-    letterSpacing: 0,
-    lineHeight: 30,
-    marginBottom: 12,
-  },
-  openingTitle: {
-    fontSize: 28,
-    lineHeight: 34,
-  },
-  subtitle: {
-    color: colors.dark.textSecondary.value,
-    fontFamily: typography.mobileFontFamily.primary.regular,
-    fontSize: 16,
-    letterSpacing: 0,
-    lineHeight: 23,
-  },
-  questionBody: {
-    flex: 1,
-    paddingTop: 10,
-  },
-  goalGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 16,
-  },
-  goalTile: {
-    backgroundColor: colors.dark.surface.value,
-    borderColor: "transparent",
-    borderCurve: "continuous",
-    borderRadius: 24,
-    borderWidth: 1,
-    flexBasis: "47.2%",
-    flexGrow: 1,
-    minHeight: 145,
-    overflow: "hidden",
-    padding: 18,
-  },
-  selectedGoalTile: {
-    backgroundColor: "#1A1E36",
-    borderColor: "rgba(168, 156, 224, 0.35)",
-    boxShadow: "inset 0 0 0 1px rgba(168,156,224,0.2), 0 8px 20px rgba(168,156,224,0.08)",
-  },
-  tilePressed: {
-    transform: [{ scale: 0.96 }],
-  },
-  goalIconCircle: {
-    alignItems: "center",
-    backgroundColor: colors.dark.surfaceRaised.value,
-    borderRadius: 24,
-    height: 44,
-    justifyContent: "center",
-    marginBottom: 26,
-    width: 44,
-  },
-  selectedIconCircle: {
-    backgroundColor: "rgba(124, 111, 205, 0.18)",
-    boxShadow: "0 0 16px rgba(124, 111, 205, 0.22)",
-  },
-  goalCopy: {
-    gap: 6,
-  },
-  goalTileTitle: {
-    color: colors.dark.textPrimary.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 16,
-    letterSpacing: 0,
-    lineHeight: 22,
-  },
-  goalTileSubtitle: {
-    color: colors.dark.textSecondary.value,
-    fontFamily: typography.mobileFontFamily.primary.regular,
-    fontSize: 13,
-    letterSpacing: 0,
-    lineHeight: 18,
-  },
-  selectedSubcopy: {
-    color: "#B5B9D1",
-  },
-  scaleCard: {
-    alignItems: "center",
-    backgroundColor: colors.dark.surface.value,
-    borderCurve: "continuous",
-    borderRadius: 32,
-    minHeight: 162,
-    overflow: "hidden",
-    paddingBottom: 20,
-    paddingHorizontal: 20,
-    paddingTop: 30,
-    position: "relative",
-  },
-  scaleTrack: {
-    backgroundColor: "#232743",
-    borderRadius: 999,
-    height: 2,
-    left: "14%",
-    position: "absolute",
-    right: "14%",
-    top: 53,
-  },
-  scaleRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-    zIndex: 1,
-  },
-  scalePoint: {
-    alignItems: "center",
-    gap: 8,
-    minHeight: 72,
-    minWidth: 52,
-  },
-  scalePressed: {
-    transform: [{ scale: 0.95 }],
-  },
-  scaleBubble: {
-    alignItems: "center",
-    backgroundColor: colors.dark.surfaceRaised.value,
-    borderRadius: 23,
-    height: 46,
-    justifyContent: "center",
-    width: 46,
-  },
-  scaleBubbleSelected: {
-    borderColor: "rgba(168,156,224,0.52)",
-    borderWidth: 1,
-    boxShadow: "0 0 22px rgba(168,156,224,0.35), 0 8px 20px rgba(124,111,205,0.15)",
-    transform: [{ scale: 1.12 }],
-  },
-  scaleNumber: {
-    color: colors.dark.textSecondary.value,
-    fontFamily: typography.mobileFontFamily.data.regular,
-    fontSize: 20,
-    fontVariant: ["tabular-nums"],
-    letterSpacing: 0,
-    lineHeight: 24,
-  },
-  scaleNumberSelected: {
-    color: colors.dark.textPrimary.value,
-  },
-  scaleLabel: {
-    color: colors.dark.textSecondary.value,
-    fontFamily: typography.mobileFontFamily.primary.regular,
-    fontSize: 12,
-    letterSpacing: 0,
-    lineHeight: 15,
-    textAlign: "center",
-  },
-  scaleLabelSelected: {
-    color: colors.dark.primaryGlow.value,
-  },
-  cardDivider: {
-    backgroundColor: "#232743",
-    height: 1,
-    marginBottom: 12,
-    marginTop: 20,
-    opacity: 0.72,
-    width: "80%",
-  },
-  scaleSummary: {
-    color: colors.dark.textPrimary.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 14,
-    letterSpacing: 0,
-    lineHeight: 20,
-  },
-  timeCard: {
-    alignItems: "center",
-    backgroundColor: colors.dark.surface.value,
-    borderCurve: "continuous",
-    borderRadius: 32,
-    minHeight: 333,
-    paddingBottom: 24,
-    paddingHorizontal: 20,
-    paddingTop: 24,
-  },
-  presetRow: {
-    flexDirection: "row",
-    gap: 10,
-    justifyContent: "center",
-    marginBottom: 28,
-    width: "100%",
-  },
-  presetButton: {
-    alignItems: "center",
-    backgroundColor: colors.dark.surfaceRaised.value,
-    borderColor: "transparent",
-    borderRadius: 999,
-    borderWidth: 1,
-    justifyContent: "center",
-    minHeight: 36,
-    minWidth: 82,
-    paddingHorizontal: 12,
-  },
-  presetButtonSelected: {
-    borderColor: "rgba(168,156,224,0.54)",
-    boxShadow: "0 4px 12px rgba(124,111,205,0.15)",
-  },
-  presetPressed: {
-    transform: [{ scale: 0.96 }],
-  },
-  presetText: {
-    color: colors.dark.textSecondary.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 14,
-    letterSpacing: 0,
-    lineHeight: 18,
-  },
-  presetTextSelected: {
-    color: colors.dark.textPrimary.value,
-  },
-  timeWheel: {
-    alignItems: "center",
-    borderRadius: 20,
-    flexDirection: "row",
-    height: 180,
-    justifyContent: "center",
-    overflow: "hidden",
-    position: "relative",
-    width: 260,
-  },
-  timeHighlightBand: {
-    backgroundColor: colors.dark.surfaceRaised.value,
-    borderColor: "rgba(168,156,224,0.24)",
-    borderCurve: "continuous",
-    borderRadius: 16,
-    borderWidth: 1,
-    boxShadow: "0 8px 20px rgba(124,111,205,0.1)",
-    height: 58,
-    left: 0,
-    position: "absolute",
-    right: 0,
-    top: 61,
-  },
-  timeFadeTop: {
-    backgroundColor: "rgba(20, 23, 43, 0.84)",
-    height: 58,
-    left: 0,
-    position: "absolute",
-    right: 0,
-    top: 0,
-    zIndex: 2,
-  },
-  timeFadeBottom: {
-    backgroundColor: "rgba(20, 23, 43, 0.84)",
-    bottom: 0,
-    height: 58,
-    left: 0,
-    position: "absolute",
-    right: 0,
-    zIndex: 2,
-  },
-  timeColumn: {
-    alignItems: "center",
-    gap: 22,
-    width: 54,
-    zIndex: 3,
-  },
-  timeValue: {
-    color: colors.dark.textPrimary.value,
-    fontFamily: typography.mobileFontFamily.data.light,
-    fontSize: 38,
-    fontVariant: ["tabular-nums"],
-    height: 48,
-    letterSpacing: 0,
-    lineHeight: 48,
-    textAlign: "center",
-  },
-  timeValueDimmed: {
-    color: "#676C88",
-    fontFamily: typography.mobileFontFamily.data.regular,
-    fontSize: 22,
-    height: 24,
-    lineHeight: 24,
-  },
-  timeValueLarge: {
-    color: "rgba(238, 240, 255, 0.92)",
-  },
-  timeColon: {
-    color: colors.dark.textSecondary.value,
-    fontFamily: typography.mobileFontFamily.data.light,
-    fontSize: 30,
-    fontVariant: ["tabular-nums"],
-    lineHeight: 40,
-    marginHorizontal: 14,
-    paddingBottom: 4,
-    zIndex: 3,
-  },
-  periodColumn: {
-    alignItems: "center",
-    gap: 22,
-    width: 46,
-    zIndex: 3,
-  },
-  periodText: {
-    color: "rgba(238, 240, 255, 0.92)",
-    fontFamily: typography.mobileFontFamily.data.regular,
-    fontSize: 20,
-    height: 48,
-    letterSpacing: 0,
-    lineHeight: 48,
-  },
-  periodHidden: {
-    color: colors.dark.textSecondary.value,
-    fontFamily: typography.mobileFontFamily.data.regular,
-    fontSize: 18,
-    height: 24,
-    lineHeight: 24,
-    opacity: 0,
-  },
-  timeDivider: {
-    backgroundColor: "#232743",
-    height: 1,
-    marginBottom: 16,
-    marginTop: 26,
-    opacity: 0.72,
-    width: "80%",
-  },
-  timeCaption: {
-    color: colors.dark.textSecondary.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 15,
-    letterSpacing: 0,
-    lineHeight: 20,
-  },
-  choiceStack: {
-    gap: 16,
-  },
-  choiceCard: {
-    alignItems: "flex-start",
-    backgroundColor: colors.dark.surface.value,
-    borderColor: "transparent",
-    borderCurve: "continuous",
-    borderRadius: 20,
-    borderWidth: 1,
-    flexDirection: "row",
-    gap: 18,
-    minHeight: 84,
-    padding: 20,
-  },
-  choiceCardSelected: {
-    backgroundColor: "#16192E",
-    borderColor: "rgba(168,156,224,0.34)",
-    boxShadow: "0 8px 24px rgba(168,156,224,0.13)",
-  },
-  choiceIconCircle: {
-    alignItems: "center",
-    backgroundColor: colors.dark.surfaceRaised.value,
-    borderRadius: 22,
-    height: 44,
-    justifyContent: "center",
-    width: 44,
-  },
-  choiceCopy: {
-    flex: 1,
-    gap: 6,
-    paddingTop: 2,
-  },
-  choiceLabel: {
-    color: colors.dark.textPrimary.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 17,
-    letterSpacing: 0,
-    lineHeight: 22,
-  },
-  choiceDescription: {
-    color: colors.dark.textSecondary.value,
-    fontFamily: typography.mobileFontFamily.primary.regular,
-    fontSize: 14,
-    letterSpacing: 0,
-    lineHeight: 18,
-  },
-  nameStack: {
-    gap: 14,
-    paddingTop: 24,
-  },
-  inputShell: {
-    alignItems: "center",
-    backgroundColor: colors.dark.surface.value,
-    borderColor: "transparent",
-    borderCurve: "continuous",
-    borderRadius: 20,
-    borderWidth: 1,
-    flexDirection: "row",
-    gap: 12,
-    height: 64,
-    paddingHorizontal: 20,
-  },
-  inputShellError: {
-    borderColor: "rgba(255,107,107,0.54)",
-  },
-  nameInput: {
-    color: colors.dark.textPrimary.value,
-    flex: 1,
-    fontFamily: typography.mobileFontFamily.primary.regular,
-    fontSize: 18,
-    letterSpacing: 0,
-    lineHeight: 24,
-    minHeight: 44,
-    padding: 0,
-  },
-  privacyLine: {
-    alignItems: "center",
-    flexDirection: "row",
-    gap: 8,
-    paddingHorizontal: 8,
-  },
-  privacyText: {
-    color: colors.dark.textSecondary.value,
-    fontFamily: typography.mobileFontFamily.primary.regular,
-    fontSize: 14,
-    letterSpacing: 0,
-    lineHeight: 18,
-  },
-  errorText: {
-    color: colors.dark.danger.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 13,
-    letterSpacing: 0,
-    lineHeight: 18,
-  },
-  footer: {
-    gap: 10,
-    marginTop: "auto",
-    paddingTop: spacing.lg,
-  },
-  continueButton: {
-    alignItems: "center",
-    backgroundColor: colors.dark.surfaceRaised.value,
-    borderCurve: "continuous",
-    borderRadius: 20,
-    height: 52,
-    justifyContent: "center",
-    width: "100%",
-  },
-  primaryButton: {
-    backgroundColor: colors.dark.primary.value,
-    boxShadow: "0 8px 20px rgba(124,111,205,0.25)",
-  },
-  disabledButton: {
-    opacity: 0.46,
-  },
-  ctaPressed: {
-    transform: [{ scale: 0.98 }],
-  },
-  continueButtonText: {
-    color: colors.dark.textPrimary.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 16,
-    letterSpacing: 0,
-    lineHeight: 22,
-  },
-  primaryButtonText: {
-    color: colors.dark.textPrimary.value,
-  },
-  disabledButtonText: {
-    color: "rgba(138,143,168,0.7)",
-  },
-  skipButton: {
-    alignItems: "center",
-    borderRadius: 20,
-    height: 44,
-    justifyContent: "center",
-  },
-  skipButtonPressed: {
-    transform: [{ scale: 0.98 }],
-  },
-  skipButtonText: {
-    color: colors.dark.textSecondary.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 16,
-    letterSpacing: 0,
-    lineHeight: 22,
-  },
-});

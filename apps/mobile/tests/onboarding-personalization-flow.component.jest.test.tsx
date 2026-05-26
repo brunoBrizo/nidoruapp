@@ -1,11 +1,21 @@
 import { describe, expect, it, jest } from "@jest/globals";
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react-native";
-import { AccessibilityInfo, StyleSheet } from "react-native";
+import { AccessibilityInfo } from "react-native";
 
 import {
   ONBOARDING_PERSONALIZATION_QUESTION_COUNT,
   OnboardingPersonalizationFlowScreen,
 } from "../src/onboarding/onboarding-flow-screen";
+
+jest.mock("react-native-css", () => {
+  const React = jest.requireActual<typeof import("react")>("react");
+
+  return {
+    useCssElement: (Component: React.ElementType, props: Record<string, unknown>) =>
+      React.createElement(Component, props),
+    useNativeVariable: (variable: string) => `mocked-${variable}`,
+  };
+});
 
 jest
   .spyOn(AccessibilityInfo, "isReduceMotionEnabled")
@@ -41,7 +51,35 @@ function answerThroughBreathworkQuestion() {
   continueToNextQuestion();
 }
 
+function expectClassNameContains(testID: string, expectedClassName: string) {
+  expect(screen.getByTestId(testID, { includeHiddenElements: true }).props.className).toEqual(
+    expect.stringContaining(expectedClassName),
+  );
+}
+
 describe("OnboardingPersonalizationFlowScreen", () => {
+  it("renders the question shell and disabled CTA with Tailwind primitives", () => {
+    jest.useFakeTimers();
+
+    render(
+      <OnboardingPersonalizationFlowScreen
+        continueAfterPlan={jest.fn()}
+        persistAnswers={jest.fn(() => Promise.resolve())}
+        screenExitMs={0}
+        startedAt="2026-05-20T01:00:00.000Z"
+      />,
+    );
+
+    expectClassNameContains("onboarding-question-shell", "bg-nidoru-dark-background");
+    expectClassNameContains("onboarding-question-content", "px-6");
+    expectClassNameContains("onboarding-progress-track", "w-24");
+    expectClassNameContains("onboarding-progress-segment-goal", "bg-[#A89CE0]");
+    expectClassNameContains("onboarding-continue-cta", "bg-[#1C2040]");
+    expectClassNameContains("onboarding-continue-cta", "opacity-0");
+
+    jest.useRealTimers();
+  });
+
   it("captures typed answers across the five-question flow without pre-plan gates", async () => {
     jest.useFakeTimers();
     const persistAnswers = jest.fn(() => Promise.resolve());
@@ -60,14 +98,12 @@ describe("OnboardingPersonalizationFlowScreen", () => {
     expect(screen.getByText("1 of 5")).toBeTruthy();
     expect(screen.getByText("We’ll shape your follow-up plan around this.")).toBeTruthy();
     expect(screen.queryByText("We’ll shape your first session around this.")).toBeNull();
-    expect(StyleSheet.flatten(screen.getByText("What brings you here?").props.style)).toEqual(
-      expect.objectContaining({ fontSize: 28 }),
+    expect(screen.getByText("What brings you here?").props.className).toEqual(
+      expect.stringContaining("text-[28px]"),
     );
-    expect(
-      StyleSheet.flatten(
-        screen.getByTestId("onboarding-personalization-scroll").props.contentContainerStyle,
-      ),
-    ).toEqual(expect.objectContaining({ paddingHorizontal: 24 }));
+    expect(screen.getByTestId("onboarding-question-content").props.className).toEqual(
+      expect.stringContaining("px-6"),
+    );
     expect(screen.queryByText(forbiddenPrePlanGatePattern)).toBeNull();
 
     answerThroughBreathworkQuestion();

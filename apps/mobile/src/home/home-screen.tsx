@@ -129,7 +129,7 @@ const libraryCards = [
     title: "Body Scan",
     subtitle: "Guided · release tension",
     duration: "8 MIN",
-    routeTarget: "/breathe/evening-prep",
+    routeTarget: "/breathe/4-7-8-sleep?durationSeconds=300",
     Icon: Sparkles,
     cardClass:
       "bg-[#181B32]/90 shadow-[inset_0_1px_0_rgba(238,240,255,0.08),0_10px_30px_-10px_rgba(168,156,224,0.3)]",

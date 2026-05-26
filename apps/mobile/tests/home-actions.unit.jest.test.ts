@@ -57,6 +57,26 @@ describe("home actions contract", () => {
     ]);
   });
 
+  it("routes Home breathing anchors to real technique sessions instead of placeholder screens", () => {
+    expect(
+      ["morning-breathwork", "midday-reset", "evening-prep"].map(
+        (actionId) =>
+          selectHomePrimaryAction({
+            now:
+              actionId === "morning-breathwork"
+                ? localDateAt(5)
+                : actionId === "midday-reset"
+                  ? localDateAt(12)
+                  : localDateAt(17),
+          }).routeTarget,
+      ),
+    ).toEqual([
+      "/breathe/coherent-breathing?durationSeconds=180",
+      "/breathe/box-breathing?durationSeconds=300",
+      "/breathe/4-7-8-sleep?durationSeconds=300",
+    ]);
+  });
+
   it.each([
     ["00:00", localDateAt(0, 0), "Rescue Me", true],
     ["04:59", localDateAt(4, 59), "Rescue Me", true],

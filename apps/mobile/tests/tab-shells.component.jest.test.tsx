@@ -1,6 +1,6 @@
 import { describe, expect, it, jest } from "@jest/globals";
 import { fireEvent, render, screen, within } from "@testing-library/react-native";
-import { AccessibilityInfo, StyleSheet } from "react-native";
+import { AccessibilityInfo } from "react-native";
 
 import BreatheTabScreen, {
   BREATHE_FREE_BREATHE_STATUS,
@@ -15,6 +15,16 @@ import {
   TAB_ACTIVE_INDICATOR_MOTION,
   getTabIndicatorMotionConfig,
 } from "../src/navigation/app-tab-bar";
+
+jest.mock("react-native-css", () => {
+  const React = jest.requireActual<typeof import("react")>("react");
+
+  return {
+    useCssElement: (Component: React.ElementType, props: Record<string, unknown>) =>
+      React.createElement(Component, props),
+    useNativeVariable: (variable: string) => `mocked-${variable}`,
+  };
+});
 
 const routes = [
   { key: "home-key", name: "index" },
@@ -133,11 +143,11 @@ describe("tab entry shells", () => {
     expect(screen.getByRole("header", { name: "Breathe" })).toBeTruthy();
     expect(screen.getByText("Find a rhythm for right now.")).toBeTruthy();
     expect(screen.getByText("Choose by how you want to feel.")).toBeTruthy();
-    expect(StyleSheet.flatten(screen.getByTestId("breathe-tabs").props.style)).toEqual(
-      expect.objectContaining({
-        minHeight: 52,
-        padding: 6,
-      }),
+    expect(screen.getByTestId("breathe-screen").props.className).toEqual(
+      expect.stringContaining("bg-[#0D0F1A]"),
+    );
+    expect(screen.getByTestId("breathe-tabs").props.className).toEqual(
+      expect.stringContaining("rounded-2xl bg-[#14172B]/50 p-1.5"),
     );
     expect(screen.getByRole("button", { name: "Sleep" })).toHaveProp("accessibilityState", {
       selected: true,
@@ -153,6 +163,15 @@ describe("tab entry shells", () => {
     expect(screen.getByText("Smooth, steady rhythm.")).toBeTruthy();
     expect(screen.getByText("4 in · 7 hold · 8 out")).toBeTruthy();
     expect(screen.getByText("5 in · 5 out")).toBeTruthy();
+    expect(screen.getByTestId("breathe-4-7-8-sleep-card").props.className).toEqual(
+      expect.stringContaining("min-h-[100px]"),
+    );
+    expect(screen.getByTestId("breathe-4-7-8-sleep-card").props.className).toEqual(
+      expect.stringContaining("rounded-[20px]"),
+    );
+    expect(screen.getByTestId("breathe-4-7-8-sleep-card").props.className).toEqual(
+      expect.stringContaining("bg-[#14172B]/50"),
+    );
     expect(screen.queryByRole("link", { name: "Box Breathing" })).toBeNull();
     expect(screen.queryByRole("link", { name: "Diaphragmatic Breathing" })).toBeNull();
     expect(screen.queryByRole("link", { name: "Physiological Sigh" })).toBeNull();
@@ -215,12 +234,9 @@ describe("tab entry shells", () => {
     const freeBreathe = screen.getByRole("button", { name: "Free Breathe" });
 
     expect(freeBreathe).toHaveProp("accessibilityState", { disabled: true });
-    expect(StyleSheet.flatten(freeBreathe.props.style)).toEqual(
-      expect.objectContaining({
-        backgroundColor: "rgba(20, 23, 43, 0.36)",
-        boxShadow: "inset 0 1px 0 rgba(238, 240, 255, 0.045)",
-      }),
-    );
+    expect(freeBreathe.props.className).toEqual(expect.stringContaining("min-h-[88px]"));
+    expect(freeBreathe.props.className).toEqual(expect.stringContaining("rounded-[20px]"));
+    expect(freeBreathe.props.className).toEqual(expect.stringContaining("bg-[#14172B]/20"));
     expect(freeBreathe).toHaveProp(
       "accessibilityHint",
       "Custom Free Breathe settings are planned after MVP.",

@@ -17,9 +17,9 @@ export type HomeRouteTarget =
   | "/sleep/sounds"
   | "/sleep/wind-down"
   | "/breathe/coherent-breathing?durationSeconds=600"
-  | "/breathe/morning"
-  | "/breathe/midday-reset"
-  | "/breathe/evening-prep";
+  | "/breathe/coherent-breathing?durationSeconds=180"
+  | "/breathe/box-breathing?durationSeconds=300"
+  | "/breathe/4-7-8-sleep?durationSeconds=300";
 
 export type HomeIconIntent =
   | "home"
@@ -115,7 +115,7 @@ export const homePrimaryActions = {
     label: "Morning Breathwork",
     subtitle: "3 min energizing breath",
     ctaText: "Start now",
-    routeTarget: "/breathe/morning",
+    routeTarget: "/breathe/coherent-breathing?durationSeconds=180",
     iconIntent: "sunrise",
     isDistressUrgent: false,
   },
@@ -124,7 +124,7 @@ export const homePrimaryActions = {
     label: "Midday Reset",
     subtitle: "Box breathing for stress",
     ctaText: "Start now",
-    routeTarget: "/breathe/midday-reset",
+    routeTarget: "/breathe/box-breathing?durationSeconds=300",
     iconIntent: "refresh",
     isDistressUrgent: false,
   },
@@ -133,7 +133,7 @@ export const homePrimaryActions = {
     label: "Evening Wind-Down",
     subtitle: "4-7-8 breathing · rain & low strings",
     ctaText: "Start now",
-    routeTarget: "/breathe/evening-prep",
+    routeTarget: "/breathe/4-7-8-sleep?durationSeconds=300",
     iconIntent: "sunset",
     isDistressUrgent: false,
   },

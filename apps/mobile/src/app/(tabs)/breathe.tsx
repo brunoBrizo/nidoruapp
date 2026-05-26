@@ -1,12 +1,11 @@
 import { breathTechniques, type MvpBreathTechniqueId } from "@nidoru/domain";
-import { colors, radii, spacing, typography } from "@nidoru/ui-tokens";
 import { StatusBar } from "expo-status-bar";
-import { Link, type Href, usePathname } from "expo-router";
+import { type Href, usePathname, useRouter } from "expo-router";
 import { ChevronRight, Wind } from "lucide-react-native";
 import { useMemo, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { CardFade } from "../../surfaces/card-fade";
+import { Pressable, ScrollView, Text, View, cn } from "../../tw";
 
 type BreatheCategoryId = "sleep" | "calm" | "energy" | "focus";
 
@@ -98,6 +97,9 @@ const techniqueById = BREATHE_TECHNIQUE_LIBRARY.reduce(
   {} as Record<MvpBreathTechniqueId, BreatheTechniqueLibraryItem>,
 );
 
+const cardBaseClassName =
+  "relative min-h-[100px] w-full flex-row items-center justify-between gap-4 overflow-hidden rounded-[20px] border border-transparent bg-[#14172B]/50 p-4 shadow-[inset_0_1px_0_rgba(238,240,255,0.05)] active:scale-[0.96] active:bg-[#1C2040]/80";
+
 export default function BreatheTabScreen() {
   const pathname = usePathname();
   const [selectedCategoryId, setSelectedCategoryId] = useState<BreatheCategoryId>("sleep");
@@ -112,21 +114,30 @@ export default function BreatheTabScreen() {
       <StatusBar hidden={pathname === "/breathe"} />
       <ScrollView
         automaticallyAdjustContentInsets={false}
-        contentContainerStyle={styles.content}
+        className="flex-1 bg-[#0D0F1A]"
+        contentContainerClassName="gap-4 px-[30px] pb-[100px] pt-[60px]"
         contentInsetAdjustmentBehavior="never"
         showsVerticalScrollIndicator={false}
-        style={styles.screen}
+        testID="breathe-screen"
       >
-        <View style={styles.header}>
-          <Text accessibilityRole="header" selectable style={styles.title}>
+        <View className="gap-1">
+          <Text
+            accessibilityRole="header"
+            className="font-nidoru-primary-semibold text-[22px] leading-7 text-[#EEF0FF]"
+            selectable
+          >
             Breathe
           </Text>
-          <Text selectable style={styles.subtitle}>
+          <Text className="font-nidoru-primary-regular text-sm leading-5 text-[#8A8FA8]" selectable>
             Find a rhythm for right now.
           </Text>
         </View>
 
-        <View accessibilityRole="tablist" style={styles.segmentedControl} testID="breathe-tabs">
+        <View
+          accessibilityRole="tablist"
+          className="min-h-[52px] flex-row gap-0.5 rounded-2xl bg-[#14172B]/50 p-1.5 shadow-[inset_0_1px_0_rgba(238,240,255,0.05)]"
+          testID="breathe-tabs"
+        >
           {breatheCategories.map((category) => {
             const isSelected = category.id === selectedCategoryId;
 
@@ -135,17 +146,24 @@ export default function BreatheTabScreen() {
                 accessibilityLabel={category.label}
                 accessibilityRole="button"
                 accessibilityState={{ selected: isSelected }}
+                className={cn(
+                  "min-h-10 flex-1 items-center justify-center rounded-[14px] border px-1 active:scale-[0.96]",
+                  isSelected
+                    ? "border-[#7C6FCD]/20 bg-[#1C2040]/60 shadow-[0_2px_8px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(238,240,255,0.02)]"
+                    : "border-transparent bg-transparent",
+                )}
                 key={category.id}
                 onPress={() => {
                   setSelectedCategoryId(category.id);
                 }}
-                style={({ pressed }) => [
-                  styles.segmentButton,
-                  isSelected ? styles.segmentButtonSelected : styles.segmentButtonIdle,
-                  pressed ? styles.segmentButtonPressed : null,
-                ]}
               >
-                <Text style={[styles.segmentText, isSelected ? styles.segmentTextSelected : null]}>
+                <Text
+                  className={cn(
+                    "font-nidoru-primary-semibold text-sm leading-[18px]",
+                    isSelected ? "text-[#D4D8F0]" : "text-[#8A8FA8]",
+                  )}
+                  selectable={false}
+                >
                   {category.label}
                 </Text>
               </Pressable>
@@ -153,13 +171,16 @@ export default function BreatheTabScreen() {
           })}
         </View>
 
-        <View style={styles.explainer}>
-          <Text selectable style={styles.explainerText}>
+        <View className="px-1.5 pb-1 pt-4">
+          <Text
+            className="font-nidoru-primary-regular text-[13px] leading-[18px] text-[#8A8FA8]"
+            selectable
+          >
             Choose by how you want to feel.
           </Text>
         </View>
 
-        <View style={styles.cardList}>
+        <View className="gap-2">
           {visibleTechniques.map((technique) => (
             <BreatheTechniqueCard
               categoryId={selectedCategoryId}
@@ -169,27 +190,39 @@ export default function BreatheTabScreen() {
           ))}
         </View>
 
-        <View style={styles.freeBreatheSection}>
+        <View className="pb-4 pt-1">
           <Pressable
             accessibilityHint="Custom Free Breathe settings are planned after MVP."
             accessibilityLabel="Free Breathe"
             accessibilityRole="button"
             accessibilityState={{ disabled: true }}
+            className="min-h-[88px] flex-row items-center justify-between gap-4 rounded-[20px] border border-transparent bg-[#14172B]/20 p-4"
             disabled
-            style={styles.freeBreatheCard}
           >
-            <View style={styles.freeBreatheCopy}>
-              <Text style={styles.cardTitle}>Free Breathe</Text>
-              <Text style={styles.cardDescription}>Set your own inhale, hold, and exhale.</Text>
-              <View style={styles.badge}>
-                <Text style={[styles.badgeText, styles.freeBreatheBadgeText]}>Custom rhythm</Text>
+            <View className="flex-1 gap-1">
+              <Text
+                className="font-nidoru-primary-semibold text-base leading-[22px] text-[#EEF0FF]"
+                selectable
+              >
+                Free Breathe
+              </Text>
+              <Text
+                className="font-nidoru-primary-regular text-sm leading-[18px] text-[#8A8FA8]"
+                selectable
+              >
+                Set your own inhale, hold, and exhale.
+              </Text>
+              <View className="mt-1.5 self-start rounded-md border border-[#A89CE0]/10 bg-[#A89CE0]/5 px-2 py-0.5">
+                <Text className="font-nidoru-data-regular text-[11px] leading-[14px] text-[#A89CE0] tabular-nums">
+                  Custom rhythm
+                </Text>
               </View>
             </View>
-            <View style={styles.freeBreatheActions}>
-              <View style={styles.freeBreatheIconSurface}>
-                <Wind color={colors.dark.primaryGlow.value} size={18} strokeWidth={1.6} />
+            <View className="flex-row items-center gap-3">
+              <View className="h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-[#1C2040]/60">
+                <Wind color="#A89CE0" size={18} strokeWidth={1.6} />
               </View>
-              <ChevronRight color={colors.dark.textTertiary.value} size={20} strokeWidth={1.8} />
+              <ChevronRight color="#4A4E6A" size={20} strokeWidth={1.8} />
             </View>
           </Pressable>
         </View>
@@ -199,217 +232,44 @@ export default function BreatheTabScreen() {
 }
 
 function BreatheTechniqueCard({ categoryId, technique }: BreatheTechniqueCardProps) {
+  const router = useRouter();
   const label =
     categoryId === "sleep" && technique.referenceLabel ? technique.referenceLabel : technique.label;
   const description =
     technique.categoryCopy[categoryId] ?? breathTechniques[technique.id].description;
 
   return (
-    <Link asChild href={technique.href}>
-      <Pressable
-        accessibilityHint={`Starts ${technique.label} for ${technique.durationMinutes} minutes.`}
-        accessibilityLabel={label}
-        accessibilityRole="link"
-      >
-        {({ pressed }) => (
-          <View style={[styles.techniqueCard, pressed ? styles.techniqueCardPressed : null]}>
-            <CardFade testID={`breathe-${technique.id}-card-fade`} variant="breathe-sleep-card" />
-            <View style={styles.cardCopy}>
-              <Text style={styles.cardTitle}>{label}</Text>
-              <Text style={styles.cardDescription}>{description}</Text>
-              <View style={styles.badge}>
-                <Text style={styles.badgeText}>{technique.rhythmLabel}</Text>
-              </View>
-            </View>
-            <ChevronRight color={colors.dark.textTertiary.value} size={20} strokeWidth={1.8} />
-          </View>
-        )}
-      </Pressable>
-    </Link>
+    <Pressable
+      accessibilityHint={`Starts ${technique.label} for ${technique.durationMinutes} minutes.`}
+      accessibilityLabel={label}
+      accessibilityRole="link"
+      className={cardBaseClassName}
+      onPress={() => {
+        router.push(technique.href);
+      }}
+      testID={`breathe-${technique.id}-card`}
+    >
+      <CardFade testID={`breathe-${technique.id}-card-fade`} variant="breathe-sleep-card" />
+      <View className="z-10 flex-1 gap-1">
+        <Text
+          className="font-nidoru-primary-semibold text-base leading-[22px] text-[#EEF0FF]"
+          selectable
+        >
+          {label}
+        </Text>
+        <Text
+          className="font-nidoru-primary-regular text-sm leading-[18px] text-[#8A8FA8]"
+          selectable
+        >
+          {description}
+        </Text>
+        <View className="mt-1.5 self-start rounded-md border border-white/[0.03] bg-[#0D0F1A]/40 px-2 py-0.5">
+          <Text className="font-nidoru-data-regular text-[11px] leading-[14px] text-[#8A8FA8] tabular-nums">
+            {technique.rhythmLabel}
+          </Text>
+        </View>
+      </View>
+      <ChevronRight color="#4A4E6A" size={20} strokeWidth={1.8} />
+    </Pressable>
   );
 }
-
-const referenceColors = {
-  card: "rgba(20, 23, 43, 0.5)",
-  freeBreatheCard: "rgba(20, 23, 43, 0.36)",
-  selectedSegment: "rgba(28, 32, 64, 0.6)",
-  segmentSurface: "rgba(20, 23, 43, 0.5)",
-} as const;
-
-const styles = StyleSheet.create({
-  screen: {
-    backgroundColor: colors.dark.background.value,
-    flex: 1,
-  },
-  content: {
-    gap: spacing.sm,
-    paddingBottom: spacing.bottomNavigationHeight + spacing.sm,
-    paddingHorizontal: 30,
-    paddingTop: 60,
-  },
-  header: {
-    gap: 4,
-  },
-  title: {
-    color: colors.dark.textPrimary.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 22,
-    letterSpacing: 0,
-    lineHeight: 28,
-  },
-  subtitle: {
-    color: colors.dark.textSecondary.value,
-    fontFamily: typography.mobileFontFamily.primary.regular,
-    fontSize: 14,
-    lineHeight: 20,
-  },
-  segmentedControl: {
-    backgroundColor: referenceColors.segmentSurface,
-    borderRadius: 16,
-    boxShadow: "inset 0 1px 0 rgba(238, 240, 255, 0.05)",
-    flexDirection: "row",
-    gap: 2,
-    minHeight: 52,
-    padding: 6,
-  },
-  segmentButton: {
-    alignItems: "center",
-    borderRadius: 14,
-    flex: 1,
-    justifyContent: "center",
-    minHeight: 40,
-    transform: [{ scale: 1 }],
-  },
-  segmentButtonIdle: {
-    backgroundColor: "transparent",
-    borderColor: "transparent",
-    borderWidth: 1,
-  },
-  segmentButtonSelected: {
-    backgroundColor: referenceColors.selectedSegment,
-    borderColor: "rgba(124, 111, 205, 0.2)",
-    borderWidth: 1,
-    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(238, 240, 255, 0.02)",
-  },
-  segmentButtonPressed: {
-    transform: [{ scale: 0.96 }],
-  },
-  segmentText: {
-    color: colors.dark.textSecondary.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 14,
-    letterSpacing: 0,
-    lineHeight: 18,
-  },
-  segmentTextSelected: {
-    color: "#D4D8F0",
-  },
-  explainer: {
-    paddingBottom: 4,
-    paddingHorizontal: 6,
-    paddingTop: spacing.sm,
-  },
-  explainerText: {
-    color: colors.dark.textSecondary.value,
-    fontFamily: typography.mobileFontFamily.primary.regular,
-    fontSize: 13,
-    lineHeight: 18,
-  },
-  cardList: {
-    gap: spacing.xs,
-  },
-  techniqueCard: {
-    alignItems: "center",
-    alignSelf: "stretch",
-    backgroundColor: referenceColors.card,
-    borderColor: "transparent",
-    borderRadius: radii.card,
-    borderWidth: 1,
-    boxShadow: "inset 0 1px 0 rgba(238, 240, 255, 0.05)",
-    flexDirection: "row",
-    gap: spacing.sm,
-    justifyContent: "space-between",
-    minHeight: 100,
-    overflow: "hidden",
-    padding: spacing.sm,
-    position: "relative",
-    transform: [{ scale: 1 }],
-    width: "100%",
-  },
-  techniqueCardPressed: {
-    backgroundColor: "rgba(28, 32, 64, 0.8)",
-    transform: [{ scale: 0.96 }],
-  },
-  cardCopy: {
-    flex: 1,
-    gap: 4,
-    zIndex: 1,
-  },
-  cardTitle: {
-    color: colors.dark.textPrimary.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: typography.scale.bodyLarge.size,
-    letterSpacing: 0,
-    lineHeight: 22,
-  },
-  cardDescription: {
-    color: colors.dark.textSecondary.value,
-    fontFamily: typography.mobileFontFamily.primary.regular,
-    fontSize: 14,
-    lineHeight: 18,
-  },
-  badge: {
-    alignSelf: "flex-start",
-    backgroundColor: "rgba(13, 15, 26, 0.4)",
-    borderColor: "rgba(255, 255, 255, 0.03)",
-    borderRadius: 6,
-    borderWidth: 1,
-    marginTop: 6,
-    paddingHorizontal: spacing.xs,
-    paddingVertical: 2,
-  },
-  badgeText: {
-    color: colors.dark.textSecondary.value,
-    fontFamily: typography.mobileFontFamily.data.regular,
-    fontSize: 11,
-    lineHeight: 14,
-  },
-  freeBreatheSection: {
-    paddingBottom: spacing.sm,
-    paddingTop: 4,
-  },
-  freeBreatheCard: {
-    alignItems: "center",
-    backgroundColor: referenceColors.freeBreatheCard,
-    borderColor: "rgba(238, 240, 255, 0.025)",
-    borderRadius: radii.card,
-    borderWidth: 1,
-    boxShadow: "inset 0 1px 0 rgba(238, 240, 255, 0.045)",
-    flexDirection: "row",
-    gap: spacing.sm,
-    justifyContent: "space-between",
-    minHeight: 88,
-    padding: spacing.sm,
-  },
-  freeBreatheCopy: {
-    flex: 1,
-    gap: 4,
-  },
-  freeBreatheActions: {
-    alignItems: "center",
-    flexDirection: "row",
-    gap: 12,
-  },
-  freeBreatheIconSurface: {
-    alignItems: "center",
-    backgroundColor: referenceColors.selectedSegment,
-    borderRadius: 9999,
-    height: 40,
-    justifyContent: "center",
-    overflow: "hidden",
-    width: 40,
-  },
-  freeBreatheBadgeText: {
-    color: colors.dark.primaryGlow.value,
-  },
-});

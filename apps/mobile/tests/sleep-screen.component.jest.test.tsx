@@ -92,7 +92,7 @@ describe("SleepTabScreen", () => {
       expect.stringContaining("bg-[#0D0F1A]"),
     );
     expect(screen.getByTestId("sleep-screen").props.contentContainerClassName).toEqual(
-      expect.stringContaining("gap-5 px-5 pt-12 pb-[104px]"),
+      expect.stringContaining("gap-5 px-nidoru-screen pt-12 pb-[104px]"),
     );
     expect(screen.getByTestId("sleep-screen")).toHaveProp(
       "contentInsetAdjustmentBehavior",

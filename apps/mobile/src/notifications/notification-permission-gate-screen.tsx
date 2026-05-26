@@ -117,7 +117,7 @@ export function NotificationPermissionGateScreen({
           transform: [{ translateY }],
         }}
       >
-        <View className="flex-1 px-6 pt-16" testID="notification-gate-main-content">
+        <View className="flex-1 px-nidoru-screen pt-16" testID="notification-gate-main-content">
           <Text className="mb-4 font-nidoru-primary-semibold text-[13px] leading-[18px] tracking-normal text-[#A89CE0]">
             {copy.contextLabel}
           </Text>
@@ -147,7 +147,7 @@ export function NotificationPermissionGateScreen({
         </View>
 
         <View
-          className="relative z-20 w-full bg-[#0D0F1A] px-5 pb-28 pt-4"
+          className="relative z-20 w-full bg-[#0D0F1A] px-nidoru-screen pb-28 pt-4"
           testID="notification-gate-actions"
         >
           <NotificationGateActionFade />

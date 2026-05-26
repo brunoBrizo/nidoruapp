@@ -56,8 +56,8 @@ describe("NotificationPermissionGateScreen", () => {
 
     expect(screen.getByTestId("notification-gate-ambient-fade")).toBeTruthy();
     expect(modal.props.visible).toBe(true);
-    expectClassNameContains(mainClassName, ["flex-1", "px-6", "pt-16"]);
-    expectClassNameContains(actionsClassName, ["px-5", "pt-4", "pb-28"]);
+    expectClassNameContains(mainClassName, ["flex-1", "px-nidoru-screen", "pt-16"]);
+    expectClassNameContains(actionsClassName, ["px-nidoru-screen", "pt-4", "pb-28"]);
     expectClassNameContains(acceptClassName, [
       "h-14",
       "min-h-11",

@@ -56,7 +56,7 @@ export function SleepScreen() {
   return (
     <ScrollView
       className="flex-1 bg-[#0D0F1A]"
-      contentContainerClassName="gap-5 px-5 pt-12 pb-[104px]"
+      contentContainerClassName="gap-5 px-nidoru-screen pt-12 pb-[104px]"
       contentInsetAdjustmentBehavior="automatic"
       showsVerticalScrollIndicator={false}
       testID="sleep-screen"

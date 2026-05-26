@@ -71,7 +71,7 @@ describe("OnboardingPersonalizationFlowScreen", () => {
     );
 
     expectClassNameContains("onboarding-question-shell", "bg-nidoru-dark-background");
-    expectClassNameContains("onboarding-question-content", "px-6");
+    expectClassNameContains("onboarding-question-content", "px-nidoru-screen");
     expectClassNameContains("onboarding-progress-track", "w-24");
     expectClassNameContains("onboarding-progress-segment-goal", "bg-[#A89CE0]");
     expectClassNameContains("onboarding-continue-cta", "bg-[#1C2040]");
@@ -102,7 +102,7 @@ describe("OnboardingPersonalizationFlowScreen", () => {
       expect.stringContaining("text-[28px]"),
     );
     expect(screen.getByTestId("onboarding-question-content").props.className).toEqual(
-      expect.stringContaining("px-6"),
+      expect.stringContaining("px-nidoru-screen"),
     );
     expect(screen.queryByText(forbiddenPrePlanGatePattern)).toBeNull();
 

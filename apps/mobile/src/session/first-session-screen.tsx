@@ -204,8 +204,8 @@ const firstSessionClassNames = {
   endForNowButton: "min-h-12 items-center justify-center active:scale-[0.98]",
   endForNowText: "font-nidoru-primary-semibold text-[16px] leading-[22px] text-[#8A8FA8]",
   footer:
-    "relative z-10 flex-row items-center justify-between bg-gradient-to-t from-[#0D0F1A] via-[#0D0F1A] to-transparent px-7 pb-7 pt-4",
-  header: "relative z-10 items-center gap-[7px] px-6 pb-4 pt-16 text-center",
+    "relative z-10 flex-row items-center justify-between bg-gradient-to-t from-[#0D0F1A] via-[#0D0F1A] to-transparent px-nidoru-screen pb-7 pt-4",
+  header: "relative z-10 items-center gap-[7px] px-nidoru-screen pb-4 pt-16 text-center",
   innerGlow: "absolute h-[200px] w-[200px] rounded-full bg-[#7C6FCD]/20",
   midDiffusion:
     "absolute h-[220px] w-[220px] rounded-full bg-[#A89CE0]/30 shadow-[0_0_32px_rgba(168,156,224,0.22)]",
@@ -214,7 +214,7 @@ const firstSessionClassNames = {
   orbStagePaused: "opacity-30 scale-[0.85]",
   outerRing:
     "absolute h-[240px] w-[240px] rounded-full border-[1.5px] border-[#A89CE0]/25 border-t-[#A89CE0]/40",
-  overlay: "absolute inset-0 z-40 items-center justify-center bg-[#0D0F1A] px-8",
+  overlay: "absolute inset-0 z-40 items-center justify-center bg-[#0D0F1A] px-nidoru-screen",
   overlayActions: "w-full max-w-[280px] gap-3",
   overlayCopy: "mb-[34px] font-nidoru-primary-regular text-[14px] leading-[20px] text-[#8A8FA8]",
   overlayEyebrow:
@@ -236,7 +236,8 @@ const firstSessionClassNames = {
   reflectionCheckCircle:
     "h-6 w-6 items-center justify-center rounded-full border-[1.5px] border-[#2A2E50]",
   reflectionCheckSelected: "border-transparent shadow-[0_0_10px_rgba(168,156,224,0.42)]",
-  reflectionContent: "relative z-10 w-full -translate-y-7 items-center justify-center px-6",
+  reflectionContent:
+    "relative z-10 w-full -translate-y-7 items-center justify-center px-nidoru-screen",
   reflectionCopy:
     "max-w-[290px] text-center font-nidoru-primary-regular text-[14px] leading-[21px] text-[#A4AAC4]",
   reflectionError:
@@ -249,7 +250,7 @@ const firstSessionClassNames = {
     "absolute inset-0 z-50 items-center justify-center overflow-hidden bg-[#0D0F1A]",
   reflectionTitle:
     "mb-8 text-center font-nidoru-primary-semibold text-[28px] leading-[34px] tracking-normal text-[#EEF0FF]",
-  rewardActionWrap: "absolute bottom-8 left-0 right-0 items-center px-6",
+  rewardActionWrap: "absolute bottom-8 left-0 right-0 items-center px-nidoru-screen",
   rewardContinueButton:
     "h-14 w-full max-w-[342px] items-center justify-center rounded-2xl border border-[#1C2040] bg-[#1C2040] active:scale-[0.96]",
   rewardContinueText: "font-nidoru-primary-semibold text-[16px] leading-[22px] text-[#EEF0FF]",

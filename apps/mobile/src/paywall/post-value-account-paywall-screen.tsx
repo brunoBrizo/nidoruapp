@@ -96,7 +96,7 @@ export function PostValueAccountPaywallScreen({
       <ScrollView
         className="flex-1"
         contentContainerClassName={cn(
-          "px-5 pb-[360px]",
+          "px-nidoru-screen pb-[360px]",
           shouldShowPlanSelection ? "pt-16" : "pt-[62px]",
         )}
         contentInsetAdjustmentBehavior="never"
@@ -244,7 +244,7 @@ export function PostValueAccountPaywallScreen({
         pointerEvents="none"
       />
       <View
-        className="absolute bottom-0 left-0 right-0 bg-[#0D0F1A] px-5 pb-8 pt-6"
+        className="absolute bottom-0 left-0 right-0 bg-[#0D0F1A] px-nidoru-screen pb-8 pt-6"
         testID="post-value-sticky-footer"
       >
         {accessState.canShowPaywall ? (

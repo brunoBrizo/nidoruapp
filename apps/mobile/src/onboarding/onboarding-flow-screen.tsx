@@ -515,7 +515,7 @@ export function OnboardingPersonalizationFlowScreen({
         testID="onboarding-personalization-scroll"
       >
         <ReactNativeAnimatedView
-          className="flex-1 px-6"
+          className="flex-1 px-nidoru-screen"
           style={{
             opacity: entryProgress,
             paddingBottom: Math.max(safeAreaInsets.bottom + 32, 48),

@@ -147,7 +147,7 @@ describe("tab entry shells", () => {
       expect.stringContaining("bg-[#0D0F1A]"),
     );
     expect(screen.getByTestId("breathe-screen").props.contentContainerClassName).toEqual(
-      expect.stringContaining("gap-4 px-[30px] pb-[100px] pt-12"),
+      expect.stringContaining("gap-4 px-nidoru-screen pb-[100px] pt-12"),
     );
     expect(screen.getByTestId("breathe-screen")).toHaveProp(
       "contentInsetAdjustmentBehavior",
@@ -337,7 +337,7 @@ describe("tab entry shells", () => {
       expect.stringContaining("bg-nidoru-dark-background"),
     );
     expect(screen.getByTestId("profile-screen").props.contentContainerClassName).toEqual(
-      expect.stringContaining("gap-6 px-5 pt-8 pb-[112px]"),
+      expect.stringContaining("gap-6 px-nidoru-screen pt-8 pb-[112px]"),
     );
     expect(screen.getByTestId("profile-card").props.className).toEqual(
       expect.stringContaining("rounded-[20px] border border-[#1E2236]/80 bg-[#14172B] p-4"),

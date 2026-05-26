@@ -199,7 +199,7 @@ export function WindDownScreen(props: WindDownScreenProps) {
   if (state === "transition_card") {
     return (
       <WindDownFrame stateId="transition_card">
-        <View className="flex-1 justify-center px-8 pb-24">
+        <View className="flex-1 justify-center px-nidoru-screen pb-24">
           <Text
             accessibilityRole="header"
             className="max-w-[260px] font-nidoru-primary-semibold text-[28px] leading-[34px] text-[#EEF0FF]"
@@ -240,7 +240,7 @@ export function WindDownScreen(props: WindDownScreenProps) {
   if (state === "body_cue") {
     return (
       <WindDownFrame stateId="body_cue">
-        <View className="flex-1 justify-between px-8 pt-[82px] pb-[34px]">
+        <View className="flex-1 justify-between px-nidoru-screen pt-[82px] pb-[34px]">
           <View className="items-center">
             <View className="h-1 w-10 rounded-full bg-[#EEF0FF]/24" />
           </View>
@@ -290,7 +290,7 @@ export function WindDownScreen(props: WindDownScreenProps) {
   if (state === "ambient_handoff") {
     return (
       <WindDownFrame stateId="ambient_handoff">
-        <View className="flex-1 px-[30px] pt-[74px] pb-[32px]">
+        <View className="flex-1 px-nidoru-screen pt-[74px] pb-[32px]">
           <View className="items-center gap-2">
             <Text
               className="font-nidoru-data-regular text-[11px] uppercase leading-4 tracking-[0.22em] text-[#4A4E6A]"
@@ -352,7 +352,7 @@ export function WindDownScreen(props: WindDownScreenProps) {
   if (state === "dimmed_idle") {
     return (
       <WindDownFrame dimmed onPress={props.onWake} stateId="dimmed_idle">
-        <View className="flex-1 items-center justify-center px-8">
+        <View className="flex-1 items-center justify-center px-nidoru-screen">
           <Text
             accessibilityRole="header"
             className="font-nidoru-data-light text-[48px] leading-[58px] text-[#EEF0FF]/74 tabular-nums"
@@ -388,7 +388,7 @@ export function WindDownScreen(props: WindDownScreenProps) {
   if (state === "tap_to_wake") {
     return (
       <WindDownFrame stateId="tap_to_wake">
-        <View className="flex-1 items-center px-[30px] pt-[82px] pb-[34px]">
+        <View className="flex-1 items-center px-nidoru-screen pt-[82px] pb-[34px]">
           <Text
             className="font-nidoru-data-regular text-[11px] uppercase leading-4 tracking-[0.2em] text-[#4A4E6A]"
             selectable
@@ -673,7 +673,7 @@ function BreathworkState({
 
   return (
     <WindDownFrame stateId={state}>
-      <View className="flex-1 px-7 pt-[48px]">
+      <View className="flex-1 px-nidoru-screen pt-[48px]">
         <View className="items-center gap-2">
           <Text
             accessibilityRole="header"

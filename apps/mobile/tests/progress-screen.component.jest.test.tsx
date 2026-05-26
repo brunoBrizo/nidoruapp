@@ -50,7 +50,7 @@ describe("ProgressScreen Tailwind parity", () => {
       expect.stringContaining("bg-[#0D0F1A]"),
     );
     expect(screen.getByTestId("progress-screen").props.contentContainerClassName).toEqual(
-      expect.stringContaining("px-5 pt-12 pb-[104px]"),
+      expect.stringContaining("px-nidoru-screen pt-12 pb-[104px]"),
     );
     expect(screen.getByTestId("progress-stat-row").props.className).toEqual(
       expect.stringContaining("flex-row gap-3"),

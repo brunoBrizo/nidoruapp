@@ -232,7 +232,7 @@ export function HomeScreen({
       <HomeAmbientBackdrop />
       <ScrollView
         className="relative z-10 flex-1"
-        contentContainerClassName="gap-4 px-5 pt-12 pb-[104px]"
+        contentContainerClassName="gap-4 px-nidoru-screen pt-12 pb-[104px]"
         contentInsetAdjustmentBehavior="automatic"
         testID="home-screen"
       >
@@ -902,8 +902,8 @@ function WindDownLibrary() {
         </View>
       </View>
       <ScrollView
-        className="-mx-5"
-        contentContainerClassName="gap-3 px-5 pb-1"
+        className="-mx-nidoru-screen"
+        contentContainerClassName="gap-3 px-nidoru-screen pb-1"
         horizontal
         showsHorizontalScrollIndicator={false}
       >

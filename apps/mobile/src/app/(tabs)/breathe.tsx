@@ -114,7 +114,7 @@ export default function BreatheTabScreen() {
       <StatusBar hidden={pathname === "/breathe"} />
       <ScrollView
         className="flex-1 bg-[#0D0F1A]"
-        contentContainerClassName="gap-4 px-[30px] pb-[100px] pt-12"
+        contentContainerClassName="gap-4 px-nidoru-screen pb-[100px] pt-12"
         contentInsetAdjustmentBehavior="automatic"
         showsVerticalScrollIndicator={false}
         testID="breathe-screen"

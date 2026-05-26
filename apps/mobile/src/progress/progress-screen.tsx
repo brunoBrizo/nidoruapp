@@ -79,7 +79,7 @@ export function ProgressScreen() {
   return (
     <ScrollView
       className="flex-1 bg-[#0D0F1A]"
-      contentContainerClassName="px-5 pt-12 pb-[104px]"
+      contentContainerClassName="px-nidoru-screen pt-12 pb-[104px]"
       contentInsetAdjustmentBehavior="automatic"
       testID="progress-screen"
     >

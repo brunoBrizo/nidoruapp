@@ -70,7 +70,7 @@ describe("PostValueAccountPaywallScreen", () => {
     expectClassNameContains(screen.getByTestId("post-value-sticky-footer").props.className, [
       "absolute",
       "bottom-0",
-      "px-5",
+      "px-nidoru-screen",
     ]);
     expect(screen.getByTestId("post-value-paywall-top-fade")).toBeTruthy();
     expect(screen.getByText("First session complete")).toBeTruthy();

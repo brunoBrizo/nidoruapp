@@ -95,7 +95,7 @@ export function ProfileScreen() {
   return (
     <ScrollView
       className="flex-1 bg-nidoru-dark-background"
-      contentContainerClassName="gap-6 px-5 pt-8 pb-[112px]"
+      contentContainerClassName="gap-6 px-nidoru-screen pt-8 pb-[112px]"
       contentInsetAdjustmentBehavior="automatic"
       testID="profile-screen"
     >

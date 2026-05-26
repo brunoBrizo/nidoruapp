@@ -164,7 +164,7 @@ describe("HomeScreen", () => {
       expect.stringContaining("bg-nidoru-dark-background"),
     );
     expect(screen.getByTestId("home-screen").props.contentContainerClassName).toEqual(
-      expect.stringContaining("px-5 pt-12 pb-[104px]"),
+      expect.stringContaining("px-nidoru-screen pt-12 pb-[104px]"),
     );
     expect(screen.getByTestId("home-ambient-backdrop").props.className).toEqual(
       expect.stringContaining("absolute inset-0"),

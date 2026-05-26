@@ -53,6 +53,7 @@ export type HomeScreenProps = {
 };
 
 type QuickActionTone = "accent" | "danger" | "primary";
+type LibraryCardVariant = "meditation" | "rainfall" | "story";
 
 const quickActionIcons: Record<HomeQuickActionId, LucideIcon> = {
   "rescue-me": HeartPulse,
@@ -104,11 +105,11 @@ const libraryCards = [
     duration: "12 MIN",
     routeTarget: "/sleep/wind-down",
     Icon: BookOpen,
-    cardClass:
-      "bg-[#1C2040]/85 shadow-[inset_0_1px_0_rgba(238,240,255,0.08),0_10px_30px_-10px_rgba(124,111,205,0.4)]",
-    glowClass: "-right-8 -top-8 bg-[#A89CE0]/30",
-    iconClass: "border-[#A89CE0]/25 bg-[#A89CE0]/15",
+    shadowClass:
+      "shadow-[inset_0_1px_0_rgba(238,240,255,0.08),0_10px_30px_-10px_rgba(124,111,205,0.4)]",
     accentColor: "#A89CE0",
+    iconColor: "#EEF0FF",
+    variant: "story",
   },
   {
     id: "coastal-rainfall",
@@ -118,11 +119,11 @@ const libraryCards = [
     duration: "∞",
     routeTarget: "/sleep/sounds",
     Icon: Droplets,
-    cardClass:
-      "bg-[#173344]/80 shadow-[inset_0_1px_0_rgba(238,240,255,0.08),0_10px_30px_-10px_rgba(94,196,212,0.3)]",
-    glowClass: "-left-8 -top-8 bg-[#5EC4D4]/25",
-    iconClass: "border-[#5EC4D4]/25 bg-[#5EC4D4]/15",
+    shadowClass:
+      "shadow-[inset_0_1px_0_rgba(238,240,255,0.08),0_10px_30px_-10px_rgba(94,196,212,0.3)]",
     accentColor: "#5EC4D4",
+    iconColor: "#5EC4D4",
+    variant: "rainfall",
   },
   {
     id: "body-scan",
@@ -132,11 +133,11 @@ const libraryCards = [
     duration: "8 MIN",
     routeTarget: "/breathe/4-7-8-sleep?durationSeconds=300",
     Icon: Sparkles,
-    cardClass:
-      "bg-[#181B32]/90 shadow-[inset_0_1px_0_rgba(238,240,255,0.08),0_10px_30px_-10px_rgba(168,156,224,0.3)]",
-    glowClass: "-bottom-8 -right-8 bg-[#A89CE0]/20",
-    iconClass: "border-[#A89CE0]/20 bg-[#A89CE0]/15",
+    shadowClass:
+      "shadow-[inset_0_1px_0_rgba(238,240,255,0.08),0_10px_30px_-10px_rgba(168,156,224,0.3)]",
     accentColor: "#A89CE0",
+    iconColor: "#A89CE0",
+    variant: "meditation",
   },
 ] as const satisfies readonly {
   readonly id: string;
@@ -146,10 +147,10 @@ const libraryCards = [
   readonly duration: string;
   readonly routeTarget: HomeRouteTarget;
   readonly Icon: LucideIcon;
-  readonly cardClass: string;
-  readonly glowClass: string;
-  readonly iconClass: string;
   readonly accentColor: string;
+  readonly iconColor: string;
+  readonly shadowClass: string;
+  readonly variant: LibraryCardVariant;
 }[];
 
 function HomeEntrancePolish({ children }: { readonly children: ReactNode }) {
@@ -897,13 +898,16 @@ function WindDownLibrary() {
     <View className="gap-3 pt-1">
       <View className="flex-row items-center justify-between px-1">
         <View className="flex-row items-center gap-2">
-          <BookOpen color="#A89CE0" size={16} strokeWidth={1.8} />
+          <BookOpen color="#A89CE0" size={16} strokeWidth={2.1} />
           <Text className="font-nidoru-data-regular text-sm font-medium leading-[20px] text-[#EEF0FF]">
             Wind-down library
           </Text>
         </View>
         <Link asChild href="/sleep">
-          <Pressable accessibilityRole="link" className="min-h-8 flex-row items-center gap-1">
+          <Pressable
+            accessibilityRole="link"
+            className="min-h-8 shrink-0 flex-row items-center gap-1"
+          >
             <Text className="font-nidoru-data-regular text-[10px] font-medium uppercase tracking-[0.15em] text-[#7C6FCD]">
               See all
             </Text>
@@ -926,20 +930,20 @@ function WindDownLibrary() {
                 <View
                   className={cn(
                     "relative h-[180px] w-[148px] shrink-0 overflow-hidden rounded-[22px] border border-white/[0.06] p-3.5",
-                    card.cardClass,
+                    card.shadowClass,
                   )}
+                  testID={`home-library-card-${card.id}`}
                 >
-                  <View className={cn("absolute h-20 w-20 rounded-full", card.glowClass)} />
+                  <LibraryCardBackdrop id={card.id} variant={card.variant} />
                   <View className="relative z-10 h-full justify-between">
                     <View className="flex-row items-center justify-between">
-                      <View
-                        className={cn(
-                          "h-9 w-9 items-center justify-center rounded-full border",
-                          card.iconClass,
-                        )}
-                      >
-                        <Icon color={card.accentColor} size={18} strokeWidth={1.8} />
-                      </View>
+                      <LibraryIconBadge
+                        accentColor={card.accentColor}
+                        iconColor={card.iconColor}
+                        Icon={Icon}
+                        id={card.id}
+                        variant={card.variant}
+                      />
                       <Text
                         className="font-nidoru-data-regular text-[10px] tracking-wider"
                         style={{ color: card.accentColor }}
@@ -968,6 +972,153 @@ function WindDownLibrary() {
           );
         })}
       </ScrollView>
+    </View>
+  );
+}
+
+function LibraryCardBackdrop({
+  id,
+  variant,
+}: {
+  readonly id: string;
+  readonly variant: LibraryCardVariant;
+}) {
+  const isStory = variant === "story";
+  const isRainfall = variant === "rainfall";
+  const isMeditation = variant === "meditation";
+  const firstStopColor = isRainfall ? "#5EC4D4" : isStory ? "#7C6FCD" : "#A89CE0";
+  const firstStopOpacity = isRainfall ? "0.28" : isStory ? "0.35" : "0.22";
+  const glowColor = isRainfall ? "#5EC4D4" : "#A89CE0";
+  const glowOpacity = isRainfall ? "0.25" : isStory ? "0.3" : "0.2";
+  const glowCx = isRainfall ? "0" : "148";
+  const glowCy = isMeditation ? "180" : "0";
+
+  return (
+    <View
+      className="absolute inset-0"
+      pointerEvents="none"
+      testID={`home-library-card-backdrop-${id}`}
+    >
+      <Svg height="100%" preserveAspectRatio="none" viewBox="0 0 148 180" width="100%">
+        <Defs>
+          <LinearGradient id={`home-library-card-bg-${variant}`} x1="0.1" x2="0.9" y1="0" y2="1">
+            <Stop offset="0" stopColor={firstStopColor} stopOpacity={firstStopOpacity} />
+            <Stop offset="0.65" stopColor="#14172B" stopOpacity="0.9" />
+            <Stop offset="1" stopColor="#14172B" stopOpacity="0.9" />
+          </LinearGradient>
+          <RadialGradient
+            cx={glowCx}
+            cy={glowCy}
+            gradientUnits="userSpaceOnUse"
+            id={`home-library-card-glow-${variant}`}
+            r="66"
+          >
+            <Stop offset="0" stopColor={glowColor} stopOpacity={glowOpacity} />
+            <Stop offset="0.56" stopColor={glowColor} stopOpacity="0.1" />
+            <Stop offset="1" stopColor={glowColor} stopOpacity="0" />
+          </RadialGradient>
+        </Defs>
+        <Rect
+          fill={`url(#home-library-card-bg-${variant})`}
+          height="180"
+          testID={`home-library-card-gradient-${id}`}
+          width="148"
+        />
+        <Rect
+          fill={`url(#home-library-card-glow-${variant})`}
+          height="180"
+          testID={`home-library-card-glow-${id}`}
+          width="148"
+        />
+        {isStory ? (
+          <G opacity="0.5" testID="home-library-card-stars-lantern-keeper">
+            <Circle cx="44" cy="45" fill="#EEF0FF" r="1" />
+            <Circle cx="104" cy="72" fill="#A89CE0" r="1" />
+            <Circle cx="74" cy="117" fill="#EEF0FF" r="1" />
+          </G>
+        ) : null}
+        {isRainfall ? (
+          <G
+            opacity="0.6"
+            testID="home-library-card-wave-coastal-rainfall"
+            transform="translate(0 124)"
+          >
+            <Path
+              d="M0 32 Q18 18 36 30 T74 28 T112 26 T148 22 L148 56 L0 56 Z"
+              fill="#5EC4D4"
+              fillOpacity="0.15"
+              testID="home-library-card-wave-fill-coastal-rainfall"
+            />
+            <Path
+              d="M0 40 Q18 30 36 38 T74 36 T112 34 T148 32"
+              fill="none"
+              stroke="#5EC4D4"
+              strokeOpacity="0.5"
+              strokeWidth="1"
+              testID="home-library-card-wave-line-coastal-rainfall"
+            />
+          </G>
+        ) : null}
+      </Svg>
+    </View>
+  );
+}
+
+function LibraryIconBadge({
+  accentColor,
+  Icon,
+  iconColor,
+  id,
+  variant,
+}: {
+  readonly accentColor: string;
+  readonly Icon: LucideIcon;
+  readonly iconColor: string;
+  readonly id: string;
+  readonly variant: LibraryCardVariant;
+}) {
+  const secondStopColor = variant === "story" ? "#7C6FCD" : accentColor;
+  const firstStopOpacity = variant === "meditation" ? "0.25" : "0.3";
+  const secondStopOpacity = variant === "meditation" ? "0.05" : "0.1";
+  const borderClass =
+    variant === "rainfall"
+      ? "border-[#5EC4D4]/25"
+      : variant === "meditation"
+        ? "border-[#A89CE0]/20"
+        : "border-[#A89CE0]/25";
+
+  return (
+    <View
+      className={cn(
+        "relative h-9 w-9 items-center justify-center overflow-hidden rounded-full border",
+        borderClass,
+      )}
+      testID={`home-library-icon-badge-${id}`}
+    >
+      <Svg
+        height="100%"
+        preserveAspectRatio="none"
+        style={{ bottom: 0, left: 0, position: "absolute", right: 0, top: 0 }}
+        viewBox="0 0 36 36"
+        width="100%"
+      >
+        <Defs>
+          <LinearGradient id={`home-library-icon-bg-${variant}`} x1="0" x2="1" y1="0" y2="1">
+            <Stop offset="0" stopColor={accentColor} stopOpacity={firstStopOpacity} />
+            <Stop offset="1" stopColor={secondStopColor} stopOpacity={secondStopOpacity} />
+          </LinearGradient>
+        </Defs>
+        <Circle
+          cx="18"
+          cy="18"
+          fill={`url(#home-library-icon-bg-${variant})`}
+          r="18"
+          testID={`home-library-icon-gradient-${id}`}
+        />
+      </Svg>
+      <View className="relative z-10" testID={`home-library-icon-${id}`}>
+        <Icon color={iconColor} size={18} strokeWidth={2.2} />
+      </View>
     </View>
   );
 }

@@ -401,6 +401,82 @@ describe("HomeScreen", () => {
     }
   });
 
+  it("matches the home.html Wind-down library card backgrounds and icon badges", () => {
+    render(<HomeScreen now={designDate} />);
+
+    expect(screen.getByText("Wind-down library")).toBeTruthy();
+    expect(screen.getByRole("link", { name: "See all" }).props.className).toEqual(
+      expect.stringContaining("shrink-0"),
+    );
+
+    const storyCardClassName = screen.getByTestId("home-library-card-lantern-keeper").props
+      .className;
+    const rainfallCardClassName = screen.getByTestId("home-library-card-coastal-rainfall").props
+      .className;
+    const meditationCardClassName = screen.getByTestId("home-library-card-body-scan").props
+      .className;
+
+    for (const className of [storyCardClassName, rainfallCardClassName, meditationCardClassName]) {
+      expect(className).toEqual(expect.stringContaining("h-[180px] w-[148px]"));
+      expect(className).toEqual(expect.stringContaining("rounded-[22px]"));
+      expect(className).toEqual(expect.stringContaining("border-white/[0.06]"));
+      expect(className).not.toEqual(expect.stringContaining("bg-[#"));
+    }
+
+    expect(storyCardClassName).toEqual(
+      expect.stringContaining("0_10px_30px_-10px_rgba(124,111,205,0.4)"),
+    );
+    expect(rainfallCardClassName).toEqual(
+      expect.stringContaining("0_10px_30px_-10px_rgba(94,196,212,0.3)"),
+    );
+    expect(meditationCardClassName).toEqual(
+      expect.stringContaining("0_10px_30px_-10px_rgba(168,156,224,0.3)"),
+    );
+
+    expect(screen.getByTestId("home-library-card-gradient-lantern-keeper").props.fill).toEqual(
+      expect.objectContaining({ brushRef: "home-library-card-bg-story" }),
+    );
+    expect(screen.getByTestId("home-library-card-gradient-coastal-rainfall").props.fill).toEqual(
+      expect.objectContaining({ brushRef: "home-library-card-bg-rainfall" }),
+    );
+    expect(screen.getByTestId("home-library-card-gradient-body-scan").props.fill).toEqual(
+      expect.objectContaining({ brushRef: "home-library-card-bg-meditation" }),
+    );
+    expect(screen.getByTestId("home-library-card-glow-lantern-keeper").props.fill).toEqual(
+      expect.objectContaining({ brushRef: "home-library-card-glow-story" }),
+    );
+    expect(screen.getByTestId("home-library-card-stars-lantern-keeper")).toBeTruthy();
+    expect(screen.getByTestId("home-library-card-wave-coastal-rainfall")).toBeTruthy();
+    expect(screen.getByTestId("home-library-card-wave-fill-coastal-rainfall").props.d).toBe(
+      "M0 32 Q18 18 36 30 T74 28 T112 26 T148 22 L148 56 L0 56 Z",
+    );
+    expect(screen.getByTestId("home-library-card-wave-line-coastal-rainfall").props.d).toBe(
+      "M0 40 Q18 30 36 38 T74 36 T112 34 T148 32",
+    );
+
+    expect(screen.getByTestId("home-library-icon-badge-lantern-keeper").props.className).toEqual(
+      expect.stringContaining("border-[#A89CE0]/25"),
+    );
+    expect(screen.getByTestId("home-library-icon-badge-coastal-rainfall").props.className).toEqual(
+      expect.stringContaining("border-[#5EC4D4]/25"),
+    );
+    expect(screen.getByTestId("home-library-icon-badge-body-scan").props.className).toEqual(
+      expect.stringContaining("border-[#A89CE0]/20"),
+    );
+    expect(screen.getByTestId("home-library-icon-lantern-keeper")).toBeTruthy();
+    expect(screen.getByTestId("home-library-icon-coastal-rainfall")).toBeTruthy();
+    expect(screen.getByTestId("home-library-icon-body-scan")).toBeTruthy();
+
+    expect(screen.UNSAFE_getAllByType(Stop).map((node) => node.props)).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ offset: "0", stopColor: "#7C6FCD", stopOpacity: "0.35" }),
+        expect.objectContaining({ offset: "0", stopColor: "#5EC4D4", stopOpacity: "0.28" }),
+        expect.objectContaining({ offset: "0", stopColor: "#A89CE0", stopOpacity: "0.22" }),
+        expect.objectContaining({ offset: "0.65", stopColor: "#14172B", stopOpacity: "0.9" }),
+      ]),
+    );
+  });
+
   it("omits prohibited Home surfaces", () => {
     render(<HomeScreen />);
 

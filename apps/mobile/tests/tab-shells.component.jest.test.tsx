@@ -322,4 +322,39 @@ describe("tab entry shells", () => {
       ),
     ).toBeNull();
   });
+
+  it("uses Profile Tailwind primitives that match the accepted content handoff", () => {
+    render(<ProfileTabScreen />);
+
+    expect(screen.getByTestId("profile-screen").props.className).toEqual(
+      expect.stringContaining("bg-nidoru-dark-background"),
+    );
+    expect(screen.getByTestId("profile-screen").props.contentContainerClassName).toEqual(
+      expect.stringContaining("gap-6 px-5 pt-8 pb-[112px]"),
+    );
+    expect(screen.getByTestId("profile-card").props.className).toEqual(
+      expect.stringContaining("rounded-[20px] border border-[#1E2236]/80 bg-[#14172B] p-4"),
+    );
+    expect(screen.getByTestId("profile-card").props.className).toEqual(
+      expect.stringContaining("active:scale-[0.96]"),
+    );
+    expect(screen.getByTestId("profile-avatar").props.className).toEqual(
+      expect.stringContaining("h-[52px] w-[52px] rounded-full"),
+    );
+    expect(screen.getByTestId("profile-rhythm-chip").props.className).toEqual(
+      expect.stringContaining("rounded-[12px] border border-[#1E2236]/50 bg-[#0D0F1A]/50"),
+    );
+    expect(screen.getByTestId("profile-subscription-row").props.className).toEqual(
+      expect.stringContaining("min-h-[64px] rounded-[20px] border border-[#1E2236]/60"),
+    );
+
+    for (const rowId of ["settings", "notifications", "sound-preferences", "support", "privacy"]) {
+      expect(screen.getByTestId(`profile-list-row-${rowId}`).props.className).toEqual(
+        expect.stringContaining("min-h-[74px] rounded-[20px] border border-[#1E2236]/60"),
+      );
+      expect(screen.getByTestId(`profile-list-row-icon-${rowId}`).props.className).toEqual(
+        expect.stringContaining("h-10 w-10 rounded-[12px] border border-[#1E2236]/50"),
+      );
+    }
+  });
 });

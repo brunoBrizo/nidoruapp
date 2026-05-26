@@ -1,4 +1,3 @@
-import { colors, typography } from "@nidoru/ui-tokens";
 import type {
   AbandonedBreathSessionRecord,
   BreathSessionStartedRecord,
@@ -9,19 +8,11 @@ import { StatusBar } from "expo-status-bar";
 import { Bell, Pause, Play, Vibrate } from "lucide-react-native";
 import type { ReactNode } from "react";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
-import {
-  Animated,
-  AppState,
-  Easing,
-  Pressable,
-  StyleSheet,
-  Text,
-  useWindowDimensions,
-  View,
-} from "react-native";
+import { Animated, AppState, Easing, useWindowDimensions } from "react-native";
 import { SafeAreaInsetsContext } from "react-native-safe-area-context";
 import Svg, { Circle, Defs, LinearGradient, RadialGradient, Rect, Stop } from "react-native-svg";
 
+import { Pressable, ReactNativeAnimatedView, Text, View, cn } from "../tw";
 import {
   useReduceMotionEnabled,
   useReduceMotionPreference,
@@ -105,6 +96,84 @@ const rescueMeTickIntervalMs = 1000;
 const rescueMeDraftPersistIntervalMs = 15000;
 const rescueMeFinalDraftWindowMs = 10000;
 const rescueMeAudioCueModeId = "gentle-bell";
+const rescueMeIconColor = {
+  primary: "#EEF0FF",
+  secondary: "#8A8FA8",
+  secondaryDim: "rgba(138, 143, 168, 0.42)",
+} as const;
+
+const rescueMeClassNames = {
+  activeMain: "flex-1 items-center justify-center",
+  centeredState: "flex-1 items-center justify-center px-14",
+  centeredStateCompact: "-translate-y-[18px]",
+  completionCopy:
+    "mt-3 text-center font-nidoru-primary-regular text-[15px] leading-[22px] tracking-normal text-[#8A8FA8]",
+  completionTitle:
+    "mt-[54px] text-center font-nidoru-primary-semibold text-[19px] leading-[27px] tracking-normal text-[#EEF0FF]",
+  controlButton:
+    "min-h-[44px] min-w-[44px] w-16 items-center gap-2.5 active:scale-[0.96] transition-transform duration-200",
+  controlIcon:
+    "h-12 w-12 items-center justify-center rounded-full border border-[#EEF0FF]/[0.06] bg-[#14172B]/60",
+  controlLabel:
+    "text-center font-nidoru-primary-regular text-[11px] leading-[14px] tracking-normal text-[#8A8FA8]",
+  controls: "min-h-[160px] flex-row items-center justify-center gap-[38px] px-7 pb-[30px]",
+  handoffCopy:
+    "mt-3 text-center font-nidoru-primary-regular text-[13px] leading-5 tracking-normal text-[#8A8FA8]",
+  handoffTitle:
+    "mt-[54px] text-center font-nidoru-primary-semibold text-xl leading-7 tracking-normal text-[#EEF0FF]",
+  innerGlow: "absolute bg-[#A89CE0]/[0.18] shadow-[0_0_34px_rgba(168,156,224,0.22)]",
+  midGlow: "absolute bg-[#7C6FCD]/[0.12] shadow-[0_0_54px_rgba(124,111,205,0.24)]",
+  miniOrbCore: "h-16 w-16 overflow-hidden rounded-full",
+  miniOrbGlow:
+    "absolute h-[180px] w-[180px] rounded-full bg-[#7C6FCD]/[0.16] shadow-[0_0_42px_rgba(124,111,205,0.36)]",
+  miniOrbStage: "h-[116px] w-[180px] items-center justify-center",
+  orbCore: "items-center justify-center overflow-hidden shadow-[0_0_44px_rgba(124,111,205,0.4)]",
+  orbStage: "h-[300px] w-[300px] items-center justify-center",
+  outerGlow:
+    "absolute border border-[#7C6FCD]/[0.16] bg-[#7C6FCD]/[0.04] shadow-[0_0_72px_rgba(124,111,205,0.18)]",
+  pauseButton:
+    "-mt-4 h-[68px] w-[68px] min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-[#7C6FCD]/[0.28] bg-[#1C2040]/[0.64] shadow-[0_0_24px_rgba(124,111,205,0.1)] active:scale-[0.96] transition-transform duration-200",
+  phaseLabel:
+    "absolute text-center font-nidoru-primary-semibold text-[16px] leading-[22px] tracking-[0.2px] text-[#EEF0FF]/90",
+  primaryAction:
+    "mt-[46px] min-h-[44px] self-stretch items-center justify-center rounded-[13px] bg-[#7C6FCD] px-[18px] py-3 active:scale-[0.96] transition-transform duration-200",
+  primaryActionText:
+    "text-center font-nidoru-primary-semibold text-[13px] leading-[18px] tracking-normal text-[#EEF0FF]",
+  pulseRing: "absolute border-[1.2px] border-[#A89CE0]/[0.42] opacity-[0.22]",
+  pauseOverlay: "absolute inset-0 z-40 items-center justify-center bg-[#0D0F1A]/[0.94] px-[42px]",
+  pauseOverlayActions: "mt-[42px] w-full items-center gap-[18px]",
+  pauseOverlayCopy:
+    "mt-3 text-center font-nidoru-primary-regular text-[15px] leading-[22px] tracking-normal text-[#8A8FA8]",
+  pauseOverlayGlow:
+    "pointer-events-none absolute top-[34%] h-[180px] w-[180px] rounded-full bg-[#7C6FCD]/[0.13] shadow-[0_0_80px_rgba(124,111,205,0.3)]",
+  pauseOverlayPrimaryAction:
+    "min-h-12 min-w-[180px] flex-row items-center justify-center gap-2 rounded-[13px] bg-[#7C6FCD] px-5 active:scale-[0.96] transition-transform duration-200",
+  pauseOverlayPrimaryText:
+    "text-center font-nidoru-primary-semibold text-sm leading-[18px] tracking-normal text-[#EEF0FF]",
+  pauseOverlaySecondaryAction:
+    "min-h-[44px] min-w-[140px] items-center justify-center px-3 active:scale-[0.98] transition-transform duration-200",
+  pauseOverlaySecondaryText:
+    "text-center font-nidoru-primary-regular text-[13px] leading-[18px] tracking-normal text-[#8A8FA8]",
+  pauseOverlayTitle:
+    "text-center font-nidoru-primary-semibold text-[22px] leading-[30px] tracking-normal text-[#EEF0FF]",
+  reassurance:
+    "absolute bottom-[194px] self-center px-8 text-center font-nidoru-primary-regular text-[12px] leading-[18px] tracking-normal text-[rgba(138,143,168,0.78)]",
+  returnHomeButton:
+    "mt-6 min-h-[44px] min-w-[120px] items-center justify-center px-3 active:scale-[0.98] transition-transform duration-200",
+  returnHomeText:
+    "text-center font-nidoru-primary-regular text-[13px] leading-[18px] tracking-normal text-[#8A8FA8]",
+  screen: "flex-1 overflow-hidden bg-[#0D0F1A]",
+  soundBar: "w-1 rounded-full bg-[#A89CE0]",
+  soundBars: "h-[30px] flex-row items-center justify-center gap-[5px]",
+  soundBarsAura: "absolute h-[174px] w-[220px]",
+  soundBarsStage: "h-28 w-[220px] items-center justify-center",
+  soundLabel:
+    "mt-2.5 text-center font-nidoru-primary-regular text-[11px] leading-[14px] tracking-normal text-[#8A8FA8]",
+  soundPauseButton:
+    "mt-[58px] h-[50px] w-[50px] min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-[#7C6FCD]/[0.34] bg-[#1C2040]/[0.64] shadow-[0_0_24px_rgba(124,111,205,0.12)] active:scale-[0.96] transition-transform duration-200",
+  timer:
+    "text-center font-nidoru-data-regular text-[17px] leading-6 tracking-[3px] text-[#8A8FA8]/80 tabular-nums",
+} as const;
 
 const activeStateConfig: Record<ActiveState, ActiveStateConfig> = {
   "active-launch": {
@@ -178,16 +247,17 @@ export function RescueMeScreen({
     hasRecordedOrbVisibleRef.current = true;
     recordRescueMeOrbVisible();
   }, []);
-  const rootStyle = [
-    styles.screen,
-    {
-      paddingBottom: Math.max(safeAreaInsets.bottom, 0),
-      paddingTop: Math.max(safeAreaInsets.top, 0),
-    },
-  ];
+  const rootStyle = {
+    paddingBottom: Math.max(safeAreaInsets.bottom, 0),
+    paddingTop: Math.max(safeAreaInsets.top, 0),
+  };
 
   return (
-    <View style={rootStyle} testID={`rescue-me-screen-${state}`}>
+    <View
+      className={rescueMeClassNames.screen}
+      style={rootStyle}
+      testID={`rescue-me-screen-${state}`}
+    >
       <StatusBar hidden />
       <RescueMeBackground
         variant={state === "sound-handoff" || state === "sound-handoff-alt" ? "sound" : "standard"}
@@ -429,16 +499,17 @@ export function RescueMeActiveSessionScreen({
       });
   };
 
-  const rootStyle = [
-    styles.screen,
-    {
-      paddingBottom: Math.max(safeAreaInsets.bottom, 0),
-      paddingTop: Math.max(safeAreaInsets.top, 0),
-    },
-  ];
+  const rootStyle = {
+    paddingBottom: Math.max(safeAreaInsets.bottom, 0),
+    paddingTop: Math.max(safeAreaInsets.top, 0),
+  };
 
   return (
-    <View style={rootStyle} testID="rescue-me-active-session-screen">
+    <View
+      className={rescueMeClassNames.screen}
+      style={rootStyle}
+      testID="rescue-me-active-session-screen"
+    >
       <StatusBar hidden />
       <RescueMeBackground variant="standard" />
       {completionMode === "completed" ? (
@@ -475,7 +546,7 @@ function RescueMeBackground({ variant }: { readonly variant: "standard" | "sound
   const isSoundHandoff = variant === "sound";
 
   return (
-    <View pointerEvents="none" style={StyleSheet.absoluteFill} testID="rescue-me-background">
+    <View className="absolute inset-0" pointerEvents="none" testID="rescue-me-background">
       <Svg height="100%" preserveAspectRatio="none" viewBox="0 0 390 844" width="100%">
         <Defs>
           <RadialGradient
@@ -531,7 +602,10 @@ function ActiveSessionState({
 
   return (
     <>
-      <View style={[styles.activeMain, { transform: [{ translateY: orbLift }] }]}>
+      <View
+        className={rescueMeClassNames.activeMain}
+        style={{ transform: [{ translateY: orbLift }] }}
+      >
         <BreathingOrb
           accessibilityLabel={config.accessibilityLabel}
           coreSize={config.coreSize}
@@ -541,15 +615,16 @@ function ActiveSessionState({
         />
         <Text
           accessibilityLabel={`Time remaining ${config.timer}`}
+          className={rescueMeClassNames.timer}
           selectable
-          style={[styles.timer, { marginTop: config.timerOffset }]}
+          style={{ marginTop: config.timerOffset }}
         >
           {config.timer}
         </Text>
       </View>
 
       {config.showReassurance ? (
-        <Text selectable style={styles.reassurance}>
+        <Text className={rescueMeClassNames.reassurance} selectable>
           You’re doing enough. Stay with the next breath.
         </Text>
       ) : null}
@@ -581,7 +656,10 @@ function ActiveSessionRuntimeState({
 
   return (
     <>
-      <View style={[styles.activeMain, { transform: [{ translateY: orbLift }] }]}>
+      <View
+        className={rescueMeClassNames.activeMain}
+        style={{ transform: [{ translateY: orbLift }] }}
+      >
         <BreathingOrb
           accessibilityLabel={config.accessibilityLabel}
           coreSize={config.coreSize}
@@ -594,15 +672,16 @@ function ActiveSessionRuntimeState({
           accessibilityLabel={`Time remaining ${formatAccessibleRemainingTime(
             snapshot.remainingSeconds,
           )}`}
+          className={rescueMeClassNames.timer}
           selectable
-          style={[styles.timer, { marginTop: config.timerOffset }]}
+          style={{ marginTop: config.timerOffset }}
         >
           {formatRemainingTime(snapshot.remainingSeconds)}
         </Text>
       </View>
 
       {config.showReassurance ? (
-        <Text selectable style={styles.reassurance}>
+        <Text className={rescueMeClassNames.reassurance} selectable>
           You’re doing enough. Stay with the next breath.
         </Text>
       ) : null}
@@ -640,71 +719,61 @@ function BreathingOrb({
       accessibilityHint="Guides the current breath phase."
       accessibilityLabel={accessibilityLabel}
       accessibilityRole="timer"
+      className={rescueMeClassNames.orbStage}
       onLayout={onLayout}
-      style={styles.orbStage}
       testID="rescue-me-orb"
     >
       {reduceMotionEnabled ? null : (
         <View
+          className={rescueMeClassNames.outerGlow}
           pointerEvents="none"
-          style={[
-            styles.outerGlow,
-            {
-              borderRadius: outerSize / 2,
-              height: outerSize,
-              width: outerSize,
-            },
-          ]}
+          style={{
+            borderRadius: outerSize / 2,
+            height: outerSize,
+            width: outerSize,
+          }}
           testID="rescue-me-orb-outer-glow"
         />
       )}
       <View
+        className={rescueMeClassNames.midGlow}
         pointerEvents="none"
-        style={[
-          styles.midGlow,
-          {
-            borderRadius: midSize / 2,
-            height: midSize,
-            width: midSize,
-          },
-        ]}
+        style={{
+          borderRadius: midSize / 2,
+          height: midSize,
+          width: midSize,
+        }}
         testID="rescue-me-orb-mid-glow"
       />
       <View
+        className={rescueMeClassNames.innerGlow}
         pointerEvents="none"
-        style={[
-          styles.innerGlow,
-          {
-            borderRadius: innerSize / 2,
-            height: innerSize,
-            width: innerSize,
-          },
-        ]}
+        style={{
+          borderRadius: innerSize / 2,
+          height: innerSize,
+          width: innerSize,
+        }}
         testID="rescue-me-orb-inner-glow"
       />
       {reduceMotionEnabled ? null : (
         <View
+          className={rescueMeClassNames.pulseRing}
           pointerEvents="none"
-          style={[
-            styles.pulseRing,
-            {
-              borderRadius: coreSize * 0.68,
-              height: coreSize * 1.36,
-              width: coreSize * 1.36,
-            },
-          ]}
+          style={{
+            borderRadius: coreSize * 0.68,
+            height: coreSize * 1.36,
+            width: coreSize * 1.36,
+          }}
           testID="rescue-me-orb-pulse-ring"
         />
       )}
       <View
-        style={[
-          styles.orbCore,
-          {
-            borderRadius: coreSize / 2,
-            height: coreSize,
-            width: coreSize,
-          },
-        ]}
+        className={rescueMeClassNames.orbCore}
+        style={{
+          borderRadius: coreSize / 2,
+          height: coreSize,
+          width: coreSize,
+        }}
         testID="rescue-me-orb-core"
       >
         <Svg height="100%" viewBox="0 0 132 132" width="100%">
@@ -721,7 +790,7 @@ function BreathingOrb({
           <Circle cx="66" cy="66" fill="url(#rescue-orb-core-gradient)" r="66" />
           <Circle cx="66" cy="46" fill="url(#rescue-orb-highlight)" r="66" />
         </Svg>
-        <Text selectable={false} style={styles.phaseLabel}>
+        <Text className={rescueMeClassNames.phaseLabel} selectable={false}>
           {phase}
         </Text>
       </View>
@@ -739,25 +808,25 @@ function ActiveControls({
   readonly onToggleHaptics?: () => void;
 }) {
   return (
-    <View style={styles.controls} testID="rescue-me-controls">
+    <View className={rescueMeClassNames.controls} testID="rescue-me-controls">
       <ControlButton accessibilityLabel="Audio cue: Bell" label="Bell">
-        <Bell color={colors.dark.textSecondary.value} size={22} strokeWidth={1.5} />
+        <Bell color={rescueMeIconColor.secondary} size={22} strokeWidth={1.5} />
       </ControlButton>
 
       <Pressable
         accessibilityHint="Pauses this Rescue Me session."
         accessibilityLabel="Pause Rescue Me session"
         accessibilityRole="button"
+        className={rescueMeClassNames.pauseButton}
         hitSlop={8}
         onPress={onPause}
-        style={styles.pauseButton}
       >
-        <Pause color={colors.dark.textPrimary.value} size={30} strokeWidth={1.45} />
+        <Pause color={rescueMeIconColor.primary} size={30} strokeWidth={1.45} />
       </Pressable>
 
       <ControlButton accessibilityLabel="Haptics on" label="Haptics" onPress={onToggleHaptics}>
         <Vibrate
-          color={hapticsEnabled ? colors.dark.textSecondary.value : "rgba(138, 143, 168, 0.42)"}
+          color={hapticsEnabled ? rescueMeIconColor.secondary : rescueMeIconColor.secondaryDim}
           size={22}
           strokeWidth={1.45}
         />
@@ -781,12 +850,12 @@ function ControlButton({
     <Pressable
       accessibilityLabel={accessibilityLabel}
       accessibilityRole="button"
+      className={rescueMeClassNames.controlButton}
       hitSlop={8}
       onPress={onPress}
-      style={styles.controlButton}
     >
-      <View style={styles.controlIcon}>{children}</View>
-      <Text selectable={false} style={styles.controlLabel}>
+      <View className={rescueMeClassNames.controlIcon}>{children}</View>
+      <Text className={rescueMeClassNames.controlLabel} selectable={false}>
         {label}
       </Text>
     </Pressable>
@@ -803,21 +872,26 @@ function CompletionState({
   readonly onReturnHome?: () => void;
 }) {
   return (
-    <View style={[styles.centeredState, compact && styles.centeredStateCompact]}>
+    <View
+      className={cn(
+        rescueMeClassNames.centeredState,
+        compact ? rescueMeClassNames.centeredStateCompact : null,
+      )}
+    >
       <MiniOrb />
-      <Text accessibilityRole="header" selectable style={styles.completionTitle}>
+      <Text accessibilityRole="header" className={rescueMeClassNames.completionTitle} selectable>
         That took courage to start.
       </Text>
-      <Text selectable style={styles.completionCopy}>
+      <Text className={rescueMeClassNames.completionCopy} selectable>
         You completed 5 breath cycles.
       </Text>
       <Pressable
         accessibilityLabel="Continue with a calming sound"
         accessibilityRole="button"
+        className={rescueMeClassNames.primaryAction}
         onPress={onContinueWithSound}
-        style={styles.primaryAction}
       >
-        <Text selectable={false} style={styles.primaryActionText}>
+        <Text className={rescueMeClassNames.primaryActionText} selectable={false}>
           Continue with a calming sound
         </Text>
       </Pressable>
@@ -864,29 +938,32 @@ function SoundHandoffState({
 
   return (
     <View
-      style={[styles.centeredState, styles.handoffState, compact && styles.centeredStateCompact]}
+      className={cn(
+        rescueMeClassNames.centeredState,
+        compact ? rescueMeClassNames.centeredStateCompact : null,
+      )}
     >
       <SoundBars variant={state} />
-      <Text accessibilityRole="header" selectable style={styles.handoffTitle}>
+      <Text accessibilityRole="header" className={rescueMeClassNames.handoffTitle} selectable>
         Rain is playing
       </Text>
-      <Text selectable style={styles.handoffCopy}>
+      <Text className={rescueMeClassNames.handoffCopy} selectable>
         Works offline. You can stop anytime.
       </Text>
       <Pressable
         accessibilityLabel={isPlaying ? "Pause Rain sound" : "Resume Rain sound"}
         accessibilityRole="button"
+        className={rescueMeClassNames.soundPauseButton}
         hitSlop={10}
         onPress={togglePlayback}
-        style={styles.soundPauseButton}
       >
         {isPlaying ? (
-          <Pause color={colors.dark.textPrimary.value} size={28} strokeWidth={1.5} />
+          <Pause color={rescueMeIconColor.primary} size={28} strokeWidth={1.5} />
         ) : (
-          <Play color={colors.dark.textPrimary.value} size={24} strokeWidth={1.5} />
+          <Play color={rescueMeIconColor.primary} size={24} strokeWidth={1.5} />
         )}
       </Pressable>
-      <Text selectable={false} style={styles.soundLabel}>
+      <Text className={rescueMeClassNames.soundLabel} selectable={false}>
         Rain
       </Text>
       <ReturnHomeButton onPress={onReturnHome} />
@@ -896,9 +973,9 @@ function SoundHandoffState({
 
 function MiniOrb() {
   return (
-    <View style={styles.miniOrbStage} testID="rescue-me-complete-orb">
-      <View style={styles.miniOrbGlow} />
-      <View style={styles.miniOrbCore}>
+    <View className={rescueMeClassNames.miniOrbStage} testID="rescue-me-complete-orb">
+      <View className={rescueMeClassNames.miniOrbGlow} />
+      <View className={rescueMeClassNames.miniOrbCore}>
         <Svg height="100%" viewBox="0 0 64 64" width="100%">
           <Defs>
             <LinearGradient id="rescue-mini-orb-gradient" x1="0" x2="1" y1="1" y2="0">
@@ -956,33 +1033,31 @@ function SoundBars({
   }, [playbackProgress, reduceMotionEnabled, variant]);
 
   return (
-    <View style={styles.soundBarsStage} testID={`rescue-me-${variant}-bars`}>
+    <View className={rescueMeClassNames.soundBarsStage} testID={`rescue-me-${variant}-bars`}>
       <SoundHandoffIconAura />
-      <View style={styles.soundBars}>
+      <View className={rescueMeClassNames.soundBars}>
         {soundBarFrames.map(({ soundHandoff, soundHandoffAlt }, index) => (
-          <Animated.View
+          <ReactNativeAnimatedView
+            className={rescueMeClassNames.soundBar}
             key={`sound-bar-${index}`}
-            style={[
-              styles.soundBar,
-              {
-                height: soundBarMaxHeight,
-                opacity: playbackProgress.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [soundHandoff.opacity, soundHandoffAlt.opacity],
-                }),
-                transform: [
-                  {
-                    scaleY: playbackProgress.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [
-                        soundHandoff.height / soundBarMaxHeight,
-                        soundHandoffAlt.height / soundBarMaxHeight,
-                      ],
-                    }),
-                  },
-                ],
-              },
-            ]}
+            style={{
+              height: soundBarMaxHeight,
+              opacity: playbackProgress.interpolate({
+                inputRange: [0, 1],
+                outputRange: [soundHandoff.opacity, soundHandoffAlt.opacity],
+              }),
+              transform: [
+                {
+                  scaleY: playbackProgress.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [
+                      soundHandoff.height / soundBarMaxHeight,
+                      soundHandoffAlt.height / soundBarMaxHeight,
+                    ],
+                  }),
+                },
+              ],
+            }}
             testID={`rescue-me-sound-bar-${index}`}
           />
         ))}
@@ -1009,7 +1084,11 @@ const soundBarFrames = [
 
 function SoundHandoffIconAura() {
   return (
-    <View pointerEvents="none" style={styles.soundBarsAura} testID="rescue-me-sound-bars-aura">
+    <View
+      className={rescueMeClassNames.soundBarsAura}
+      pointerEvents="none"
+      testID="rescue-me-sound-bars-aura"
+    >
       <Svg height="100%" preserveAspectRatio="none" viewBox="0 0 220 174" width="100%">
         <Defs>
           <RadialGradient
@@ -1038,11 +1117,11 @@ function ReturnHomeButton({ onPress = () => undefined }: { readonly onPress?: ()
     <Pressable
       accessibilityLabel="Return home"
       accessibilityRole="button"
+      className={rescueMeClassNames.returnHomeButton}
       hitSlop={10}
       onPress={onPress}
-      style={styles.returnHomeButton}
     >
-      <Text selectable={false} style={styles.returnHomeText}>
+      <Text className={rescueMeClassNames.returnHomeText} selectable={false}>
         Return home
       </Text>
     </Pressable>
@@ -1057,33 +1136,33 @@ function RescueMePauseOverlay({
   readonly onResume: () => void;
 }) {
   return (
-    <View style={styles.pauseOverlay} testID="rescue-me-pause-overlay">
-      <View pointerEvents="none" style={styles.pauseOverlayGlow} />
-      <Text accessibilityRole="header" selectable style={styles.pauseOverlayTitle}>
+    <View className={rescueMeClassNames.pauseOverlay} testID="rescue-me-pause-overlay">
+      <View className={rescueMeClassNames.pauseOverlayGlow} pointerEvents="none" />
+      <Text accessibilityRole="header" className={rescueMeClassNames.pauseOverlayTitle} selectable>
         Paused
       </Text>
-      <Text selectable style={styles.pauseOverlayCopy}>
+      <Text className={rescueMeClassNames.pauseOverlayCopy} selectable>
         You can continue when you’re ready.
       </Text>
-      <View style={styles.pauseOverlayActions}>
+      <View className={rescueMeClassNames.pauseOverlayActions}>
         <Pressable
           accessibilityLabel="Resume Rescue Me session"
           accessibilityRole="button"
+          className={rescueMeClassNames.pauseOverlayPrimaryAction}
           onPress={onResume}
-          style={styles.pauseOverlayPrimaryAction}
         >
-          <Play color={colors.dark.textPrimary.value} size={18} strokeWidth={1.7} />
-          <Text selectable={false} style={styles.pauseOverlayPrimaryText}>
+          <Play color={rescueMeIconColor.primary} size={18} strokeWidth={1.7} />
+          <Text className={rescueMeClassNames.pauseOverlayPrimaryText} selectable={false}>
             Resume
           </Text>
         </Pressable>
         <Pressable
           accessibilityLabel="End Rescue Me for now"
           accessibilityRole="button"
+          className={rescueMeClassNames.pauseOverlaySecondaryAction}
           onPress={onEnd}
-          style={styles.pauseOverlaySecondaryAction}
         >
-          <Text selectable={false} style={styles.pauseOverlaySecondaryText}>
+          <Text className={rescueMeClassNames.pauseOverlaySecondaryText} selectable={false}>
             End for now
           </Text>
         </Pressable>
@@ -1208,357 +1287,3 @@ function captureRescueMeAnalyticsEvent(eventName: RescueMeAnalyticsEventName): v
     // Telemetry must never block Rescue Me rendering or local persistence.
   }
 }
-
-const styles = StyleSheet.create({
-  activeMain: {
-    alignItems: "center",
-    flex: 1,
-    justifyContent: "center",
-  },
-  centeredState: {
-    alignItems: "center",
-    flex: 1,
-    justifyContent: "center",
-    paddingHorizontal: 56,
-  },
-  centeredStateCompact: {
-    transform: [{ translateY: -18 }],
-  },
-  completionCopy: {
-    color: colors.dark.textSecondary.value,
-    fontFamily: typography.mobileFontFamily.primary.regular,
-    fontSize: 15,
-    letterSpacing: 0,
-    lineHeight: 22,
-    marginTop: 12,
-    textAlign: "center",
-  },
-  completionTitle: {
-    color: colors.dark.textPrimary.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 19,
-    letterSpacing: 0,
-    lineHeight: 27,
-    marginTop: 54,
-    textAlign: "center",
-  },
-  controlButton: {
-    alignItems: "center",
-    gap: 10,
-    minHeight: 44,
-    minWidth: 44,
-    width: 64,
-  },
-  controlIcon: {
-    alignItems: "center",
-    backgroundColor: "rgba(20, 23, 43, 0.6)",
-    borderColor: "rgba(238, 240, 255, 0.06)",
-    borderRadius: 24,
-    borderWidth: 1,
-    height: 48,
-    justifyContent: "center",
-    width: 48,
-  },
-  controlLabel: {
-    color: colors.dark.textSecondary.value,
-    fontFamily: typography.mobileFontFamily.primary.regular,
-    fontSize: 11,
-    letterSpacing: 0,
-    lineHeight: 14,
-    textAlign: "center",
-  },
-  controls: {
-    alignItems: "center",
-    flexDirection: "row",
-    gap: 38,
-    justifyContent: "center",
-    minHeight: 160,
-    paddingBottom: 30,
-    paddingHorizontal: 28,
-  },
-  handoffCopy: {
-    color: colors.dark.textSecondary.value,
-    fontFamily: typography.mobileFontFamily.primary.regular,
-    fontSize: 13,
-    letterSpacing: 0,
-    lineHeight: 20,
-    marginTop: 12,
-    textAlign: "center",
-  },
-  handoffState: {
-    justifyContent: "center",
-  },
-  handoffTitle: {
-    color: colors.dark.textPrimary.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 20,
-    letterSpacing: 0,
-    lineHeight: 28,
-    marginTop: 54,
-    textAlign: "center",
-  },
-  innerGlow: {
-    backgroundColor: "rgba(168, 156, 224, 0.18)",
-    boxShadow: "0 0 34px rgba(168, 156, 224, 0.22)",
-    position: "absolute",
-  },
-  midGlow: {
-    backgroundColor: "rgba(124, 111, 205, 0.12)",
-    boxShadow: "0 0 54px rgba(124, 111, 205, 0.24)",
-    position: "absolute",
-  },
-  miniOrbCore: {
-    borderRadius: 32,
-    height: 64,
-    overflow: "hidden",
-    width: 64,
-  },
-  miniOrbGlow: {
-    backgroundColor: "rgba(124, 111, 205, 0.16)",
-    borderRadius: 90,
-    boxShadow: "0 0 42px rgba(124, 111, 205, 0.36)",
-    height: 180,
-    position: "absolute",
-    width: 180,
-  },
-  miniOrbStage: {
-    alignItems: "center",
-    height: 116,
-    justifyContent: "center",
-    width: 180,
-  },
-  orbCore: {
-    alignItems: "center",
-    boxShadow: "0 0 44px rgba(124, 111, 205, 0.4)",
-    justifyContent: "center",
-    overflow: "hidden",
-  },
-  orbStage: {
-    alignItems: "center",
-    height: 300,
-    justifyContent: "center",
-    width: 300,
-  },
-  outerGlow: {
-    backgroundColor: "rgba(124, 111, 205, 0.04)",
-    borderColor: "rgba(124, 111, 205, 0.16)",
-    borderWidth: 1,
-    boxShadow: "0 0 72px rgba(124, 111, 205, 0.18)",
-    position: "absolute",
-  },
-  pauseButton: {
-    alignItems: "center",
-    backgroundColor: "rgba(28, 32, 64, 0.64)",
-    borderColor: "rgba(124, 111, 205, 0.28)",
-    borderRadius: 34,
-    borderWidth: 1,
-    boxShadow: "0 0 24px rgba(124, 111, 205, 0.1)",
-    height: 68,
-    justifyContent: "center",
-    marginTop: -16,
-    minHeight: 44,
-    minWidth: 44,
-    width: 68,
-  },
-  phaseLabel: {
-    color: "rgba(238, 240, 255, 0.9)",
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 16,
-    letterSpacing: 0.2,
-    lineHeight: 22,
-    position: "absolute",
-    textAlign: "center",
-  },
-  primaryAction: {
-    alignItems: "center",
-    alignSelf: "stretch",
-    backgroundColor: colors.dark.primary.value,
-    borderRadius: 13,
-    justifyContent: "center",
-    marginTop: 46,
-    minHeight: 44,
-    paddingHorizontal: 18,
-    paddingVertical: 12,
-  },
-  primaryActionText: {
-    color: colors.dark.textPrimary.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 13,
-    letterSpacing: 0,
-    lineHeight: 18,
-    textAlign: "center",
-  },
-  pulseRing: {
-    borderColor: "rgba(168, 156, 224, 0.42)",
-    borderWidth: 1.2,
-    opacity: 0.22,
-    position: "absolute",
-  },
-  pauseOverlay: {
-    alignItems: "center",
-    backgroundColor: "rgba(13, 15, 26, 0.94)",
-    bottom: 0,
-    justifyContent: "center",
-    left: 0,
-    paddingHorizontal: 42,
-    position: "absolute",
-    right: 0,
-    top: 0,
-  },
-  pauseOverlayActions: {
-    alignItems: "center",
-    gap: 18,
-    marginTop: 42,
-    width: "100%",
-  },
-  pauseOverlayCopy: {
-    color: colors.dark.textSecondary.value,
-    fontFamily: typography.mobileFontFamily.primary.regular,
-    fontSize: 15,
-    letterSpacing: 0,
-    lineHeight: 22,
-    marginTop: 12,
-    textAlign: "center",
-  },
-  pauseOverlayGlow: {
-    backgroundColor: "rgba(124, 111, 205, 0.13)",
-    borderRadius: 120,
-    boxShadow: "0 0 80px rgba(124, 111, 205, 0.3)",
-    height: 180,
-    position: "absolute",
-    top: "34%",
-    width: 180,
-  },
-  pauseOverlayPrimaryAction: {
-    alignItems: "center",
-    backgroundColor: colors.dark.primary.value,
-    borderRadius: 13,
-    flexDirection: "row",
-    gap: 8,
-    justifyContent: "center",
-    minHeight: 48,
-    minWidth: 180,
-    paddingHorizontal: 20,
-  },
-  pauseOverlayPrimaryText: {
-    color: colors.dark.textPrimary.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 14,
-    letterSpacing: 0,
-    lineHeight: 18,
-    textAlign: "center",
-  },
-  pauseOverlaySecondaryAction: {
-    alignItems: "center",
-    justifyContent: "center",
-    minHeight: 44,
-    minWidth: 140,
-    paddingHorizontal: 12,
-  },
-  pauseOverlaySecondaryText: {
-    color: colors.dark.textSecondary.value,
-    fontFamily: typography.mobileFontFamily.primary.regular,
-    fontSize: 13,
-    letterSpacing: 0,
-    lineHeight: 18,
-    textAlign: "center",
-  },
-  pauseOverlayTitle: {
-    color: colors.dark.textPrimary.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 22,
-    letterSpacing: 0,
-    lineHeight: 30,
-    textAlign: "center",
-  },
-  reassurance: {
-    alignSelf: "center",
-    backgroundColor: undefined,
-    bottom: 194,
-    color: "rgba(138, 143, 168, 0.78)",
-    fontFamily: typography.mobileFontFamily.primary.regular,
-    fontSize: 12,
-    letterSpacing: 0,
-    lineHeight: 18,
-    paddingHorizontal: 32,
-    position: "absolute",
-    textAlign: "center",
-  },
-  returnHomeButton: {
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 24,
-    minHeight: 44,
-    minWidth: 120,
-    paddingHorizontal: 12,
-  },
-  returnHomeText: {
-    color: colors.dark.textSecondary.value,
-    fontFamily: typography.mobileFontFamily.primary.regular,
-    fontSize: 13,
-    letterSpacing: 0,
-    lineHeight: 18,
-    textAlign: "center",
-  },
-  screen: {
-    backgroundColor: colors.dark.background.value,
-    flex: 1,
-    overflow: "hidden",
-  },
-  soundBar: {
-    backgroundColor: colors.dark.primaryGlow.value,
-    borderRadius: 9999,
-    width: 4,
-  },
-  soundBars: {
-    alignItems: "center",
-    flexDirection: "row",
-    gap: 5,
-    height: 30,
-    justifyContent: "center",
-  },
-  soundBarsAura: {
-    height: 174,
-    position: "absolute",
-    width: 220,
-  },
-  soundBarsStage: {
-    alignItems: "center",
-    height: 112,
-    justifyContent: "center",
-    width: 220,
-  },
-  soundLabel: {
-    color: colors.dark.textSecondary.value,
-    fontFamily: typography.mobileFontFamily.primary.regular,
-    fontSize: 11,
-    letterSpacing: 0,
-    lineHeight: 14,
-    marginTop: 10,
-    textAlign: "center",
-  },
-  soundPauseButton: {
-    alignItems: "center",
-    backgroundColor: "rgba(28, 32, 64, 0.64)",
-    borderColor: "rgba(124, 111, 205, 0.34)",
-    borderRadius: 25,
-    borderWidth: 1,
-    boxShadow: "0 0 24px rgba(124, 111, 205, 0.12)",
-    height: 50,
-    justifyContent: "center",
-    marginTop: 58,
-    minHeight: 44,
-    minWidth: 44,
-    width: 50,
-  },
-  timer: {
-    color: colors.dark.textSecondary.value,
-    fontFamily: typography.mobileFontFamily.data.regular,
-    fontSize: 17,
-    fontVariant: ["tabular-nums"],
-    letterSpacing: 3,
-    lineHeight: 24,
-    opacity: 0.8,
-    textAlign: "center",
-  },
-});

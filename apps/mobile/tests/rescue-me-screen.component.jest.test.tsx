@@ -1,5 +1,7 @@
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react-native";
 import { afterEach, beforeEach, describe, expect, it, jest } from "@jest/globals";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import {
   AccessibilityInfo,
   Animated,
@@ -22,6 +24,16 @@ const mockSoundHandoffAudioPlayer = {
 const mockCreateAudioPlayer = jest.fn(() => mockSoundHandoffAudioPlayer);
 const mockSetAudioModeAsync = jest.fn(() => Promise.resolve());
 const mockSetIsAudioActiveAsync = jest.fn(() => Promise.resolve());
+
+jest.mock("react-native-css", () => {
+  const React = jest.requireActual<typeof import("react")>("react");
+
+  return {
+    useCssElement: (Component: React.ElementType, props: Record<string, unknown>) =>
+      React.createElement(Component, props),
+    useNativeVariable: (variable: string) => `mocked-${variable}`,
+  };
+});
 
 jest.mock("expo-audio", () => ({
   createAudioPlayer: mockCreateAudioPlayer,
@@ -139,6 +151,17 @@ describe("RescueMeScreen", () => {
     jest.useRealTimers();
   });
 
+  it("uses Tailwind classes instead of static StyleSheet styling", () => {
+    const rescueMeScreenSource = readFileSync(
+      resolve(__dirname, "../src/rescue/rescue-me-screen.tsx"),
+      "utf8",
+    );
+
+    expect(rescueMeScreenSource).toContain('from "../tw"');
+    expect(rescueMeScreenSource).toContain("className=");
+    expect(rescueMeScreenSource).not.toMatch(/StyleSheet\.create|styles\./);
+  });
+
   it("renders every accepted visual state without setup or gate surfaces", () => {
     for (const state of RESCUE_ME_SCREEN_STATES) {
       const { unmount } = render(<RescueMeScreen state={state} />);
@@ -182,14 +205,14 @@ describe("RescueMeScreen", () => {
 
     expect(screen.getByLabelText("Exhale breathing phase")).toBeTruthy();
     expect(reassurance).toBeTruthy();
-    expect(StyleSheet.flatten(reassurance.props.style)).toEqual(
-      expect.objectContaining({
-        backgroundColor: undefined,
-        color: "rgba(138, 143, 168, 0.78)",
-        fontSize: 12,
-        textAlign: "center",
-      }),
+    expect(reassurance.props.className).toEqual(expect.stringContaining("absolute"));
+    expect(reassurance.props.className).toEqual(expect.stringContaining("bottom-[194px]"));
+    expect(reassurance.props.className).toEqual(
+      expect.stringContaining("text-[rgba(138,143,168,0.78)]"),
     );
+    expect(reassurance.props.className).toEqual(expect.stringContaining("text-[12px]"));
+    expect(reassurance.props.className).toEqual(expect.stringContaining("text-center"));
+    expect(reassurance.props.className).not.toMatch(/\bbg-/);
   });
 
   it("renders completion copy and quiet actions exactly", () => {
@@ -219,21 +242,18 @@ describe("RescueMeScreen", () => {
   it("renders the handoff sound icon with a fading aura and animated playback bars", () => {
     render(<RescueMeScreen state="sound-handoff" />);
 
-    const auraStyle = StyleSheet.flatten(
-      screen.getByTestId("rescue-me-sound-bars-aura").props.style,
-    );
+    const auraClassName = screen.getByTestId("rescue-me-sound-bars-aura").props.className;
     const firstBarStyle = StyleSheet.flatten(
       screen.getByTestId("rescue-me-sound-bar-0").props.style,
     );
 
-    expect(auraStyle).toEqual(
-      expect.objectContaining({
-        height: 174,
-        position: "absolute",
-        width: 220,
-      }),
+    expect(auraClassName).toEqual(expect.stringContaining("absolute"));
+    expect(auraClassName).toEqual(expect.stringContaining("h-[174px]"));
+    expect(auraClassName).toEqual(expect.stringContaining("w-[220px]"));
+    expect(auraClassName).not.toMatch(/\bbg-/);
+    expect(screen.getByTestId("rescue-me-sound-bar-0").props.className).toEqual(
+      expect.stringContaining("bg-[#A89CE0]"),
     );
-    expect(auraStyle.backgroundColor).toBeUndefined();
     expect(firstBarStyle.height).toBe(24);
     expect(firstBarStyle.opacity).toBe(0.92);
     expect(firstBarStyle.transform).toEqual([
@@ -327,6 +347,7 @@ describe("RescueMeScreen", () => {
 
       expect(JSON.stringify(screenRoot.props.style)).not.toContain("#FF6B6B");
       expect(JSON.stringify(screenRoot.props.style)).not.toContain("255, 107, 107");
+      expect(screenRoot.props.className).not.toContain("#FF6B6B");
 
       unmount();
     }
@@ -338,24 +359,16 @@ describe("RescueMeScreen", () => {
     for (const label of ["Audio cue: Bell", "Pause Rescue Me session", "Haptics on"]) {
       const button = screen.getByRole("button", { name: label });
 
-      expect(StyleSheet.flatten(button.props.style)).toEqual(
-        expect.objectContaining({
-          minHeight: 44,
-          minWidth: 44,
-        }),
-      );
+      expect(button.props.className).toEqual(expect.stringContaining("min-h-[44px]"));
+      expect(button.props.className).toEqual(expect.stringContaining("min-w-[44px]"));
     }
 
     const pauseButton = within(screen.getByTestId("rescue-me-controls")).getByRole("button", {
       name: "Pause Rescue Me session",
     });
 
-    expect(StyleSheet.flatten(pauseButton.props.style)).toEqual(
-      expect.objectContaining({
-        height: 68,
-        width: 68,
-      }),
-    );
+    expect(pauseButton.props.className).toEqual(expect.stringContaining("h-[68px]"));
+    expect(pauseButton.props.className).toEqual(expect.stringContaining("w-[68px]"));
   });
 
   it("starts the fixed Rescue Me runtime without launch setup copy", async () => {
@@ -473,11 +486,11 @@ describe("RescueMeScreen", () => {
     render(<RescueMeActiveSessionScreen {...rescueSessionProps} />);
 
     expect(screen.queryByText("You’re doing enough. Stay with the next breath.")).toBeNull();
-    expect(StyleSheet.flatten(screen.getByTestId("rescue-me-orb").props.style)).toEqual(
-      expect.objectContaining({
-        height: 300,
-        width: 300,
-      }),
+    expect(screen.getByTestId("rescue-me-orb").props.className).toEqual(
+      expect.stringContaining("h-[300px]"),
+    );
+    expect(screen.getByTestId("rescue-me-orb").props.className).toEqual(
+      expect.stringContaining("w-[300px]"),
     );
 
     await act(async () => {
@@ -488,11 +501,11 @@ describe("RescueMeScreen", () => {
     const reassurance = screen.getByText("You’re doing enough. Stay with the next breath.");
 
     expect(reassurance).toBeTruthy();
-    expect(StyleSheet.flatten(screen.getByTestId("rescue-me-orb").props.style)).toEqual(
-      expect.objectContaining({
-        height: 300,
-        width: 300,
-      }),
+    expect(screen.getByTestId("rescue-me-orb").props.className).toEqual(
+      expect.stringContaining("h-[300px]"),
+    );
+    expect(screen.getByTestId("rescue-me-orb").props.className).toEqual(
+      expect.stringContaining("w-[300px]"),
     );
   });
 

@@ -1375,7 +1375,7 @@
       "label": "cn()",
       "file_type": "code",
       "source_file": "apps/mobile/src/home/home-screen.tsx",
-      "source_location": "L351",
+      "source_location": "L367",
       "id": "home_screen_cn",
       "community": 2,
       "norm_label": "cn()"
@@ -5466,7 +5466,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/home/home-screen.tsx",
-      "source_location": "L351",
+      "source_location": "L367",
       "weight": 1.0,
       "_src": "apps_mobile_src_home_home_screen_tsx",
       "_tgt": "home_screen_cn",

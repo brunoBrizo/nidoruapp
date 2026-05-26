@@ -161,9 +161,27 @@ describe("HomeScreen", () => {
     expect(screen.getByTestId("home-primary-card").props.className).toEqual(
       expect.stringContaining("shadow-[inset_0_1px_0_rgba(238,240,255,0.08)"),
     );
-    expect(screen.getByTestId("home-primary-button-frame").props.className).toEqual(
-      expect.stringContaining("bg-[#A89CE0]"),
+    expect(screen.getByTestId("home-primary-card").props.className).not.toEqual(
+      expect.stringContaining("bg-[#14172B]"),
     );
+    expect(screen.getByTestId("home-primary-card-backdrop")).toBeTruthy();
+    expect(screen.getByTestId("home-primary-card-gradient")).toBeTruthy();
+    expect(screen.getByTestId("home-primary-card-lavender-glow")).toBeTruthy();
+    expect(screen.getByTestId("home-primary-card-moonstone-glow")).toBeTruthy();
+    expect(screen.getByTestId("home-ritual-scene").props.className).not.toEqual(
+      expect.stringContaining("bg-[#111426]"),
+    );
+    expect(screen.getByTestId("home-ritual-scene-svg")).toBeTruthy();
+    expect(screen.getByTestId("home-mountain-far").props.d).toBe(
+      "M0 124 L60 94 L110 114 L160 86 L220 119 L280 92 L340 112 L390 96 L390 144 L0 144 Z",
+    );
+    expect(screen.getByTestId("home-mountain-near").props.d).toBe(
+      "M0 134 L40 114 L90 129 L150 106 L210 132 L260 114 L320 130 L390 116 L390 144 L0 144 Z",
+    );
+    expect(screen.getByTestId("home-primary-button-frame").props.className).toEqual(
+      expect.stringContaining("overflow-hidden"),
+    );
+    expect(screen.getByTestId("home-primary-button-gradient")).toBeTruthy();
     expect(screen.getByTestId("home-primary-button-frame").props.className).toEqual(
       expect.stringContaining("active:scale-[0.97]"),
     );

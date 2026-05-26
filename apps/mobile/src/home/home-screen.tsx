@@ -261,13 +261,12 @@ export function HomeScreen({
 
         <View
           className={cn(
-            "relative overflow-hidden rounded-[28px] border border-white/[0.06] bg-[#14172B]/90 p-5 shadow-[inset_0_1px_0_rgba(238,240,255,0.08),0_20px_60px_-15px_rgba(124,111,205,0.45)]",
+            "relative overflow-hidden rounded-[28px] border border-white/[0.06] p-5 shadow-[inset_0_1px_0_rgba(238,240,255,0.08),0_20px_60px_-15px_rgba(124,111,205,0.45)]",
             primaryAction.isDistressUrgent ? "border-[#FF6B6B]/16" : null,
           )}
           testID="home-primary-card"
         >
-          <View className="pointer-events-none absolute right-0 top-0 h-40 w-40 rounded-full bg-[#A89CE0]/10" />
-          <View className="pointer-events-none absolute -bottom-10 -left-10 h-36 w-36 rounded-full bg-[#5EC4D4]/10" />
+          <PrimaryCardBackdrop />
 
           <View className="relative z-10 mb-1 flex-row items-center justify-between">
             <Text className="font-nidoru-data-regular text-[10px] font-medium uppercase tracking-[0.2em] text-[#A89CE0]/90">
@@ -300,13 +299,30 @@ export function HomeScreen({
               onPress={() => markRescueMeTapIfNeeded(primaryAction.id)}
             >
               <View
-                className="h-[52px] w-full flex-row items-center justify-center gap-2 rounded-[16px] bg-[#A89CE0] py-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_8px_20px_-5px_rgba(124,111,205,0.6)] active:scale-[0.97]"
+                className="relative h-[52px] w-full flex-row items-center justify-center gap-2 overflow-hidden rounded-[16px] py-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_8px_20px_-5px_rgba(124,111,205,0.6)] active:scale-[0.97]"
                 testID="home-primary-button-frame"
               >
-                <Play color="#0D0F1A" fill="#0D0F1A" size={15} strokeWidth={2} />
-                <Text className="font-nidoru-data-regular text-sm font-semibold leading-[20px] text-[#0D0F1A]">
-                  {primaryAction.ctaText}
-                </Text>
+                <View
+                  className="absolute inset-0 overflow-hidden rounded-[16px]"
+                  pointerEvents="none"
+                  testID="home-primary-button-gradient"
+                >
+                  <Svg height={52} preserveAspectRatio="none" viewBox="0 0 310 52" width="100%">
+                    <Defs>
+                      <LinearGradient id="home-start-button-bg" x1="0" x2="0" y1="0" y2="1">
+                        <Stop offset="0" stopColor="#A89CE0" />
+                        <Stop offset="1" stopColor="#7C6FCD" />
+                      </LinearGradient>
+                    </Defs>
+                    <Rect fill="url(#home-start-button-bg)" height="52" rx="16" width="310" />
+                  </Svg>
+                </View>
+                <View className="relative z-10 flex-row items-center gap-2">
+                  <Play color="#0D0F1A" fill="#0D0F1A" size={15} strokeWidth={2} />
+                  <Text className="font-nidoru-data-regular text-sm font-semibold leading-[20px] text-[#0D0F1A]">
+                    {primaryAction.ctaText}
+                  </Text>
+                </View>
               </View>
             </Pressable>
           </Link>
@@ -370,6 +386,66 @@ export function HomeScreen({
         </HomeEntrancePolish>
       </ScrollView>
       {notificationGateController}
+    </View>
+  );
+}
+
+function PrimaryCardBackdrop() {
+  return (
+    <View
+      className="absolute inset-0"
+      pointerEvents="none"
+      testID="home-primary-card-backdrop"
+    >
+      <Svg height="100%" preserveAspectRatio="none" viewBox="0 0 350 310" width="100%">
+        <Defs>
+          <LinearGradient id="home-primary-card-bg" x1="0.18" x2="0.82" y1="0" y2="1">
+            <Stop offset="0" stopColor="#7C6FCD" stopOpacity="0.22" />
+            <Stop offset="0.5" stopColor="#14172B" stopOpacity="0.85" />
+            <Stop offset="1" stopColor="#0F1230" stopOpacity="0.95" />
+          </LinearGradient>
+          <RadialGradient
+            cx="238"
+            cy="112"
+            gradientUnits="userSpaceOnUse"
+            id="home-primary-card-lavender-glow"
+            r="172"
+          >
+            <Stop offset="0" stopColor="#A89CE0" stopOpacity="0.2" />
+            <Stop offset="0.65" stopColor="#A89CE0" stopOpacity="0.1" />
+            <Stop offset="1" stopColor="#A89CE0" stopOpacity="0" />
+          </RadialGradient>
+          <RadialGradient
+            cx="56"
+            cy="366"
+            gradientUnits="userSpaceOnUse"
+            id="home-primary-card-moonstone-glow"
+            r="156"
+          >
+            <Stop offset="0" stopColor="#5EC4D4" stopOpacity="0.1" />
+            <Stop offset="0.62" stopColor="#5EC4D4" stopOpacity="0.05" />
+            <Stop offset="1" stopColor="#5EC4D4" stopOpacity="0" />
+          </RadialGradient>
+        </Defs>
+        <Rect
+          fill="url(#home-primary-card-bg)"
+          height="310"
+          testID="home-primary-card-gradient"
+          width="350"
+        />
+        <Rect
+          fill="url(#home-primary-card-lavender-glow)"
+          height="310"
+          testID="home-primary-card-lavender-glow"
+          width="350"
+        />
+        <Rect
+          fill="url(#home-primary-card-moonstone-glow)"
+          height="310"
+          testID="home-primary-card-moonstone-glow"
+          width="350"
+        />
+      </Svg>
     </View>
   );
 }
@@ -467,51 +543,97 @@ function HomeAmbientBackdrop() {
 function RitualScene() {
   return (
     <View
-      className="relative z-10 mb-6 h-36 overflow-hidden rounded-[20px] border border-white/[0.05] bg-[#111426]/70"
+      className="relative z-10 mb-6 h-36 overflow-hidden rounded-[20px] border border-white/[0.05]"
       testID="home-ritual-scene"
     >
-      <Svg height="100%" width="100%">
-        <Circle cx="18%" cy="28%" fill="#EEF0FF" opacity="0.7" r="1" />
-        <Circle cx="72%" cy="18%" fill="#A89CE0" opacity="0.75" r="1" />
-        <Circle cx="42%" cy="44%" fill="#EEF0FF" opacity="0.72" r="1" />
-        <Circle cx="88%" cy="38%" fill="#5EC4D4" opacity="0.72" r="1" />
-        <Circle cx="12%" cy="62%" fill="#EEF0FF" opacity="0.72" r="1" />
-        <Circle cx="58%" cy="30%" fill="#EEF0FF" opacity="0.8" r="1.5" />
-        <Circle cx="32%" cy="12%" fill="#A89CE0" opacity="0.75" r="1" />
-        <Circle cx="80%" cy="60%" fill="#EEF0FF" opacity="0.7" r="1" />
-      </Svg>
       <Svg
-        height={80}
+        height="100%"
         preserveAspectRatio="none"
-        viewBox="0 0 390 80"
+        style={{ bottom: 0, left: 0, position: "absolute", right: 0, top: 0 }}
+        testID="home-ritual-scene-svg"
+        viewBox="0 0 390 144"
         width="100%"
-        className="absolute bottom-0 left-0"
       >
         <Defs>
-          <LinearGradient id="home-mountain-far" x1="0" x2="0" y1="0" y2="1">
-            <Stop offset="0" stopColor="#7C6FCD" stopOpacity="0.75" />
-            <Stop offset="1" stopColor="#252A52" stopOpacity="0.72" />
+          <LinearGradient id="home-ritual-scene-bg" x1="0" x2="0" y1="0" y2="1">
+            <Stop offset="0" stopColor="#0D0F1A" stopOpacity="0" />
+            <Stop offset="0.7" stopColor="#0D0F1A" stopOpacity="0.35" />
+            <Stop offset="1" stopColor="#0D0F1A" stopOpacity="0.6" />
           </LinearGradient>
-          <LinearGradient id="home-mountain-near" x1="0" x2="0" y1="0" y2="1">
-            <Stop offset="0" stopColor="#252A52" />
-            <Stop offset="1" stopColor="#111426" />
+          <LinearGradient
+            gradientUnits="userSpaceOnUse"
+            id="home-mountain-far"
+            x1="0"
+            x2="0"
+            y1="64"
+            y2="144"
+          >
+            <Stop offset="0" stopColor="#7C6FCD" stopOpacity="0.55" />
+            <Stop offset="1" stopColor="#14172B" stopOpacity="0.9" />
+          </LinearGradient>
+          <LinearGradient
+            gradientUnits="userSpaceOnUse"
+            id="home-mountain-near"
+            x1="0"
+            x2="0"
+            y1="64"
+            y2="144"
+          >
+            <Stop offset="0" stopColor="#1C2040" />
+            <Stop offset="1" stopColor="#0D0F1A" />
           </LinearGradient>
         </Defs>
+        <Rect fill="url(#home-ritual-scene-bg)" height="144" width="390" />
+        <Circle cx="70.2" cy="40.32" fill="#EEF0FF" opacity="0.7" r="1" />
+        <Circle cx="280.8" cy="25.92" fill="#A89CE0" opacity="0.7" r="1" />
+        <Circle cx="163.8" cy="63.36" fill="#EEF0FF" opacity="0.7" r="1" />
+        <Circle cx="343.2" cy="54.72" fill="#5EC4D4" opacity="0.7" r="1" />
+        <Circle cx="46.8" cy="89.28" fill="#EEF0FF" opacity="0.7" r="1" />
+        <Circle cx="226.2" cy="43.2" fill="#EEF0FF" opacity="0.7" r="1.5" />
+        <Circle cx="124.8" cy="17.28" fill="#A89CE0" opacity="0.7" r="1" />
+        <Circle cx="312" cy="86.4" fill="#EEF0FF" opacity="0.7" r="1" />
         <Path
-          d="M0 60 L60 30 L110 50 L160 22 L220 55 L280 28 L340 48 L390 32 L390 80 L0 80 Z"
+          d="M0 124 L60 94 L110 114 L160 86 L220 119 L280 92 L340 112 L390 96 L390 144 L0 144 Z"
           fill="url(#home-mountain-far)"
           opacity="0.55"
+          testID="home-mountain-far"
         />
         <Path
-          d="M0 70 L40 50 L90 65 L150 42 L210 68 L260 50 L320 66 L390 52 L390 80 L0 80 Z"
+          d="M0 134 L40 114 L90 129 L150 106 L210 132 L260 114 L320 130 L390 116 L390 144 L0 144 Z"
           fill="url(#home-mountain-near)"
+          testID="home-mountain-near"
         />
       </Svg>
       <View className="absolute right-5 top-4 h-10 w-10" testID="home-scene-crescent-moon">
-        <View className="absolute inset-0 rounded-full bg-[#A89CE0]/20" />
+        <Svg
+          height={64}
+          style={{ left: -12, position: "absolute", top: -12 }}
+          viewBox="0 0 64 64"
+          width={64}
+        >
+          <Defs>
+            <RadialGradient
+              cx="32"
+              cy="32"
+              gradientUnits="userSpaceOnUse"
+              id="home-moon-glow"
+              r="32"
+            >
+              <Stop offset="0" stopColor="#A89CE0" stopOpacity="0.3" />
+              <Stop offset="1" stopColor="#A89CE0" stopOpacity="0" />
+            </RadialGradient>
+          </Defs>
+          <Circle cx="32" cy="32" fill="url(#home-moon-glow)" r="32" />
+        </Svg>
         <Svg height={40} viewBox="0 0 40 40" width={40}>
-          <Circle cx="20" cy="20" fill="#A89CE0" opacity="0.95" r="18" />
-          <Circle cx="13" cy="18" fill="#0D0F1A" r="18" />
+          <Defs>
+            <LinearGradient id="home-crescent-fill" x1="0" x2="1" y1="0" y2="1">
+              <Stop offset="0" stopColor="#EEF0FF" />
+              <Stop offset="1" stopColor="#A89CE0" />
+            </LinearGradient>
+          </Defs>
+          <Circle cx="20" cy="20" fill="url(#home-crescent-fill)" r="20" />
+          <Circle cx="12" cy="18" fill="#0D0F1A" r="19.2" />
         </Svg>
       </View>
       <View className="absolute bottom-2 left-0 right-0 z-10 flex-row justify-between px-4">

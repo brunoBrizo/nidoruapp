@@ -1,30 +1,29 @@
-import { colors, spacing, typography } from "@nidoru/ui-tokens";
-import { Link, type Href } from "expo-router";
-import {
-  AudioLines,
-  BookOpen,
-  ChevronRight,
-  CloudRain,
-  Flame,
-  Play,
-  Timer,
-  Waves,
-  Wind,
-  type LucideIcon,
-} from "lucide-react-native";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { type Href, useRouter } from "expo-router";
 
 import { CardFade } from "../surfaces/card-fade";
+import { Pressable, ScrollView, Text, View, cn } from "../tw";
+import {
+  SolarAltArrowRightLinearIcon,
+  SolarBookBookmarkLinearIcon,
+  SolarCloudRainLinearIcon,
+  SolarClockCircleLinearIcon,
+  SolarFireLinearIcon,
+  SolarPlayLinearIcon,
+  SolarSoundwaveLinearIcon,
+  SolarWaterdropsLinearIcon,
+  SolarWindLinearIcon,
+  type SleepIconComponent,
+} from "./sleep-icons";
 
 type MixerLayer = {
   readonly label: string;
   readonly volume: 70 | 55 | 35;
-  readonly Icon: LucideIcon;
+  readonly Icon: SleepIconComponent;
 };
 
 type QuickSound = {
   readonly label: string;
-  readonly Icon: LucideIcon;
+  readonly Icon: SleepIconComponent;
 };
 
 const sleepRoutes = {
@@ -34,160 +33,217 @@ const sleepRoutes = {
 } as const satisfies Record<string, Href>;
 
 const mixerLayers = [
-  { label: "Rain", volume: 70, Icon: CloudRain },
-  { label: "Brown noise", volume: 55, Icon: AudioLines },
-  { label: "Fireplace", volume: 35, Icon: Flame },
+  { label: "Rain", volume: 70, Icon: SolarCloudRainLinearIcon },
+  { label: "Brown noise", volume: 55, Icon: SolarSoundwaveLinearIcon },
+  { label: "Fireplace", volume: 35, Icon: SolarFireLinearIcon },
 ] as const satisfies readonly MixerLayer[];
 
 const quickSounds = [
-  { label: "Rain", Icon: CloudRain },
-  { label: "Ocean", Icon: Waves },
-  { label: "Fan", Icon: Wind },
+  { label: "Rain", Icon: SolarCloudRainLinearIcon },
+  { label: "Ocean", Icon: SolarWaterdropsLinearIcon },
+  { label: "Fan", Icon: SolarWindLinearIcon },
 ] as const satisfies readonly QuickSound[];
 
+const layerFillClassByVolume = {
+  35: "w-[35%]",
+  55: "w-[55%]",
+  70: "w-[70%]",
+} as const satisfies Record<MixerLayer["volume"], string>;
+
 export function SleepScreen() {
+  const router = useRouter();
+
   return (
     <ScrollView
-      style={styles.screen}
-      contentContainerStyle={styles.content}
-      contentInsetAdjustmentBehavior="automatic"
+      automaticallyAdjustContentInsets={false}
+      className="flex-1 bg-[#0D0F1A]"
+      contentContainerClassName="gap-5 px-5 pt-12 pb-[104px]"
+      contentInsetAdjustmentBehavior="never"
+      showsVerticalScrollIndicator={false}
+      testID="sleep-screen"
     >
-      <View style={styles.header}>
-        <Text accessibilityRole="header" selectable style={styles.title}>
+      <View className="items-start justify-between pt-2">
+        <Text
+          accessibilityRole="header"
+          className="font-nidoru-primary-semibold text-xl leading-7 text-[#EEF0FF]"
+          selectable
+        >
           Sleep
         </Text>
-        <Text selectable style={styles.subtitle}>
+        <Text className="font-nidoru-primary-regular text-sm leading-5 text-[#8A8FA8]" selectable>
           Settle into tonight.
         </Text>
       </View>
 
-      <View style={styles.primaryCard}>
+      <View
+        className="relative mt-1 min-h-[128px] overflow-hidden rounded-[24px] bg-[#1C2040] px-5 pt-[18px] pb-4 shadow-[inset_0_1px_0_rgba(238,240,255,0.06),0_8px_32px_-8px_rgba(15,18,48,0.6)]"
+        testID="sleep-primary-card"
+      >
         <CardFade testID="sleep-primary-card-fade" variant="sleep-primary" />
-        <View style={styles.primaryCopy}>
-          <Text selectable style={styles.primaryTitle}>
+        <View className="relative z-10 mb-5 gap-1">
+          <Text
+            className="font-nidoru-primary-semibold text-base leading-[22px] text-[#EEF0FF]"
+            selectable
+          >
             Evening Wind-Down
           </Text>
-          <Text selectable style={styles.primarySubtitle}>
+          <Text
+            className="font-nidoru-primary-regular text-sm leading-[18px] text-[#8A8FA8]"
+            selectable
+          >
             4-7-8 breath · body relax · sleep sounds
           </Text>
         </View>
 
-        <Link asChild href={sleepRoutes.windDown}>
-          <Pressable accessibilityHint="Opens the Evening Wind-Down flow." accessibilityRole="link">
-            {({ pressed }) => (
-              <View style={[styles.primaryButton, pressed ? styles.pressed : null]}>
-                <View style={styles.primaryButtonContent}>
-                  <Play color={colors.dark.textPrimary.value} size={17} strokeWidth={1.7} />
-                  <Text style={styles.primaryButtonText}>Start wind-down</Text>
-                </View>
-              </View>
-            )}
-          </Pressable>
-        </Link>
+        <Pressable
+          accessibilityHint="Opens the Evening Wind-Down flow."
+          accessibilityRole="link"
+          className="relative z-10 h-[44px] rounded-[16px] bg-[#7C6FCD] w-full flex-row items-center justify-center shadow-[inset_0_1px_0_rgba(238,240,255,0.2)] active:scale-[0.96] transition-transform duration-200"
+          onPress={() => {
+            router.push(sleepRoutes.windDown);
+          }}
+          testID="sleep-primary-cta"
+        >
+          <View className="translate-x-[2px] flex-row items-center gap-2">
+            <SolarPlayLinearIcon color="#EEF0FF" size={18} strokeWidth={1.5} />
+            <Text
+              className="font-nidoru-primary-semibold text-sm leading-5 text-[#EEF0FF]"
+              selectable={false}
+            >
+              Start wind-down
+            </Text>
+          </View>
+        </Pressable>
       </View>
 
-      <Link asChild href={sleepRoutes.sounds}>
-        <Pressable
-          accessibilityHint="Opens the Sound Mixer anchor."
-          accessibilityLabel="Sound Mixer"
-          accessibilityRole="link"
-        >
-          {({ pressed }) => (
-            <View style={[styles.mixerCard, pressed ? styles.cardPressed : null]}>
-              <View style={styles.cardHeadingRow}>
-                <View style={styles.cardTitleGroup}>
-                  <Text selectable style={styles.cardTitle}>
-                    Sound Mixer
-                  </Text>
-                  <Text selectable style={styles.cardDescription}>
-                    Layer sounds for sleep.
-                  </Text>
-                </View>
-                <View style={styles.cardMetaGroup}>
-                  <View style={styles.timerPill}>
-                    <Timer color={colors.dark.textTertiary.value} size={12} strokeWidth={1.7} />
-                    <Text selectable style={styles.timerText}>
-                      30 min
-                    </Text>
-                  </View>
-                  <ChevronRight
-                    color={colors.dark.textTertiary.value}
-                    size={20}
-                    strokeWidth={1.6}
-                  />
-                </View>
-              </View>
-
-              <View style={styles.layerList}>
-                {mixerLayers.map((layer) => (
-                  <MixerLayerRow key={layer.label} layer={layer} />
-                ))}
-              </View>
+      <Pressable
+        accessibilityHint="Opens the Sound Mixer anchor."
+        accessibilityLabel="Sound Mixer"
+        accessibilityRole="link"
+        className="min-h-[168px] gap-4 rounded-[24px] border border-[#1E2236]/60 bg-[#14172B] p-5 shadow-[inset_0_1px_0_rgba(238,240,255,0.03)] active:scale-[0.98] transition-transform duration-200"
+        onPress={() => {
+          router.push(sleepRoutes.sounds);
+        }}
+        testID="sleep-mixer-card"
+      >
+        <View className="flex-row items-start justify-between gap-2">
+          <View className="min-w-0 flex-1 gap-0.5">
+            <Text
+              className="font-nidoru-primary-semibold text-base leading-[22px] text-[#EEF0FF]"
+              selectable
+            >
+              Sound Mixer
+            </Text>
+            <Text
+              className="font-nidoru-primary-regular text-sm leading-5 text-[#8A8FA8]"
+              selectable
+            >
+              Layer sounds for sleep.
+            </Text>
+          </View>
+          <View className="flex-row items-center gap-2.5">
+            <View
+              className="min-h-[26px] flex-row items-center gap-1.5 rounded-[10px] border border-[#1E2236] bg-[#0D0F1A]/80 px-2.5 py-1"
+              testID="sleep-timer-pill"
+            >
+              <SolarClockCircleLinearIcon color="#4A4E6A" size={12} strokeWidth={1.5} />
+              <Text
+                className="font-nidoru-data-regular text-xs leading-4 text-[#8A8FA8] tabular-nums"
+                selectable
+              >
+                30 min
+              </Text>
             </View>
-          )}
-        </Pressable>
-      </Link>
+            <SolarAltArrowRightLinearIcon color="#4A4E6A" size={20} strokeWidth={1.5} />
+          </View>
+        </View>
 
-      <View style={styles.quickSoundRow}>
+        <View className="gap-2.5 pt-1">
+          {mixerLayers.map((layer) => (
+            <MixerLayerRow key={layer.label} layer={layer} />
+          ))}
+        </View>
+      </Pressable>
+
+      <View className="flex-row flex-wrap gap-2.5">
         {quickSounds.map((sound) => {
           const Icon = sound.Icon;
 
           return (
-            <Link asChild href={sleepRoutes.sounds} key={sound.label}>
-              <Pressable
-                accessibilityHint="Opens the Sound Mixer anchor."
-                accessibilityLabel={`${sound.label} quick sound`}
-                accessibilityRole="link"
+            <Pressable
+              accessibilityHint="Opens the Sound Mixer anchor."
+              accessibilityLabel={`${sound.label} quick sound`}
+              accessibilityRole="link"
+              className="min-h-[44px] flex-row items-center gap-2.5 rounded-[16px] border border-[#1E2236]/60 bg-[#14172B] px-4 py-3 shadow-[inset_0_1px_0_rgba(238,240,255,0.04),0_12px_28px_rgba(0,0,0,0.18)] active:scale-[0.96] transition-transform duration-200"
+              key={sound.label}
+              onPress={() => {
+                router.push(sleepRoutes.sounds);
+              }}
+              testID={`sleep-quick-sound-${sound.label}`}
+            >
+              <Icon color="#8A8FA8" size={18} strokeWidth={1.5} />
+              <Text
+                className="font-nidoru-primary-semibold text-sm leading-[18px] text-[#EEF0FF]"
+                selectable={false}
               >
-                {({ pressed }) => (
-                  <View style={[styles.quickSound, pressed ? styles.pressed : null]}>
-                    <Icon color={colors.dark.textSecondary.value} size={17} strokeWidth={1.7} />
-                    <Text style={styles.quickSoundText}>{sound.label}</Text>
-                  </View>
-                )}
-              </Pressable>
-            </Link>
+                {sound.label}
+              </Text>
+            </Pressable>
           );
         })}
       </View>
 
-      <Link asChild href={sleepRoutes.stories}>
-        <Pressable
-          accessibilityHint="Opens the Sleep Stories anchor."
-          accessibilityLabel="Sleep Stories"
-          accessibilityRole="link"
-        >
-          {({ pressed }) => (
-            <View style={[styles.storyCard, pressed ? styles.cardPressed : null]}>
-              <View style={styles.cardHeadingRow}>
-                <View style={styles.cardTitleGroup}>
-                  <Text selectable style={styles.cardTitle}>
-                    Sleep Stories
-                  </Text>
-                  <Text selectable style={styles.cardDescription}>
-                    Quiet narration for restless thoughts.
-                  </Text>
-                </View>
-                <ChevronRight color={colors.dark.textTertiary.value} size={20} strokeWidth={1.6} />
-              </View>
+      <Pressable
+        accessibilityHint="Opens the Sleep Stories anchor."
+        accessibilityLabel="Sleep Stories"
+        accessibilityRole="link"
+        className="min-h-[136px] gap-3 rounded-[20px] border border-[#1E2236]/60 bg-[#14172B] p-4 shadow-[inset_0_1px_0_rgba(238,240,255,0.03)] active:scale-[0.98] transition-transform duration-200"
+        onPress={() => {
+          router.push(sleepRoutes.stories);
+        }}
+        testID="sleep-story-card"
+      >
+        <View className="flex-row items-start justify-between gap-2">
+          <View className="min-w-0 flex-1 gap-0.5">
+            <Text
+              className="font-nidoru-primary-semibold text-base leading-[22px] text-[#EEF0FF]"
+              selectable
+            >
+              Sleep Stories
+            </Text>
+            <Text
+              className="font-nidoru-primary-regular text-sm leading-5 text-[#8A8FA8]"
+              selectable
+            >
+              Quiet narration for restless thoughts.
+            </Text>
+          </View>
+          <SolarAltArrowRightLinearIcon color="#4A4E6A" size={20} strokeWidth={1.5} />
+        </View>
 
-              <View style={styles.storyPreview}>
-                <View style={styles.storyIconSurface}>
-                  <BookOpen color={colors.dark.accent.value} size={18} strokeWidth={1.7} />
-                </View>
-                <View style={styles.storyCopy}>
-                  <Text selectable style={styles.storyTitle}>
-                    The Quiet Shoreline
-                  </Text>
-                  <Text selectable style={styles.storyMeta}>
-                    45 min
-                  </Text>
-                </View>
-              </View>
-            </View>
-          )}
-        </Pressable>
-      </Link>
+        <View
+          className="min-h-[52px] flex-row items-center gap-3.5 rounded-[16px] border border-[#1E2236]/50 bg-[#0D0F1A]/60 p-2.5"
+          testID="sleep-story-preview"
+        >
+          <View className="h-10 w-10 shrink-0 items-center justify-center rounded-[12px] border border-[#1E2236]/80 bg-[#1C2040] shadow-[inset_0_1px_0_rgba(238,240,255,0.05)]">
+            <SolarBookBookmarkLinearIcon color="#5EC4D4" opacity={0.8} size={18} />
+          </View>
+          <View className="min-w-0 flex-1">
+            <Text
+              className="font-nidoru-primary-semibold text-sm leading-[19px] text-[#EEF0FF]"
+              selectable
+            >
+              The Quiet Shoreline
+            </Text>
+            <Text
+              className="mt-0.5 font-nidoru-data-regular text-xs leading-4 text-[#4A4E6A] tabular-nums"
+              selectable
+            >
+              45 min
+            </Text>
+          </View>
+        </View>
+      </Pressable>
     </ScrollView>
   );
 }
@@ -196,299 +252,33 @@ function MixerLayerRow({ layer }: { readonly layer: MixerLayer }) {
   const Icon = layer.Icon;
 
   return (
-    <View style={styles.layerRow}>
-      <View style={styles.layerNameGroup}>
-        <Icon color={colors.dark.textSecondary.value} size={17} strokeWidth={1.6} />
-        <Text selectable style={styles.layerLabel}>
+    <View
+      className="min-h-5 flex-row items-center justify-between gap-2"
+      testID={`sleep-mixer-layer-${layer.label}`}
+    >
+      <View className="min-w-0 flex-1 flex-row items-center gap-3">
+        <Icon color="#8A8FA8" size={18} strokeWidth={1.5} />
+        <Text
+          className="shrink font-nidoru-primary-semibold text-sm leading-[19px] text-[#EEF0FF]"
+          selectable
+        >
           {layer.label}
         </Text>
       </View>
-      <View style={styles.layerMeterGroup}>
-        <Text selectable style={styles.layerPercent}>
+      <View className="flex-row items-center gap-2.5">
+        <Text
+          className="min-w-[30px] text-right font-nidoru-data-regular text-xs leading-4 text-[#4A4E6A] tabular-nums"
+          selectable
+        >
           {layer.volume}%
         </Text>
-        <View style={styles.layerTrack}>
-          <View style={[styles.layerFill, { width: `${layer.volume}%` }]} />
+        <View className="h-1.5 w-10 shrink-0 overflow-hidden rounded-full bg-[#1E2236]">
+          <View
+            className={cn("h-full rounded-full bg-[#A89CE0]", layerFillClassByVolume[layer.volume])}
+            testID={`sleep-mixer-layer-${layer.label}-fill`}
+          />
         </View>
       </View>
     </View>
   );
 }
-
-const sleepColors = {
-  cardBorder: "rgba(30, 34, 54, 0.72)",
-  cardInset: "inset 0 1px 0 rgba(238, 240, 255, 0.05)",
-  cardShadow: "inset 0 1px 0 rgba(238, 240, 255, 0.04), 0 12px 28px rgba(0, 0, 0, 0.18)",
-  elevatedCardShadow: "inset 0 1px 0 rgba(238, 240, 255, 0.06), 0 8px 32px rgba(15, 18, 48, 0.6)",
-} as const;
-
-const styles = StyleSheet.create({
-  screen: {
-    backgroundColor: colors.dark.background.value,
-    flex: 1,
-  },
-  content: {
-    gap: 18,
-    paddingBottom: spacing.bottomNavigationHeight + spacing.md,
-    paddingHorizontal: spacing.screenPadding,
-    paddingTop: spacing.xl + spacing.xs,
-  },
-  header: {
-    gap: 4,
-    paddingTop: 2,
-  },
-  title: {
-    color: colors.dark.textPrimary.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 22,
-    letterSpacing: 0,
-    lineHeight: 28,
-  },
-  subtitle: {
-    color: colors.dark.textSecondary.value,
-    fontFamily: typography.mobileFontFamily.primary.regular,
-    fontSize: 14,
-    lineHeight: 20,
-  },
-  primaryCard: {
-    backgroundColor: colors.dark.surfaceRaised.value,
-    borderRadius: 24,
-    boxShadow: sleepColors.elevatedCardShadow,
-    gap: 18,
-    minHeight: 128,
-    overflow: "hidden",
-    paddingBottom: spacing.sm,
-    paddingHorizontal: spacing.sm,
-    paddingTop: 18,
-    position: "relative",
-  },
-  primaryCopy: {
-    gap: 4,
-  },
-  primaryTitle: {
-    color: colors.dark.textPrimary.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: typography.scale.bodyLarge.size,
-    letterSpacing: 0,
-    lineHeight: 22,
-  },
-  primarySubtitle: {
-    color: colors.dark.textSecondary.value,
-    fontFamily: typography.mobileFontFamily.primary.regular,
-    fontSize: 14,
-    lineHeight: 20,
-  },
-  primaryButton: {
-    alignItems: "center",
-    backgroundColor: colors.dark.primary.value,
-    borderRadius: 16,
-    boxShadow: "inset 0 1px 0 rgba(238, 240, 255, 0.2)",
-    justifyContent: "center",
-    minHeight: 44,
-    transform: [{ scale: 1 }],
-  },
-  primaryButtonContent: {
-    alignItems: "center",
-    flexDirection: "row",
-    gap: 8,
-  },
-  primaryButtonText: {
-    color: colors.dark.textPrimary.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 14,
-    lineHeight: 20,
-  },
-  mixerCard: {
-    backgroundColor: colors.dark.surface.value,
-    borderColor: sleepColors.cardBorder,
-    borderRadius: 24,
-    borderWidth: 1,
-    boxShadow: sleepColors.cardInset,
-    gap: 17,
-    minHeight: 168,
-    padding: spacing.sm,
-    transform: [{ scale: 1 }],
-  },
-  storyCard: {
-    backgroundColor: colors.dark.surface.value,
-    borderColor: sleepColors.cardBorder,
-    borderRadius: 20,
-    borderWidth: 1,
-    boxShadow: sleepColors.cardInset,
-    gap: 14,
-    minHeight: 136,
-    padding: spacing.sm,
-    transform: [{ scale: 1 }],
-  },
-  cardPressed: {
-    backgroundColor: "rgba(20, 23, 43, 0.82)",
-    transform: [{ scale: 0.98 }],
-  },
-  pressed: {
-    transform: [{ scale: 0.96 }],
-  },
-  cardHeadingRow: {
-    alignItems: "flex-start",
-    flexDirection: "row",
-    gap: spacing.xs,
-    justifyContent: "space-between",
-  },
-  cardTitleGroup: {
-    flex: 1,
-    gap: 3,
-    minWidth: 0,
-  },
-  cardTitle: {
-    color: colors.dark.textPrimary.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: typography.scale.bodyLarge.size,
-    letterSpacing: 0,
-    lineHeight: 22,
-  },
-  cardDescription: {
-    color: colors.dark.textSecondary.value,
-    fontFamily: typography.mobileFontFamily.primary.regular,
-    fontSize: 14,
-    lineHeight: 20,
-  },
-  cardMetaGroup: {
-    alignItems: "center",
-    flexDirection: "row",
-    gap: 10,
-  },
-  timerPill: {
-    alignItems: "center",
-    backgroundColor: "rgba(13, 15, 26, 0.8)",
-    borderColor: colors.dark.divider.value,
-    borderRadius: 10,
-    borderWidth: 1,
-    flexDirection: "row",
-    gap: 6,
-    minHeight: 26,
-    paddingHorizontal: 10,
-  },
-  timerText: {
-    color: colors.dark.textSecondary.value,
-    fontFamily: typography.mobileFontFamily.data.regular,
-    fontSize: 12,
-    fontVariant: ["tabular-nums"],
-    lineHeight: 16,
-  },
-  layerList: {
-    gap: 11,
-    paddingTop: 2,
-  },
-  layerRow: {
-    alignItems: "center",
-    flexDirection: "row",
-    gap: spacing.xs,
-    justifyContent: "space-between",
-    minHeight: 20,
-  },
-  layerNameGroup: {
-    alignItems: "center",
-    flex: 1,
-    flexDirection: "row",
-    gap: 12,
-    minWidth: 0,
-  },
-  layerLabel: {
-    color: colors.dark.textPrimary.value,
-    flexShrink: 1,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 14,
-    lineHeight: 19,
-  },
-  layerMeterGroup: {
-    alignItems: "center",
-    flexDirection: "row",
-    gap: 10,
-  },
-  layerPercent: {
-    color: colors.dark.textTertiary.value,
-    fontFamily: typography.mobileFontFamily.data.regular,
-    fontSize: 12,
-    fontVariant: ["tabular-nums"],
-    lineHeight: 16,
-    minWidth: 30,
-    textAlign: "right",
-  },
-  layerTrack: {
-    backgroundColor: colors.dark.divider.value,
-    borderRadius: 9999,
-    height: 5,
-    overflow: "hidden",
-    width: 36,
-  },
-  layerFill: {
-    backgroundColor: colors.dark.primaryGlow.value,
-    borderRadius: 9999,
-    height: 5,
-  },
-  quickSoundRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 10,
-  },
-  quickSound: {
-    alignItems: "center",
-    backgroundColor: colors.dark.surface.value,
-    borderColor: sleepColors.cardBorder,
-    borderRadius: 16,
-    borderWidth: 1,
-    boxShadow: sleepColors.cardShadow,
-    flexDirection: "row",
-    gap: 10,
-    justifyContent: "center",
-    minHeight: 44,
-    minWidth: 66,
-    paddingHorizontal: 16,
-    transform: [{ scale: 1 }],
-  },
-  quickSoundText: {
-    color: colors.dark.textPrimary.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 14,
-    lineHeight: 18,
-  },
-  storyPreview: {
-    alignItems: "center",
-    backgroundColor: "rgba(13, 15, 26, 0.6)",
-    borderColor: "rgba(30, 34, 54, 0.5)",
-    borderRadius: 16,
-    borderWidth: 1,
-    flexDirection: "row",
-    gap: 14,
-    minHeight: 52,
-    padding: 10,
-  },
-  storyIconSurface: {
-    alignItems: "center",
-    backgroundColor: colors.dark.surfaceRaised.value,
-    borderColor: "rgba(30, 34, 54, 0.8)",
-    borderRadius: 12,
-    borderWidth: 1,
-    boxShadow: "inset 0 1px 0 rgba(238, 240, 255, 0.05)",
-    height: 40,
-    justifyContent: "center",
-    width: 40,
-  },
-  storyCopy: {
-    flex: 1,
-    gap: 2,
-    minWidth: 0,
-  },
-  storyTitle: {
-    color: colors.dark.textPrimary.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 14,
-    lineHeight: 19,
-  },
-  storyMeta: {
-    color: colors.dark.textTertiary.value,
-    fontFamily: typography.mobileFontFamily.data.regular,
-    fontSize: 12,
-    fontVariant: ["tabular-nums"],
-    lineHeight: 16,
-  },
-});

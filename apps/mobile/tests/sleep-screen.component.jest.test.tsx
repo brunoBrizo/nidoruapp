@@ -94,6 +94,10 @@ describe("SleepTabScreen", () => {
     expect(screen.getByTestId("sleep-screen").props.contentContainerClassName).toEqual(
       expect.stringContaining("gap-5 px-5 pt-12 pb-[104px]"),
     );
+    expect(screen.getByTestId("sleep-screen")).toHaveProp(
+      "contentInsetAdjustmentBehavior",
+      "automatic",
+    );
 
     expect(screen.getByTestId("sleep-primary-card").props.className).toEqual(
       expect.stringContaining("rounded-[24px] bg-[#1C2040] px-5 pt-[18px] pb-4"),

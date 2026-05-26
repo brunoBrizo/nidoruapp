@@ -146,6 +146,13 @@ describe("tab entry shells", () => {
     expect(screen.getByTestId("breathe-screen").props.className).toEqual(
       expect.stringContaining("bg-[#0D0F1A]"),
     );
+    expect(screen.getByTestId("breathe-screen").props.contentContainerClassName).toEqual(
+      expect.stringContaining("gap-4 px-[30px] pb-[100px] pt-12"),
+    );
+    expect(screen.getByTestId("breathe-screen")).toHaveProp(
+      "contentInsetAdjustmentBehavior",
+      "automatic",
+    );
     expect(screen.getByTestId("breathe-tabs").props.className).toEqual(
       expect.stringContaining("rounded-2xl bg-[#14172B]/50 p-1.5"),
     );

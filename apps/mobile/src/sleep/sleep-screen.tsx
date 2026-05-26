@@ -55,14 +55,13 @@ export function SleepScreen() {
 
   return (
     <ScrollView
-      automaticallyAdjustContentInsets={false}
       className="flex-1 bg-[#0D0F1A]"
       contentContainerClassName="gap-5 px-5 pt-12 pb-[104px]"
-      contentInsetAdjustmentBehavior="never"
+      contentInsetAdjustmentBehavior="automatic"
       showsVerticalScrollIndicator={false}
       testID="sleep-screen"
     >
-      <View className="items-start justify-between pt-2">
+      <View className="items-start justify-between">
         <Text
           accessibilityRole="header"
           className="font-nidoru-primary-semibold text-xl leading-7 text-[#EEF0FF]"

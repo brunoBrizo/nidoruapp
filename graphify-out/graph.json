@@ -6765,8 +6765,8 @@
       "source_file": "apps/mobile/src/onboarding/onboarding-splash-screen.tsx",
       "source_location": "L35",
       "weight": 1.0,
-      "_src": "onboarding_splash_screen_onboardingsplashscreen",
-      "_tgt": "use_reduce_motion_enabled_usereducemotionpreference",
+      "_src": "use_reduce_motion_enabled_usereducemotionpreference",
+      "_tgt": "onboarding_splash_screen_onboardingsplashscreen",
       "source": "use_reduce_motion_enabled_usereducemotionpreference",
       "target": "onboarding_splash_screen_onboardingsplashscreen"
     },

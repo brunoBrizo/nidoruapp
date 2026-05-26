@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import {
   abandonBreathSessionLocally,
   completeBreathSessionLocally,
-  loadPendingBreathSessionCompletion,
   loadRecoverableBreathSessionDraft,
   recordBreathSessionStartedLocally,
   saveBreathSessionDraftLocally,
@@ -39,32 +38,16 @@ export function RescueMeSessionRoute() {
         };
 
         return getOrCreateLocalInstallIdentity({ database: localDatabase }).then((localInstallId) =>
-          loadPendingBreathSessionCompletion(localDatabase, {
+          loadRecoverableBreathSessionDraft(localDatabase, {
             localInstallId,
             source: "rescue_me",
-          }).then((pendingCompletion) => {
-            if (pendingCompletion) {
-              return {
-                database: localDatabase,
-                hasExistingLocalRecord: true,
-                initialCompletionMode: "completed" as const,
-                localInstallId,
-                sessionId: pendingCompletion.sessionId,
-                startedAtMs: Date.parse(pendingCompletion.startedAt),
-              };
-            }
-
-            return loadRecoverableBreathSessionDraft(localDatabase, {
-              localInstallId,
-              source: "rescue_me",
-            }).then((draft) => ({
-              database: localDatabase,
-              hasExistingLocalRecord: Boolean(draft),
-              localInstallId,
-              sessionId: draft?.sessionId ?? createRescueMeSessionId(),
-              startedAtMs: draft ? Date.now() - draft.elapsedDurationMs : Date.now(),
-            }));
-          }),
+          }).then((draft) => ({
+            database: localDatabase,
+            hasExistingLocalRecord: Boolean(draft),
+            localInstallId,
+            sessionId: draft?.sessionId ?? createRescueMeSessionId(),
+            startedAtMs: draft ? Date.now() - draft.elapsedDurationMs : Date.now(),
+          })),
         );
       })
       .catch(() => ({

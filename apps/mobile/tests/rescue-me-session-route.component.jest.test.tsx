@@ -164,14 +164,62 @@ describe("RescueMeSessionRoute", () => {
     );
     expect(activeProps?.startedAtMs).toBeGreaterThanOrEqual(observedAtMs - 42_000);
     expect(activeProps?.startedAtMs).toBeLessThan(observedAtMs - 41_000);
-    expect(mockLoadPendingBreathSessionCompletion).toHaveBeenCalledWith(expect.any(Object), {
-      localInstallId: "install_0123456789abcdef",
-      source: "rescue_me",
-    });
+    expect(mockLoadPendingBreathSessionCompletion).not.toHaveBeenCalled();
     expect(mockLoadRecoverableBreathSessionDraft).toHaveBeenCalledWith(expect.any(Object), {
       localInstallId: "install_0123456789abcdef",
       source: "rescue_me",
     });
+  });
+
+  it("starts a fresh Rescue Me session instead of restoring an old completed session", async () => {
+    const observedAtMs = Date.parse("2026-05-23T06:15:00.000Z");
+    const database = {
+      getFirstAsync: jest.fn(),
+      runAsync: jest.fn(),
+    };
+
+    jest.useFakeTimers();
+    jest.setSystemTime(observedAtMs);
+    mockOpenMigratedLocalDatabase.mockResolvedValue(database);
+    mockGetOrCreateLocalInstallIdentity.mockResolvedValue("install_0123456789abcdef");
+    mockLoadPendingBreathSessionCompletion.mockResolvedValue({
+      audioCueModeId: "gentle-bell",
+      completedAt: "2026-05-23T06:05:00.000Z",
+      completedBreathCycles: 5,
+      completionPersistedAt: "2026-05-23T06:05:01.000Z",
+      currentPhaseName: "exhale",
+      durationSeconds: 209,
+      elapsedDurationMs: 209_000,
+      localInstallId: "install_0123456789abcdef",
+      remainingDurationMs: 0,
+      sessionId: "session_completedrescueme",
+      source: "rescue_me",
+      startedAt: "2026-05-23T06:01:31.000Z",
+      status: "completed",
+      techniqueId: "4-7-8-sleep",
+      updatedAt: "2026-05-23T06:05:01.000Z",
+    });
+    mockLoadRecoverableBreathSessionDraft.mockResolvedValue(null);
+
+    render(<RescueMeSessionRoute />);
+
+    await act(async () => {
+      await flushPromises();
+    });
+
+    const [activeProps] = mockRescueMeActiveSessionScreen.mock.calls.at(-1) ?? [];
+
+    expect(activeProps).toEqual(
+      expect.objectContaining({
+        hasExistingLocalRecord: false,
+        initialCompletionMode: undefined,
+        localInstallId: "install_0123456789abcdef",
+      }),
+    );
+    expect(activeProps?.sessionId).toMatch(/^session_[A-Za-z0-9_-]{8,64}$/);
+    expect(activeProps?.sessionId).not.toBe("session_completedrescueme");
+    expect(activeProps?.startedAtMs).toBe(observedAtMs);
+    expect(mockLoadPendingBreathSessionCompletion).not.toHaveBeenCalled();
   });
 });
 

@@ -16,7 +16,9 @@ import { useEffect, useMemo, useRef, type ReactNode } from "react";
 import { Animated, Easing } from "react-native";
 import Svg, {
   Circle,
+  ClipPath,
   Defs,
+  G,
   LinearGradient,
   Path,
   Pattern,
@@ -626,20 +628,30 @@ function RitualScene() {
           <Circle cx="32" cy="32" fill="url(#home-moon-glow)" r="32" />
         </Svg>
         <Svg
-          height={42}
-          style={{ left: -8, position: "absolute", top: -1 }}
+          height={40}
           testID="home-crescent-moon-disc"
-          viewBox="-8 -1 50 42"
-          width={50}
+          viewBox="0 0 40 40"
+          width={40}
         >
           <Defs>
             <LinearGradient id="home-crescent-fill" x1="0" x2="1" y1="0" y2="1">
               <Stop offset="0" stopColor="#EEF0FF" />
               <Stop offset="1" stopColor="#A89CE0" />
             </LinearGradient>
+            <ClipPath id="home-crescent-outer-clip">
+              <Circle cx="20" cy="20" r="20" />
+            </ClipPath>
           </Defs>
-          <Circle cx="20" cy="20" fill="url(#home-crescent-fill)" r="20" />
-          <Circle cx="12" cy="18" fill="#0D0F1A" r="19.2" testID="home-crescent-moon-cutout" />
+          <G clipPath="url(#home-crescent-outer-clip)" testID="home-crescent-moon-clipped-disc">
+            <Circle cx="20" cy="20" fill="url(#home-crescent-fill)" r="20" />
+            <Circle
+              cx="12"
+              cy="18"
+              fill="#0D0F1A"
+              r="19.2"
+              testID="home-crescent-moon-cutout"
+            />
+          </G>
         </Svg>
       </View>
       <View className="absolute bottom-2 left-0 right-0 z-10 flex-row justify-between px-4">

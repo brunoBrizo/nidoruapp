@@ -105,8 +105,7 @@ const libraryCards = [
     duration: "12 MIN",
     routeTarget: "/sleep/wind-down",
     Icon: BookOpen,
-    shadowClass:
-      "shadow-[inset_0_1px_0_rgba(238,240,255,0.08),0_10px_30px_-10px_rgba(124,111,205,0.4)]",
+    shadowClass: "shadow-[inset_0_1px_0_rgba(238,240,255,0.08)]",
     accentColor: "#A89CE0",
     iconColor: "#EEF0FF",
     variant: "story",
@@ -119,8 +118,7 @@ const libraryCards = [
     duration: "∞",
     routeTarget: "/sleep/sounds",
     Icon: Droplets,
-    shadowClass:
-      "shadow-[inset_0_1px_0_rgba(238,240,255,0.08),0_10px_30px_-10px_rgba(94,196,212,0.3)]",
+    shadowClass: "shadow-[inset_0_1px_0_rgba(238,240,255,0.08)]",
     accentColor: "#5EC4D4",
     iconColor: "#5EC4D4",
     variant: "rainfall",
@@ -133,8 +131,7 @@ const libraryCards = [
     duration: "8 MIN",
     routeTarget: "/breathe/4-7-8-sleep?durationSeconds=300",
     Icon: Sparkles,
-    shadowClass:
-      "shadow-[inset_0_1px_0_rgba(238,240,255,0.08),0_10px_30px_-10px_rgba(168,156,224,0.3)]",
+    shadowClass: "shadow-[inset_0_1px_0_rgba(238,240,255,0.08)]",
     accentColor: "#A89CE0",
     iconColor: "#A89CE0",
     variant: "meditation",
@@ -903,17 +900,6 @@ function WindDownLibrary() {
             Wind-down library
           </Text>
         </View>
-        <Link asChild href="/sleep">
-          <Pressable
-            accessibilityRole="link"
-            className="min-h-8 shrink-0 flex-row items-center gap-1"
-          >
-            <Text className="font-nidoru-data-regular text-[10px] font-medium uppercase tracking-[0.15em] text-[#7C6FCD]">
-              See all
-            </Text>
-            <ArrowRight color="#7C6FCD" size={12} strokeWidth={1.8} />
-          </Pressable>
-        </Link>
       </View>
       <ScrollView
         className="-mx-5"

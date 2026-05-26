@@ -405,9 +405,8 @@ describe("HomeScreen", () => {
     render(<HomeScreen now={designDate} />);
 
     expect(screen.getByText("Wind-down library")).toBeTruthy();
-    expect(screen.getByRole("link", { name: "See all" }).props.className).toEqual(
-      expect.stringContaining("shrink-0"),
-    );
+    expect(screen.queryByRole("link", { name: "See all" })).toBeNull();
+    expect(screen.queryByText("See all")).toBeNull();
 
     const storyCardClassName = screen.getByTestId("home-library-card-lantern-keeper").props
       .className;
@@ -423,15 +422,12 @@ describe("HomeScreen", () => {
       expect(className).not.toEqual(expect.stringContaining("bg-[#"));
     }
 
-    expect(storyCardClassName).toEqual(
-      expect.stringContaining("0_10px_30px_-10px_rgba(124,111,205,0.4)"),
-    );
-    expect(rainfallCardClassName).toEqual(
-      expect.stringContaining("0_10px_30px_-10px_rgba(94,196,212,0.3)"),
-    );
-    expect(meditationCardClassName).toEqual(
-      expect.stringContaining("0_10px_30px_-10px_rgba(168,156,224,0.3)"),
-    );
+    for (const className of [storyCardClassName, rainfallCardClassName, meditationCardClassName]) {
+      expect(className).toEqual(
+        expect.stringContaining("shadow-[inset_0_1px_0_rgba(238,240,255,0.08)]"),
+      );
+      expect(className).not.toEqual(expect.stringContaining("0_10px_30px"));
+    }
 
     expect(screen.getByTestId("home-library-card-gradient-lantern-keeper").props.fill).toEqual(
       expect.objectContaining({ brushRef: "home-library-card-bg-story" }),

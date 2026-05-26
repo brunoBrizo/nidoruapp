@@ -39,4 +39,19 @@ describe("Tailwind migration guardrails", () => {
     expect(source).not.toContain("StyleSheet.create");
     expect(source).not.toMatch(/\bstyles\./);
   });
+
+  it("keeps notification and post-value paywall surfaces migrated to Tailwind base UI styling", () => {
+    for (const sourcePath of [
+      "src/notifications/notification-permission-gate-screen.tsx",
+      "src/paywall/post-value-account-paywall-route.tsx",
+      "src/paywall/post-value-account-paywall-screen.tsx",
+    ]) {
+      const source = readMobileSource(sourcePath);
+
+      expect(source).toContain('from "../tw"');
+      expect(source).toContain("className=");
+      expect(source).not.toContain("StyleSheet.create");
+      expect(source).not.toMatch(/\bstyles\./);
+    }
+  });
 });

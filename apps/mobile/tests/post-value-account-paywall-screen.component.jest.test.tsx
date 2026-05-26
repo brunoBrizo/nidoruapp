@@ -1,6 +1,16 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react-native";
 import { AccessibilityInfo } from "react-native";
 
+jest.mock("react-native-css", () => {
+  const React = jest.requireActual<typeof import("react")>("react");
+
+  return {
+    useCssElement: (Component: React.ElementType, props: Record<string, unknown>) =>
+      React.createElement(Component, props),
+    useNativeVariable: (variable: string) => `mocked-${variable}`,
+  };
+});
+
 import { PostValueAccountPaywallScreen } from "../src/paywall/post-value-account-paywall-screen";
 import type { PostRewardPaywallEligibility } from "../src/paywall/post-value-account-linking";
 
@@ -49,6 +59,19 @@ describe("PostValueAccountPaywallScreen", () => {
   it("matches the post-value account screen with session proof before plans are requested", () => {
     render(<PostValueAccountPaywallScreen accessState={eligibleAccessState} />);
 
+    expectClassNameContains(
+      screen.getByTestId("post-value-account-paywall-screen").props.className,
+      ["flex-1", "bg-[#0D0F1A]"],
+    );
+    expectClassNameContains(screen.getByTestId("post-value-account-section").props.className, [
+      "gap-3",
+      "mb-24",
+    ]);
+    expectClassNameContains(screen.getByTestId("post-value-sticky-footer").props.className, [
+      "absolute",
+      "bottom-0",
+      "px-5",
+    ]);
     expect(screen.getByTestId("post-value-paywall-top-fade")).toBeTruthy();
     expect(screen.getByText("First session complete")).toBeTruthy();
     expect(screen.getByText("Keep tonight’s calm going")).toBeTruthy();
@@ -72,6 +95,10 @@ describe("PostValueAccountPaywallScreen", () => {
 
     fireEvent.press(screen.getByRole("button", { name: "See plans" }));
 
+    expectClassNameContains(screen.getByTestId("post-value-plan-list").props.className, [
+      "gap-3",
+      "mb-[22px]",
+    ]);
     expect(screen.getByText("Try 14 days of Nidoru Premium")).toBeTruthy();
     expect(screen.getByText("Build on the routine that helped tonight.")).toBeTruthy();
     expect(screen.getByText("Unlimited sleep sessions and breath techniques")).toBeTruthy();
@@ -137,3 +164,11 @@ describe("PostValueAccountPaywallScreen", () => {
     expect(screen.getByRole("button", { name: "Continue with free" })).toBeTruthy();
   });
 });
+
+function expectClassNameContains(className: string | undefined, expectedParts: readonly string[]) {
+  expect(className).toBeTruthy();
+
+  for (const expectedPart of expectedParts) {
+    expect(className).toContain(expectedPart);
+  }
+}

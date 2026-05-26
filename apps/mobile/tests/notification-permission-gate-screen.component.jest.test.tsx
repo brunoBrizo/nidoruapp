@@ -1,6 +1,16 @@
 import { describe, expect, it, jest } from "@jest/globals";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react-native";
-import { AccessibilityInfo, Modal, StyleSheet } from "react-native";
+import { AccessibilityInfo, Modal } from "react-native";
+
+jest.mock("react-native-css", () => {
+  const React = jest.requireActual<typeof import("react")>("react");
+
+  return {
+    useCssElement: (Component: React.ElementType, props: Record<string, unknown>) =>
+      React.createElement(Component, props),
+    useNativeVariable: (variable: string) => `mocked-${variable}`,
+  };
+});
 
 import {
   NOTIFICATION_GATE_MOTION,
@@ -38,41 +48,24 @@ describe("NotificationPermissionGateScreen", () => {
   it("keeps touch targets and visual styling aligned with the reference", () => {
     render(<NotificationPermissionGateScreen onAccept={jest.fn()} onDecline={jest.fn()} />);
 
-    const mainStyle = StyleSheet.flatten(
-      screen.getByTestId("notification-gate-main-content").props.style,
-    );
-    const actionsStyle = StyleSheet.flatten(
-      screen.getByTestId("notification-gate-actions").props.style,
-    );
+    const mainClassName = screen.getByTestId("notification-gate-main-content").props.className;
+    const actionsClassName = screen.getByTestId("notification-gate-actions").props.className;
     const modal = screen.UNSAFE_getByType(Modal);
-    const acceptStyle = resolvePressableStyle(
-      screen.getByTestId("notification-gate-accept").props.style,
-    );
-    const declineStyle = resolvePressableStyle(
-      screen.getByTestId("notification-gate-decline").props.style,
-    );
+    const acceptClassName = screen.getByTestId("notification-gate-accept").props.className;
+    const declineClassName = screen.getByTestId("notification-gate-decline").props.className;
 
     expect(screen.getByTestId("notification-gate-ambient-fade")).toBeTruthy();
     expect(modal.props.visible).toBe(true);
-    expect(mainStyle).toMatchObject({
-      paddingHorizontal: 24,
-      paddingTop: 64,
-    });
-    expect(actionsStyle).toMatchObject({
-      paddingBottom: 112,
-      paddingHorizontal: 20,
-      paddingTop: 16,
-    });
-    expect(StyleSheet.flatten(acceptStyle)).toMatchObject({
-      backgroundColor: "#7C6FCD",
-      borderRadius: 16,
-      height: 56,
-      minHeight: 44,
-    });
-    expect(StyleSheet.flatten(declineStyle)).toMatchObject({
-      height: 48,
-      minHeight: 44,
-    });
+    expectClassNameContains(mainClassName, ["flex-1", "px-6", "pt-16"]);
+    expectClassNameContains(actionsClassName, ["px-5", "pt-4", "pb-28"]);
+    expectClassNameContains(acceptClassName, [
+      "h-14",
+      "min-h-11",
+      "rounded-[16px]",
+      "bg-[#7C6FCD]",
+      "active:scale-[0.97]",
+    ]);
+    expectClassNameContains(declineClassName, ["h-12", "min-h-11", "active:scale-[0.98]"]);
   });
 
   it("routes the primary CTA to the OS prompt path without invoking decline", async () => {
@@ -120,6 +113,10 @@ describe("NotificationPermissionGateScreen", () => {
   });
 });
 
-function resolvePressableStyle(style: unknown) {
-  return typeof style === "function" ? style({ pressed: false }) : style;
+function expectClassNameContains(className: string | undefined, expectedParts: readonly string[]) {
+  expect(className).toBeTruthy();
+
+  for (const expectedPart of expectedParts) {
+    expect(className).toContain(expectedPart);
+  }
 }

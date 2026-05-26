@@ -1,12 +1,13 @@
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator, StyleSheet, View } from "react-native";
+import { ActivityIndicator } from "react-native";
 
 import { getOrCreateLocalInstallIdentity } from "../onboarding/local-first-onboarding";
 import { captureSyncFailureDeferred } from "../observability/deferred-capture";
 import { createPrivacySafeSyncFailureContext } from "../observability/sync-observability";
 import { openMigratedLocalDatabase } from "../storage/local-database";
 import { syncPostValueLocalRecords, type PostValueSyncDatabase } from "../sync/post-value-sync";
+import { View } from "../tw";
 import {
   linkPostValueAccount,
   loadPostRewardPaywallEligibility,
@@ -147,7 +148,7 @@ export function PostValueAccountPaywallRouteScreen() {
 
   if (routeState.status === "loading") {
     return (
-      <View style={styles.loadingScreen}>
+      <View className="flex-1 items-center justify-center bg-[#0D0F1A]">
         <ActivityIndicator color="#7C6FCD" />
       </View>
     );
@@ -190,12 +191,3 @@ function createPostValueSyncHandler(
     }
   };
 }
-
-const styles = StyleSheet.create({
-  loadingScreen: {
-    alignItems: "center",
-    backgroundColor: "#0D0F1A",
-    flex: 1,
-    justifyContent: "center",
-  },
-});

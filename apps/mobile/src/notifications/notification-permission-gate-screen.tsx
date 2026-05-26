@@ -1,12 +1,12 @@
 import { messages, type LocaleMessages } from "@nidoru/i18n";
-import { colors, radii, spacing, typography } from "@nidoru/ui-tokens";
 import { StatusBar } from "expo-status-bar";
 import { Bell, Moon, ShieldCheck, type LucideIcon } from "lucide-react-native";
 import { useEffect, useRef, useState } from "react";
-import { Animated, Easing, Modal, Pressable, StyleSheet, Text, View } from "react-native";
+import { Animated, Easing, Modal } from "react-native";
 import Svg, { Defs, LinearGradient, RadialGradient, Rect, Stop } from "react-native-svg";
 
 import { useReduceMotionPreference } from "../motion/use-reduce-motion-enabled";
+import { Pressable, ReactNativeAnimatedView, Text, View, cn } from "../tw";
 
 export const NOTIFICATION_GATE_MOTION = {
   enterDurationMs: 600,
@@ -105,75 +105,89 @@ export function NotificationPermissionGateScreen({
   const gate = (
     <View
       accessibilityLabel={copy.contextLabel}
-      style={styles.screen}
+      className="absolute inset-0 z-20 flex-1 overflow-hidden bg-[#0D0F1A]"
       testID="notification-permission-gate"
     >
       <StatusBar hidden />
       <NotificationGateAmbientFade />
-      <Animated.View
-        style={[
-          styles.content,
-          {
-            opacity: entranceProgress,
-            transform: [{ translateY }],
-          },
-        ]}
+      <ReactNativeAnimatedView
+        className="flex-1"
+        style={{
+          opacity: entranceProgress,
+          transform: [{ translateY }],
+        }}
       >
-        <View style={styles.main} testID="notification-gate-main-content">
-          <Text style={styles.contextLabel}>{copy.contextLabel}</Text>
-          <Text accessibilityRole="header" style={styles.headline}>
+        <View className="flex-1 px-6 pt-16" testID="notification-gate-main-content">
+          <Text className="mb-4 font-nidoru-primary-semibold text-[13px] leading-[18px] tracking-normal text-[#A89CE0]">
+            {copy.contextLabel}
+          </Text>
+          <Text
+            accessibilityRole="header"
+            className="mb-3 font-nidoru-primary-semibold text-[28px] leading-[34px] tracking-normal text-[#EEF0FF]"
+          >
             {headlineParts.first}
             {headlineParts.second ? `\n${headlineParts.second}` : null}
           </Text>
-          <Text style={styles.body}>{copy.body}</Text>
+          <Text className="mb-10 font-nidoru-primary-regular text-base leading-[26px] text-[#8A8FA8]">
+            {copy.body}
+          </Text>
 
-          <View style={styles.bulletStack}>
+          <View className="gap-5">
             {bullets.map(({ Icon, label }) => (
-              <View key={label} style={styles.bulletRow}>
-                <View style={styles.iconCircle}>
-                  <Icon color={colors.dark.accent.value} size={18} strokeWidth={1.8} />
+              <View className="flex-row items-start gap-4" key={label}>
+                <View className="mt-0.5 h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#1C2040] bg-[#14172B]">
+                  <Icon color="#5EC4D4" size={18} strokeWidth={1.8} />
                 </View>
-                <Text style={styles.bulletLabel}>{label}</Text>
+                <Text className="flex-1 pt-1 font-nidoru-primary-semibold text-base leading-[22px] text-[#EEF0FF]">
+                  {label}
+                </Text>
               </View>
             ))}
           </View>
         </View>
 
-        <View style={styles.actions} testID="notification-gate-actions">
+        <View
+          className="relative z-20 w-full bg-[#0D0F1A] px-5 pb-28 pt-4"
+          testID="notification-gate-actions"
+        >
           <NotificationGateActionFade />
           <Pressable
             accessibilityHint="Shows the system notification permission prompt."
             accessibilityRole="button"
+            className={cn(
+              "relative mb-2 h-14 min-h-11 w-full items-center justify-center rounded-[16px] bg-[#7C6FCD] shadow-[0_4px_16px_rgba(124,111,205,0.12)] active:scale-[0.97] active:bg-[#685BB3]",
+              isSubmitting ? "opacity-[0.72]" : null,
+            )}
             disabled={isSubmitting}
             onPress={() => void dismissWith(onAccept)}
-            style={({ pressed }) => [
-              styles.primaryButton,
-              pressed && !isSubmitting && styles.primaryButtonPressed,
-              isSubmitting && styles.disabledAction,
-            ]}
             testID="notification-gate-accept"
           >
-            <Text style={styles.primaryButtonText}>{copy.primaryCta}</Text>
+            <Text className="font-nidoru-primary-semibold text-base leading-[22px] text-[#EEF0FF]">
+              {copy.primaryCta}
+            </Text>
           </Pressable>
 
           <Pressable
             accessibilityHint="Keeps the app usable without showing the system prompt."
             accessibilityRole="button"
+            className={cn(
+              "h-12 min-h-11 w-full items-center justify-center active:scale-[0.98]",
+              isSubmitting ? "opacity-[0.72]" : null,
+            )}
             disabled={isSubmitting}
             onPress={() => void dismissWith(onDecline)}
-            style={({ pressed }) => [
-              styles.secondaryButton,
-              pressed && !isSubmitting && styles.secondaryButtonPressed,
-              isSubmitting && styles.disabledAction,
-            ]}
             testID="notification-gate-decline"
           >
-            <Text style={styles.secondaryButtonText}>{copy.secondaryCta}</Text>
+            <Text className="font-nidoru-primary-semibold text-[15px] leading-5 text-[#8A8FA8]">
+              {copy.secondaryCta}
+            </Text>
           </Pressable>
 
-          <Text style={styles.helper}>{copy.helper}</Text>
+          <Text className="mt-0.5 text-center font-nidoru-data-regular text-[13px] leading-[18px] text-[#8A8FA8]">
+            {copy.helper}
+          </Text>
         </View>
-      </Animated.View>
+      </ReactNativeAnimatedView>
     </View>
   );
 
@@ -202,11 +216,7 @@ function splitHeadline(headline: string) {
 
 function NotificationGateAmbientFade() {
   return (
-    <View
-      pointerEvents="none"
-      style={styles.ambientFadeLayer}
-      testID="notification-gate-ambient-fade"
-    >
+    <View className="absolute inset-0" pointerEvents="none" testID="notification-gate-ambient-fade">
       <Svg height="100%" preserveAspectRatio="none" viewBox="0 0 390 844" width="100%">
         <Defs>
           <RadialGradient
@@ -218,10 +228,10 @@ function NotificationGateAmbientFade() {
             id="notification-gate-top-glow"
             r="285"
           >
-            <Stop offset="0" stopColor={colors.dark.primary.value} stopOpacity="0.1" />
-            <Stop offset="0.42" stopColor={colors.dark.primary.value} stopOpacity="0.055" />
-            <Stop offset="0.76" stopColor={colors.dark.primary.value} stopOpacity="0.016" />
-            <Stop offset="1" stopColor={colors.dark.primary.value} stopOpacity="0" />
+            <Stop offset="0" stopColor="#7C6FCD" stopOpacity="0.1" />
+            <Stop offset="0.42" stopColor="#7C6FCD" stopOpacity="0.055" />
+            <Stop offset="0.76" stopColor="#7C6FCD" stopOpacity="0.016" />
+            <Stop offset="1" stopColor="#7C6FCD" stopOpacity="0" />
           </RadialGradient>
         </Defs>
         <Rect fill="url(#notification-gate-top-glow)" height="844" width="390" x="0" y="0" />
@@ -232,13 +242,13 @@ function NotificationGateAmbientFade() {
 
 function NotificationGateActionFade() {
   return (
-    <View pointerEvents="none" style={styles.actionFadeLayer}>
+    <View className="absolute inset-0" pointerEvents="none">
       <Svg height="100%" preserveAspectRatio="none" viewBox="0 0 390 260" width="100%">
         <Defs>
           <LinearGradient id="notification-gate-action-fade" x1="0" x2="0" y1="0" y2="1">
-            <Stop offset="0" stopColor={colors.dark.background.value} stopOpacity="0" />
-            <Stop offset="0.18" stopColor={colors.dark.background.value} stopOpacity="1" />
-            <Stop offset="1" stopColor={colors.dark.background.value} stopOpacity="1" />
+            <Stop offset="0" stopColor="#0D0F1A" stopOpacity="0" />
+            <Stop offset="0.18" stopColor="#0D0F1A" stopOpacity="1" />
+            <Stop offset="1" stopColor="#0D0F1A" stopOpacity="1" />
           </LinearGradient>
         </Defs>
         <Rect fill="url(#notification-gate-action-fade)" height="260" width="390" x="0" y="0" />
@@ -246,135 +256,3 @@ function NotificationGateActionFade() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  screen: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: colors.dark.background.value,
-    overflow: "hidden",
-    zIndex: 20,
-  },
-  ambientFadeLayer: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  actionFadeLayer: {
-    ...StyleSheet.absoluteFillObject,
-    position: "absolute",
-  },
-  content: {
-    flex: 1,
-  },
-  main: {
-    flex: 1,
-    paddingHorizontal: spacing.md,
-    paddingTop: 64,
-  },
-  contextLabel: {
-    color: colors.dark.primaryGlow.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 13,
-    fontWeight: "600",
-    letterSpacing: 0,
-    marginBottom: 16,
-  },
-  headline: {
-    color: colors.dark.textPrimary.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 28,
-    fontWeight: "600",
-    letterSpacing: 0,
-    lineHeight: 34,
-    marginBottom: 12,
-  },
-  body: {
-    color: colors.dark.textSecondary.value,
-    fontFamily: typography.mobileFontFamily.primary.regular,
-    fontSize: 16,
-    fontWeight: "400",
-    lineHeight: 26,
-    marginBottom: 40,
-  },
-  bulletStack: {
-    gap: 20,
-  },
-  bulletRow: {
-    alignItems: "flex-start",
-    flexDirection: "row",
-    gap: 16,
-  },
-  iconCircle: {
-    alignItems: "center",
-    backgroundColor: colors.dark.surface.value,
-    borderColor: colors.dark.surfaceRaised.value,
-    borderRadius: radii.pill,
-    borderWidth: 1,
-    height: 32,
-    justifyContent: "center",
-    marginTop: 2,
-    width: 32,
-  },
-  bulletLabel: {
-    color: colors.dark.textPrimary.value,
-    flex: 1,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 16,
-    fontWeight: "600",
-    lineHeight: 22,
-    paddingTop: 4,
-  },
-  actions: {
-    backgroundColor: colors.dark.background.value,
-    paddingBottom: 112,
-    paddingHorizontal: spacing.screenPadding,
-    paddingTop: spacing.sm,
-  },
-  primaryButton: {
-    alignItems: "center",
-    backgroundColor: colors.dark.primary.value,
-    borderRadius: radii.button + 2,
-    height: 56,
-    justifyContent: "center",
-    marginBottom: 8,
-    minHeight: 44,
-    position: "relative",
-    boxShadow: "0 4px 16px rgba(124, 111, 205, 0.12)",
-    transform: [{ scale: 1 }],
-  },
-  primaryButtonPressed: {
-    backgroundColor: "#685BB3",
-    transform: [{ scale: 0.97 }],
-  },
-  primaryButtonText: {
-    color: colors.dark.textPrimary.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  secondaryButton: {
-    alignItems: "center",
-    height: 48,
-    justifyContent: "center",
-    minHeight: 44,
-    transform: [{ scale: 1 }],
-  },
-  secondaryButtonPressed: {
-    transform: [{ scale: 0.98 }],
-  },
-  secondaryButtonText: {
-    color: colors.dark.textSecondary.value,
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 15,
-    fontWeight: "600",
-  },
-  helper: {
-    color: colors.dark.textSecondary.value,
-    fontFamily: typography.mobileFontFamily.data.regular,
-    fontSize: 13,
-    lineHeight: 18,
-    marginTop: 2,
-    textAlign: "center",
-  },
-  disabledAction: {
-    opacity: 0.72,
-  },
-});

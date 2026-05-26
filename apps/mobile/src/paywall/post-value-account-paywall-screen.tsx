@@ -1,10 +1,9 @@
-import { colors, spacing, typography } from "@nidoru/ui-tokens";
 import { StatusBar } from "expo-status-bar";
 import { CheckCircle, ShieldCheck } from "lucide-react-native";
 import { useCallback, useMemo, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import Svg, { Defs, RadialGradient, Rect, Stop } from "react-native-svg";
 
+import { Pressable, ScrollView, Text, View, cn } from "../tw";
 import type {
   PostRewardPaywallEligibility,
   PostValueAuthProvider,
@@ -91,44 +90,57 @@ export function PostValueAccountPaywallScreen({
   }
 
   return (
-    <View style={styles.screen}>
+    <View className="flex-1 bg-[#0D0F1A]" testID="post-value-account-paywall-screen">
       <StatusBar hidden />
       <PaywallTopFade />
       <ScrollView
-        contentContainerStyle={[
-          styles.scrollContent,
-          shouldShowPlanSelection ? styles.planScrollContent : styles.accountScrollContent,
-        ]}
+        className="flex-1"
+        contentContainerClassName={cn(
+          "px-5 pb-[360px]",
+          shouldShowPlanSelection ? "pt-16" : "pt-[62px]",
+        )}
         contentInsetAdjustmentBehavior="never"
-        style={styles.scrollView}
       >
         {!shouldShowPlanSelection ? (
           <>
-            <View style={styles.proofLabelRow}>
+            <View className="mb-4 flex-row items-center gap-2">
               <CheckCircle color="#0D0F1A" fill="#5EC4D4" size={14} strokeWidth={3} />
-              <Text selectable style={styles.proofLabelText}>
+              <Text
+                className="font-nidoru-primary-semibold text-[13px] leading-[18px] text-[#A4AAC4]"
+                selectable
+              >
                 First session complete
               </Text>
             </View>
 
-            <Text accessibilityRole="header" selectable style={styles.headline}>
+            <Text
+              accessibilityRole="header"
+              className="mb-3 font-nidoru-primary-semibold text-[28px] leading-[34px] tracking-normal text-[#EEF0FF]"
+              selectable
+            >
               Keep tonight’s calm going
             </Text>
-            <Text selectable style={styles.subcopy}>
+            <Text
+              className="mb-7 font-nidoru-primary-regular text-[15px] leading-6 text-[#8A8FA8]"
+              selectable
+            >
               Tonight’s session is saved on this phone. Link an account to protect your progress and
               restore it later.
             </Text>
 
-            <View style={styles.proofCard}>
+            <View className="mb-[38px] min-h-[72px] flex-row items-center justify-between rounded-[16px] border border-[#1C2040] bg-[#14172B] py-3.5">
               <ProofMetric label="Session" value={accessState.proof.durationLabel} />
-              <View style={styles.proofDivider} />
+              <View className="self-stretch bg-[#1C2040] w-px" />
               <ProofMetric label="Breaths" value={`${accessState.proof.breathCount}`} />
-              <View style={styles.proofDivider} />
+              <View className="self-stretch bg-[#1C2040] w-px" />
               <ProofMetric accent label="Streak" value={`${accessState.proof.streakCount}`} />
             </View>
 
-            <View style={styles.accountSection}>
-              <Text selectable style={styles.sectionKicker}>
+            <View className="mb-24 gap-3" testID="post-value-account-section">
+              <Text
+                className="mb-1 font-nidoru-primary-semibold text-[15px] leading-5 text-[#EEF0FF]"
+                selectable
+              >
                 Save tonight’s progress
               </Text>
               <AccountButton
@@ -147,11 +159,18 @@ export function PostValueAccountPaywallScreen({
                   handleAccountLinkPress("google");
                 }}
               />
-              <Text selectable style={styles.trustLine}>
+              <Text
+                className="mt-0.5 text-center font-nidoru-primary-regular text-[13px] leading-[18px] text-[#8A8FA8]"
+                selectable
+              >
                 Used for progress sync, purchase restore, and data controls.
               </Text>
               {actionMessage ? (
-                <Text accessibilityRole="alert" selectable style={styles.actionMessage}>
+                <Text
+                  accessibilityRole="alert"
+                  className="text-center font-nidoru-primary-semibold text-[13px] leading-[18px] text-[#A89CE0]"
+                  selectable
+                >
                   {actionMessage}
                 </Text>
               ) : null}
@@ -160,26 +179,36 @@ export function PostValueAccountPaywallScreen({
         ) : null}
 
         {shouldShowPlanSelection ? (
-          <View style={styles.premiumSection}>
-            <Text accessibilityRole="header" selectable style={styles.premiumTitle}>
+          <View className="mb-40">
+            <Text
+              accessibilityRole="header"
+              className="mb-2 font-nidoru-primary-semibold text-xl leading-[26px] tracking-normal text-[#EEF0FF]"
+              selectable
+            >
               Try 14 days of Nidoru Premium
             </Text>
-            <Text selectable style={styles.premiumCopy}>
+            <Text
+              className="mb-[26px] font-nidoru-primary-regular text-[15px] leading-[22px] text-[#8A8FA8]"
+              selectable
+            >
               Build on the routine that helped tonight.
             </Text>
 
-            <View style={styles.benefitList}>
+            <View className="mb-12 gap-3.5">
               {premiumBenefits.map((benefit) => (
-                <View key={benefit} style={styles.benefitRow}>
+                <View className="flex-row items-start gap-3" key={benefit}>
                   <CheckCircle color="#A89CE0" size={18} />
-                  <Text selectable style={styles.benefitText}>
+                  <Text
+                    className="flex-1 font-nidoru-primary-regular text-[15px] leading-[21px] text-[#EEF0FF]"
+                    selectable
+                  >
                     {benefit}
                   </Text>
                 </View>
               ))}
             </View>
 
-            <View style={styles.planList}>
+            <View className="mb-[22px] gap-3" testID="post-value-plan-list">
               <PlanButton
                 badge="BEST VALUE"
                 id="annual"
@@ -200,18 +229,32 @@ export function PostValueAccountPaywallScreen({
                 onPress={setSelectedPlanId}
               />
             </View>
-            <Text selectable style={styles.termsText}>
+            <Text
+              className="text-center font-nidoru-primary-regular text-[13px] leading-[18px] text-[#6A6F93]"
+              selectable
+            >
               14 days free. Then $39.99/year unless canceled.
             </Text>
           </View>
         ) : null}
       </ScrollView>
 
-      <View style={styles.stickyFooter}>
+      <View
+        className="pointer-events-none absolute bottom-0 left-0 right-0 h-[260px] bg-gradient-to-t from-[#0D0F1A] via-[#0D0F1A]/95 to-transparent"
+        pointerEvents="none"
+      />
+      <View
+        className="absolute bottom-0 left-0 right-0 bg-[#0D0F1A] px-5 pb-8 pt-6"
+        testID="post-value-sticky-footer"
+      >
         {accessState.canShowPaywall ? (
           <>
             <Pressable
               accessibilityRole="button"
+              className={cn(
+                "h-14 w-full items-center justify-center rounded-[16px] bg-[#7C6FCD] shadow-[0_4px_24px_rgba(124,111,205,0.25)] active:scale-[0.96] active:bg-[#685BB3]",
+                pendingAction === "trial" ? "opacity-55" : null,
+              )}
               disabled={pendingAction === "trial"}
               onPress={() => {
                 if (!plansPresented) {
@@ -221,17 +264,18 @@ export function PostValueAccountPaywallScreen({
 
                 handleStartTrialPress();
               }}
-              style={({ pressed }) => [
-                styles.primaryCta,
-                pressed ? styles.pressed : null,
-                pendingAction === "trial" ? styles.disabled : null,
-              ]}
             >
-              <Text selectable={false} style={styles.primaryCtaText}>
+              <Text
+                className="font-nidoru-primary-semibold text-base leading-[22px] text-[#EEF0FF]"
+                selectable={false}
+              >
                 {ctaLabel}
               </Text>
             </Pressable>
-            <Text selectable style={styles.ctaHelper}>
+            <Text
+              className="mb-4 mt-1.5 text-center font-nidoru-primary-semibold text-xs leading-4 text-[#A89CE0]"
+              selectable
+            >
               {ctaHelper}
             </Text>
           </>
@@ -240,10 +284,13 @@ export function PostValueAccountPaywallScreen({
         {accessState.canContinueFree ? (
           <Pressable
             accessibilityRole="button"
+            className="min-h-11 items-center justify-center py-3 active:scale-[0.96]"
             onPress={onContinueFree}
-            style={({ pressed }) => [styles.freeButton, pressed ? styles.pressed : null]}
           >
-            <Text selectable={false} style={styles.freeButtonText}>
+            <Text
+              className="font-nidoru-primary-semibold text-[15px] leading-5 text-[#8A8FA8]"
+              selectable={false}
+            >
               Continue with free
             </Text>
           </Pressable>
@@ -252,11 +299,17 @@ export function PostValueAccountPaywallScreen({
         {accessState.canShowPaywall && plansPresented ? (
           <Pressable
             accessibilityRole="button"
+            className={cn(
+              "min-h-11 items-center justify-center active:scale-[0.96]",
+              pendingAction === "restore" ? "opacity-55" : null,
+            )}
             disabled={pendingAction === "restore"}
             onPress={handleRestorePress}
-            style={({ pressed }) => [styles.restoreButton, pressed ? styles.pressed : null]}
           >
-            <Text selectable={false} style={styles.restoreButtonText}>
+            <Text
+              className="font-nidoru-primary-semibold text-[13px] leading-[18px] text-[#6A6F93]"
+              selectable={false}
+            >
               Restore purchase
             </Text>
           </Pressable>
@@ -268,7 +321,7 @@ export function PostValueAccountPaywallScreen({
 
 function PaywallTopFade() {
   return (
-    <View pointerEvents="none" style={styles.topFadeLayer} testID="post-value-paywall-top-fade">
+    <View className="absolute inset-0" pointerEvents="none" testID="post-value-paywall-top-fade">
       <Svg height="100%" preserveAspectRatio="none" viewBox="0 0 390 760" width="100%">
         <Defs>
           <RadialGradient
@@ -302,12 +355,19 @@ function BlockedPostValueGate({ reason }: { readonly reason: string }) {
   }, [reason]);
 
   return (
-    <View style={styles.blockedScreen}>
+    <View className="flex-1 items-center justify-center gap-4 bg-[#0D0F1A] p-10">
       <ShieldCheck color="#5EC4D4" size={24} />
-      <Text accessibilityRole="header" selectable style={styles.blockedTitle}>
+      <Text
+        accessibilityRole="header"
+        className="font-nidoru-primary-semibold text-2xl leading-8 text-[#EEF0FF]"
+        selectable
+      >
         Not yet
       </Text>
-      <Text selectable style={styles.blockedCopy}>
+      <Text
+        className="text-center font-nidoru-primary-regular text-[15px] leading-[22px] text-[#8A8FA8]"
+        selectable
+      >
         {copy}
       </Text>
     </View>
@@ -324,11 +384,17 @@ function ProofMetric({
   readonly value: string;
 }) {
   return (
-    <View style={styles.proofMetric}>
-      <Text selectable style={[styles.proofValue, accent ? styles.proofValueAccent : null]}>
+    <View className="flex-1 items-center gap-1">
+      <Text
+        className={cn(
+          "font-nidoru-data-regular text-[15px] font-bold leading-5 text-[#EEF0FF]",
+          accent ? "text-[#5EC4D4]" : null,
+        )}
+        selectable
+      >
         {value}
       </Text>
-      <Text selectable style={styles.proofMetricLabel}>
+      <Text className="font-nidoru-primary-semibold text-xs leading-4 text-[#8A8FA8]" selectable>
         {label}
       </Text>
     </View>
@@ -349,19 +415,29 @@ function AccountButton({
   return (
     <Pressable
       accessibilityRole="button"
+      className={cn(
+        "h-[52px] w-full flex-row items-center justify-center gap-2.5 rounded-[16px] active:scale-[0.98]",
+        mark === "apple"
+          ? "bg-[#1C2040] active:bg-[#252A50]"
+          : "border border-[#1C2040] bg-[#14172B] active:bg-[#1C2040]",
+        disabled ? "opacity-55" : null,
+      )}
       disabled={disabled}
       onPress={onPress}
-      style={({ pressed }) => [
-        styles.accountButton,
-        mark === "apple" ? styles.appleButton : styles.googleButton,
-        pressed ? styles.pressed : null,
-        disabled ? styles.disabled : null,
-      ]}
     >
-      <Text selectable={false} style={mark === "apple" ? styles.appleMark : styles.googleMark}>
+      <Text
+        className={cn(
+          "text-lg leading-6",
+          mark === "apple" ? "text-[#EEF0FF]" : "font-nidoru-data-regular text-[#5EC4D4]",
+        )}
+        selectable={false}
+      >
         {mark === "apple" ? "" : "G"}
       </Text>
-      <Text selectable={false} style={styles.accountButtonText}>
+      <Text
+        className="font-nidoru-primary-semibold text-[15px] leading-5 text-[#EEF0FF]"
+        selectable={false}
+      >
         {label}
       </Text>
     </Pressable>
@@ -391,392 +467,65 @@ function PlanButton({
     <Pressable
       accessibilityRole="button"
       accessibilityState={{ selected: isSelected }}
+      className={cn(
+        "relative min-h-[70px] w-full flex-row items-center justify-between rounded-[16px] border-[1.5px] p-4 active:scale-[0.98]",
+        isSelected ? "border-[#7C6FCD] bg-[#7C6FCD]/10" : "border-[#1C2040] bg-[#14172B]",
+      )}
       onPress={() => {
         onPress(id);
       }}
-      style={({ pressed }) => [
-        styles.planButton,
-        isSelected ? styles.planButtonSelected : null,
-        pressed ? styles.pressed : null,
-      ]}
     >
       {badge ? (
-        <View style={styles.planBadge}>
-          <Text selectable={false} style={styles.planBadgeText}>
+        <View className="absolute -top-3 right-6 rounded-full bg-[#7C6FCD] px-2 py-0.5">
+          <Text
+            className="font-nidoru-data-regular text-[11px] font-bold uppercase leading-4 tracking-wider text-[#EEF0FF]"
+            selectable={false}
+          >
             {badge}
           </Text>
         </View>
       ) : null}
-      <View style={styles.planLeft}>
-        <View style={[styles.planRadio, isSelected ? styles.planRadioSelected : null]}>
-          {isSelected ? <View style={styles.planRadioDot} /> : null}
+      <View className="flex-row items-center gap-3">
+        <View
+          className={cn(
+            "h-5 w-5 shrink-0 items-center justify-center rounded-full border-[1.5px]",
+            isSelected ? "border-[#7C6FCD]" : "border-[#4A4E6A]",
+          )}
+        >
+          {isSelected ? <View className="h-2.5 w-2.5 rounded-full bg-[#7C6FCD]" /> : null}
         </View>
         <View>
-          <Text selectable style={styles.planTitle}>
+          <Text
+            className="font-nidoru-primary-semibold text-base leading-[22px] text-[#EEF0FF]"
+            selectable
+          >
             {title}
           </Text>
           <Text
+            className={cn(
+              "mt-0.5 font-nidoru-primary-regular text-[13px] leading-[18px] text-[#8A8FA8]",
+              isSelected ? "text-[#A89CE0]" : null,
+            )}
             selectable
-            style={[styles.planSubcopy, isSelected ? styles.planSubcopyAccent : null]}
           >
             {subcopy}
           </Text>
         </View>
       </View>
-      <View style={styles.planPriceWrap}>
-        <Text selectable style={styles.planPrice}>
+      <View className="items-end">
+        <Text
+          className="font-nidoru-data-regular text-base font-bold leading-[22px] text-[#EEF0FF]"
+          selectable
+        >
           {price}
         </Text>
-        <Text selectable style={styles.planSuffix}>
+        <Text
+          className="mt-0.5 font-nidoru-data-regular text-[13px] leading-[18px] text-[#8A8FA8]"
+          selectable
+        >
           {suffix}
         </Text>
       </View>
     </Pressable>
   );
 }
-
-const styles = StyleSheet.create({
-  accountButton: {
-    alignItems: "center",
-    borderRadius: 16,
-    flexDirection: "row",
-    gap: 10,
-    height: 52,
-    justifyContent: "center",
-    width: "100%",
-  },
-  accountButtonText: {
-    color: "#EEF0FF",
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 15,
-  },
-  accountScrollContent: {
-    paddingTop: 62,
-  },
-  accountSection: {
-    gap: 12,
-    marginBottom: 96,
-  },
-  actionMessage: {
-    color: "#A89CE0",
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 13,
-    lineHeight: 18,
-    textAlign: "center",
-  },
-  appleButton: {
-    backgroundColor: "#1C2040",
-  },
-  appleMark: {
-    color: "#EEF0FF",
-    fontSize: 18,
-  },
-  benefitList: {
-    gap: 14,
-    marginBottom: 48,
-  },
-  benefitRow: {
-    alignItems: "flex-start",
-    flexDirection: "row",
-    gap: 12,
-  },
-  benefitText: {
-    color: "#EEF0FF",
-    flex: 1,
-    fontFamily: typography.mobileFontFamily.primary.regular,
-    fontSize: 15,
-    lineHeight: 21,
-  },
-  blockedCopy: {
-    color: "#8A8FA8",
-    fontFamily: typography.mobileFontFamily.primary.regular,
-    fontSize: 15,
-    lineHeight: 22,
-    textAlign: "center",
-  },
-  blockedScreen: {
-    alignItems: "center",
-    backgroundColor: "#0D0F1A",
-    flex: 1,
-    gap: spacing.sm,
-    justifyContent: "center",
-    padding: spacing.xl,
-  },
-  blockedTitle: {
-    color: "#EEF0FF",
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 24,
-  },
-  ctaHelper: {
-    color: "#A89CE0",
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 12,
-    marginBottom: 16,
-    marginTop: 6,
-    textAlign: "center",
-  },
-  disabled: {
-    opacity: 0.55,
-  },
-  freeButton: {
-    alignItems: "center",
-    justifyContent: "center",
-    minHeight: 44,
-    paddingVertical: 12,
-  },
-  freeButtonText: {
-    color: "#8A8FA8",
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 15,
-  },
-  googleButton: {
-    backgroundColor: "#14172B",
-    borderColor: "#1C2040",
-    borderWidth: 1,
-  },
-  googleMark: {
-    color: "#5EC4D4",
-    fontFamily: typography.mobileFontFamily.data.regular,
-    fontSize: 18,
-  },
-  headline: {
-    color: "#EEF0FF",
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 28,
-    letterSpacing: 0,
-    lineHeight: 34,
-    marginBottom: 12,
-  },
-  planBadge: {
-    backgroundColor: "#7C6FCD",
-    borderRadius: 10,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    position: "absolute",
-    right: 22,
-    top: -11,
-  },
-  planBadgeText: {
-    color: "#EEF0FF",
-    fontFamily: typography.mobileFontFamily.data.regular,
-    fontSize: 11,
-    fontWeight: "700",
-  },
-  planScrollContent: {
-    paddingTop: 64,
-  },
-  planButton: {
-    alignItems: "center",
-    backgroundColor: "#14172B",
-    borderColor: "#1C2040",
-    borderRadius: 16,
-    borderWidth: 1.5,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    minHeight: 70,
-    padding: 16,
-  },
-  planButtonSelected: {
-    backgroundColor: "rgba(124, 111, 205, 0.10)",
-    borderColor: "#7C6FCD",
-  },
-  planLeft: {
-    alignItems: "center",
-    flexDirection: "row",
-    gap: 12,
-  },
-  planList: {
-    gap: 12,
-    marginBottom: 22,
-  },
-  planPrice: {
-    color: "#EEF0FF",
-    fontFamily: typography.mobileFontFamily.data.regular,
-    fontSize: 16,
-    fontWeight: "700",
-  },
-  planPriceWrap: {
-    alignItems: "flex-end",
-  },
-  planRadio: {
-    alignItems: "center",
-    borderColor: "#4A4E6A",
-    borderRadius: 10,
-    borderWidth: 1.5,
-    height: 20,
-    justifyContent: "center",
-    width: 20,
-  },
-  planRadioDot: {
-    backgroundColor: "#7C6FCD",
-    borderRadius: 5,
-    height: 10,
-    width: 10,
-  },
-  planRadioSelected: {
-    borderColor: "#7C6FCD",
-  },
-  planSubcopy: {
-    color: "#8A8FA8",
-    fontFamily: typography.mobileFontFamily.primary.regular,
-    fontSize: 13,
-    marginTop: 3,
-  },
-  planSubcopyAccent: {
-    color: "#A89CE0",
-  },
-  planSuffix: {
-    color: "#8A8FA8",
-    fontFamily: typography.mobileFontFamily.data.regular,
-    fontSize: 13,
-    marginTop: 3,
-  },
-  planTitle: {
-    color: "#EEF0FF",
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 16,
-  },
-  premiumCopy: {
-    color: "#8A8FA8",
-    fontFamily: typography.mobileFontFamily.primary.regular,
-    fontSize: 15,
-    lineHeight: 22,
-    marginBottom: 26,
-  },
-  premiumSection: {
-    marginBottom: 160,
-  },
-  premiumTitle: {
-    color: "#EEF0FF",
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 20,
-    letterSpacing: 0,
-    lineHeight: 26,
-    marginBottom: 8,
-  },
-  pressed: {
-    transform: [{ scale: 0.96 }],
-  },
-  primaryCta: {
-    alignItems: "center",
-    backgroundColor: "#7C6FCD",
-    borderRadius: 16,
-    height: 56,
-    justifyContent: "center",
-    width: "100%",
-  },
-  primaryCtaText: {
-    color: "#EEF0FF",
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 16,
-  },
-  proofCard: {
-    alignItems: "center",
-    backgroundColor: "#14172B",
-    borderColor: "#1C2040",
-    borderRadius: 16,
-    borderWidth: 1,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 38,
-    minHeight: 72,
-    paddingVertical: 14,
-  },
-  proofDivider: {
-    alignSelf: "stretch",
-    backgroundColor: "#1C2040",
-    width: 1,
-  },
-  proofLabelRow: {
-    alignItems: "center",
-    flexDirection: "row",
-    gap: 8,
-    marginBottom: 16,
-  },
-  proofLabelText: {
-    color: "#A4AAC4",
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 13,
-  },
-  proofMetric: {
-    alignItems: "center",
-    flex: 1,
-    gap: 4,
-  },
-  proofMetricLabel: {
-    color: "#8A8FA8",
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 12,
-  },
-  proofValue: {
-    color: "#EEF0FF",
-    fontFamily: typography.mobileFontFamily.data.regular,
-    fontSize: 15,
-    fontWeight: "700",
-  },
-  proofValueAccent: {
-    color: "#5EC4D4",
-  },
-  restoreButton: {
-    alignItems: "center",
-    justifyContent: "center",
-    minHeight: 44,
-  },
-  restoreButtonText: {
-    color: "#6A6F93",
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 13,
-  },
-  screen: {
-    backgroundColor: colors.dark.background.value,
-    flex: 1,
-  },
-  scrollContent: {
-    paddingBottom: 360,
-    paddingHorizontal: 20,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  sectionKicker: {
-    color: "#EEF0FF",
-    fontFamily: typography.mobileFontFamily.primary.semiBold,
-    fontSize: 15,
-    marginBottom: 4,
-  },
-  stickyFooter: {
-    backgroundColor: "#0D0F1A",
-    bottom: 0,
-    left: 0,
-    paddingBottom: 32,
-    paddingHorizontal: 20,
-    paddingTop: 24,
-    position: "absolute",
-    right: 0,
-  },
-  subcopy: {
-    color: "#8A8FA8",
-    fontFamily: typography.mobileFontFamily.primary.regular,
-    fontSize: 15,
-    lineHeight: 24,
-    marginBottom: 28,
-  },
-  termsText: {
-    color: "#6A6F93",
-    fontFamily: typography.mobileFontFamily.primary.regular,
-    fontSize: 13,
-    lineHeight: 18,
-    textAlign: "center",
-  },
-  trustLine: {
-    color: "#8A8FA8",
-    fontFamily: typography.mobileFontFamily.primary.regular,
-    fontSize: 13,
-    lineHeight: 18,
-    marginTop: 2,
-    textAlign: "center",
-  },
-  topFadeLayer: {
-    ...StyleSheet.absoluteFillObject,
-  },
-});

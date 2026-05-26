@@ -1,5 +1,5 @@
 import type { ElementType, ReactNode } from "react";
-import type { LayoutChangeEvent, StyleProp, ViewStyle } from "react-native";
+import type { LayoutChangeEvent, StyleProp, TextStyle, ViewStyle } from "react-native";
 
 import { Pressable, ReactNativeAnimatedView, Text, View, cn, type PressableProps } from "../tw";
 
@@ -9,6 +9,20 @@ export const GLOBAL_TAB_BAR_COLORS = {
 } as const;
 
 export const GLOBAL_TAB_ACTIVE_INDICATOR_WIDTH = 32;
+
+const activeLabelStyle: TextStyle = {
+  color: GLOBAL_TAB_BAR_COLORS.active,
+  fontSize: 11,
+  fontWeight: "600",
+  lineHeight: 14,
+};
+
+const inactiveLabelStyle: TextStyle = {
+  color: GLOBAL_TAB_BAR_COLORS.inactive,
+  fontSize: 12,
+  fontWeight: "400",
+  lineHeight: 16,
+};
 
 type GlobalTabBarSurfaceProps = {
   readonly children: ReactNode;
@@ -84,11 +98,13 @@ export function GlobalTabBarItem({
       </View>
       <Text
         className={cn(
+          "h-4 text-center",
           isFocused
             ? "font-nidoru-primary-semibold text-[11px] font-semibold text-[#A89CE0]"
             : "font-nidoru-primary-regular text-xs font-normal text-[#A0A5C0]",
         )}
         selectable={false}
+        style={isFocused ? activeLabelStyle : inactiveLabelStyle}
         testID={`tab-label-${tabId}`}
       >
         {label}

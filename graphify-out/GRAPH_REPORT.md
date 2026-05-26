@@ -1,12 +1,12 @@
 # Graph Report - sleep-app  (2026-05-26)
 
 ## Corpus Check
-- 157 files · ~423,088 words
+- 157 files · ~423,201 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 485 nodes · 502 edges · 19 communities detected
-- Extraction: 88% EXTRACTED · 12% INFERRED · 0% AMBIGUOUS · INFERRED: 62 edges (avg confidence: 0.8)
+- 487 nodes · 505 edges · 19 communities detected
+- Extraction: 88% EXTRACTED · 12% INFERRED · 0% AMBIGUOUS · INFERRED: 63 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
@@ -21,7 +21,7 @@
 - [[_COMMUNITY_Community 8|Community 8]]
 - [[_COMMUNITY_Community 9|Community 9]]
 - [[_COMMUNITY_Community 10|Community 10]]
-- [[_COMMUNITY_Community 12|Community 12]]
+- [[_COMMUNITY_Community 11|Community 11]]
 - [[_COMMUNITY_Community 13|Community 13]]
 - [[_COMMUNITY_Community 16|Community 16]]
 - [[_COMMUNITY_Community 18|Community 18]]
@@ -65,48 +65,48 @@ Cohesion: 0.11
 Nodes (25): canPromptForNotificationPermission(), completeFirstSessionLocally(), createDefaultRandomSegment(), createLocalEventId(), createLocalReflectionId(), getLocalCalendarDayDifference(), insertLocalEventQueue(), insertNotificationPermissionEvent() (+17 more)
 
 ### Community 2 - "Community 2"
-Cohesion: 0.08
-Nodes (10): captureAudioFailedDeferred(), captureAnalyticsEventDeferred(), captureSyncFailureDeferred(), shouldStartFirstLaunchOnboarding(), hasCompletedOnboardingPersonalization(), getOrCreateLocalInstallIdentity(), OnboardingContinueButton(), padTimeNumber() (+2 more)
+Cohesion: 0.1
+Nodes (12): shouldStartFirstLaunchOnboarding(), openAndMigrateLocalDatabase(), openMigratedLocalDatabase(), hasCompletedOnboardingPersonalization(), getOrCreateLocalInstallIdentity(), applyMigration(), runSqliteMigrations(), assertCondition() (+4 more)
 
 ### Community 3 - "Community 3"
-Cohesion: 0.1
-Nodes (10): AppTabBar(), getTabIndicatorMotionConfig(), getHomeContentEntranceMotionConfig(), HomeEntrancePolish(), markRescueMeTapIfNeeded(), NotificationPermissionGateScreen(), splitHeadline(), markRescueMeHomeTap() (+2 more)
+Cohesion: 0.12
+Nodes (15): clampEveningReminderMinuteOfDay(), createLocalDateAtMinuteOfDay(), createPersonalizedOnboardingPlan(), formatWindDownTime(), getInstructionDepthForFamiliarity(), getLocalMinuteOfDay(), getNextEveningReminderDate(), getOnboardingPlanForGoal() (+7 more)
 
 ### Community 4 - "Community 4"
 Cohesion: 0.13
 Nodes (12): fetch(), createPostValueSupabaseAuthenticator(), createPostValueSupabaseClient(), createPostValueSyncHttpError(), createSupabaseHeaders(), createSupabaseServiceUrl(), createSupabaseStorageKey(), isAllowedPostValueSyncTarget() (+4 more)
 
 ### Community 5 - "Community 5"
+Cohesion: 0.12
+Nodes (10): createLocalHomeState(), getLocalMinuteOfDay(), getPrimaryActionIdForMinute(), selectHomePrimaryAction(), getHomeContentEntranceMotionConfig(), HomeEntrancePolish(), HomeScreen(), markRescueMeTapIfNeeded() (+2 more)
+
+### Community 6 - "Community 6"
 Cohesion: 0.14
 Nodes (11): getAppEnvironment(), isNonProductionEnvironment(), isObservabilityProofModeEnabled(), capturePostHog(), captureSentry(), captureAnalyticsEvent(), captureExplicitEvent(), capturePostHogProofEvent() (+3 more)
 
-### Community 6 - "Community 6"
-Cohesion: 0.17
-Nodes (12): clampEveningReminderMinuteOfDay(), createLocalDateAtMinuteOfDay(), createPersonalizedOnboardingPlan(), formatWindDownTime(), getInstructionDepthForFamiliarity(), getLocalMinuteOfDay(), getNextEveningReminderDate(), getOnboardingPlanForGoal() (+4 more)
-
 ### Community 7 - "Community 7"
-Cohesion: 0.18
-Nodes (9): openAndMigrateLocalDatabase(), openMigratedLocalDatabase(), applyMigration(), runSqliteMigrations(), assertCondition(), assertRejects(), runSqlite(), SqliteCliDatabase (+1 more)
-
-### Community 8 - "Community 8"
 Cohesion: 0.29
 Nodes (12): createBlockedEligibility(), formatDurationLabel(), getEligibleReason(), isPostSessionFeeling(), linkPostValueAccount(), loadPostRewardPaywallEligibility(), mapLocalRecordsToUser(), parseUserId() (+4 more)
 
-### Community 9 - "Community 9"
+### Community 8 - "Community 8"
 Cohesion: 0.24
 Nodes (9): completeWindDownRunLocally(), createLocalEventId(), getInitialRecoveryState(), insertWindDownEventQueue(), loadLatestRecoverableWindDownRun(), parseWindDownRunRow(), recordWindDownStartedLocally(), saveWindDownStepProgressLocally() (+1 more)
 
+### Community 9 - "Community 9"
+Cohesion: 0.18
+Nodes (4): captureAudioFailedDeferred(), captureAnalyticsEventDeferred(), captureSyncFailureDeferred(), captureRescueMeSoundHandoffAudioFailedDeferred()
+
 ### Community 10 - "Community 10"
+Cohesion: 0.21
+Nodes (6): AppTabBar(), getTabIndicatorMotionConfig(), NotificationPermissionGateScreen(), splitHeadline(), useReduceMotionEnabled(), useReduceMotionPreference()
+
+### Community 11 - "Community 11"
 Cohesion: 0.35
 Nodes (10): abandonBreathSessionLocally(), completeBreathSessionLocally(), createLocalEventId(), insertBreathSessionEventQueue(), loadPendingBreathSessionCompletion(), loadRecoverableBreathSessionDraft(), parseSourceFilterInput(), recordBreathSessionStartedLocally() (+2 more)
 
-### Community 12 - "Community 12"
+### Community 13 - "Community 13"
 Cohesion: 0.44
 Nodes (8): classifySyncError(), createBreathSessionSyncPayloads(), createSyncTableError(), getFailedRecordType(), parseUserId(), syncPostValueLocalRecords(), unwrapSyncCause(), upsertOrThrow()
-
-### Community 13 - "Community 13"
-Cohesion: 0.43
-Nodes (5): createLocalHomeState(), getLocalMinuteOfDay(), getPrimaryActionIdForMinute(), selectHomePrimaryAction(), createHomeOverview()
 
 ### Community 16 - "Community 16"
 Cohesion: 0.6
@@ -145,11 +145,11 @@ Nodes (2): OnboardingRouteScreen(), parseOnboardingStage()
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `requestNotificationPermissionFromGate()` connect `Community 1` to `Community 5`?**
+- **Why does `requestNotificationPermissionFromGate()` connect `Community 1` to `Community 6`?**
   _High betweenness centrality (0.017) - this node is a cross-community bridge._
-- **Why does `captureAnalyticsEvent()` connect `Community 5` to `Community 1`?**
-  _High betweenness centrality (0.016) - this node is a cross-community bridge._
-- **Why does `submitError()` connect `Community 2` to `Community 6`?**
+- **Why does `captureAnalyticsEvent()` connect `Community 6` to `Community 1`?**
+  _High betweenness centrality (0.015) - this node is a cross-community bridge._
+- **Why does `submitError()` connect `Community 3` to `Community 9`, `Community 2`?**
   _High betweenness centrality (0.015) - this node is a cross-community bridge._
 - **Are the 5 inferred relationships involving `getBreathSessionSnapshot()` (e.g. with `pauseSession()` and `resumeSession()`) actually correct?**
   _`getBreathSessionSnapshot()` has 5 INFERRED edges - model-reasoned connections that need verification._

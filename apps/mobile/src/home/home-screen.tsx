@@ -1,3 +1,4 @@
+import { useRouter } from "expo-router";
 import {
   ArrowRight,
   BookOpen,
@@ -218,10 +219,15 @@ export function HomeScreen({
   notificationGateController = null,
   now = new Date(),
 }: HomeScreenProps) {
+  const router = useRouter();
   const homeState = createHomeOverview({ hasMorningCheckIn, now });
   const primaryAction = homeState.primaryAction;
   const summarySlot = homeState.summarySlot;
   const timestamp = useMemo(() => formatHomeTimestamp(now), [now]);
+  const handleHomeActionPress = (actionId: string, routeTarget: HomeRouteTarget) => {
+    markRescueMeTapIfNeeded(actionId);
+    router.push(routeTarget);
+  };
 
   return (
     <View className="flex-1 bg-[#0D0F1A]" testID="home-root">
@@ -293,41 +299,42 @@ export function HomeScreen({
 
           <RitualScene />
 
-          <Link asChild href={primaryAction.routeTarget}>
-            <Pressable
-              accessibilityHint={`Opens the ${primaryAction.label} anchor.`}
-              accessibilityRole="link"
-              className="relative z-10"
-              onPress={() => markRescueMeTapIfNeeded(primaryAction.id)}
+          <Pressable
+            accessibilityHint={`Opens the ${primaryAction.label} anchor.`}
+            accessibilityRole="link"
+            className="relative z-10 active:scale-[0.97]"
+            onPress={() => {
+              handleHomeActionPress(primaryAction.id, primaryAction.routeTarget);
+            }}
+            testID="home-primary-action-link"
+          >
+            <View
+              className="relative h-[52px] w-full flex-row items-center justify-center gap-2 overflow-hidden rounded-[16px] py-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_8px_20px_-5px_rgba(124,111,205,0.6)]"
+              testID="home-primary-button-frame"
             >
               <View
-                className="relative h-[52px] w-full flex-row items-center justify-center gap-2 overflow-hidden rounded-[16px] py-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_8px_20px_-5px_rgba(124,111,205,0.6)] active:scale-[0.97]"
-                testID="home-primary-button-frame"
+                className="absolute inset-0 overflow-hidden rounded-[16px]"
+                pointerEvents="none"
+                testID="home-primary-button-gradient"
               >
-                <View
-                  className="absolute inset-0 overflow-hidden rounded-[16px]"
-                  pointerEvents="none"
-                  testID="home-primary-button-gradient"
-                >
-                  <Svg height={52} preserveAspectRatio="none" viewBox="0 0 310 52" width="100%">
-                    <Defs>
-                      <LinearGradient id="home-start-button-bg" x1="0" x2="0" y1="0" y2="1">
-                        <Stop offset="0" stopColor="#A89CE0" />
-                        <Stop offset="1" stopColor="#7C6FCD" />
-                      </LinearGradient>
-                    </Defs>
-                    <Rect fill="url(#home-start-button-bg)" height="52" rx="16" width="310" />
-                  </Svg>
-                </View>
-                <View className="relative z-10 flex-row items-center gap-2">
-                  <Play color="#0D0F1A" fill="#0D0F1A" size={15} strokeWidth={2} />
-                  <Text className="font-nidoru-data-regular text-sm font-semibold leading-[20px] text-[#0D0F1A]">
-                    {primaryAction.ctaText}
-                  </Text>
-                </View>
+                <Svg height={52} preserveAspectRatio="none" viewBox="0 0 310 52" width="100%">
+                  <Defs>
+                    <LinearGradient id="home-start-button-bg" x1="0" x2="0" y1="0" y2="1">
+                      <Stop offset="0" stopColor="#A89CE0" />
+                      <Stop offset="1" stopColor="#7C6FCD" />
+                    </LinearGradient>
+                  </Defs>
+                  <Rect fill="url(#home-start-button-bg)" height="52" rx="16" width="310" />
+                </Svg>
               </View>
-            </Pressable>
-          </Link>
+              <View className="relative z-10 flex-row items-center gap-2">
+                <Play color="#0D0F1A" fill="#0D0F1A" size={15} strokeWidth={2} />
+                <Text className="font-nidoru-data-regular text-sm font-semibold leading-[20px] text-[#0D0F1A]">
+                  {primaryAction.ctaText}
+                </Text>
+              </View>
+            </View>
+          </Pressable>
         </View>
 
         <View className="flex-row gap-2.5" testID="home-quick-action-grid">
@@ -337,46 +344,52 @@ export function HomeScreen({
             const Icon = quickActionIcons[action.id];
 
             return (
-              <View className="flex-1" key={action.id} testID={`home-quick-action-slot-${action.id}`}>
-                <Link asChild href={action.routeTarget}>
-                  <Pressable
-                    accessibilityHint={action.accessibilityHint}
-                    accessibilityLabel={`${action.label} quick action`}
-                    accessibilityRole="link"
-                    onPress={() => markRescueMeTapIfNeeded(action.id)}
+              <View
+                className="flex-1"
+                key={action.id}
+                testID={`home-quick-action-slot-${action.id}`}
+              >
+                <Pressable
+                  accessibilityHint={action.accessibilityHint}
+                  accessibilityLabel={`${action.label} quick action`}
+                  accessibilityRole="link"
+                  className="active:scale-[0.96]"
+                  onPress={() => {
+                    handleHomeActionPress(action.id, action.routeTarget);
+                  }}
+                  testID={`home-quick-action-link-${action.id}`}
+                >
+                  <View
+                    className={cn(
+                      "min-h-[92px] items-center justify-center gap-2 rounded-[18px] border bg-[#14172B]/70 px-2 py-3.5",
+                      toneClasses.card,
+                    )}
+                    testID={`home-quick-action-card-${action.id}`}
                   >
                     <View
                       className={cn(
-                        "min-h-[92px] items-center justify-center gap-2 rounded-[18px] border bg-[#14172B]/70 px-2 py-3.5 active:scale-[0.96]",
-                        toneClasses.card,
+                        "h-9 w-9 rounded-full border items-center justify-center",
+                        toneClasses.iconBox,
                       )}
-                      testID={`home-quick-action-card-${action.id}`}
+                      testID={`home-quick-action-icon-box-${action.id}`}
                     >
-                      <View
-                        className={cn(
-                          "h-9 w-9 rounded-full border items-center justify-center",
-                          toneClasses.iconBox,
-                        )}
-                        testID={`home-quick-action-icon-box-${action.id}`}
-                      >
-                        <Icon color={toneClasses.iconColor} size={18} strokeWidth={1.7} />
-                      </View>
-                      <View className="items-center">
-                        <Text className="text-center font-nidoru-data-regular text-[13px] font-semibold leading-[18px] text-[#EEF0FF]">
-                          {action.label}
-                        </Text>
-                        <Text
-                          className={cn(
-                            "font-nidoru-data-regular text-[10px] font-normal tracking-wide",
-                            toneClasses.subtitle,
-                          )}
-                        >
-                          {action.subtitle}
-                        </Text>
-                      </View>
+                      <Icon color={toneClasses.iconColor} size={18} strokeWidth={1.7} />
                     </View>
-                  </Pressable>
-                </Link>
+                    <View className="items-center">
+                      <Text className="text-center font-nidoru-data-regular text-[13px] font-semibold leading-[18px] text-[#EEF0FF]">
+                        {action.label}
+                      </Text>
+                      <Text
+                        className={cn(
+                          "font-nidoru-data-regular text-[10px] font-normal tracking-wide",
+                          toneClasses.subtitle,
+                        )}
+                      >
+                        {action.subtitle}
+                      </Text>
+                    </View>
+                  </View>
+                </Pressable>
               </View>
             );
           })}

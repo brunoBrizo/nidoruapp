@@ -17,6 +17,8 @@ jest.mock("../src/rescue/rescue-me-launch-performance", () => ({
   markRescueMeHomeTap: jest.fn(),
 }));
 
+const mockNavigate = jest.fn();
+
 jest.mock("expo-router", () => {
   const React = jest.requireActual<typeof import("react")>("react");
 
@@ -25,10 +27,27 @@ jest.mock("expo-router", () => {
       children,
       href,
     }: {
-      readonly children: React.ReactElement<{ readonly href?: string }>;
+      readonly children: React.ReactElement<{
+        readonly href?: string;
+        readonly onPress?: (...args: unknown[]) => void;
+      }>;
       readonly href: string;
-    }) => React.cloneElement(children, { href }),
+    }) =>
+      React.cloneElement(children, {
+        href,
+        onPress: (...args: unknown[]) => {
+          children.props.onPress?.(...args);
+
+          const event = args[0] as { readonly defaultPrevented?: boolean } | undefined;
+          if (!event?.defaultPrevented) {
+            mockNavigate(href);
+          }
+        },
+      }),
     usePathname: () => "/",
+    useRouter: () => ({
+      push: mockNavigate,
+    }),
   };
 });
 
@@ -74,12 +93,13 @@ const mockMarkRescueMeHomeTap = markRescueMeHomeTap as jest.MockedFunction<
   typeof markRescueMeHomeTap
 >;
 const routePressEvent = {
-  defaultPrevented: true,
+  defaultPrevented: false,
   preventDefault: jest.fn(),
 };
 
 describe("HomeScreen", () => {
   beforeEach(() => {
+    mockNavigate.mockClear();
     mockMarkRescueMeHomeTap.mockClear();
   });
 
@@ -188,8 +208,11 @@ describe("HomeScreen", () => {
       expect.stringContaining("overflow-hidden"),
     );
     expect(screen.getByTestId("home-primary-button-gradient")).toBeTruthy();
-    expect(screen.getByTestId("home-primary-button-frame").props.className).toEqual(
+    expect(screen.getByTestId("home-primary-action-link").props.className).toEqual(
       expect.stringContaining("active:scale-[0.97]"),
+    );
+    expect(screen.getByTestId("home-primary-button-frame").props.className).not.toEqual(
+      expect.stringContaining("active:scale"),
     );
   });
 
@@ -257,10 +280,6 @@ describe("HomeScreen", () => {
       "accessibilityHint",
       "Starts the Rescue Me anchor immediately.",
     );
-    expect(screen.getByRole("link", { name: "Rescue Me quick action" })).toHaveProp(
-      "href",
-      "/rescue-me",
-    );
     expect(screen.getByRole("link", { name: "Sounds quick action" })).toHaveProp(
       "accessibilityHint",
       "Opens the Sound Mixer anchor.",
@@ -277,8 +296,13 @@ describe("HomeScreen", () => {
     fireEvent.press(screen.getByRole("link", { name: "Start now" }), routePressEvent);
 
     expect(mockMarkRescueMeHomeTap).toHaveBeenCalledTimes(1);
+    expect(mockNavigate).toHaveBeenCalledWith("/rescue-me");
+    expect(mockMarkRescueMeHomeTap.mock.invocationCallOrder[0]).toBeLessThan(
+      mockNavigate.mock.invocationCallOrder[0],
+    );
 
     unmount();
+    mockNavigate.mockClear();
     mockMarkRescueMeHomeTap.mockClear();
 
     render(<HomeScreen now={localDateAt(20)} />);
@@ -286,6 +310,22 @@ describe("HomeScreen", () => {
     fireEvent.press(screen.getByRole("link", { name: "Rescue Me quick action" }), routePressEvent);
 
     expect(mockMarkRescueMeHomeTap).toHaveBeenCalledTimes(1);
+    expect(mockNavigate).toHaveBeenCalledWith("/rescue-me");
+    expect(mockMarkRescueMeHomeTap.mock.invocationCallOrder[0]).toBeLessThan(
+      mockNavigate.mock.invocationCallOrder[0],
+    );
+  });
+
+  it("routes Home quick actions through native press handlers", () => {
+    render(<HomeScreen now={localDateAt(20)} />);
+
+    fireEvent.press(screen.getByRole("link", { name: "Sounds quick action" }), routePressEvent);
+    expect(mockNavigate).toHaveBeenCalledWith("/sleep/sounds");
+
+    mockNavigate.mockClear();
+
+    fireEvent.press(screen.getByRole("link", { name: "Breathe quick action" }), routePressEvent);
+    expect(mockNavigate).toHaveBeenCalledWith("/breathe");
   });
 
   it.each([
@@ -332,6 +372,10 @@ describe("HomeScreen", () => {
       expect(cardClassName).toEqual(expect.stringContaining("min-h-[92px]"));
       expect(cardClassName).toEqual(expect.stringContaining("rounded-[18px]"));
       expect(cardClassName.split(/\s+/)).toContain("border");
+      expect(screen.getByTestId(`home-quick-action-link-${actionId}`).props.className).toEqual(
+        expect.stringContaining("active:scale-[0.96]"),
+      );
+      expect(cardClassName).not.toEqual(expect.stringContaining("active:scale"));
       expect(screen.getByTestId(`home-quick-action-icon-box-${actionId}`).props.className).toEqual(
         expect.stringContaining("h-9 w-9 rounded-full"),
       );

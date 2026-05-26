@@ -625,7 +625,13 @@ function RitualScene() {
           </Defs>
           <Circle cx="32" cy="32" fill="url(#home-moon-glow)" r="32" />
         </Svg>
-        <Svg height={40} viewBox="0 0 40 40" width={40}>
+        <Svg
+          height={42}
+          style={{ left: -8, position: "absolute", top: -1 }}
+          testID="home-crescent-moon-disc"
+          viewBox="-8 -1 50 42"
+          width={50}
+        >
           <Defs>
             <LinearGradient id="home-crescent-fill" x1="0" x2="1" y1="0" y2="1">
               <Stop offset="0" stopColor="#EEF0FF" />
@@ -633,7 +639,7 @@ function RitualScene() {
             </LinearGradient>
           </Defs>
           <Circle cx="20" cy="20" fill="url(#home-crescent-fill)" r="20" />
-          <Circle cx="12" cy="18" fill="#0D0F1A" r="19.2" />
+          <Circle cx="12" cy="18" fill="#0D0F1A" r="19.2" testID="home-crescent-moon-cutout" />
         </Svg>
       </View>
       <View className="absolute bottom-2 left-0 right-0 z-10 flex-row justify-between px-4">

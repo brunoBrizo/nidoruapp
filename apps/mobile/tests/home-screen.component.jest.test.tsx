@@ -178,6 +178,8 @@ describe("HomeScreen", () => {
     expect(screen.getByTestId("home-mountain-near").props.d).toBe(
       "M0 134 L40 114 L90 129 L150 106 L210 132 L260 114 L320 130 L390 116 L390 144 L0 144 Z",
     );
+    expect(screen.getByTestId("home-crescent-moon-disc")).toBeTruthy();
+    expect(screen.getByTestId("home-crescent-moon-cutout").props.r).toBe("19.2");
     expect(screen.getByTestId("home-primary-button-frame").props.className).toEqual(
       expect.stringContaining("overflow-hidden"),
     );

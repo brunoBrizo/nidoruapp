@@ -118,7 +118,7 @@ describe("tab entry shells", () => {
       {
         href: "/breathe/coherent-breathing?durationSeconds=600",
         label: "Coherent Breathing / Daily Calm",
-        rhythmLabel: "5 in · 5 out",
+        rhythmLabel: "5.5 in · 5.5 out",
       },
       {
         href: "/breathe/box-breathing?durationSeconds=300",
@@ -169,7 +169,7 @@ describe("tab entry shells", () => {
     expect(screen.getByText("Settle into the night.")).toBeTruthy();
     expect(screen.getByText("Smooth, steady rhythm.")).toBeTruthy();
     expect(screen.getByText("4 in · 7 hold · 8 out")).toBeTruthy();
-    expect(screen.getByText("5 in · 5 out")).toBeTruthy();
+    expect(screen.getByText("5.5 in · 5.5 out")).toBeTruthy();
     expect(screen.getByTestId("breathe-4-7-8-sleep-card").props.className).toEqual(
       expect.stringContaining("min-h-[100px]"),
     );

@@ -1280,7 +1280,7 @@ function ReflectionOverlay({
               selectable
               style={scienceAnimatedStyle}
             >
-              Deep breathing shifts your nervous system into rest mode.
+              A slow breath can help your body settle.
             </Animated.Text>
           ) : null}
 

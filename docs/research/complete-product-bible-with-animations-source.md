@@ -177,10 +177,10 @@ On exhale: all layers contract smoothly back to rest size. The exhale animation 
 
 | Name | Pattern | Description | Context |
 |------|---------|-------------|---------|
-| 4-7-8 Sleep | 4s in / 7s hold / 8s out | The most viral technique[^10]; natural nervous system tranquilizer | Before bed |
-| Box Breathing | 4s in / 4s hold / 4s out / 4s hold | Military-grade anxiety control, used by Navy SEALs | Anxiety/stress |
-| Coherent Breathing | 5s in / 5s out | Optimizes heart rate variability, balancing | Daytime calm |
-| Physiological Sigh | 2s in / 1s in / 8s out | Double inhale + long exhale — fastest nervous system reset[^11] | Panic/acute stress |
+| 4-7-8 Sleep | 4s in / 7s hold / 8s out | Popular long-exhale cadence for bedtime relaxation; do not frame as a tranquilizer or treatment | Before bed |
+| Box Breathing | 4s in / 4s hold / 4s out / 4s hold | Simple square cadence for calm and focus; avoid military or anxiety-treatment claims | Stress/focus |
+| Coherent Breathing | 5.5s in / 5.5s out | Regular 10-minute practice for HRV-oriented resilience | Daytime calm |
+| Physiological Sigh | 2s in / 1s in / 8s out | Double inhale + long exhale; promising acute-arousal reset candidate, keep post-MVP until safety/copy is validated | Acute stress reset |
 
 **What competitors get wrong:**
 - Breathwrk labels exercises by vague emotion ("Calm," "Focus") not by technique — power users who know what 4-7-8 is can't find it[^12]
@@ -227,11 +227,11 @@ The mixer screen arrives. Their last used sound mix pre-loaded (remembered from 
 A story from the library begins. The orb becomes a subtle background pattern. The narration is quiet, monotone-adjacent, and deliberately "boring" — descriptive nature walks, slow journeys, peaceful scenes. The story ends at a natural pause and flows into ambient sound automatically.
 
 **Step 4c: Body Scan (optional)**
-A 5-minute audio guide slowly drawing attention from toes to head, releasing tension. Gentle voice, no music, very low background ambient. This is ideal for users who have "can't stop thinking" insomnia rather than "can't fall asleep initially" insomnia.
+A 5-minute audio guide slowly drawing attention from toes to head, releasing tension. Gentle voice, no music, very low background ambient. This is aimed at users whose minds feel busy at bedtime; do not frame it as insomnia treatment.
 
 **What competitors get wrong:**
 - Every existing app requires multiple taps to get into a session. Calm requires: open app → navigate to Sleep → find Sleep Stories → choose story → tap play = at least 4 taps and 30+ seconds. On the Wind-Down app on the App Store, it's better but still requires choosing content first[^17][^18]
-- Apps don't link breathwork and sleep sound playback — they're separate features in different sections. This misses the proven sequential benefit
+- Apps don't link breathwork and sleep sound playback — they're separate features in different sections. This misses the low-friction sequential bedtime experience.
 - The screen stays bright throughout. This is a huge problem: you don't want full brightness UI at 11 PM. The auto-dim behavior is completely absent in current competitors
 
 **Unique details that make this feature differentiated:**
@@ -656,7 +656,7 @@ Understanding why users return daily requires designing the Nir Eyal "Hook Model
 
 Research is specific: the biggest churn window is days 3–5, when initial motivation fades and the habit hasn't formed yet. The solution:[^21]
 
-- **Day 3:** In-app card: "3 sessions in — your nervous system is already adapting. People who reach Day 7 sleep 0.8 stars better on average."
+- **Day 3:** In-app card: "3 sessions in: you're building a quieter bedtime cue. Keep the next one simple."
 - **Day 5:** If no session in 2 days, send a non-guilt notification: "The best session is the next one. Your 5-day wind-down is still here when you're ready."
 - **Day 7:** The first Sleep Insight preview — even with limited data, show them something. "You've completed 7 sessions. We're starting to learn your sleep patterns."
 
@@ -792,4 +792,3 @@ A product built with this specification — an animated orb that works offline, 
 30. [Wishroute - Increase Your App Notification Opt-in Rate by Learning What the Top 20 Consumer Wellness Apps Get Right](https://www.wishroute.com/resources/increase-your-app-notification-opt-in-rate-by-learning-what-the-top-20-consumer-wellness-apps-get-right)
 
 31. [I went through RevenueCat's subscription report and checked how many of our conversions happen in the first session. it was almost all of them.](https://www.reddit.com/r/TestMyApp/comments/1s5pe6d/i_went_through_revenuecats_subscription_report/) - I went through RevenueCat's subscription report and checked how many of our conversions happen in th...
-

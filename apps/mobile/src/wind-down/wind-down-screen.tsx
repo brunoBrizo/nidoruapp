@@ -749,7 +749,7 @@ function BreathworkState({
                   className="mt-1 font-nidoru-primary-regular text-[11px] leading-4 text-[#EEF0FF]/55"
                   selectable
                 >
-                  4.5 in · 4.5 out
+                  5.5 in · 5.5 out
                 </Text>
               ) : null}
             </View>

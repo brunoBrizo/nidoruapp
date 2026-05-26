@@ -26,7 +26,7 @@ Understanding why users return daily requires designing the Nir Eyal "Hook Model
 
 Research is specific: the biggest churn window is days 3–5, when initial motivation fades and the habit hasn't formed yet. The solution:[^21]
 
-- **Day 3:** In-app card: "3 sessions in — your nervous system is already adapting. People who reach Day 7 sleep 0.8 stars better on average."
+- **Day 3:** In-app card: "3 sessions in: you're building a quieter bedtime cue. Keep the next one simple."
 - **Day 5:** If no session in 2 days, show an in-app non-guilt card when the user returns. Default push re-engagement remains limited to the one-time 3-day inactivity notification in [Notification Strategy](../ux/notification-strategy.md).
 - **Day 7:** The first Sleep Insight preview — even with limited data, show them something. "You've completed 7 sessions. We're starting to learn your sleep patterns."
 

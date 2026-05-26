@@ -643,9 +643,7 @@ describe("FirstSessionScreen", () => {
     expect(screen.getByText("Same")).toBeTruthy();
     expect(screen.getByText("Better")).toBeTruthy();
     expect(screen.getByText("Much better")).toBeTruthy();
-    expect(
-      screen.queryByText("Deep breathing shifts your nervous system into rest mode."),
-    ).toBeNull();
+    expect(screen.queryByText("A slow breath can help your body settle.")).toBeNull();
     expect(screen.queryByRole("button", { name: "Continue" })).toBeNull();
 
     fireEvent.press(screen.getByRole("button", { name: "Better" }));
@@ -658,9 +656,7 @@ describe("FirstSessionScreen", () => {
         sessionId: "session_0123456789abcdef",
       });
     });
-    expect(
-      screen.getByText("Deep breathing shifts your nervous system into rest mode."),
-    ).toBeTruthy();
+    expect(screen.getByText("A slow breath can help your body settle.")).toBeTruthy();
     expect(screen.getByRole("button", { name: "Continue" })).toBeTruthy();
     expect(screen.queryByText(forbiddenActiveSessionGatePattern)).toBeNull();
 

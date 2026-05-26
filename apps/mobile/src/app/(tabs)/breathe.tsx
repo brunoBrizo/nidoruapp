@@ -50,7 +50,7 @@ export const BREATHE_TECHNIQUE_LIBRARY = [
     referenceLabel: breathTechniques["coherent-breathing"].name,
     href: "/breathe/coherent-breathing?durationSeconds=600",
     durationMinutes: 10,
-    rhythmLabel: "5 in · 5 out",
+    rhythmLabel: "5.5 in · 5.5 out",
     categoryCopy: {
       calm: "Daily Calm / HRV Training.",
       energy: "Steady energy without strain.",

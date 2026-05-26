@@ -124,8 +124,8 @@ describe("HomeScreen", () => {
     expect(screen.getByText("Out")).toBeTruthy();
     expect(screen.getByText("Last night")).toBeTruthy();
     expect(screen.getByText("Rain helped you settle")).toBeTruthy();
-    expect(screen.getByText("You fell asleep 14 min faster. Try box breathing tonight."))
-      .toBeTruthy();
+    expect(screen.getByTestId("home-last-night-suggestion")).toBeTruthy();
+    expect(screen.getByText("14 min")).toBeTruthy();
     expect(screen.getByText("7h 12m")).toBeTruthy();
     expect(screen.getByText("Wind-down library")).toBeTruthy();
     expect(screen.getByText("The Lantern Keeper")).toBeTruthy();
@@ -199,6 +199,34 @@ describe("HomeScreen", () => {
     expect(
       screen.getAllByLabelText(/quick action$/i).map((action) => action.props.accessibilityLabel),
     ).toEqual(["Rescue Me quick action", "Sounds quick action", "Breathe quick action"]);
+  });
+
+  it("matches the home.html Last night card gradient and detail structure", () => {
+    render(<HomeScreen now={designDate} />);
+
+    const lastNightCardClassName = screen.getByTestId("home-last-night-card").props.className;
+
+    expect(lastNightCardClassName).toEqual(expect.stringContaining("rounded-[22px]"));
+    expect(lastNightCardClassName).toEqual(expect.stringContaining("border-white/[0.06]"));
+    expect(lastNightCardClassName).not.toEqual(expect.stringContaining("bg-[#14172B]/70"));
+    expect(screen.getByTestId("home-last-night-card-backdrop")).toBeTruthy();
+    expect(screen.getByTestId("home-last-night-card-base-gradient")).toBeTruthy();
+    expect(screen.getByTestId("home-last-night-card-cyan-glow")).toBeTruthy();
+    expect(screen.getByTestId("home-last-night-rating").props.className).toEqual(
+      expect.stringContaining("gap-1"),
+    );
+    expect(screen.getByTestId("home-last-night-rating-text").props.className).toEqual(
+      expect.stringContaining("ml-1"),
+    );
+    expect(screen.getByTestId("home-last-night-highlight-duration").props.className).toEqual(
+      expect.stringContaining("text-[#EEF0FF]"),
+    );
+    expect(screen.getByTestId("home-last-night-suggestion-line-break").props.children).toBe(
+      "\ntonight.",
+    );
+    expect(screen.getByTestId("home-last-night-action-row").props.className).not.toEqual(
+      expect.stringContaining("min-h-8"),
+    );
   });
 
   it("exposes route-aware accessible hints for the persistent quick actions", () => {

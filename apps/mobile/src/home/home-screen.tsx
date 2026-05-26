@@ -705,8 +705,14 @@ function SleepInsightCard({
   const isLastNight = summarySlot.kind === "last-night";
 
   return (
-    <View className="relative overflow-hidden rounded-[22px] border border-white/[0.06] bg-[#14172B]/70 p-4 active:scale-[0.98]">
-      <View className="pointer-events-none absolute right-0 top-0 h-24 w-24 rounded-full bg-[#5EC4D4]/10" />
+    <View
+      className={cn(
+        "relative overflow-hidden rounded-[22px] border border-white/[0.06] p-4 active:scale-[0.98]",
+        isLastNight ? null : "bg-[#14172B]/70",
+      )}
+      testID={isLastNight ? "home-last-night-card" : undefined}
+    >
+      {isLastNight ? <LastNightCardBackdrop /> : null}
       <View className="relative z-10">
         <View className="mb-3 flex-row items-center justify-between">
           <View className="flex-row items-center gap-2">
@@ -722,7 +728,8 @@ function SleepInsightCard({
           {isLastNight ? (
             <View
               accessibilityLabel={summarySlot.ratingAccessibilityLabel}
-              className="flex-row items-center gap-2"
+              className="flex-row items-center gap-1"
+              testID="home-last-night-rating"
             >
               <View className="flex-row gap-0.5">
                 {[0, 1, 2, 3, 4].map((index) => (
@@ -735,7 +742,10 @@ function SleepInsightCard({
                   />
                 ))}
               </View>
-              <Text className="font-nidoru-data-regular text-[11px] font-medium text-[#EEF0FF] tabular-nums">
+              <Text
+                className="ml-1 font-nidoru-data-regular text-[11px] font-medium text-[#EEF0FF] tabular-nums"
+                testID="home-last-night-rating-text"
+              >
                 {summarySlot.ratingText}
               </Text>
             </View>
@@ -749,9 +759,13 @@ function SleepInsightCard({
           >
             {summarySlot.summary}
           </Text>
-          <Text className="font-nidoru-data-regular text-sm leading-[22px] text-[#8A8FA8]">
-            {summarySlot.suggestion}
-          </Text>
+          {isLastNight ? (
+            <LastNightSuggestionText suggestion={summarySlot.suggestion} />
+          ) : (
+            <Text className="font-nidoru-data-regular text-sm leading-[22px] text-[#8A8FA8]">
+              {summarySlot.suggestion}
+            </Text>
+          )}
         </View>
         <View className="border-t border-white/[0.05] pt-2">
           <Link asChild href={summarySlot.routeTarget}>
@@ -760,7 +774,8 @@ function SleepInsightCard({
                 summarySlot.kind === "check-in" ? summarySlot.accessibilityHint : undefined
               }
               accessibilityRole="link"
-              className="min-h-8 flex-row items-center justify-between"
+              className="flex-row items-center justify-between"
+              testID={isLastNight ? "home-last-night-action-row" : undefined}
             >
               <View className="flex-row items-center gap-1.5">
                 <Text className="font-nidoru-data-regular text-sm font-medium leading-[20px] text-[#A89CE0]">
@@ -781,6 +796,86 @@ function SleepInsightCard({
         </View>
       </View>
     </View>
+  );
+}
+
+function LastNightCardBackdrop() {
+  return (
+    <View
+      className="pointer-events-none absolute inset-0"
+      pointerEvents="none"
+      testID="home-last-night-card-backdrop"
+    >
+      <Svg height="100%" preserveAspectRatio="none" viewBox="0 0 390 156" width="100%">
+        <Defs>
+          <LinearGradient id="home-last-night-card-bg" x1="0" x2="1" y1="0" y2="1">
+            <Stop offset="0" stopColor="#5EC4D4" stopOpacity="0.08" />
+            <Stop offset="0.6" stopColor="#14172B" stopOpacity="0.6" />
+            <Stop offset="1" stopColor="#14172B" stopOpacity="0.6" />
+          </LinearGradient>
+          <RadialGradient
+            cx="390"
+            cy="0"
+            gradientUnits="userSpaceOnUse"
+            id="home-last-night-card-glow"
+            r="128"
+          >
+            <Stop offset="0" stopColor="#5EC4D4" stopOpacity="0.12" />
+            <Stop offset="0.45" stopColor="#5EC4D4" stopOpacity="0.06" />
+            <Stop offset="1" stopColor="#5EC4D4" stopOpacity="0" />
+          </RadialGradient>
+        </Defs>
+        <Rect
+          fill="url(#home-last-night-card-bg)"
+          height="156"
+          testID="home-last-night-card-base-gradient"
+          width="390"
+        />
+        <Rect
+          fill="url(#home-last-night-card-glow)"
+          height="156"
+          testID="home-last-night-card-cyan-glow"
+          width="390"
+        />
+      </Svg>
+    </View>
+  );
+}
+
+function LastNightSuggestionText({ suggestion }: { readonly suggestion: string }) {
+  const [prefix, suffix] = suggestion.split("14 min");
+
+  if (suffix === undefined) {
+    return (
+      <Text
+        className="font-nidoru-data-regular text-sm leading-[22px] text-[#8A8FA8]"
+        testID="home-last-night-suggestion"
+      >
+        {suggestion}
+      </Text>
+    );
+  }
+
+  const [beforeLineBreak, afterLineBreak] = suffix.split(" tonight.");
+
+  return (
+    <Text
+      className="font-nidoru-data-regular text-sm leading-[22px] text-[#8A8FA8]"
+      testID="home-last-night-suggestion"
+    >
+      {prefix}
+      <Text className="text-[#EEF0FF]" testID="home-last-night-highlight-duration">
+        14 min
+      </Text>
+      {afterLineBreak === undefined ? (
+        suffix
+      ) : (
+        <>
+          {beforeLineBreak}
+          <Text testID="home-last-night-suggestion-line-break">{"\ntonight."}</Text>
+        </>
+      )}
+    </Text>
   );
 }
 

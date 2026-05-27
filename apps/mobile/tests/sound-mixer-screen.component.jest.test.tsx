@@ -170,6 +170,108 @@ describe("SoundMixerAnchorScreen", () => {
     );
   });
 
+  it("opens the accepted Save Mix sheet over a dimmed mixer", () => {
+    render(<SoundMixerAnchorScreen />);
+
+    expect(screen.queryByText("Save mix")).toBeNull();
+
+    fireEvent.press(screen.getByRole("button", { name: "Save Mix" }));
+
+    expect(screen.getByRole("header", { name: "Save mix" })).toBeTruthy();
+    expect(screen.getByText("Keep this sound combination for another night.")).toBeTruthy();
+    expect(screen.getByText("Mix name")).toBeTruthy();
+    expect(screen.getByDisplayValue("Rain Hearth")).toBeTruthy();
+    expect(screen.getByText("You can save up to 3 mixes.")).toBeTruthy();
+    expect(screen.getByText("2 of 3 saved")).toBeTruthy();
+
+    expect(screen.getByLabelText("Light Rain active layer at 72% volume")).toBeTruthy();
+    expect(screen.getByLabelText("Brown Noise active layer at 58% volume")).toBeTruthy();
+    expect(screen.getByLabelText("Fireplace Crackling active layer at 34% volume")).toBeTruthy();
+    expect(screen.getByTestId("sound-mixer-save-mix-name-input")).toHaveProp(
+      "accessibilityLabel",
+      "Mix name",
+    );
+
+    expect(
+      screen.getByTestId("sound-mixer-main-content", { includeHiddenElements: true }),
+    ).toHaveProp("pointerEvents", "none");
+    expect(
+      screen.getByTestId("sound-mixer-main-content", { includeHiddenElements: true }),
+    ).toHaveProp("importantForAccessibility", "no-hide-descendants");
+    expect(screen.getByRole("button", { name: "Close Save Mix sheet" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Cancel Save Mix" })).toBeTruthy();
+  });
+
+  it("matches the Save Mix sheet layout classes and touch-target requirements", () => {
+    render(<SoundMixerAnchorScreen />);
+
+    fireEvent.press(screen.getByRole("button", { name: "Save Mix" }));
+
+    expectClassNameContains(
+      screen.getByTestId("sound-mixer-main-content", { includeHiddenElements: true }).props
+        .className,
+      ["opacity-[0.45]", "blur-[2px]"],
+    );
+    expectClassNameContains(screen.getByTestId("sound-mixer-save-mix-overlay").props.className, [
+      "absolute inset-0",
+      "bg-black/45",
+      "backdrop-blur-[2px]",
+      "justify-end",
+    ]);
+    expectClassNameContains(screen.getByTestId("sound-mixer-save-mix-sheet").props.className, [
+      "rounded-t-[24px]",
+      "border-t border-[#1E2236]",
+      "bg-[#14172B]",
+      "px-5 pt-3 pb-11",
+      "shadow-[0_-10px_40px_rgba(0,0,0,0.5)]",
+    ]);
+    expectClassNameContains(
+      screen.getByTestId("sound-mixer-save-mix-handle", { includeHiddenElements: true }).props
+        .className,
+      ["h-1 w-10", "bg-[#2D3359]"],
+    );
+    expectClassNameContains(screen.getByTestId("sound-mixer-save-mix-close").props.className, [
+      "h-11 w-11",
+      "active:scale-[0.96]",
+    ]);
+    expectClassNameContains(
+      screen.getByTestId("sound-mixer-save-mix-close-icon-frame").props.className,
+      ["h-8 w-8", "rounded-full", "border border-[#2D3359]", "bg-[#1C2040]"],
+    );
+    expectClassNameContains(screen.getByTestId("sound-mixer-save-mix-preview").props.className, [
+      "rounded-[16px]",
+      "min-h-[152px]",
+      "border border-[#1E2236]/60",
+      "bg-[#0D0F1A]",
+      "shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]",
+    ]);
+    expectClassNameContains(screen.getByTestId("sound-mixer-save-mix-submit").props.className, [
+      "h-12",
+      "rounded-[14px]",
+      "bg-[#7C6FCD]",
+    ]);
+    expectClassNameContains(screen.getByTestId("sound-mixer-save-mix-cancel").props.className, [
+      "h-12",
+      "rounded-[14px]",
+    ]);
+  });
+
+  it("dismisses the Save Mix sheet through Cancel and close", () => {
+    render(<SoundMixerAnchorScreen />);
+
+    fireEvent.press(screen.getByRole("button", { name: "Save Mix" }));
+    fireEvent.press(screen.getByRole("button", { name: "Cancel Save Mix" }));
+
+    expect(screen.queryByText("Save mix")).toBeNull();
+    expect(screen.getByTestId("sound-mixer-main-content")).toHaveProp("pointerEvents", "auto");
+
+    fireEvent.press(screen.getByRole("button", { name: "Save Mix" }));
+    fireEvent.press(screen.getByRole("button", { name: "Close Save Mix sheet" }));
+
+    expect(screen.queryByText("Save mix")).toBeNull();
+    expect(screen.getByTestId("sound-mixer-main-content")).toHaveProp("pointerEvents", "auto");
+  });
+
   it("routes the back affordance without adding playback, account, or network behavior", () => {
     render(<SoundMixerAnchorScreen />);
 
@@ -194,5 +296,18 @@ describe("SoundMixerAnchorScreen", () => {
       /improves sleep|treats anxiety|heals insomnia|proven frequency/i,
     );
     expect(combinedSource).not.toMatch(/expo-audio|supabase|sqlite|fetch\(/i);
+
+    render(<SoundMixerAnchorScreen />);
+    fireEvent.press(screen.getByRole("button", { name: "Save Mix" }));
+
+    expect(screen.queryByText(/account|sync|paywall|premium|cloud/i)).toBeNull();
   });
 });
+
+function expectClassNameContains(className: string | undefined, expectedParts: readonly string[]) {
+  expect(className).toBeTruthy();
+
+  for (const expectedPart of expectedParts) {
+    expect(className).toContain(expectedPart);
+  }
+}

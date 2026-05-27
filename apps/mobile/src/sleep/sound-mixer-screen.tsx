@@ -19,12 +19,13 @@ import {
   Waves,
   Wind,
 } from "lucide-react-native";
-import type { ElementType } from "react";
+import { useState, type ElementType } from "react";
+import { Modal } from "react-native";
 import Svg, { Circle, Line, Rect } from "react-native-svg";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 
-import { Pressable, ScrollView, Text, View, cn } from "../tw";
+import { Pressable, ScrollView, Text, TextInput, View, cn } from "../tw";
 
 type MixerIconProps = {
   readonly color?: string;
@@ -124,203 +125,379 @@ const timerOptions = ["20", "30", "45", "60", "∞"] as const;
 
 export function SoundMixerScreen() {
   const router = useRouter();
+  const [isSaveMixSheetOpen, setIsSaveMixSheetOpen] = useState(false);
 
   return (
     <View className="flex-1 bg-[#0D0F1A]" testID="sound-mixer-screen">
       <StatusBar hidden />
-      <ScrollView
-        className="flex-1 bg-[#0D0F1A]"
-        contentContainerClassName="pb-[252px]"
-        contentInsetAdjustmentBehavior="automatic"
-        showsVerticalScrollIndicator={false}
-        testID="sound-mixer-scroll"
+      <View
+        className={cn(
+          "will-change-variable flex-1 bg-[#0D0F1A]",
+          isSaveMixSheetOpen ? "opacity-[0.45] blur-[2px]" : null,
+        )}
+        importantForAccessibility={isSaveMixSheetOpen ? "no-hide-descendants" : "auto"}
+        pointerEvents={isSaveMixSheetOpen ? "none" : "auto"}
+        testID="sound-mixer-main-content"
       >
-        <View className="px-nidoru-screen pt-12 pb-2" testID="sound-mixer-header">
-          <View className="mb-1 min-h-8 flex-row items-center justify-between">
-            <Pressable
-              accessibilityHint="Returns to the previous sleep screen."
-              accessibilityLabel="Back to Sleep"
-              accessibilityRole="button"
-              className="-ml-2 h-11 w-11 items-center justify-center rounded-[14px] active:scale-[0.96]"
-              onPress={() => {
-                router.back();
-              }}
-              testID="sound-mixer-back"
-            >
-              <ChevronLeft color={colors.text} size={22} strokeWidth={1.5} />
-            </Pressable>
+        <ScrollView
+          className="flex-1 bg-[#0D0F1A]"
+          contentContainerClassName="pb-[252px]"
+          contentInsetAdjustmentBehavior="automatic"
+          showsVerticalScrollIndicator={false}
+          testID="sound-mixer-scroll"
+        >
+          <View className="px-nidoru-screen pt-12 pb-2" testID="sound-mixer-header">
+            <View className="mb-1 min-h-8 flex-row items-center justify-between">
+              <Pressable
+                accessibilityHint="Returns to the previous sleep screen."
+                accessibilityLabel="Back to Sleep"
+                accessibilityRole="button"
+                className="-ml-2 h-11 w-11 items-center justify-center rounded-[14px] active:scale-[0.96]"
+                onPress={() => {
+                  router.back();
+                }}
+                testID="sound-mixer-back"
+              >
+                <ChevronLeft color={colors.text} size={22} strokeWidth={1.5} />
+              </Pressable>
+
+              <Text
+                accessibilityRole="header"
+                className="-ml-1 flex-1 text-center font-nidoru-primary-regular text-[22px] font-medium leading-[28px] text-[#EEF0FF]"
+                selectable
+              >
+                Sound Mixer
+              </Text>
+
+              <View
+                className="ml-2 min-h-[29px] items-center justify-center rounded-full border border-[#1E2236] bg-[#1C2040] px-2.5 py-[5px]"
+                testID="sound-mixer-offline-pill"
+              >
+                <Text className="font-nidoru-primary-semibold text-[11px] leading-[14px] tracking-wide text-[#A89CE0]">
+                  Offline pack
+                </Text>
+              </View>
+            </View>
 
             <Text
-              accessibilityRole="header"
-              className="-ml-1 flex-1 text-center font-nidoru-primary-regular text-[22px] font-medium leading-[28px] text-[#EEF0FF]"
+              className="ml-1 mt-0.5 font-nidoru-primary-regular text-sm font-light leading-5 text-[#8A8FA8]"
               selectable
             >
-              Sound Mixer
+              Layer sounds for tonight.
             </Text>
+          </View>
 
-            <View
-              className="ml-2 min-h-[29px] items-center justify-center rounded-full border border-[#1E2236] bg-[#1C2040] px-2.5 py-[5px]"
-              testID="sound-mixer-offline-pill"
+          <View className="mt-1 pl-nidoru-screen">
+            <Text className="ml-1 mb-3 font-nidoru-primary-semibold text-[11px] leading-4 tracking-[0.1em] text-[#4A4E6A]">
+              SAVED MIXES
+            </Text>
+            <ScrollView
+              className="w-full"
+              contentContainerClassName="gap-2 pr-nidoru-screen pb-2"
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              testID="sound-mixer-saved-mixes-row"
             >
-              <Text className="font-nidoru-primary-semibold text-[11px] leading-[14px] tracking-wide text-[#A89CE0]">
-                Offline pack
-              </Text>
+              {savedMixes.map((mix) => (
+                <SavedMixChip key={mix.id} mix={mix} />
+              ))}
+              <Pressable
+                accessibilityLabel="Create new saved mix"
+                accessibilityRole="button"
+                className="h-10 shrink-0 flex-row items-center gap-1.5 rounded-[14px] border border-dashed border-[#1E2236] px-3.5 active:scale-[0.96]"
+                testID="sound-mixer-new-mix-chip"
+              >
+                <PlusCircle color={colors.inactive} size={16} strokeWidth={1.5} />
+                <Text className="font-nidoru-primary-regular text-[13px] leading-[18px] tracking-wide text-[#A1A7C4]">
+                  New mix
+                </Text>
+              </Pressable>
+            </ScrollView>
+          </View>
+
+          <View className="mt-4 px-nidoru-screen">
+            <View
+              className="h-[52px] flex-row items-center justify-between rounded-[16px] border border-[#1E2236]/50 bg-[#14172B]/70 px-4"
+              testID="sound-mixer-timer-card"
+            >
+              <View className="flex-row items-center gap-3.5">
+                <Timer color={colors.active} size={20} strokeWidth={1.5} />
+                <View>
+                  <Text className="font-nidoru-primary-regular text-sm leading-[18px] tracking-wide text-[#EEF0FF]">
+                    Timer <Text className="text-[#4A4E6A]">·</Text>{" "}
+                    <Text className="font-nidoru-data-regular text-[#A89CE0] tabular-nums">
+                      30 min
+                    </Text>
+                  </Text>
+                  <Text className="mt-0.5 font-nidoru-primary-regular text-xs font-light leading-4 tracking-wide text-[#8A8FA8]">
+                    Fade starts in{" "}
+                    <Text className="font-nidoru-data-regular tabular-nums">28 min</Text>
+                  </Text>
+                </View>
+              </View>
+              <View className="h-8 w-8 items-center justify-center">
+                <ProgressRing
+                  progress={0.93}
+                  size={32}
+                  strokeColor={colors.active}
+                  strokeWidth={2}
+                  trackColor="#1E2236"
+                />
+                <View className="absolute inset-0 items-center justify-center">
+                  <MoonStar color={colors.activeSoft} size={14} strokeWidth={1.5} />
+                </View>
+              </View>
             </View>
           </View>
 
-          <Text
-            className="ml-1 mt-0.5 font-nidoru-primary-regular text-sm font-light leading-5 text-[#8A8FA8]"
-            selectable
-          >
-            Layer sounds for tonight.
-          </Text>
-        </View>
-
-        <View className="mt-1 pl-nidoru-screen">
-          <Text className="ml-1 mb-3 font-nidoru-primary-semibold text-[11px] leading-4 tracking-[0.1em] text-[#4A4E6A]">
-            SAVED MIXES
-          </Text>
-          <ScrollView
-            className="w-full"
-            contentContainerClassName="gap-2 pr-nidoru-screen pb-2"
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            testID="sound-mixer-saved-mixes-row"
-          >
-            {savedMixes.map((mix) => (
-              <SavedMixChip key={mix.id} mix={mix} />
+          <View className="mt-5 gap-6 px-nidoru-screen pb-10">
+            {soundCategories.map((category) => (
+              <View key={category.id}>
+                <Text className="ml-1 mb-3 font-nidoru-primary-semibold text-[11px] leading-4 tracking-[0.1em] text-[#4A4E6A]">
+                  {category.label.toUpperCase()}
+                </Text>
+                <View className="flex-row flex-wrap gap-3">
+                  {category.sounds.map((sound) => (
+                    <SoundCardButton key={sound.id} sound={sound} />
+                  ))}
+                </View>
+              </View>
             ))}
-            <Pressable
-              accessibilityLabel="Create new saved mix"
-              accessibilityRole="button"
-              className="h-10 shrink-0 flex-row items-center gap-1.5 rounded-[14px] border border-dashed border-[#1E2236] px-3.5 active:scale-[0.96]"
-              testID="sound-mixer-new-mix-chip"
+          </View>
+        </ScrollView>
+
+        <View
+          className="absolute bottom-[96px] left-nidoru-screen right-nidoru-screen z-40 gap-3.5 rounded-[24px] border border-[#1E2236]/80 bg-[#14172B]/95 p-3.5 shadow-[0_-8px_30px_rgba(13,15,26,0.9)]"
+          testID="sound-mixer-active-strip"
+        >
+          <View className="flex-row items-center justify-between px-1">
+            <View>
+              <Text className="font-nidoru-primary-semibold text-[15px] leading-5 tracking-wide text-[#EEF0FF]">
+                Tonight mix
+              </Text>
+              <Text className="mt-0.5 font-nidoru-primary-regular text-xs leading-4 tracking-wide text-[#A1A7C4]">
+                3 active layers
+              </Text>
+            </View>
+            <View className="flex-row gap-1.5">
+              {activeSounds.map((sound) => (
+                <ActiveMiniIcon key={sound.id} sound={sound} />
+              ))}
+            </View>
+          </View>
+
+          <View className="h-11 flex-row gap-3">
+            <View
+              className="flex-1 flex-row items-center rounded-[14px] border border-[#1E2236]/60 bg-[#0D0F1A] p-1"
+              testID="sound-mixer-timer-segments"
             >
-              <PlusCircle color={colors.inactive} size={16} strokeWidth={1.5} />
-              <Text className="font-nidoru-primary-regular text-[13px] leading-[18px] tracking-wide text-[#A1A7C4]">
-                New mix
+              {timerOptions.map((option) => {
+                const selected = option === "30";
+
+                return (
+                  <Pressable
+                    accessibilityLabel={`${option} minute timer${selected ? ", selected" : ""}`}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected }}
+                    className={cn(
+                      "h-full flex-1 items-center justify-center rounded-[10px]",
+                      selected ? "border border-[#2D3359]/50 bg-[#1C2040]" : null,
+                    )}
+                    key={option}
+                    testID={`sound-mixer-timer-option-${option}`}
+                  >
+                    <Text
+                      className={cn(
+                        "font-nidoru-data-regular text-[13px] leading-[18px] tabular-nums",
+                        selected ? "text-[#EEF0FF]" : "text-[#6A7095]",
+                      )}
+                    >
+                      {option}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+
+            <Pressable
+              accessibilityHint="Opens the Save Mix sheet."
+              accessibilityLabel="Save Mix"
+              accessibilityRole="button"
+              className="h-full shrink-0 items-center justify-center rounded-[14px] bg-[#7C6FCD] px-4 shadow-[0_0_15px_rgba(124,111,205,0.25)] active:scale-[0.96]"
+              onPress={() => {
+                setIsSaveMixSheetOpen(true);
+              }}
+              testID="sound-mixer-save-mix"
+            >
+              <Text className="font-nidoru-primary-semibold text-[13px] leading-[18px] tracking-wide text-white">
+                Save Mix
               </Text>
             </Pressable>
-          </ScrollView>
-        </View>
-
-        <View className="mt-4 px-nidoru-screen">
-          <View
-            className="h-[52px] flex-row items-center justify-between rounded-[16px] border border-[#1E2236]/50 bg-[#14172B]/70 px-4"
-            testID="sound-mixer-timer-card"
-          >
-            <View className="flex-row items-center gap-3.5">
-              <Timer color={colors.active} size={20} strokeWidth={1.5} />
-              <View>
-                <Text className="font-nidoru-primary-regular text-sm leading-[18px] tracking-wide text-[#EEF0FF]">
-                  Timer <Text className="text-[#4A4E6A]">·</Text>{" "}
-                  <Text className="font-nidoru-data-regular text-[#A89CE0] tabular-nums">
-                    30 min
-                  </Text>
-                </Text>
-                <Text className="mt-0.5 font-nidoru-primary-regular text-xs font-light leading-4 tracking-wide text-[#8A8FA8]">
-                  Fade starts in{" "}
-                  <Text className="font-nidoru-data-regular tabular-nums">28 min</Text>
-                </Text>
-              </View>
-            </View>
-            <View className="h-8 w-8 items-center justify-center">
-              <ProgressRing
-                progress={0.93}
-                size={32}
-                strokeColor={colors.active}
-                strokeWidth={2}
-                trackColor="#1E2236"
-              />
-              <View className="absolute inset-0 items-center justify-center">
-                <MoonStar color={colors.activeSoft} size={14} strokeWidth={1.5} />
-              </View>
-            </View>
           </View>
-        </View>
-
-        <View className="mt-5 gap-6 px-nidoru-screen pb-10">
-          {soundCategories.map((category) => (
-            <View key={category.id}>
-              <Text className="ml-1 mb-3 font-nidoru-primary-semibold text-[11px] leading-4 tracking-[0.1em] text-[#4A4E6A]">
-                {category.label.toUpperCase()}
-              </Text>
-              <View className="flex-row flex-wrap gap-3">
-                {category.sounds.map((sound) => (
-                  <SoundCardButton key={sound.id} sound={sound} />
-                ))}
-              </View>
-            </View>
-          ))}
-        </View>
-      </ScrollView>
-
-      <View
-        className="absolute bottom-[96px] left-nidoru-screen right-nidoru-screen z-40 gap-3.5 rounded-[24px] border border-[#1E2236]/80 bg-[#14172B]/95 p-3.5 shadow-[0_-8px_30px_rgba(13,15,26,0.9)]"
-        testID="sound-mixer-active-strip"
-      >
-        <View className="flex-row items-center justify-between px-1">
-          <View>
-            <Text className="font-nidoru-primary-semibold text-[15px] leading-5 tracking-wide text-[#EEF0FF]">
-              Tonight mix
-            </Text>
-            <Text className="mt-0.5 font-nidoru-primary-regular text-xs leading-4 tracking-wide text-[#A1A7C4]">
-              3 active layers
-            </Text>
-          </View>
-          <View className="flex-row gap-1.5">
-            {activeSounds.map((sound) => (
-              <ActiveMiniIcon key={sound.id} sound={sound} />
-            ))}
-          </View>
-        </View>
-
-        <View className="h-11 flex-row gap-3">
-          <View
-            className="flex-1 flex-row items-center rounded-[14px] border border-[#1E2236]/60 bg-[#0D0F1A] p-1"
-            testID="sound-mixer-timer-segments"
-          >
-            {timerOptions.map((option) => {
-              const selected = option === "30";
-
-              return (
-                <Pressable
-                  accessibilityLabel={`${option} minute timer${selected ? ", selected" : ""}`}
-                  accessibilityRole="button"
-                  accessibilityState={{ selected }}
-                  className={cn(
-                    "h-full flex-1 items-center justify-center rounded-[10px]",
-                    selected ? "border border-[#2D3359]/50 bg-[#1C2040]" : null,
-                  )}
-                  key={option}
-                  testID={`sound-mixer-timer-option-${option}`}
-                >
-                  <Text
-                    className={cn(
-                      "font-nidoru-data-regular text-[13px] leading-[18px] tabular-nums",
-                      selected ? "text-[#EEF0FF]" : "text-[#6A7095]",
-                    )}
-                  >
-                    {option}
-                  </Text>
-                </Pressable>
-              );
-            })}
-          </View>
-
-          <Pressable
-            accessibilityHint="Opens the Save Mix sheet."
-            accessibilityLabel="Save Mix"
-            accessibilityRole="button"
-            className="h-full shrink-0 items-center justify-center rounded-[14px] bg-[#7C6FCD] px-4 shadow-[0_0_15px_rgba(124,111,205,0.25)] active:scale-[0.96]"
-            testID="sound-mixer-save-mix"
-          >
-            <Text className="font-nidoru-primary-semibold text-[13px] leading-[18px] tracking-wide text-white">
-              Save Mix
-            </Text>
-          </Pressable>
         </View>
       </View>
+
+      {isSaveMixSheetOpen ? (
+        <SaveMixSheet
+          activeSounds={activeSounds}
+          onDismiss={() => {
+            setIsSaveMixSheetOpen(false);
+          }}
+        />
+      ) : null}
+    </View>
+  );
+}
+
+function SaveMixSheet({
+  activeSounds,
+  onDismiss,
+}: {
+  readonly activeSounds: readonly SoundCard[];
+  readonly onDismiss: () => void;
+}) {
+  return (
+    <Modal
+      animationType="none"
+      onRequestClose={onDismiss}
+      presentationStyle="overFullScreen"
+      statusBarTranslucent
+      transparent
+      visible
+    >
+      <View
+        accessibilityViewIsModal
+        className="absolute inset-0 z-[100] justify-end bg-black/45 backdrop-blur-[2px]"
+        testID="sound-mixer-save-mix-overlay"
+      >
+        <View
+          className="w-full rounded-t-[24px] border-t border-[#1E2236] bg-[#14172B] px-5 pt-3 pb-11 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]"
+          testID="sound-mixer-save-mix-sheet"
+        >
+          <View
+            accessibilityElementsHidden
+            className="mx-auto mb-5 h-1 w-10 rounded-full bg-[#2D3359]"
+            testID="sound-mixer-save-mix-handle"
+          />
+
+          <View className="mb-2 min-h-11 flex-row items-center justify-between">
+            <Text
+              accessibilityRole="header"
+              className="font-nidoru-primary-regular text-[20px] font-medium leading-[26px] text-[#EEF0FF]"
+              selectable
+            >
+              Save mix
+            </Text>
+            <Pressable
+              accessibilityHint="Dismisses the Save Mix sheet."
+              accessibilityLabel="Close Save Mix sheet"
+              accessibilityRole="button"
+              className="-mr-1 h-11 w-11 items-center justify-center rounded-[14px] active:scale-[0.96]"
+              hitSlop={6}
+              onPress={onDismiss}
+              testID="sound-mixer-save-mix-close"
+            >
+              <View
+                className="h-8 w-8 items-center justify-center rounded-full border border-[#2D3359] bg-[#1C2040]"
+                testID="sound-mixer-save-mix-close-icon-frame"
+              >
+                <CloseCircleIcon color={colors.inactive} size={20} strokeWidth={1.5} />
+              </View>
+            </Pressable>
+          </View>
+
+          <Text className="mb-6 font-nidoru-primary-regular text-sm font-light leading-5 text-[#8A8FA8]">
+            Keep this sound combination for another night.
+          </Text>
+
+          <View
+            className="mb-6 min-h-[152px] gap-3.5 rounded-[16px] border border-[#1E2236]/60 bg-[#0D0F1A] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]"
+            testID="sound-mixer-save-mix-preview"
+          >
+            {activeSounds.map((sound) => (
+              <SaveMixLayerRow key={sound.id} sound={sound} />
+            ))}
+          </View>
+
+          <View className="mb-8">
+            <Text
+              className="ml-1 mb-2 font-nidoru-primary-semibold text-[13px] leading-[18px] tracking-wide text-[#EEF0FF]"
+              nativeID="sound-mixer-save-mix-name-label"
+            >
+              Mix name
+            </Text>
+            <TextInput
+              accessibilityLabel="Mix name"
+              accessibilityLabelledBy="sound-mixer-save-mix-name-label"
+              className="mb-2 h-12 rounded-[14px] border border-[#2D3359] bg-[#0D0F1A] px-4 font-nidoru-primary-semibold text-[15px] leading-5 text-[#EEF0FF]"
+              defaultValue="Rain Hearth"
+              placeholder="Enter mix name"
+              placeholderTextColor="#6A7095"
+              returnKeyType="done"
+              selectionColor={colors.active}
+              testID="sound-mixer-save-mix-name-input"
+            />
+            <View className="flex-row items-center justify-between px-1">
+              <Text className="font-nidoru-primary-regular text-xs font-light leading-4 text-[#8A8FA8]">
+                You can save up to 3 mixes.
+              </Text>
+              <Text className="font-nidoru-data-regular text-xs font-medium leading-4 text-[#A89CE0] tabular-nums">
+                2 of 3 saved
+              </Text>
+            </View>
+          </View>
+
+          <View className="gap-2">
+            <Pressable
+              accessibilityLabel="Save Mix"
+              accessibilityRole="button"
+              className="h-12 items-center justify-center rounded-[14px] bg-[#7C6FCD] shadow-[0_0_15px_rgba(124,111,205,0.25)] active:scale-[0.98]"
+              testID="sound-mixer-save-mix-submit"
+            >
+              <Text className="font-nidoru-primary-semibold text-[15px] leading-5 tracking-wide text-white">
+                Save Mix
+              </Text>
+            </Pressable>
+            <Pressable
+              accessibilityHint="Dismisses the Save Mix sheet without saving."
+              accessibilityLabel="Cancel Save Mix"
+              accessibilityRole="button"
+              className="h-12 items-center justify-center rounded-[14px] bg-transparent active:scale-[0.98]"
+              onPress={onDismiss}
+              testID="sound-mixer-save-mix-cancel"
+            >
+              <Text className="font-nidoru-primary-semibold text-[15px] leading-5 tracking-wide text-[#8A8FA8]">
+                Cancel
+              </Text>
+            </Pressable>
+          </View>
+        </View>
+      </View>
+    </Modal>
+  );
+}
+
+function SaveMixLayerRow({ sound }: { readonly sound: SoundCard }) {
+  const Icon = sound.Icon;
+
+  return (
+    <View
+      accessibilityLabel={`${sound.label} active layer at ${sound.volume}% volume`}
+      accessible
+      className="min-h-8 flex-row items-center justify-between"
+      testID={`sound-mixer-save-mix-layer-${sound.id}`}
+    >
+      <View className="flex-row items-center gap-3">
+        <View className="h-8 w-8 items-center justify-center rounded-full border border-[#2D3359] bg-[#1C2040]">
+          <Icon color={colors.activeSoft} size={16} strokeWidth={1.5} />
+        </View>
+        <Text className="font-nidoru-primary-regular text-sm leading-[18px] tracking-wide text-[#EEF0FF]">
+          {sound.label}
+        </Text>
+      </View>
+      <Text className="font-nidoru-data-regular text-sm font-medium leading-[18px] text-[#A89CE0] tabular-nums">
+        {`${sound.volume}%`}
+      </Text>
     </View>
   );
 }
@@ -492,6 +669,39 @@ function ProgressRing({
           strokeWidth={strokeWidth}
         />
       ) : null}
+    </Svg>
+  );
+}
+
+function CloseCircleIcon({
+  color = "currentColor",
+  size = 20,
+  strokeWidth = 1.5,
+  testID,
+}: MixerIconProps) {
+  const testProps = testID ? { testID } : {};
+
+  return (
+    <Svg fill="none" height={size} viewBox="0 0 24 24" width={size} {...testProps}>
+      <Circle cx="12" cy="12" r="8" stroke={color} strokeWidth={strokeWidth} />
+      <Line
+        stroke={color}
+        strokeLinecap="round"
+        strokeWidth={strokeWidth}
+        x1="9.5"
+        x2="14.5"
+        y1="9.5"
+        y2="14.5"
+      />
+      <Line
+        stroke={color}
+        strokeLinecap="round"
+        strokeWidth={strokeWidth}
+        x1="14.5"
+        x2="9.5"
+        y1="9.5"
+        y2="14.5"
+      />
     </Svg>
   );
 }

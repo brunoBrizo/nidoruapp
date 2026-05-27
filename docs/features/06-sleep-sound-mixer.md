@@ -4,7 +4,7 @@ Phase: MVP
 
 ## Summary
 
-The sleep sound mixer lets users layer curated ambient sounds with independent volume and a sleep timer that fades out cleanly. It is both a retention feature and a shareable product surface. The default sound experience must work offline and avoid buffering at bedtime.
+The sleep sound mixer lets users layer curated ambient sounds with independent volume and a sleep timer that fades out cleanly. It is both a retention feature and a shareable product surface. The default sound experience must work offline and avoid buffering at bedtime. Sound copy should frame audio as masking, preference, and routine support rather than proven sleep treatment.
 
 ## User Stories
 
@@ -21,7 +21,7 @@ The sleep sound mixer lets users layer curated ambient sounds with independent v
   - Nature: Ocean Waves, Forest, River Stream, Wind.
   - Noise: White Noise, Brown Noise, Pink Noise.
   - Environment: Fireplace Crackling, Cafe Ambience, Fan.
-  - Tones: 432Hz Tone, Delta Wave Binaural.
+  - Tones: 432Hz Tone, Delta Wave Binaural as experimental/preference audio, not premium proof points.
 - Each sound is minimum 4 minutes, seamlessly looped with no audible click.
 - Two-column sound-card grid.
 - Active sounds highlighted with Iris; inactive sounds use Haze.
@@ -41,6 +41,7 @@ The sleep sound mixer lets users layer curated ambient sounds with independent v
 - Unlicensed audio.
 - Abrupt timer cutoff.
 - Complex Smart Mix in MVP.
+- Claims that white/pink/brown noise, 432 Hz, binaural, or delta-wave tracks are clinically proven to improve sleep.
 
 ## Acceptance Criteria
 
@@ -52,6 +53,7 @@ The sleep sound mixer lets users layer curated ambient sounds with independent v
 - Sleep timer releases keep-awake or power-management locks when playback ends.
 - Interface fades to fully dark after 30 seconds of no interaction while audio continues.
 - User always knows whether audio will stop, fade, or continue.
+- Public copy avoids clinical efficacy claims for tones, binaural tracks, and colored noise.
 
 ## UX References
 
@@ -59,6 +61,7 @@ The sleep sound mixer lets users layer curated ambient sounds with independent v
 - [MVP Scope and Roadmap](../product/mvp-scope-and-roadmap.md)
 - [Onboarding and Retention](../ux/onboarding-retention.md)
 - [Competitor UI/UX Response Plan](../research/competitor-uiux-response-plan.md)
+- [Sleep and Breathwork Technique Audit](../research/sleep-breathwork-technique-audit.md)
 
 ## Engineering References
 

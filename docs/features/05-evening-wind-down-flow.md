@@ -4,7 +4,7 @@ Phase: MVP
 
 ## Summary
 
-Evening Wind-Down is the anchor nightly ritual. One tap from Home sequences breathwork, a body relaxation cue, and ambient sound into a low-choice bedtime flow. It combines the breathwork and sleep-audio categories instead of forcing users to browse separate sections.
+Evening Wind-Down is the anchor nightly ritual. One tap from Home sequences breathwork, a body relaxation cue, and ambient sound into a low-choice bedtime flow. It combines the breathwork and sleep-audio categories instead of forcing users to browse separate sections. It is a wellness routine, not insomnia treatment or CBT-I.
 
 ## User Stories
 
@@ -18,7 +18,7 @@ Evening Wind-Down is the anchor nightly ritual. One tap from Home sequences brea
 - One tap preferred, two taps maximum from Home.
 - Fixed launch sequence:
   - 3-5 minutes of starter breathwork, with Coherent Breathing / Daily Calm as a 10-minute regular-practice option.
-  - About 2 minutes of body relaxation cue.
+  - About 2 minutes of body relaxation cue, with Phase 2 room to expand into a simple body scan or progressive muscle relaxation track for busy-mind nights.
   - Ambient sound continues until timer or user stop.
 - Optional quick context check can ask tonight's goal and remember the last choice.
 - Wind-down transition card lasts 5 seconds and auto-advances if user does nothing.
@@ -32,6 +32,7 @@ Evening Wind-Down is the anchor nightly ritual. One tap from Home sequences brea
 - Complex routine marketplace.
 - Fully custom routine builder in MVP.
 - Sleep stories as a required MVP step.
+- CBT-I, insomnia-treatment, or guaranteed sleep-improvement claims.
 - Brightness permission as a blocker.
 - More than two taps from Home to start.
 
@@ -52,6 +53,7 @@ Evening Wind-Down is the anchor nightly ritual. One tap from Home sequences brea
 - [Onboarding and Retention](../ux/onboarding-retention.md)
 - [Navigation Architecture](../ux/navigation-architecture.md)
 - [Wind-Down UI Source Contract](../design/screens/wind-down/README.md)
+- [Sleep and Breathwork Technique Audit](../research/sleep-breathwork-technique-audit.md)
 
 ## Engineering References
 

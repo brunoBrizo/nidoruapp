@@ -281,7 +281,7 @@ Session completion is the single most important emotional moment in the daily ha
 
 3. **Lottie checkmark + confetti:** The animated checkmark draws itself (300ms) then confetti bursts (LottieFiles `animated-checkmark-with-confetti`). Duration: 1.5 seconds total. Haptic: `NotificationFeedbackType.Success` at the moment the checkmark completes.[^22]
 
-4. **Stats count up:** Session duration, total cycles, and streak increment all count up simultaneously over 800ms using Reanimated `withTiming`. The streak number gets a special treatment: it uses `withSpring({ damping: 8, stiffness: 100 })` creating a slight overshoot — the number "bounces" past its target value before settling. This is the dopamine release moment.
+4. **Stats count up:** Session duration, total cycles, and streak increment all count up simultaneously over 800ms using Reanimated `withTiming`. The streak number gets a special treatment: it uses `withSpring({ damping: 8, stiffness: 100 })` creating a slight overshoot — the number "bounces" past its target value before settling. This is the reward-feedback moment.
 
 5. **Social share card appears:** Slides up from bottom with a `translateY 80 → 0` + glassmorphism card, 400ms. Contains: a still frame of the orb at maximum expansion (beautiful screen capture), the session stats, and a share button. This is what users screenshot for TikTok.
 

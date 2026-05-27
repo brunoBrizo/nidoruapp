@@ -31,7 +31,7 @@ The app should win by combining a low-choice home screen, first-value breathing 
 | --- | --- | --- |
 | Calm's Daily Calm anticipation | A reason to open that is not only a notification | A daily "right now" card with fresh copy, one recommended action, and later a daily reflection prompt. |
 | Calm's ambient backgrounds | Slow, non-demanding background life | Night gradients, subtle particles only after performance proof, and no attention-grabbing loops. |
-| Calm's 60-second Breathe Bubble | Zero-friction relief | Rescue Me and Free Breathe must be visible from Home and start without account, network, or paywall. |
+| Calm's 60-second Breathe Bubble | Zero-friction support | Rescue Me and Free Breathe must be visible from Home and start without account, network, or paywall. |
 | Headspace emotional design | Rounded, spacious, safe UI language | Warm copy, readable whitespace, friendly typography, no sharp or urgent interaction style. |
 | Headspace breathe-before-register pattern | Demonstrate value before capture | First launch starts with a 30-second guided orb breath and a short first full session before questions, sign-in, permissions, or paywall. |
 | Headspace progressive path | Make beginners feel guided | Use bounded next steps and later short foundations/challenges, not a huge course library. |
@@ -105,7 +105,7 @@ Morning check-ins, insight-ready prompts, and paywall prompts should be in-app s
 
 ### MVP Scope
 
-Pull Rescue Me into MVP. The report makes it a direct competitive response to Calm's 60-second Breathe Bubble and a requirement for zero-friction emergency relief. It is technically small and strategically central.
+Pull Rescue Me into MVP. The report makes it a direct competitive response to Calm's 60-second Breathe Bubble and a requirement for zero-friction urgent support. It is technically small and strategically central.
 
 ## Implementation Acceptance Gates
 

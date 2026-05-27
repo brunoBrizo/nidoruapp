@@ -6,6 +6,8 @@ Phase: MVP
 
 The breathing visual pacer is the core product animation: a multi-layer orb that guides inhale, hold, exhale, and optional hold phases with synchronized text, audio cues, and haptics. It must be smooth enough to communicate the app's value in a 15-second recording and reliable enough to complete full sessions without losing progress.
 
+Evidence and copy boundaries are defined in [Sleep and Breathwork Technique Audit](../research/sleep-breathwork-technique-audit.md). Treat breathing sessions as wellness practices, not insomnia, anxiety, panic, or medical treatment.
+
 ## User Stories
 
 - As a user, I want the orb to clearly show when to inhale, hold, and exhale.
@@ -22,17 +24,19 @@ The breathing visual pacer is the core product animation: a multi-layer orb that
   - Light haptic on inhale transition.
   - Soft or closest gentle haptic on exhale transition.
 - Launch techniques from MVP roadmap:
-  - 4-7-8 breathing for sleep.
-  - Box breathing for anxiety and calm.
-  - Coherent Breathing / Daily Calm, 5.5 seconds in and 5.5 seconds out, as a regular 10-minute Evening Wind-Down or Daily Practice / HRV Training session.
-  - Diaphragmatic breathing for stress.
-- Source note: [Feature Deep Specs](../product/feature-deep-specs.md) also defines Physiological Sigh for panic or acute stress. Preserve it in the technique catalog as a post-MVP or explicit replacement candidate before tickets are written.
+  - 4-7-8 breathing as a bedtime relaxation cadence.
+  - Box breathing for calm, focus, and grounding.
+  - Coherent Breathing / Daily Calm, 5.5 seconds in and 5.5 seconds out, as a regular 10-minute Evening Wind-Down or Daily Practice session.
+  - Diaphragmatic breathing as a no-hold stress-reset option.
+- Source note: [Feature Deep Specs](../product/feature-deep-specs.md) also defines Physiological Sigh as a post-MVP acute-reset candidate. Preserve it in the technique catalog as post-MVP or an explicit replacement candidate before tickets are written.
+- Hold-based techniques must include a simple "stop, skip holds, or switch to a no-hold rhythm if uncomfortable" safety path before public launch.
 - Session completion persists before end screens, share prompts, animations, or upsells.
 
 ## Out Of Scope
 
 - Large breathwork library.
 - Clinical treatment claims.
+- Claims that any technique guarantees sleep improvement, treats anxiety, treats panic, or replaces medical care.
 - Decorative orb loops that can drift away from actual phase timing.
 - Screen-lock haptic guarantee if platform behavior prevents it.
 - Removing or weakening visual behavior after users depend on it.
@@ -47,6 +51,7 @@ The breathing visual pacer is the core product animation: a multi-layer orb that
 - Audio cues remain the reliable locked-screen guidance layer.
 - Session completion is saved before completion animation or paywall.
 - The visual remains consistent with the Midnight Indigo palette.
+- Technique descriptions stay aligned with the Sleep and Breathwork Technique Audit.
 
 ## UX References
 
@@ -54,6 +59,7 @@ The breathing visual pacer is the core product animation: a multi-layer orb that
 - [Breathing Orb Implementation Spec](../design/breathing-orb-implementation-spec.md)
 - [Motion, Animation, And Haptics](../design/motion-animation-haptics.md)
 - [Animation Source Alignment](../engineering/animation-source-alignment.md)
+- [Sleep and Breathwork Technique Audit](../research/sleep-breathwork-technique-audit.md)
 
 ## Engineering References
 

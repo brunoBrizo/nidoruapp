@@ -18,8 +18,8 @@ Phase: Phase 3
 Phase 3 first version:
 
 - Curated challenges:
-  - 7 Days of Better Sleep.
-  - 7 Days to Calm.
+  - 7 Nights of Wind-Down.
+  - 7 Days of Calm Practice.
   - No-Scroll Bedtime Week.
 - Reuse existing sessions and routines.
 - Progress cards at Day 1, Day 3, and Day 7.
@@ -32,6 +32,7 @@ Phase 3 first version:
 - Punitive challenge failure.
 - Complex challenge marketplace.
 - Medical claims.
+- Sleep-improvement, anxiety-treatment, or panic-treatment promises.
 
 ## Acceptance Criteria
 
@@ -47,6 +48,7 @@ Phase 3 first version:
 - [Growth, Pricing, and Brand](../growth/growth-pricing-brand.md)
 - [Habit Loop Architecture](../product/habit-loop-architecture.md)
 - [Feature Deep Specs](../product/feature-deep-specs.md)
+- [Sleep and Breathwork Technique Audit](../research/sleep-breathwork-technique-audit.md)
 
 ## Engineering References
 

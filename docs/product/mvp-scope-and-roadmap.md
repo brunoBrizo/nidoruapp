@@ -6,6 +6,7 @@ Related docs:
 - Use [Feature Deep Specs](feature-deep-specs.md) for detailed feature behavior.
 - Use [Technical Foundation](../architecture/technical-foundation.md) for module boundaries and backend responsibilities.
 - Use [Onboarding Flow Screen-by-Screen](../ux/onboarding-flow-screen-by-screen.md) and [Navigation Architecture](../ux/navigation-architecture.md) for launch-flow specifics.
+- Use [Sleep and Breathwork Technique Audit](../research/sleep-breathwork-technique-audit.md) for evidence strength, safety guardrails, and non-clinical claim boundaries.
 
 ## MVP Goal
 
@@ -26,7 +27,7 @@ The complete product bible describes the MVP as Features 1-6 plus onboarding and
 - Onboarding Flow.
 - Bottom Navigation.
 
-The newer competitor UI/UX intelligence report makes Rescue Me a direct response to Calm's zero-friction Breathe Bubble and the category's failure to offer immediate relief. Rescue Me is now pulled into MVP because it is technically small and strategically central.
+The newer competitor UI/UX intelligence report makes Rescue Me a direct response to Calm's zero-friction Breathe Bubble and the category's failure to offer immediate support. Rescue Me is now pulled into MVP because it is technically small and strategically central.
 
 ## Launch MVP
 
@@ -56,10 +57,11 @@ Required behavior:
 - Supports audio cues and haptic cues.
 - Technique names are explicit.
 - Launch techniques:
-  - 4-7-8 breathing for sleep.
-  - Box breathing for anxiety and calm.
+  - 4-7-8 breathing as a bedtime relaxation cadence.
+  - Box breathing for calm, focus, and grounding.
   - Coherent Breathing / Daily Calm, 5.5 seconds in and 5.5 seconds out, for 10-minute evening or daily practice.
   - Diaphragmatic breathing for stress.
+- Hold-based techniques need a simple safety affordance before public launch: users can stop or choose a no-hold rhythm if they feel dizzy, breathless, or uncomfortable.
 - Animation should be attractive enough to screen record.
 
 Why it matters:
@@ -74,6 +76,7 @@ Required behavior:
 
 - 10-15 curated sounds.
 - Include rain, ocean, white noise, brown noise, forest, fan, and fireplace.
+- Treat 432 Hz, delta-wave binaural, and colored-noise tracks as preference/masking audio, not clinically proven sleep enhancers or premium proof points.
 - Users can mix 2-3 layers.
 - Each layer has separate volume.
 - Sleep timer supports 20, 30, 45, and 60 minutes.
@@ -129,9 +132,9 @@ Required behavior:
 
 Why it matters:
 
-- It is the fastest path to relief.
+- It is the fastest path to a calming practice.
 - It directly copies what users love about Calm's Breathe Bubble while making it more visually distinctive and more reliable.
-- It gives anxious users a reason to trust the app before exploring anything else.
+- It gives overwhelmed users a reason to trust the app before exploring anything else.
 
 ## Phase 2: First 3 Months After MVP
 
@@ -164,8 +167,8 @@ After breathwork, create a clean result card with session length, breaths comple
 
 Curated sequences:
 
-- 7 Days of Better Sleep.
-- 7 Days to Calm.
+- 7 Nights of Wind-Down.
+- 7 Days of Calm Practice.
 - No-Scroll Bedtime Week.
 
 Challenges should reuse existing sessions and not require a separate content system at first.
@@ -182,6 +185,8 @@ Challenges should reuse existing sessions and not require a separate content sys
 - No CBT-I course.
 - No microphone sleep tracking.
 - No AI chatbot or therapist.
+- No claims to diagnose, treat, or cure insomnia, anxiety, panic, or sleep disorders.
+- No public copy that implies 4-7-8, box breathing, coherent breathing, binaural audio, or colored noise guarantees sleep improvement.
 - No social feed.
 - No wearable companion app.
 - No large meditation library.
@@ -221,3 +226,4 @@ The MVP is not ready until these are true:
 - No account creation or paywall appears before the first completed session.
 - Rescue Me starts from Home without account, network, or paywall.
 - Base sounds have no audible loop click during normal playback.
+- All sleep, breathwork, sound, insight, App Store, and growth copy stays aligned with the Sleep and Breathwork Technique Audit.

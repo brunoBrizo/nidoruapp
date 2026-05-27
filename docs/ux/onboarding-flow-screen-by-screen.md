@@ -74,7 +74,7 @@ Ask up to five questions:
 
 | Question | Purpose | Design rule |
 | --- | --- | --- |
-| What brings you here? | Goal segmentation: sleep, anxiety, stress, curiosity | Illustrated option tiles, no text input. |
+| What brings you here? | Goal segmentation: sleep, busy mind, stress, curiosity | Illustrated option tiles, no text input. |
 | How do you sleep most nights? | Baseline for later insight cards | One-tap 1-5 scale. |
 | When do you usually wind down? | Anchor time for Home and optional reminders | Time-wheel picker plus presets. |
 | Have you tried breathwork before? | Calibrate instruction depth | Binary: yes / new to me. |

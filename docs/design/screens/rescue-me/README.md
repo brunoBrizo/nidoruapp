@@ -16,7 +16,7 @@ on 2026-05-23.
 
 | Canonical state | Accepted file(s) | Aliases and notes |
 | --- | --- | --- |
-| Home emergency entry | `../home/home.png` | Home entry context only. Ember `#FF6B6B` is reserved for the Home Rescue Me entry and must not appear in active, completion, or handoff screens. |
+| Home urgent entry | `../home/home.png` | Home entry context only. Ember `#FF6B6B` is reserved for the Home Rescue Me entry and must not appear in active, completion, or handoff screens. |
 | Active launch | `rescue-me-active.html`, `rescue-me-active.png` | Alias: `rescue-me-active-launch`. The orb is visible immediately with no setup text, technique picker, account, paywall, permission, spinner, or loading surface. |
 | Active phase | `rescue-me-active2.png` | Alias: `rescue-me-active-phase`. Low-brightness 4-7-8 orb, timer, Bell, Pause, and Haptics controls. No coaching copy at launch. |
 | After-two-cycles reassurance | `rescue-me-phase-2.png` | Alias: `rescue-me-active-reassurance`. Reassurance stays low-contrast bottom copy only; it must not become a card, banner, toast, or coaching panel. |
@@ -31,7 +31,7 @@ on 2026-05-23.
 - Reassurance may appear only after two cycles and must stay visually subordinate to the orb.
 - Completion copy and optional sound CTA must remain exact.
 - Sound handoff must stay offline-safe and minimal.
-- Ember `#FF6B6B` is a Home emergency-entry accent only.
+- Ember `#FF6B6B` is a Home urgent-entry accent only.
 - Avoid medical/crisis-service language, badges, streaks, rewards, and coaching panels.
 
 ## Downstream Tickets

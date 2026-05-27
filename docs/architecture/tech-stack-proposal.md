@@ -19,7 +19,7 @@ No stack can guarantee users never see lag. The decision is to keep the critical
 
 ## Product Constraints Driving The Stack
 
-- Every feature must be demonstrable in 15 seconds and feel like relief within 60 seconds.
+- Every feature must be demonstrable in 15 seconds and feel useful and calming within 60 seconds.
 - First session must work without account creation, paywall, backend dependency, or notification permission.
 - The breathing pacer is the visual center of the product and must animate smoothly for full sessions.
 - Rescue Me must start immediately with no network calls and no setup.

@@ -6,6 +6,7 @@ Related docs:
 - Use [MVP Scope and Roadmap](../product/mvp-scope-and-roadmap.md) for launch-scope promises.
 - Use [Assumptions, Risks, and Open Questions](../research/assumptions-risks-open-questions.md) for remaining brand, legal, and pricing risks.
 - Use [Source Map](../research/source-map.md) before using claims in public marketing.
+- Use [Sleep and Breathwork Technique Audit](../research/sleep-breathwork-technique-audit.md) before using sleep, breathwork, sound, HRV, anxiety, panic, or nervous-system claims in App Store metadata, ads, creator scripts, or landing-page copy.
 
 ## Growth Thesis
 
@@ -40,7 +41,7 @@ Creator follows the breathing pacer for 30-60 seconds.
 
 Hook:
 
-- "If you are anxious before bed, breathe with this for one minute."
+- "If your mind is busy before bed, breathe with this for one minute."
 
 Product requirement:
 
@@ -58,17 +59,17 @@ Product requirement:
 
 - Challenges need simple progress state and shareable screenshots.
 
-### 4. Science Of The Technique
+### 4. Technique Explainers
 
 Short educational clips about 4-7-8, box breathing, coherent breathing, and sleep routines.
 
 Hook:
 
-- "Why this breathing rhythm helps your body downshift."
+- "Why this slow breathing rhythm can help a bedtime routine feel calmer."
 
 Product requirement:
 
-- Keep in-app technique explanations clear but non-clinical.
+- Keep in-app and public technique explanations clear, non-clinical, and aligned with the technique audit. Avoid "treats anxiety," "cures insomnia," "activates your parasympathetic nervous system," "guaranteed sleep," and similar claims.
 
 ### 5. Late-Night Cannot Sleep
 
@@ -93,7 +94,7 @@ Product requirement:
 Caption keywords to test:
 
 - cannot sleep
-- anxiety before bed
+- busy mind before bed
 - how to fall asleep fast
 - breathwork for sleep
 - sleepmaxxing
@@ -192,8 +193,8 @@ Use this metadata as the current App Store working set:
 | --- | --- |
 | Title | Nidoru |
 | Subtitle | Sleep Sounds & Breathwork |
-| Keyword intent | breathing exercises, deep breathing, box breathing, anxiety relief, sleep aid, white noise, relax, calm sounds, sleep timer, stress relief |
-| First App Store keyword field | breathing exercises,deep breathing,box breathing,anxiety relief,white noise,sleep aid,stress relief |
+| Keyword intent | breathing exercises, deep breathing, box breathing, sleep sounds, white noise, brown noise, relax, calm sounds, sleep timer, bedtime routine |
+| First App Store keyword field | breathing exercises,deep breathing,box breathing,sleep sounds,white noise,calm sounds,sleep timer |
 
 The full keyword intent is longer than Apple's 100-byte keyword field. The first submission keyword field preserves the strongest non-brand search phrases and fits within the 100-byte limit.
 

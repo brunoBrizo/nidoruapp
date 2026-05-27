@@ -26,7 +26,7 @@ The target positioning: **highest simplicity in the category combined with conte
 
 These are non-technical principles that govern how every design decision in the app is evaluated. They are adapted from Headspace's design system philosophy and validated against the user feedback research:[^9]
 
-1. **Never rush the user.** Every interaction should respect that the user may be anxious, tired, or overwhelmed. Menus don't fly in, buttons don't pulse to demand attention, and there is no countdown timer on anything except the breathing exercise itself.
+1. **Never rush the user.** Every interaction should respect that the user may be stressed, tired, or overwhelmed. Menus don't fly in, buttons don't pulse to demand attention, and there is no countdown timer on anything except the breathing exercise itself.
 
 2. **Never shame the user.** Streaks pause, not break. Missed sessions get: "Welcome back. Let's start fresh." Not: "You broke your 12-day streak." The app is the user's ally, not their judge. 92% churn is partly driven by users who broke a streak and felt too guilty to return.[^2][^1]
 

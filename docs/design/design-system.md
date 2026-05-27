@@ -6,14 +6,15 @@ Related docs:
 - Use [Feature Deep Specs](../product/feature-deep-specs.md) for where design tokens are used.
 - Use [Motion, Animation, And Haptics](motion-animation-haptics.md) for motion rules tied to the visual system.
 - Use [Competitor UI/UX Color Visual Hierarchy](../research/competitor-uiux-color-visual-hierarchy.md) for the research source behind the palette.
+- Use [Sleep and Breathwork Technique Audit](../research/sleep-breathwork-technique-audit.md) before turning color, motion, or breathing design rationale into nervous-system or health-effect claims.
 
 Before a single feature is defined, the visual language must be established. Design system decisions made wrong at the start cause months of rework. The following is a complete, buildable design system based on competitor analysis, color psychology research, and dark-mode best practices.
 
 ### Color Palette: "Midnight Indigo"
 
-The color strategy is built on a core insight from competitor research: **Calm went with muted blues and created a powerful brand**, but its colors feel dated and corporate in 2026. Headspace deliberately positioned away from the "dreary sea of blues and greys" in mental health apps. The opportunity is to use **deep indigo and violet tones** — the color family associated with sleep, twilight, and the nervous system — not the tired teal-navy palette everyone else uses.[^1]
+The color strategy is built on a core insight from competitor research: **Calm went with muted blues and created a powerful brand**, but its colors feel dated and corporate in 2026. Headspace deliberately positioned away from the "dreary sea of blues and greys" in mental health apps. The opportunity is to use **deep indigo and violet tones** associated with sleep, twilight, and quiet nighttime context — not the tired teal-navy palette everyone else uses.[^1]
 
-Sleep research and color psychology confirms: deep purples and navy are the specific color family used for bedtime relaxation. Blue reduces heart rate and respiration — the physiological opposite of red. But indigo adds a premium, modern feel that teal can't achieve.[^2][^3]
+Sleep and color references can inform tone, but do not use the palette as a health claim. Deep purples and navy support a low-brightness bedtime aesthetic, while indigo adds a premium, modern feel that teal can't achieve.[^2][^3]
 
 The full buildable palette, using Material Design principles of dark grey (never pure black) backgrounds:[^4]
 

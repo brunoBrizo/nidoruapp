@@ -6,6 +6,7 @@ Related docs:
 - Use [Tech Stack Decision Record](../architecture/tech-stack-proposal.md) for final technical decisions.
 - Use [Growth, Pricing, and Brand](../growth/growth-pricing-brand.md) for Nidoru metadata and brand decisions.
 - Use [Source Map](source-map.md) for claims that still need re-checking before public use.
+- Use [Sleep and Breathwork Technique Audit](sleep-breathwork-technique-audit.md) for technique evidence, safety guardrails, and health-claim boundaries.
 
 ## Assumptions Made For This Foundation
 
@@ -30,7 +31,7 @@ Remaining launch checks:
 
 ### Clinical Positioning
 
-The app can be science-informed, but the exact wording around sleep improvement, anxiety, and stress needs review before launch.
+The app can be science-informed, but it should not claim to treat insomnia, anxiety, panic, sleep disorders, or medical conditions. Current evidence supports a wellness product that helps users start a calming bedtime routine, practice low-risk breathing, use preference-based sound masking, and notice self-reported patterns. Stronger clinical claims require a separate clinical product path, clinician review, exclusion/escalation rules, and likely CBT-I-specific scope.
 
 ### No-Credit-Card Trial
 
@@ -69,6 +70,8 @@ Only after this feels good should the team add account creation, subscriptions, 
 | Health integration path | Libraries and permissions change | Build a throwaway HealthKit import proof before committing Phase 3 scope |
 | Store review risk | Background audio and subscriptions can cause review issues | Create an app-store compliance checklist before beta |
 | Clinical language | Wellness claims can create trust and legal risk | Review app copy before public launch |
+| Technique evidence drift | Breathwork, sleep, and sound research changes over time | Refresh the Sleep and Breathwork Technique Audit before launch copy, clinical-sounding features, or paid acquisition |
+| Sound-frequency claims | 432 Hz, binaural, delta, and colored-noise evidence is weaker than user-preference/masking value | Treat these as preference audio unless a future evidence review supports stronger claims |
 
 ## Product Risks
 
@@ -79,6 +82,7 @@ Only after this feels good should the team add account creation, subscriptions, 
 | Audio reliability disappoints users | High | Treat audio as a core acceptance gate. |
 | Subscription anxiety hurts reviews | High | Keep free tier useful and send renewal reminders. |
 | Insight cards overclaim causation | Medium | Phrase as observed patterns, not medical truth. |
+| Rescue Me is mistaken for crisis support or anxiety treatment | High | Keep copy minimal and non-clinical, avoid panic-treatment wording, and add appropriate escalation/safety guidance before public release. |
 | Pacer looks generic | Medium | Invest in animation quality because it is both UX and growth. |
 | Backend slows launch | Medium | Start with direct Supabase and serverless functions. |
 

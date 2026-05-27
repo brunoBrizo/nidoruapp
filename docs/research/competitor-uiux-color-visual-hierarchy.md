@@ -9,11 +9,11 @@ Related docs:
 
 ### Color Psychology for Sleep + Breathwork
 
-Color is not aesthetic preference — it is neurological. Research confirms that blue-violet wavelengths suppress cortisol and activate the parasympathetic nervous system. The wrong colors before bed increase alertness. The right colors reduce it.[^45]
+Color is not only aesthetic preference; it changes perceived mood, brightness, and trust. Treat color psychology as design input, not as a health claim: the palette should feel quiet in a dark room without claiming cortisol suppression, parasympathetic activation, or sleep treatment.[^45]
 
 | Color | Hex | Role | Why |
 |---|---|---|---|
-| Deep Night | `#0D0F1A` | Primary background | Near-black indigo suppresses blue light impact vs pure white apps |
+| Deep Night | `#0D0F1A` | Primary background | Near-black indigo reduces perceived brightness versus pure white apps |
 | Midnight Blue | `#0F1230` | Secondary background | Depth layer behind glassmorphism cards |
 | Iris | `#7C6FCD` | Primary interactive / orb core | Purple = creativity + calm; not activating like blue |
 | Lavender | `#A89CE0` | Hover states, active indicators | Lighter sister to Iris |
@@ -24,7 +24,7 @@ Color is not aesthetic preference — it is neurological. Research confirms that
 | Ember | `#FF6B6B` | Error states only | Never decorative; reserved for system errors |
 | Glass | `rgba(255,255,255,0.07)` | Card borders | Glassmorphism edge highlight |
 
-**The critical rule:** Never use pure white (`#FFFFFF`) as a text color. The contrast against `#0D0F1A` is too high and creates visual tension that is neurologically activating. Cloud (`#E8E6F2`) delivers the same readability with less strain — important for users using the app in a dark room before sleep.[^46]
+**The critical rule:** Never use pure white (`#FFFFFF`) as a text color. The contrast against `#0D0F1A` is too high and creates visual tension in a dark room. Cloud (`#E8E6F2`) delivers readability with less perceived glare — important for users using the app before sleep.[^46]
 
 ### Typography Hierarchy
 

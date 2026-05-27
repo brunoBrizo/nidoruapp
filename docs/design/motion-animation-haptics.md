@@ -6,6 +6,7 @@ Related docs:
 - Use [Animation Source Alignment](../engineering/animation-source-alignment.md) for source hierarchy and conflict decisions.
 - Use [Design System](design-system.md) for visual tokens used by motion.
 - Use [Breathing Orb Implementation Spec](breathing-orb-implementation-spec.md) for the core product animation.
+- Use [Sleep and Breathwork Technique Audit](../research/sleep-breathwork-technique-audit.md) before treating technique timing as public health or outcome copy.
 
 This doc consolidates the motion, timing, easing, and haptic rules that were present in the complete product bible. For code-first implementation, use [Animation Engineering Index](../engineering/animation-engineering-index.md) and [Animation Implementation Review Notes](../engineering/animation-implementation-review-notes.md).
 
@@ -66,9 +67,9 @@ Rules:
 | Technique | Pattern | Primary Context |
 | --- | --- | --- |
 | 4-7-8 Sleep | 4s inhale / 7s hold / 8s exhale | Before bed, Rescue Me |
-| Box Breathing | 4s inhale / 4s hold / 4s exhale / 4s hold | Anxiety and stress |
-| Coherent Breathing / Daily Calm | 5.5s inhale / 5.5s exhale | 10-minute Evening Wind-Down or Daily Practice / HRV Training |
-| Physiological Sigh | 2s inhale / 1s second inhale / 8s exhale | Panic or acute stress |
+| Box Breathing | 4s inhale / 4s hold / 4s exhale / 4s hold | Calm/focus grounding |
+| Coherent Breathing / Daily Calm | 5.5s inhale / 5.5s exhale | 10-minute Evening Wind-Down or Daily Practice |
+| Physiological Sigh | 2s inhale / 1s second inhale / 8s exhale | Post-MVP acute reset candidate |
 
 ## Implementation Rules
 

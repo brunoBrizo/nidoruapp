@@ -7,6 +7,7 @@ Related docs:
 - Use [User and Market Insights](../research/user-and-market-insights.md) for the customer pain behind the strategy.
 - Use [Competitor UI/UX Response Plan](../research/competitor-uiux-response-plan.md) for competitor-informed decisions.
 - Use [Growth, Pricing, and Brand](../growth/growth-pricing-brand.md) for Nidoru metadata, pricing, and acquisition strategy.
+- Use [Sleep and Breathwork Technique Audit](../research/sleep-breathwork-technique-audit.md) for technique evidence, safety guardrails, and health-claim boundaries.
 
 ## Positioning
 
@@ -17,6 +18,7 @@ It should not position itself as:
 - A meditation platform. Calm and Headspace already own that frame.
 - A sleep tracker. Users already complain that trackers explain the problem without helping solve it.
 - A clinical CBT-I product. That creates complexity, regulatory risk, and expectations the MVP cannot safely meet.
+- A medical, crisis, panic-treatment, anxiety-treatment, or sleep-disorder treatment product.
 
 The core promise is practical and immediate:
 
@@ -40,16 +42,16 @@ The market gap is not "more sleep content." The gap is a simple, trustworthy nig
 - Morning reflection that becomes useful insight after repeated use.
 - Honest pricing that avoids billing backlash and subscription anxiety.
 
-The two core breathing jobs stay distinct:
+The two core breathing jobs stay distinct and non-clinical:
 
-- Rescue Me is the emergency off switch: one tap into 4-7-8 breathing, with no choices or setup.
-- Coherent Breathing is regular practice: a 10-minute Daily Calm / HRV Training session for evening wind-down or daily resilience building.
+- Rescue Me is the urgent low-friction support path: one tap into 4-7-8 breathing, with no choices or setup. It is not crisis support or panic treatment.
+- Coherent Breathing is regular practice: a 10-minute slow-breathing session for evening wind-down or daily resilience building. HRV-oriented language can be internal taxonomy, but public copy should stay cautious unless separately validated.
 
 ## Current Product Bible Principle
 
 The complete product bible adds a stricter product filter:
 
-> Every feature must be demonstrable in 15 seconds on TikTok and feel like relief within 60 seconds of first use.
+> Every feature must be demonstrable in 15 seconds on TikTok and feel useful and calming within 60 seconds of first use.
 
 Use this as the default tie-breaker for product decisions. Features that fail both tests should be deferred or removed unless there is a clear infrastructure, safety, compliance, or retention reason to keep them.
 
@@ -62,7 +64,7 @@ Use this as the default tie-breaker for product decisions. Features that fail bo
    Audio, haptics, dimming, and one-tap starts matter more than rich navigation at night.
 
 3. Name breathing techniques by technique.
-   Use names like 4-7-8, box breathing, coherent breathing, and diaphragmatic breathing. Outcome labels such as Daily Calm or HRV Training can help users choose, but the technique name remains visible.
+   Use names like 4-7-8, box breathing, coherent breathing, and diaphragmatic breathing. Outcome labels such as Daily Calm can help users choose, but the technique name remains visible. Keep HRV Training as internal taxonomy unless separately validated for public copy.
 
 4. Make streaks compassionate.
    Missed days should pause momentum, not punish the user. Celebrate returning.
@@ -74,7 +76,7 @@ Use this as the default tie-breaker for product decisions. Features that fail bo
    The first launch path starts with breathing and can complete a first full session before personalization. Ask for personalization, account creation, and paid conversion after the first completed session. Ask for notification permission on Day 3 after at least two completed sessions.
 
 7. No clinical overclaiming.
-   The app can be science-informed without promising to treat insomnia, anxiety, or medical conditions.
+   The app can be science-informed without promising to treat insomnia, anxiety, panic, sleep disorders, or medical conditions. Technique copy should describe practice, routine, and self-observed patterns rather than guaranteed physiological effects.
 
 ## Launch Success Metrics
 
@@ -114,6 +116,8 @@ Use these as the first product gates:
 - No AI therapist, chatbot, or coaching claims.
 - No community feed.
 - No full CBT-I program.
+- No crisis-service positioning.
+- No sound-frequency, binaural, HRV, or breathwork claims beyond the evidence and wording approved in the technique audit.
 - No wearable companion app.
 - No large course library.
 - No forced account creation before first use.

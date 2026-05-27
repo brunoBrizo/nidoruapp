@@ -4,11 +4,11 @@ Phase: MVP
 
 ## Summary
 
-Rescue Me is the zero-friction emergency breathwork path. One tap from Home starts immediate 4-7-8 breathing with no account, network call, paywall, sound choice, timer setting, technique selection, or setup. It is the MVP version of 3 AM Recovery Mode and the direct competitive response to Calm's Breathe Bubble.
+Rescue Me is the zero-friction urgent breathwork support path. One tap from Home starts immediate 4-7-8 breathing with no account, network call, paywall, sound choice, timer setting, technique selection, or setup. It is the MVP version of 3 AM Recovery Mode and the direct competitive response to Calm's Breathe Bubble, but it must not be framed as crisis support, panic treatment, or medical care.
 
 ## User Stories
 
-- As an anxious user, I want one tap to start relief immediately.
+- As an overwhelmed user, I want one tap to start a calming practice immediately.
 - As a user awake at 2 AM, I want the lowest-friction, lowest-brightness experience possible.
 - As a user in distress, I do not want technique choices, account prompts, or paywalls.
 - As a returning user, I want my Rescue Me session to count locally even if sync fails.
@@ -16,7 +16,7 @@ Rescue Me is the zero-friction emergency breathwork path. One tap from Home star
 ## MVP Scope
 
 - Home quick action/card labeled "Rescue Me".
-- Uses `Ember #FF6B6B` only as a red accent for this emergency card.
+- Uses `Ember #FF6B6B` only as a red accent for this urgent card.
 - Tap starts immediate full-screen 4-7-8 breathing.
 - Coherent Breathing / Daily Calm remains in the regular session library, not in Rescue Me.
 - Orb is visible before transition completes.
@@ -25,6 +25,7 @@ Rescue Me is the zero-friction emergency breathwork path. One tap from Home star
 - End screen says: "That took courage to start. You completed 5 breath cycles."
 - Optional next step: "Continue with a calming sound".
 - Session progress is saved locally.
+- Safety copy must exist in a low-friction place before launch, such as first-use education, settings, or completion context: stop if breath holds feel dizzying, breathless, or uncomfortable. Do not put a blocking safety screen before the orb.
 
 ## Out Of Scope
 
@@ -33,6 +34,7 @@ Rescue Me is the zero-friction emergency breathwork path. One tap from Home star
 - Timer selection before start.
 - Network, account, paywall, analytics, or payment dependency before the orb appears.
 - Medical or crisis-service positioning.
+- Panic-treatment, anxiety-treatment, or guaranteed-outcome claims.
 
 ## Acceptance Criteria
 
@@ -42,6 +44,7 @@ Rescue Me is the zero-friction emergency breathwork path. One tap from Home star
 - Copy stays minimal and non-clinical.
 - Local session progress is saved even if app backgrounds.
 - No paywall or account prompt can appear before or during Rescue Me.
+- The flow includes or links to non-blocking breath-hold safety guidance before public launch.
 
 ## Frozen UI Handoff
 
@@ -56,6 +59,7 @@ Rescue Me is the zero-friction emergency breathwork path. One tap from Home star
 - [MVP Scope and Roadmap](../product/mvp-scope-and-roadmap.md)
 - [Onboarding and Retention](../ux/onboarding-retention.md)
 - [Competitor UI/UX Response Plan](../research/competitor-uiux-response-plan.md)
+- [Sleep and Breathwork Technique Audit](../research/sleep-breathwork-technique-audit.md)
 
 ## Engineering References
 
@@ -90,7 +94,7 @@ Rescue Me is the zero-friction emergency breathwork path. One tap from Home star
 ## Task Checklist
 
 - [ ] Add Rescue Me Home quick action/card.
-- [ ] Apply Ember accent only to Rescue Me emergency surface.
+- [ ] Apply Ember accent only to Rescue Me urgent surface.
 - [ ] Build immediate route into fixed 4-7-8 session.
 - [ ] Ensure no network/auth/paywall code runs before orb visibility.
 - [ ] Add subtle reassurance overlay after 2 cycles.

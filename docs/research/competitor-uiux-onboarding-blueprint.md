@@ -23,7 +23,7 @@ The first full session starts from a local default and stays short enough to com
 
 | Question | Purpose | Design Note |
 |---|---|---|
-| "What brings you here?" | Goal segmentation (sleep / anxiety / stress / curiosity) | Illustrated option tiles, no text input |
+| "What brings you here?" | Goal segmentation (sleep / busy mind / stress / curiosity) | Illustrated option tiles, no text input |
 | "How do you sleep most nights?" | Baseline for sleep insight card | Emoji scale 1–5, one tap |
 | "When do you usually wind down?" | Anchor time for home screen card and optional reminder | Time-wheel picker with pre-set options |
 | "Have you tried breathwork before?" | Content depth calibration | Binary: "Yes" / "New to me" |

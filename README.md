@@ -25,6 +25,7 @@ The source blueprint is dense, so the project knowledge is split by future use c
 | Exact competitor UI/UX intelligence source | [Competitor UI/UX Intelligence Source](docs/research/competitor-uiux-intelligence-source.md) |
 | Competitor failures translated into anti-patterns | [Competitor Anti-Patterns](docs/research/competitor-anti-patterns.md) |
 | User pain, competitor gaps, ideal customer | [User and Market Insights](docs/research/user-and-market-insights.md) |
+| Sleep and breathwork evidence, technique decisions, claim boundaries | [Sleep and Breathwork Technique Audit](docs/research/sleep-breathwork-technique-audit.md) |
 | What to build first, what to defer, what not to build | [MVP Scope and Roadmap](docs/product/mvp-scope-and-roadmap.md) |
 | Onboarding, first-session flow, retention loop, notifications | [Onboarding and Retention](docs/ux/onboarding-retention.md) |
 | TikTok/Instagram strategy, pricing, Nidoru brand metadata | [Growth, Pricing, and Brand](docs/growth/growth-pricing-brand.md) |
@@ -44,6 +45,8 @@ The source blueprint is dense, so the project knowledge is split by future use c
 - The app should work before account creation and before any paywall.
 - The app name is Nidoru, with App Store subtitle "Sleep Sounds & Breathwork".
 - The source blueprint is treated as strategic input, not fully audited market research.
+- Sleep, breathwork, sound, insight, and growth claims must follow the evidence and copy boundaries in the [Sleep and Breathwork Technique Audit](docs/research/sleep-breathwork-technique-audit.md).
+- Nidoru is a wellness and sleep-ritual product, not CBT-I, medical treatment, crisis support, sleep diagnosis, or anxiety treatment.
 - The complete product bible is the current detailed product source where it overlaps with the earlier blueprint.
 
 ## Working Rule

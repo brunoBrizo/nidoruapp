@@ -4,7 +4,7 @@ The competitive analysis reveals that this is not a space with technically super
 
 The differentiation is not complexity — it is intentionality. A Lottie confetti burst on session complete costs one line of code but earns the reward signal every habit loop depends on. A 5-layer breathing orb with Reanimated costs 3 days of development but generates millions of TikTok views. Haptic feedback synced to breath phases costs zero additional code and makes the app feel like it's breathing with you.
 
-Build this animation system from Day 1. Do not ship an MVP with placeholder animations and plan to "add polish later." Animation quality is brand quality in a wellness app. Users who open this app at 11 PM with anxiety are deciding in the first 30 seconds whether this product will help them tonight. The animation system described here answers that question before they breathe a single breath.
+Build this animation system from Day 1. Do not ship an MVP with placeholder animations and plan to "add polish later." Animation quality is brand quality in a wellness app. Users who open this app at 11 PM with a busy mind are deciding in the first 30 seconds whether this product can support them tonight. The animation system described here answers that question before they breathe a single breath.
 
 ---
 
@@ -69,4 +69,3 @@ Build this animation system from Day 1. Do not ship an MVP with placeholder anim
 29. [Skeleton Screens 101 - NN/G](https://www.nngroup.com/articles/skeleton-screens/) - A skeleton screen is a design pattern used to indicate that a page is loading while providing users ...
 
 30. [Motion Matters: How Animation Elevates UX in 2025](https://medium.com/design-bootcamp/motion-matters-how-animation-elevates-ux-in-2025-b181adca68a9) - Motion is no longer just a decorative flourish it’s a vital ingredient in modern UX design. When use...
-

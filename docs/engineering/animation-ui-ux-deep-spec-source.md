@@ -342,7 +342,7 @@ Session completion is the single most important emotional moment in the daily ha
 
 3. **Lottie checkmark + confetti:** The animated checkmark draws itself (300ms) then confetti bursts (LottieFiles `animated-checkmark-with-confetti`). Duration: 1.5 seconds total. Haptic: `NotificationFeedbackType.Success` at the moment the checkmark completes.[^22]
 
-4. **Stats count up:** Session duration, total cycles, and streak increment all count up simultaneously over 800ms using Reanimated `withTiming`. The streak number gets a special treatment: it uses `withSpring({ damping: 8, stiffness: 100 })` creating a slight overshoot — the number "bounces" past its target value before settling. This is the dopamine release moment.
+4. **Stats count up:** Session duration, total cycles, and streak increment all count up simultaneously over 800ms using Reanimated `withTiming`. The streak number gets a special treatment: it uses `withSpring({ damping: 8, stiffness: 100 })` creating a slight overshoot — the number "bounces" past its target value before settling. This is the reward-feedback moment.
 
 5. **Social share card appears:** Slides up from bottom with a `translateY 80 → 0` + glassmorphism card, 400ms. Contains: a still frame of the orb at maximum expansion (beautiful screen capture), the session stats, and a share button. This is what users screenshot for TikTok.
 
@@ -477,7 +477,7 @@ The competitive analysis reveals that this is not a space with technically super
 
 The differentiation is not complexity — it is intentionality. A Lottie confetti burst on session complete costs one line of code but earns the reward signal every habit loop depends on. A 5-layer breathing orb with Reanimated costs 3 days of development but generates millions of TikTok views. Haptic feedback synced to breath phases costs zero additional code and makes the app feel like it's breathing with you.
 
-Build this animation system from Day 1. Do not ship an MVP with placeholder animations and plan to "add polish later." Animation quality is brand quality in a wellness app. Users who open this app at 11 PM with anxiety are deciding in the first 30 seconds whether this product will help them tonight. The animation system described here answers that question before they breathe a single breath.
+Build this animation system from Day 1. Do not ship an MVP with placeholder animations and plan to "add polish later." Animation quality is brand quality in a wellness app. Users who open this app at 11 PM with a busy mind are deciding in the first 30 seconds whether this product can support them tonight. The animation system described here answers that question before they breathe a single breath.
 
 ---
 

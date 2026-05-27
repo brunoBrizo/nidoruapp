@@ -31,8 +31,8 @@ Calm uses a muted blue-teal palette with natural photography backgrounds. This w
 ### Headspace — Successes and Failures
 
 **What Headspace does right:**
-- The most scientifically validated content in the category — studies confirm measurable anxiety reduction[^25]
-- The 2025 rebrand was brave and right: moving from pure orange to a richer palette and adding photography signals "we're a real health company"[^1]
+- A research-backed meditation library with externally reported outcomes; do not inherit competitor anxiety-reduction claims without separate review[^25]
+- The 2025 rebrand was brave and right: moving from pure orange to a richer palette and adding photography signals "we're a serious wellness company"[^1]
 - Custom typeface ("Headspace-ified Aperçu") creates extraordinary brand distinctiveness[^1]
 - Short-form exercises (3–10 minutes) work better for modern users than 20–30 minute meditations
 - The illustration system — floating cartoon faces expressing multiple emotions — is instantly recognizable globally
@@ -54,7 +54,7 @@ Calm uses a muted blue-teal palette with natural photography backgrounds. This w
 **What Breathwrk does right:**
 - 2 million users and 40 million breaths tracked — proves the breathwork-only app market is real and sizable[^26]
 - Clean, focused product scope: it does one thing (breathing) and does it well
-- Data-driven exercise recommendations based on goal (sleep, anxiety, focus)
+- Data-driven exercise recommendations based on goal (sleep, calm, focus)
 - The social proof elements ("join 2M people breathing daily") convert well on landing pages
 
 **What Breathwrk does catastrophically wrong:**

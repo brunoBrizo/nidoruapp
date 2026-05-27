@@ -10,7 +10,7 @@ Source:
 
 ## Cross-Category Anti-Patterns
 
-- Do not make users browse a content library when they need immediate relief.
+- Do not make users browse a content library when they need immediate support.
 - Do not require account creation before first value.
 - Do not show a paywall before first value.
 - Do not ask for notification permission on first launch.

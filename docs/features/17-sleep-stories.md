@@ -4,11 +4,11 @@ Phase: Phase 3
 
 ## Summary
 
-Sleep Stories are short, quiet, deliberately low-stimulation audio narratives that help users fall asleep by occupying the analytical brain without entertaining it. They are a post-MVP content investment and must use properly licensed or owned human narration.
+Sleep Stories are short, quiet, deliberately low-stimulation audio narratives that support bedtime settling by giving the mind a gentle focus point without turning into entertainment. They are a post-MVP content investment and must use properly licensed or owned human narration.
 
 ## User Stories
 
-- As a user with racing thoughts, I want a boring, calming story to occupy my mind.
+- As a user with a busy mind, I want a boring, calming story to occupy my attention.
 - As a user at bedtime, I want stories to start without a spinner or long wait.
 - As a user who dislikes celebrity content, I want neutral, human narration.
 - As a returning listener, I want familiar stories I can repeat.
@@ -36,6 +36,7 @@ Phase 3 first version:
 - AI voice synthesis.
 - Celebrity-first positioning.
 - Entertainment-style stories.
+- Claims that stories treat insomnia or anxiety.
 - Network spinner at bedtime.
 - Unlicensed narration or music.
 
@@ -54,6 +55,7 @@ Phase 3 first version:
 - [MVP Scope and Roadmap](../product/mvp-scope-and-roadmap.md)
 - [Growth, Pricing, and Brand](../growth/growth-pricing-brand.md)
 - [Competitor UI/UX Response Plan](../research/competitor-uiux-response-plan.md)
+- [Sleep and Breathwork Technique Audit](../research/sleep-breathwork-technique-audit.md)
 
 ## Engineering References
 

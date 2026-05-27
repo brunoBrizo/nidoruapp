@@ -9,7 +9,7 @@ The app shell gives Nidoru its fixed five-tab structure and makes Home a "right 
 ## User Stories
 
 - As a tired user opening the app at night, I want one obvious action so I do not browse before bed.
-- As an anxious user, I want Rescue Me visible from Home so I can start immediate relief.
+- As an overwhelmed user, I want Rescue Me visible from Home so I can start a calming practice immediately.
 - As a returning user, I want Home to adapt to the time of day so the app feels context-aware.
 - As a subscriber or free user, I want Profile to clearly contain subscription, notification, support, and privacy settings.
 
@@ -25,7 +25,7 @@ The app shell gives Nidoru its fixed five-tab structure and makes Home a "right 
   - 12 AM-5 AM: Rescue Me.
 - Quick actions are Rescue Me, Sounds, and Breathe.
 - Sleep tab contains Wind-Down Flow, Sound Mixer, and Sleep Stories when added.
-- Breathe tab groups techniques by Sleep, Calm, Energy, and Focus while still showing technique names, including Coherent Breathing / Daily Calm as the regular 10-minute HRV Training practice.
+- Breathe tab groups techniques by Sleep, Calm, Energy, and Focus while still showing technique names, including Coherent Breathing / Daily Calm as a regular 10-minute slow-breathing practice.
 - Progress tab contains streak calendar, weekly summary, mood history, and sleep trends.
 - Profile tab contains settings, subscription, notifications, sound preferences, support, and privacy controls.
 

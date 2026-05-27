@@ -39,7 +39,7 @@ The new research is broadly aligned with the current product thesis:
 
 - First value before account, paywall, notification permission, or backend dependency.
 - Avoid content-library overload and make Home show one right-now action.
-- Keep Rescue Me or equivalent emergency breathing local, immediate, and setup-free.
+- Keep Rescue Me or equivalent urgent breathing local, immediate, and setup-free.
 - Treat billing clarity, cancellation, and support as trust features.
 - Use React Native Reanimated, Expo Haptics, local SQLite, offline-capable audio, and device proof for core flows.
 - Use a multi-layer breathing orb as the visual center of the product.
@@ -88,16 +88,16 @@ The main differences are not philosophical. They are product-scope and decision-
 
 ### 4. Rescue Me Technique Conflicts With The New Zero-Friction Widget
 
-**New research:** The emergency widget starts a 60-second coherent breathing cycle with 5.5s inhale and 5.5s exhale. Elsewhere, it emphasizes 1:2 exhale ratios like 4s in and 8s out for parasympathetic activation.
+**New research:** The urgent widget starts a 60-second coherent breathing cycle with 5.5s inhale and 5.5s exhale. Elsewhere, it emphasizes 1:2 exhale ratios like 4s in and 8s out for a calmer-feeling rhythm. Treat any autonomic-nervous-system explanation as internal research language unless the [Sleep and Breathwork Technique Audit](sleep-breathwork-technique-audit.md) supports public copy.
 
 **Current docs:** Rescue Me starts fixed 4-7-8 breathing immediately. Current breath-technique docs also include coherent breathing, but as a daytime calm/balance technique, not the Rescue Me default.
 
 **Why this matters:** The current app has a clear contract: Rescue Me equals immediate 4-7-8. The new research suggests two alternatives:
 
-- A 60-second coherent breathing emergency widget.
+- A 60-second coherent breathing urgent widget.
 - A longer-exhale calming preset optimized for sleep or acute stress.
 
-**Current decision:** Rescue Me remains one-tap 4-7-8 breathing. Coherent Breathing uses a 5.5s inhale / 5.5s exhale rhythm as a regular 10-minute Daily Calm / HRV Training session inside Evening Wind-Down or Daily Practice.
+**Current decision:** Rescue Me remains one-tap 4-7-8 breathing. Coherent Breathing uses a 5.5s inhale / 5.5s exhale rhythm as a regular 10-minute Daily Calm session inside Evening Wind-Down or Daily Practice. HRV-oriented labels can remain internal taxonomy, but public copy should stay cautious.
 
 **Possible doc updates if accepted:** Update [MVP Scope and Roadmap](../product/mvp-scope-and-roadmap.md), [Feature Deep Specs](../product/feature-deep-specs.md), [Motion, Animation, and Haptics](../design/motion-animation-haptics.md), [Technical Foundation](../architecture/technical-foundation.md), and current domain/test expectations.
 
@@ -117,7 +117,7 @@ The main differences are not philosophical. They are product-scope and decision-
 
 **New research:** Recommends:
 
-- Free: unrestricted emergency/coherent widget, four basic breathing exercises, weekly BOLT, basic history, local offline use.
+- Free: unrestricted urgent/coherent widget, four basic breathing exercises, weekly BOLT, basic history, local offline use.
 - Premium: custom pacing, keep-awake sleep timer, four-channel mixer, analytics.
 - Pricing: $9.99 monthly and $59.99 annual with a 14-day free trial.
 
@@ -249,7 +249,7 @@ The safest immediate updates would be:
 1. Refresh the source map to record the new research file and its status.
 2. Fix the internal orb layer-count drift so all current docs consistently say five layers.
 3. Add explicit wake-lock release and sleep-timer power-management acceptance criteria.
-4. Keep Rescue Me as one-tap 4-7-8 and position Coherent Breathing as Daily Calm / HRV Training for regular practice.
+4. Keep Rescue Me as one-tap 4-7-8 and position Coherent Breathing as Daily Calm for regular practice; keep HRV Training as internal taxonomy unless separately validated for public copy.
 5. Add a decision note for BOLT and physiological progress, but keep it out of MVP until safety, privacy, and claim language are reviewed.
 
 The riskiest updates would be:

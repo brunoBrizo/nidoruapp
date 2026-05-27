@@ -4,7 +4,7 @@ Phase: Phase 2
 
 ## Summary
 
-Sleep Insight Cards are the first "the app knows me" moment. After enough morning check-ins, Nidoru shows one simple, cautious, personalized pattern in plain English. The card should help users understand what worked without making medical or causal claims.
+Sleep Insight Cards are the first "the app notices my routine" moment. After enough morning check-ins, Nidoru shows one simple, cautious, personalized pattern in plain English. The card should help users understand what was associated with better self-reported nights without making medical, diagnostic, treatment, or causal claims.
 
 ## User Stories
 
@@ -20,6 +20,7 @@ Phase 2 first version:
 - Trigger after 7-14 nights of check-ins.
 - Show one simple pattern at a time.
 - Phrase insights as observed patterns, not causation.
+- Use copy like "your highest-rated nights often..." or "appears more often on..." instead of "this made you sleep better."
 - Home card has a "NEW" badge and subtle sparkle only on first reveal.
 - Detail view can show a 14-day timeline with sleep ratings and markers for session days, sound choices, and timing.
 - Insights can be premium later, but progress data remains visible without shame.
@@ -32,6 +33,7 @@ Phase 2 first version:
 - Overwhelming dashboard.
 - Passive sleep-tracker dependency.
 - Claims that wind-down caused improved sleep.
+- Claims that a technique, sound, frequency, or routine treats insomnia, anxiety, panic, or any medical condition.
 
 ## Acceptance Criteria
 
@@ -48,6 +50,7 @@ Phase 2 first version:
 - [MVP Scope and Roadmap](../product/mvp-scope-and-roadmap.md)
 - [Habit Loop Architecture](../product/habit-loop-architecture.md)
 - [Competitor UI/UX Response Plan](../research/competitor-uiux-response-plan.md)
+- [Sleep and Breathwork Technique Audit](../research/sleep-breathwork-technique-audit.md)
 
 ## Engineering References
 
@@ -80,6 +83,7 @@ Phase 2 first version:
 - If insight generation fails, retry in background and keep Home calm.
 - If user disables sensitive data sync, keep local-only insights if allowed by privacy decision.
 - If copy might imply treatment or diagnosis, rewrite before public release.
+- If copy implies causation from a small self-reported dataset, rewrite to pattern language before public release.
 
 ## Task Checklist
 

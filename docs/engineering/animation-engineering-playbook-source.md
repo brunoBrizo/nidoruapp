@@ -976,7 +976,7 @@ export const DURATION = {
 |---|---|---|---|
 | Calm | No animation on session complete — silent exit | No reward signal; habit doesn't feel good | Full session complete sequence (Section 9) |
 | Calm | Generic spinner on audio loading | Communicates failure; increases anxiety before bed | Shimmer skeleton (Section 13) |
-| Calm | Static achievement badges | No dopamine on milestones | Lottie badge + confetti (Section 9) |
+| Calm | Static achievement badges | No reward feedback on milestones | Lottie badge + confetti (Section 9) |
 | Headspace | Static product UI despite rich brand motion[^9] | Feels hollow; badge system earns no emotion | Animated milestones throughout |
 | Headspace | Navigation redesign with no spatial transition cues[^10] | Users say "I'm confused, can't find anything" | Directional transitions + shared elements |
 | Headspace | Back button freezes on black screen[^10] | Destroys calm environment; feels broken | Test every nav path on Android before release |

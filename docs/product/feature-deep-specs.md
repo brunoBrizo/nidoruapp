@@ -7,6 +7,7 @@ Related docs:
 - Use [Design System](../design/design-system.md) for colors, typography, spacing, and visual rules.
 - Use [Motion, Animation, And Haptics](../design/motion-animation-haptics.md) and [Animation Engineering Index](../engineering/animation-engineering-index.md) for animation implementation details.
 - Use [Navigation Architecture](../ux/navigation-architecture.md), [Onboarding Flow Screen-by-Screen](../ux/onboarding-flow-screen-by-screen.md), and [Notification Strategy](../ux/notification-strategy.md) for flow-specific product rules.
+- Use [Sleep and Breathwork Technique Audit](../research/sleep-breathwork-technique-audit.md) before turning any technique, sound, insight, HRV, anxiety, panic, sleep-improvement, or nervous-system claim into product copy.
 
 Every feature below is described at implementation level: what it does, what it looks like, what it must NOT do, how it earns its place in the app, and what makes it different from competitors.
 
@@ -39,14 +40,17 @@ On exhale: all layers contract smoothly back to rest size. The exhale animation 
 - During exhale: "Exhale" — same
 - The text fades OUT during transitions (crossfade) — never abrupt swap
 
-**The four built-in techniques:**
+**Technique catalog and evidence-safe positioning:**
 
-| Name | Pattern | Description | Context |
-|------|---------|-------------|---------|
-| 4-7-8 Sleep | 4s in / 7s hold / 8s out | Popular long-exhale cadence for bedtime relaxation; do not frame as a tranquilizer or treatment | Before bed |
-| Box Breathing | 4s in / 4s hold / 4s out / 4s hold | Simple square cadence for calm and focus; avoid military or anxiety-treatment claims | Stress/focus |
-| Coherent Breathing / Daily Calm | 5.5s in / 5.5s out | Regular 10-minute practice for HRV-oriented resilience | Evening Wind-Down, Daily Practice |
-| Physiological Sigh | 2s in / 1s in / 8s out | Double inhale + long exhale; promising acute-arousal reset candidate, keep post-MVP until safety/copy is validated | Acute stress reset |
+| Name | Pattern | Status | Description | Context |
+|------|---------|--------|-------------|---------|
+| 4-7-8 Sleep | 4s in / 7s hold / 8s out | MVP | Popular long-exhale cadence for bedtime relaxation; do not frame as a tranquilizer, insomnia treatment, or guaranteed sleep aid | Before bed |
+| Box Breathing | 4s in / 4s hold / 4s out / 4s hold | MVP | Simple square cadence for calm and focus; avoid military, panic-treatment, or anxiety-treatment claims | Calm/focus |
+| Coherent Breathing / Daily Calm | 5.5s in / 5.5s out | MVP | Regular 10-minute slow-breathing practice; HRV-oriented language is internal until separately validated for public copy | Evening Wind-Down, Daily Practice |
+| Diaphragmatic Breathing | 4s in / 6s out | MVP | Low-risk no-hold stress-reset option and useful fallback for users who dislike breath holds | Stress reset |
+| Physiological Sigh | 2s in / 1s in / 8s out | Post-MVP candidate | Double inhale + long exhale; promising short reset candidate, but not a proven sleep or panic-treatment protocol | Acute stress reset |
+
+Hold-based techniques must have a simple safety path before public launch: users can stop, skip holds, or choose a no-hold rhythm if they feel dizzy, breathless, or uncomfortable.
 
 **What competitors get wrong:**
 - Breathwrk labels exercises by vague emotion ("Calm," "Focus") not by technique — power users who know what 4-7-8 is can't find it[^12]
@@ -121,7 +125,7 @@ A 5-minute audio guide slowly drawing attention from toes to head, releasing ten
 | Nature | Ocean Waves, Forest, River Stream, Wind |
 | Noise | White Noise, Brown Noise, Pink Noise |
 | Environment | Fireplace Crackling, Café Ambience, Fan |
-| Tones | 432Hz Tone, Delta Wave Binaural (premium) |
+| Tones | 432Hz Tone, Delta Wave Binaural (experimental/preference audio, not a premium proof point) |
 
 Each sound: **minimum 4 minutes of audio**, seamlessly looped (zero-cross fade at loop point — this prevents the jarring "click" when audio restarts that plagues cheaper apps). Production quality: recorded in actual environments, not synthesized. This is non-negotiable — users will immediately notice the difference.
 
@@ -229,7 +233,7 @@ Skipping is always allowed with zero friction. Never guilt a user about skipping
   Quick Actions
 
   [Rescue Me]    [Sound Mixer]   [Free Breathe]
-    Panic fix      Tonight's       Just the orb
+    Settle now     Tonight's       Just the orb
                      sounds
 
 ────────────────────────────────────────────
@@ -261,7 +265,7 @@ This single behavioral feature makes the app feel alive. Users will notice that 
 - Calm's home screen is a content library — dozens of items to scroll through, creating choice paralysis[^18]
 - Headspace (pre-rebrand) was heavily course-oriented — forcing users into long programs when they just wanted a 5-minute session
 - Neither app adapts to time of day in a meaningful way
-- Breathwrk's home shows a grid of breathing techniques — useful for power users but overwhelming for anxious first-timers who just need to be told what to do
+- Breathwrk's home shows a grid of breathing techniques — useful for power users but overwhelming for first-timers who just need to be told what to do
 
 ***
 
@@ -294,17 +298,17 @@ The streak number uses `Inter 48px Light` — large, clean, not aggressive.
 
 ***
 
-### Feature 7: Rescue Me — Emergency Breathwork
+### Feature 7: Rescue Me — Urgent Breathwork Support
 
-**What it is:** A zero-friction panic button. One tap → immediate 4-7-8 session. No music choices, no technique selection, no timer setting.
+**What it is:** A zero-friction "help me settle now" path. One tap → immediate 4-7-8 session. No music choices, no technique selection, no timer setting.
 
 **Why it's the most important retention feature:**
 
-This is the feature that gets shared in Reddit threads. "I was having a panic attack at 2 AM, opened the app, tapped one button, and was okay in 4 minutes." That comment gets 200+ upvotes and 50 replies asking "what app?" This feature generates the most emotional TikTok content and the most authentic word-of-mouth.
+This is the feature that gets shared when a user feels overwhelmed at 2 AM and wants the lowest-friction way to begin a guided breath. Keep the emotional value, but do not imply crisis support, panic treatment, or guaranteed symptom relief.
 
 **Complete UX:**
 
-Home screen bottom row: a red-accented card (the ONLY time the color `Ember #FF6B6B` is used in the entire app). Text: "Rescue Me" with a small ❤️‍🩹 icon. Subtitle: "Anxiety, panic, overwhelm."
+Home screen bottom row: a red-accented card (the ONLY time the color `Ember #FF6B6B` is used in the entire app). Text: "Rescue Me" with a small support icon. Subtitle: "Overwhelmed right now."
 
 Tap → **immediate full screen transition** (no loading, no animation delay). The orb is already visible before the transition completes. No text. No instructions. The orb begins inhale phase.
 
@@ -328,16 +332,16 @@ This is a 1-day engineering build that delivers disproportionate emotional value
 
 **Why this is the highest-retention feature in the entire product:**
 
-This is the "moment of magic" — the first time the user feels the app knows them. After a week of 30-second morning check-ins, getting a card that says "You sleep 1.2 stars better on nights when you use the wind-down before 10:30 PM" creates an "oh wow" reaction that no other feature can replicate. Users screenshot this. Users share it on Instagram Stories. Users tell their friends.
+This is the "moment of magic" — the first time the user feels the app notices their routine. After a week of 30-second morning check-ins, getting a card that says "Your highest-rated nights often followed wind-down before 10:30 PM" creates an "oh wow" reaction without claiming causation. Users screenshot this. Users share it on Instagram Stories. Users tell their friends.
 
 **The insight types (all derivable from simple data, no ML required):**
 
 | Insight Type | Data Required | Example Output |
 |---|---|---|
-| Bedtime correlation | Wind-down start time + sleep rating | "Your best sleep happens when you start wind-down before 10:45 PM" |
-| Streak effect | Session streak length + sleep rating | "After 3+ consecutive nights using the app, your sleep rating is 1.5★ higher" |
-| Sound preference | Most used sounds + sleep rating | "You sleep better with rain sounds than white noise (0.8★ difference)" |
-| Breathing technique impact | Technique used + sleep rating | "4-7-8 breathing gives you better sleep than box breathing on your data" |
+| Bedtime correlation | Wind-down start time + sleep rating | "Your highest-rated nights often start with wind-down before 10:45 PM" |
+| Streak effect | Session streak length + sleep rating | "After 3+ consecutive nights using the app, your check-ins have trended higher" |
+| Sound preference | Most used sounds + sleep rating | "Rain sounds appear on more of your higher-rated nights than white noise" |
+| Breathing technique impact | Technique used + sleep rating | "Your recent 4-7-8 nights have been rated higher than your recent box-breathing nights" |
 | Weekend pattern | Day of week + sleep rating | "Your worst sleep is Sunday to Monday. Try starting wind-down 30 min earlier on Sundays" |
 | Session duration effect | Breathing session duration + sleep rating | "Longer breathing sessions (5+ min) correlate with your best sleep nights" |
 
@@ -364,7 +368,7 @@ The detail screen shows a 14-day timeline graph: sleep ratings as a line, with m
 
 **Why "boring" is the point:**
 
-Sleep stories work by occupying the analytical brain with just enough low-stimulation input that it stops generating anxious thoughts, while not being interesting enough to keep you awake. The worst version of this: Calm's celebrity sleep stories. Matthew McConaughey reading a western, Harry Styles describing a trip, LeBron discussing mindfulness — these are engaging, which defeats the purpose. Users want a quiet stranger describing a gentle walk through a forest, not entertainment.[^18]
+Sleep stories work by giving a busy mind just enough low-stimulation input to follow, while not being interesting enough to keep you awake. The worst version of this: Calm's celebrity sleep stories. Matthew McConaughey reading a western, Harry Styles describing a trip, LeBron discussing mindfulness — these are engaging, which defeats the purpose. Users want a quiet stranger describing a gentle walk through a forest, not entertainment.[^18]
 
 **Story categories and themes:**
 
@@ -401,5 +405,7 @@ Sleep stories work by occupying the analytical brain with just enough low-stimul
 - Duration: 3 / 5 / 10 / 20 minutes / ∞
 
 Then: full screen orb, no text, no timer visible by default (shown only if user taps screen). This is the "screensaver mode" of the app — pure, meditative, beautiful.
+
+Safety rule: custom holds must be optional, bounded, and easy to skip. If a custom pattern feels uncomfortable, the app should make stopping or switching to a no-hold rhythm obvious.
 
 ***

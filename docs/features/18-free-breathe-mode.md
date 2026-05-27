@@ -4,7 +4,7 @@ Phase: Post-MVP
 
 ## Summary
 
-Free Breathe is the pure, configurable breathwork mode for power users. It lets users set custom inhale, hold, exhale, hold-out, and duration values, then breathe with the orb without guidance, content, or tracking pressure.
+Free Breathe is the pure, configurable breathwork mode for power users. It lets users set custom inhale, hold, exhale, hold-out, and duration values, then breathe with the orb without guidance, content, or tracking pressure. Custom timing must stay bounded and non-clinical.
 
 ## User Stories
 
@@ -36,6 +36,7 @@ Post-MVP first version:
 - Complex saved custom programs.
 - Social comparison.
 - Technique education.
+- Medical, performance, HRV, anxiety, or sleep-improvement claims for custom patterns.
 
 ## Acceptance Criteria
 
@@ -44,6 +45,7 @@ Post-MVP first version:
 - No visible timer by default during active session.
 - Infinity duration does not create memory leaks or runaway timers.
 - Session can be stopped clearly.
+- Holds can be set to zero, and stopping or switching away from an uncomfortable pattern is obvious.
 
 ## UX References
 
@@ -51,6 +53,7 @@ Post-MVP first version:
 - [Navigation Architecture](../ux/navigation-architecture.md)
 - [Motion, Animation, And Haptics](../design/motion-animation-haptics.md)
 - [Breathing Orb Implementation Spec](../design/breathing-orb-implementation-spec.md)
+- [Sleep and Breathwork Technique Audit](../research/sleep-breathwork-technique-audit.md)
 
 ## Engineering References
 
@@ -74,6 +77,7 @@ Post-MVP first version:
 
 - If duration is infinity, user must have a clear stop control.
 - If custom timing is invalid, constrain controls rather than showing errors.
+- If custom holds feel uncomfortable, user must be able to stop or use a no-hold rhythm without shame copy.
 - If user backgrounds app, phase reconciliation still uses elapsed time.
 - If haptics are disabled, audio/visual still work.
 

@@ -4,7 +4,7 @@ Phase: MVP
 
 ## Summary
 
-Morning Check-In is the second daily habit anchor. It asks for a 1-5 sleep rating, one mood or energy tag, and offers a short morning breath session. This creates structured data for later insight cards without using passive sleep tracking.
+Morning Check-In is the second daily habit anchor. It asks for a 1-5 sleep rating, one mood or energy tag, and offers a short morning breath session. This creates structured data for later insight cards without using passive sleep tracking or claiming diagnosis.
 
 ## User Stories
 
@@ -23,6 +23,7 @@ Morning Check-In is the second daily habit anchor. It asks for a 1-5 sleep ratin
 - Skip is always allowed with no guilt.
 - Local confirmation happens immediately.
 - Data powers later insight cards.
+- Morning suggestions should be framed as optional practice prompts, not treatment, energy guarantees, or clinical recommendations.
 
 ## Out Of Scope
 
@@ -31,6 +32,7 @@ Morning Check-In is the second daily habit anchor. It asks for a 1-5 sleep ratin
 - Passive sleep tracking.
 - Health permissions in MVP.
 - Sleep score anxiety or detailed graphs in MVP.
+- Medical or sleep-disorder interpretation of self-reported ratings.
 
 ## Acceptance Criteria
 
@@ -47,6 +49,7 @@ Morning Check-In is the second daily habit anchor. It asks for a 1-5 sleep ratin
 - [Product Strategy](../product/product-strategy.md)
 - [Onboarding and Retention](../ux/onboarding-retention.md)
 - [MVP Scope and Roadmap](../product/mvp-scope-and-roadmap.md)
+- [Sleep and Breathwork Technique Audit](../research/sleep-breathwork-technique-audit.md)
 
 ## Engineering References
 

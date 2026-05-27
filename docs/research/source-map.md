@@ -24,9 +24,14 @@ The original project foundation was derived from:
 
 The complete product bible is the source for feature behavior, screen flow, UI/UX details, design system, notification strategy, competitor analysis, and feature-level instructions. The earlier blueprint remains strategic context for market thesis, roadmap thinking, viral strategy, pricing direction, and initial technical suggestions.
 
+The current evidence and claim-boundary layer for breathing, sleep, ambient sound, insight copy, and growth wording is:
+
+- In-repo audit: [Sleep and Breathwork Technique Audit](sleep-breathwork-technique-audit.md)
+
 The `Complete App Product Bible with animations.md` upload was compared against the prior `Complete App Product Bible.md` upload and is byte-for-byte identical. The animation-labelled archive is still preserved so the latest supplied source file is not lost.
 
 If product sources conflict, use the complete product bible for product and UX specifics unless the team explicitly decides otherwise. If the conflict is specifically about competitor response, onboarding, navigation, notification limits, or billing trust, use [Competitor UI/UX Response Plan](competitor-uiux-response-plan.md). If animation sources conflict, use [Animation Source Alignment](../engineering/animation-source-alignment.md) as the current decision layer.
+If any source makes a health, treatment, insomnia, anxiety, panic, autonomic-nervous-system, HRV, sound-frequency, or binaural-beat claim, use the Sleep and Breathwork Technique Audit before turning it into product copy, paid marketing, App Store metadata, or implementation acceptance criteria.
 
 ## Product Bible Split
 
@@ -40,6 +45,7 @@ If product sources conflict, use the complete product bible for product and UX s
 - [Competitor Design Analysis](competitor-design-analysis.md)
 - [Competitor UI/UX Response Plan](competitor-uiux-response-plan.md)
 - [Competitor Anti-Patterns](competitor-anti-patterns.md)
+- [Sleep and Breathwork Technique Audit](sleep-breathwork-technique-audit.md)
 - [Habit Loop Architecture](../product/habit-loop-architecture.md)
 - [Notification Strategy](../ux/notification-strategy.md)
 - [Onboarding Flow Screen-by-Screen](../ux/onboarding-flow-screen-by-screen.md)
@@ -102,6 +108,11 @@ These were checked during this documentation pass:
 - Supabase React Native auth guide: https://supabase.com/docs/guides/auth/quickstarts/react-native
 - RevenueCat Expo documentation: https://www.revenuecat.com/docs/getting-started/installation/expo
 - Apple HealthKit documentation: https://developer.apple.com/documentation/healthkit
+- ACP chronic insomnia guideline / recommendation: https://www.acponline.org/acp-newsroom/acp-recommends-cognitive-behavioral-therapy-as-initial-treatment-for-chronic-insomnia
+- AASM behavioral and psychological insomnia guideline: https://pmc.ncbi.nlm.nih.gov/articles/PMC7853203/
+- Breathwork for stress and mental health meta-analysis: https://www.nature.com/articles/s41598-022-27247-y
+- Cyclic sighing / structured respiration randomized trial: https://pubmed.ncbi.nlm.nih.gov/36630953/
+- Noise as a sleep aid systematic review: https://pubmed.ncbi.nlm.nih.gov/33007706/
 
 ## Source Claims To Re-Check Later
 
@@ -115,6 +126,7 @@ Re-check these before using them in investor material, ad copy, landing pages, o
 - Whether no-credit-card trials are feasible with the final subscription implementation.
 - Current app store policies for background audio and subscription renewal messaging.
 - Final trademark and store-reservation status for Nidoru.
+- Any stronger sleep-improvement, anxiety, panic, HRV, sound-frequency, binaural, or nervous-system copy before it appears in public surfaces.
 
 ## How To Use The Sources
 

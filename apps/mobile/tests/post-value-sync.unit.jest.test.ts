@@ -7,6 +7,7 @@ const localInstallId = "install_0123456789abcdef";
 
 type SyncDatabase = Parameters<typeof syncPostValueLocalRecords>[0]["database"];
 type SyncClient = Parameters<typeof syncPostValueLocalRecords>[0]["client"];
+type SyncRow = Record<string, unknown>;
 
 function createDatabase(): SyncDatabase & {
   readonly getAllAsync: jest.MockedFunction<SyncDatabase["getAllAsync"]>;
@@ -62,6 +63,10 @@ function createDatabase(): SyncDatabase & {
         ] as never);
       }
 
+      if (source.includes("FROM wind_down_runs")) {
+        return Promise.resolve([] as never);
+      }
+
       return Promise.resolve([] as never);
     }),
     getFirstAsync: jest.fn<SyncDatabase["getFirstAsync"]>().mockResolvedValue({
@@ -107,6 +112,47 @@ function createCompletedRescueMeSyncRow() {
     technique_id: "4-7-8-sleep",
     updated_at: "2026-05-23T05:03:30.000Z",
   };
+}
+
+function createCompletedWindDownSyncRow(overrides: SyncRow = {}) {
+  return {
+    ambient_completed_at: "2026-05-27T02:20:00.000Z",
+    ambient_sound_id: "light-rain",
+    ambient_started_at: "2026-05-27T02:10:00.000Z",
+    body_cue_completed_at: "2026-05-27T02:10:00.000Z",
+    body_cue_started_at: "2026-05-27T02:08:00.000Z",
+    breath_session_id: "session_winddown0123456789",
+    breathwork_completed_at: "2026-05-27T02:08:00.000Z",
+    breathwork_started_at: "2026-05-27T02:00:00.000Z",
+    completed_at: "2026-05-27T02:20:00.000Z",
+    context_goal: "calm_racing_thoughts",
+    local_install_id: localInstallId,
+    recovery_state: "completion",
+    routine_id: "wind_down_racing_thoughts",
+    run_id: "winddown_0123456789abcdef",
+    started_at: "2026-05-27T02:00:00.000Z",
+    status: "completed",
+    stop_reason: null,
+    stopped_at: null,
+    total_duration_seconds: 1200,
+    updated_at: "2026-05-27T02:20:00.000Z",
+    ...overrides,
+  };
+}
+
+function createStoppedWindDownSyncRow(overrides: SyncRow = {}) {
+  return createCompletedWindDownSyncRow({
+    ambient_completed_at: null,
+    completed_at: null,
+    recovery_state: "partial_stop",
+    run_id: "winddown_stopped0123456789",
+    status: "stopped",
+    stop_reason: "user_stop",
+    stopped_at: "2026-05-27T02:14:00.000Z",
+    total_duration_seconds: 840,
+    updated_at: "2026-05-27T02:14:00.000Z",
+    ...overrides,
+  });
 }
 
 describe("post-value local record sync", () => {
@@ -278,6 +324,72 @@ describe("post-value local record sync", () => {
     );
   });
 
+  it("syncs terminal Wind-Down runs with idempotent conflicts and structured insight fields", async () => {
+    const database = createDatabase();
+    database.getAllAsync.mockImplementation((source) => {
+      if (source.includes("FROM wind_down_runs")) {
+        return Promise.resolve([
+          createCompletedWindDownSyncRow(),
+          createStoppedWindDownSyncRow(),
+        ] as never);
+      }
+
+      return Promise.resolve([] as never);
+    });
+    const client = createClient();
+
+    await expect(
+      syncPostValueLocalRecords({
+        client,
+        database,
+        localInstallId,
+        now: new Date("2026-05-27T02:21:00.000Z"),
+        userId,
+      }),
+    ).resolves.toEqual({ status: "succeeded" });
+
+    expect(client.upserts.wind_down_runs).toHaveBeenCalledWith(
+      [
+        {
+          ambient_sound_id: "light-rain",
+          completed_at: "2026-05-27T02:20:00.000Z",
+          completion_state: "completed",
+          context_goal: "calm_racing_thoughts",
+          local_breath_session_id: "session_winddown0123456789",
+          local_install_id: localInstallId,
+          local_run_id: "winddown_0123456789abcdef",
+          routine_id: "wind_down_racing_thoughts",
+          started_at: "2026-05-27T02:00:00.000Z",
+          stop_reason: null,
+          stopped_at: null,
+          total_duration_seconds: 1200,
+          updated_at: "2026-05-27T02:21:00.000Z",
+          user_id: userId,
+        },
+        {
+          ambient_sound_id: "light-rain",
+          completed_at: null,
+          completion_state: "stopped",
+          context_goal: "calm_racing_thoughts",
+          local_breath_session_id: "session_winddown0123456789",
+          local_install_id: localInstallId,
+          local_run_id: "winddown_stopped0123456789",
+          routine_id: "wind_down_racing_thoughts",
+          started_at: "2026-05-27T02:00:00.000Z",
+          stop_reason: "user_stop",
+          stopped_at: "2026-05-27T02:14:00.000Z",
+          total_duration_seconds: 840,
+          updated_at: "2026-05-27T02:21:00.000Z",
+          user_id: userId,
+        },
+      ],
+      { onConflict: "user_id,local_run_id" },
+    );
+    expect(JSON.stringify(client.upserts.wind_down_runs.mock.calls)).not.toMatch(
+      /recovery_state|body_cue|raw|display_name|device_id|local_install_id_install_/i,
+    );
+  });
+
   it("rejects invalid completed breath-session rows before any network upsert", async () => {
     const database = createDatabase();
     database.getAllAsync.mockImplementation((source) => {
@@ -323,6 +435,41 @@ describe("post-value local record sync", () => {
       attemptCount: 1,
       reasonClass: "validation_error",
       recordType: "breath_session",
+      syncStage: "post_value_sync",
+    });
+  });
+
+  it("rejects invalid terminal Wind-Down rows before any network upsert", async () => {
+    const database = createDatabase();
+    database.getAllAsync.mockImplementation((source) => {
+      if (source.includes("FROM wind_down_runs")) {
+        return Promise.resolve([
+          createCompletedWindDownSyncRow({
+            context_goal: "panic_treatment",
+          }),
+        ] as never);
+      }
+
+      return Promise.resolve([] as never);
+    });
+    const client = createClient();
+    const observeFailure = jest.fn();
+
+    await expect(
+      syncPostValueLocalRecords({
+        client,
+        database,
+        localInstallId,
+        observeFailure,
+        userId,
+      }),
+    ).resolves.toEqual({ reason: "validation_error", status: "retry_pending" });
+
+    expect(client.from).not.toHaveBeenCalled();
+    expect(observeFailure).toHaveBeenCalledWith({
+      attemptCount: 1,
+      reasonClass: "validation_error",
+      recordType: "wind_down_run",
       syncStage: "post_value_sync",
     });
   });
@@ -396,6 +543,49 @@ describe("post-value local record sync", () => {
     });
     expect(database.runAsync).not.toHaveBeenCalledWith(
       expect.stringContaining("DELETE FROM first_session_records"),
+      expect.anything(),
+    );
+  });
+
+  it("classifies Wind-Down sync failures without deleting local history", async () => {
+    const database = createDatabase();
+    database.getAllAsync.mockImplementation((source) => {
+      if (source.includes("FROM wind_down_runs")) {
+        return Promise.resolve([createCompletedWindDownSyncRow()] as never);
+      }
+
+      return Promise.resolve([] as never);
+    });
+    const client = createClient();
+    client.from.mockImplementation((tableName) => ({
+      upsert: jest.fn(() => {
+        if (tableName === "wind_down_runs") {
+          return Promise.reject(new TypeError("Network request failed"));
+        }
+
+        return Promise.resolve({ error: null });
+      }),
+    }));
+    const observeFailure = jest.fn();
+
+    await expect(
+      syncPostValueLocalRecords({
+        client,
+        database,
+        localInstallId,
+        observeFailure,
+        userId,
+      }),
+    ).resolves.toEqual({ reason: "offline", status: "retry_pending" });
+
+    expect(observeFailure).toHaveBeenCalledWith({
+      attemptCount: 1,
+      reasonClass: "offline",
+      recordType: "wind_down_run",
+      syncStage: "post_value_sync",
+    });
+    expect(database.runAsync).not.toHaveBeenCalledWith(
+      expect.stringMatching(/DELETE FROM wind_down_runs|UPDATE wind_down_runs/),
       expect.anything(),
     );
   });

@@ -121,6 +121,68 @@ describe("post-value Supabase auth client", () => {
     );
   });
 
+  it("allows idempotent Wind-Down run sync only on the local run conflict target", async () => {
+    const fetchMock = jest.fn(() =>
+      Promise.resolve({
+        json: () => Promise.resolve({}),
+        ok: true,
+        status: 201,
+      }),
+    );
+    global.fetch = fetchMock as typeof fetch;
+    mockAuthMethods.getSession.mockResolvedValue({
+      data: { session: { access_token: "user-access-token" } },
+      error: null,
+    });
+
+    const client = createPostValueSupabaseClient();
+
+    await expect(
+      client?.from("wind_down_runs").upsert(
+        {
+          completion_state: "completed",
+          local_run_id: "winddown_0123456789abcdef",
+          user_id: "123e4567-e89b-12d3-a456-426614174000",
+        },
+        { onConflict: "user_id,local_run_id" },
+      ),
+    ).resolves.toEqual({ error: null });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://project-ref.supabase.co/rest/v1/wind_down_runs?on_conflict=user_id%2Clocal_run_id",
+      expect.objectContaining({
+        method: "POST",
+      }),
+    );
+  });
+
+  it("rejects Wind-Down run sync with a non-idempotent conflict target", async () => {
+    const fetchMock = jest.fn();
+    global.fetch = fetchMock as typeof fetch;
+    mockAuthMethods.getSession.mockResolvedValue({
+      data: { session: { access_token: "user-access-token" } },
+      error: null,
+    });
+    const client = createPostValueSupabaseClient();
+
+    await expect(
+      client?.from("wind_down_runs").upsert(
+        {
+          completion_state: "completed",
+          local_run_id: "winddown_0123456789abcdef",
+          user_id: "123e4567-e89b-12d3-a456-426614174000",
+        },
+        { onConflict: "local_run_id" },
+      ),
+    ).resolves.toEqual({
+      error: {
+        message: "Unsupported post-value sync target.",
+        status: 400,
+      },
+    });
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it("rejects unsupported sync targets before any network request", async () => {
     const fetchMock = jest.fn();
     global.fetch = fetchMock as typeof fetch;

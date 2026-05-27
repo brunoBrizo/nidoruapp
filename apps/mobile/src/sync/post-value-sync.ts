@@ -1,4 +1,8 @@
-import { completedBreathSessionRecordSchema, localInstallIdSchema } from "@nidoru/validation";
+import {
+  completedBreathSessionRecordSchema,
+  localInstallIdSchema,
+  windDownRunRecordSchema,
+} from "@nidoru/validation";
 
 import type {
   SyncFailureReasonClass,
@@ -66,6 +70,29 @@ type BreathSessionSyncRow = {
   readonly source: string;
   readonly started_at: string;
   readonly technique_id: string;
+};
+
+type WindDownRunSyncRow = {
+  readonly ambient_completed_at: string | null;
+  readonly ambient_sound_id: string;
+  readonly ambient_started_at: string | null;
+  readonly body_cue_completed_at: string | null;
+  readonly body_cue_started_at: string | null;
+  readonly breath_session_id: string | null;
+  readonly breathwork_completed_at: string | null;
+  readonly breathwork_started_at: string | null;
+  readonly completed_at: string | null;
+  readonly context_goal: string;
+  readonly local_install_id: string;
+  readonly recovery_state: string;
+  readonly routine_id: string;
+  readonly run_id: string;
+  readonly started_at: string;
+  readonly status: string;
+  readonly stop_reason: string | null;
+  readonly stopped_at: string | null;
+  readonly total_duration_seconds: number | null;
+  readonly updated_at: string;
 };
 
 const userIdPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -161,11 +188,46 @@ export async function syncPostValueLocalRecords({
     `,
     [parsedLocalInstallId],
   );
+  const windDownRunRows = await database.getAllAsync<WindDownRunSyncRow>(
+    `
+      SELECT
+        run_id,
+        local_install_id,
+        routine_id,
+        context_goal,
+        breath_session_id,
+        ambient_sound_id,
+        status,
+        stop_reason,
+        recovery_state,
+        started_at,
+        breathwork_started_at,
+        breathwork_completed_at,
+        body_cue_started_at,
+        body_cue_completed_at,
+        ambient_started_at,
+        ambient_completed_at,
+        completed_at,
+        stopped_at,
+        total_duration_seconds,
+        updated_at
+      FROM wind_down_runs
+      WHERE local_install_id = ?
+        AND status IN ('completed', 'stopped')
+        AND total_duration_seconds IS NOT NULL;
+    `,
+    [parsedLocalInstallId],
+  );
 
   try {
     const breathSessionPayloads = createBreathSessionSyncPayloads({
       nowIso,
       rows: breathSessionRows,
+      userId: parsedUserId,
+    });
+    const windDownRunPayloads = createWindDownRunSyncPayloads({
+      nowIso,
+      rows: windDownRunRows,
       userId: parsedUserId,
     });
 
@@ -227,6 +289,10 @@ export async function syncPostValueLocalRecords({
         "user_id,local_session_id",
       );
     }
+
+    if (windDownRunPayloads.length > 0) {
+      await upsertOrThrow(client, "wind_down_runs", windDownRunPayloads, "user_id,local_run_id");
+    }
   } catch (error) {
     const reason = classifySyncError(error);
 
@@ -241,6 +307,80 @@ export async function syncPostValueLocalRecords({
   }
 
   return { status: "succeeded" };
+}
+
+function createWindDownRunSyncPayloads({
+  nowIso,
+  rows,
+  userId,
+}: {
+  readonly nowIso: string;
+  readonly rows: readonly WindDownRunSyncRow[];
+  readonly userId: string;
+}): readonly Record<string, unknown>[] {
+  try {
+    return rows.map((row) => {
+      const record = windDownRunRecordSchema.parse({
+        ...(row.ambient_completed_at === null
+          ? {}
+          : { ambientCompletedAt: row.ambient_completed_at }),
+        ambientSoundId: row.ambient_sound_id,
+        ...(row.ambient_started_at === null ? {} : { ambientStartedAt: row.ambient_started_at }),
+        ...(row.body_cue_completed_at === null
+          ? {}
+          : { bodyCueCompletedAt: row.body_cue_completed_at }),
+        ...(row.body_cue_started_at === null ? {} : { bodyCueStartedAt: row.body_cue_started_at }),
+        ...(row.breath_session_id === null ? {} : { breathSessionId: row.breath_session_id }),
+        ...(row.breathwork_completed_at === null
+          ? {}
+          : { breathworkCompletedAt: row.breathwork_completed_at }),
+        ...(row.breathwork_started_at === null
+          ? {}
+          : { breathworkStartedAt: row.breathwork_started_at }),
+        ...(row.completed_at === null ? {} : { completedAt: row.completed_at }),
+        contextGoal: row.context_goal,
+        localInstallId: row.local_install_id,
+        recoveryState: row.recovery_state,
+        routineId: row.routine_id,
+        runId: row.run_id,
+        startedAt: row.started_at,
+        status: row.status,
+        ...(row.stop_reason === null ? {} : { stopReason: row.stop_reason }),
+        ...(row.stopped_at === null ? {} : { stoppedAt: row.stopped_at }),
+        ...(row.total_duration_seconds === null
+          ? {}
+          : { totalDurationSeconds: row.total_duration_seconds }),
+        updatedAt: row.updated_at,
+      });
+
+      if (record.status !== "completed" && record.status !== "stopped") {
+        throw new Error("Wind-down sync only accepts terminal runs.");
+      }
+
+      return {
+        ambient_sound_id: record.ambientSoundId,
+        completed_at: record.completedAt ?? null,
+        completion_state: record.status,
+        context_goal: record.contextGoal,
+        local_breath_session_id: record.breathSessionId ?? null,
+        local_install_id: record.localInstallId,
+        local_run_id: record.runId,
+        routine_id: record.routineId,
+        started_at: record.startedAt,
+        stop_reason: record.stopReason ?? null,
+        stopped_at: record.stoppedAt ?? null,
+        total_duration_seconds: record.totalDurationSeconds,
+        updated_at: nowIso,
+        user_id: userId,
+      };
+    });
+  } catch {
+    throw createSyncTableError("wind_down_runs", {
+      code: "LOCAL_VALIDATION_ERROR",
+      message: "Invalid local wind-down run sync payload.",
+      status: 400,
+    });
+  }
 }
 
 function createBreathSessionSyncPayloads({
@@ -327,13 +467,15 @@ function createSyncTableError(
   };
 
   wrappedError.syncRecordType =
-    tableName === "breath_sessions"
-      ? "breath_session"
-      : tableName === "first_session_sync_records"
-        ? "first_session_record"
-        : tableName === "post_session_reflection_sync_records"
-          ? "post_session_reflection"
-          : "local_install_link";
+    tableName === "wind_down_runs"
+      ? "wind_down_run"
+      : tableName === "breath_sessions"
+        ? "breath_session"
+        : tableName === "first_session_sync_records"
+          ? "first_session_record"
+          : tableName === "post_session_reflection_sync_records"
+            ? "post_session_reflection"
+            : "local_install_link";
 
   return wrappedError;
 }

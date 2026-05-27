@@ -64,7 +64,8 @@ type AnalyticsEventProperties = Readonly<
       | "local_install_link"
       | "first_session_record"
       | "post_session_reflection"
-      | "local_event_queue";
+      | "local_event_queue"
+      | "wind_down_run";
     release: string;
     source: "observability_proof";
     sync_stage: "post_value_sync" | "analytics_event_flush";
@@ -108,6 +109,7 @@ const allowedStringAnalyticsProperties = {
     "first_session_record",
     "post_session_reflection",
     "local_event_queue",
+    "wind_down_run",
   ]),
   source: new Set(["observability_proof"]),
   sync_stage: new Set(["post_value_sync", "analytics_event_flush"]),

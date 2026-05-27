@@ -1,11 +1,11 @@
 # Graph Report - sleep-app  (2026-05-27)
 
 ## Corpus Check
-- 160 files · ~459,002 words
+- 160 files · ~460,025 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 508 nodes · 541 edges · 20 communities detected
+- 511 nodes · 547 edges · 20 communities detected
 - Extraction: 86% EXTRACTED · 14% INFERRED · 0% AMBIGUOUS · INFERRED: 74 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
@@ -22,9 +22,9 @@
 - [[_COMMUNITY_Community 9|Community 9]]
 - [[_COMMUNITY_Community 10|Community 10]]
 - [[_COMMUNITY_Community 11|Community 11]]
-- [[_COMMUNITY_Community 12|Community 12]]
-- [[_COMMUNITY_Community 14|Community 14]]
-- [[_COMMUNITY_Community 17|Community 17]]
+- [[_COMMUNITY_Community 13|Community 13]]
+- [[_COMMUNITY_Community 16|Community 16]]
+- [[_COMMUNITY_Community 18|Community 18]]
 - [[_COMMUNITY_Community 19|Community 19]]
 - [[_COMMUNITY_Community 20|Community 20]]
 - [[_COMMUNITY_Community 23|Community 23]]
@@ -38,10 +38,10 @@
 4. `linkPostValueAccount()` - 8 edges
 5. `requestNotificationPermissionFromGate()` - 8 edges
 6. `captureAnalyticsEventDeferred()` - 7 edges
-7. `loadRouteState()` - 7 edges
-8. `evaluateGate()` - 7 edges
-9. `createLocalEventId()` - 7 edges
-10. `captureExplicitEvent()` - 6 edges
+7. `syncPostValueLocalRecords()` - 7 edges
+8. `loadRouteState()` - 7 edges
+9. `evaluateGate()` - 7 edges
+10. `createLocalEventId()` - 7 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `getOnboardingPlanForGoal()` --calls--> `completeOnboardingPersonalizationLocally()`  [INFERRED]
@@ -58,16 +58,16 @@
 ## Communities
 
 ### Community 0 - "Community 0"
+Cohesion: 0.08
+Nodes (29): shouldStartFirstLaunchOnboarding(), canPromptForNotificationPermission(), completeFirstSessionLocally(), completeOnboardingPersonalizationLocally(), createDefaultRandomSegment(), createLocalEventId(), createLocalReflectionId(), getLocalCalendarDayDifference() (+21 more)
+
+### Community 1 - "Community 1"
 Cohesion: 0.1
 Nodes (25): clamp(), completeBreathSessionIfDue(), createBreathSessionController(), endBreathSessionEarly(), getBreathSessionSnapshot(), getCycleDurationMs(), getPhaseAtElapsedMs(), getSessionPhases() (+17 more)
 
-### Community 1 - "Community 1"
-Cohesion: 0.12
-Nodes (25): canPromptForNotificationPermission(), completeFirstSessionLocally(), completeOnboardingPersonalizationLocally(), createDefaultRandomSegment(), createLocalEventId(), createLocalReflectionId(), getLocalCalendarDayDifference(), insertLocalEventQueue() (+17 more)
-
 ### Community 2 - "Community 2"
-Cohesion: 0.12
-Nodes (13): fetch(), loadRouteState(), createPostValueSupabaseAuthenticator(), createPostValueSupabaseClient(), createPostValueSyncHttpError(), createSupabaseHeaders(), createSupabaseServiceUrl(), createSupabaseStorageKey() (+5 more)
+Cohesion: 0.11
+Nodes (15): fetch(), loadRouteState(), createPostValueSupabaseAuthenticator(), createPostValueSupabaseClient(), createPostValueSyncHttpError(), createSupabaseHeaders(), createSupabaseServiceUrl(), createSupabaseStorageKey() (+7 more)
 
 ### Community 3 - "Community 3"
 Cohesion: 0.11
@@ -98,32 +98,32 @@ Cohesion: 0.17
 Nodes (8): AppTabBar(), getTabIndicatorMotionConfig(), NotificationPermissionGateScreen(), splitHeadline(), getOnboardingSplashOrbPulseConfig(), OnboardingSplashScreen(), useReduceMotionEnabled(), useReduceMotionPreference()
 
 ### Community 10 - "Community 10"
-Cohesion: 0.14
-Nodes (6): shouldStartFirstLaunchOnboarding(), hasCompletedOnboardingPersonalization(), getOrCreateLocalInstallIdentity(), OnboardingContinueButton(), padTimeNumber(), submitError()
-
-### Community 11 - "Community 11"
 Cohesion: 0.29
 Nodes (12): createBlockedEligibility(), formatDurationLabel(), getEligibleReason(), isPostSessionFeeling(), linkPostValueAccount(), loadPostRewardPaywallEligibility(), mapLocalRecordsToUser(), parseUserId() (+4 more)
 
-### Community 12 - "Community 12"
+### Community 11 - "Community 11"
 Cohesion: 0.35
 Nodes (10): abandonBreathSessionLocally(), completeBreathSessionLocally(), createLocalEventId(), insertBreathSessionEventQueue(), loadPendingBreathSessionCompletion(), loadRecoverableBreathSessionDraft(), parseSourceFilterInput(), recordBreathSessionStartedLocally() (+2 more)
 
-### Community 14 - "Community 14"
-Cohesion: 0.44
-Nodes (8): classifySyncError(), createBreathSessionSyncPayloads(), createSyncTableError(), getFailedRecordType(), parseUserId(), syncPostValueLocalRecords(), unwrapSyncCause(), upsertOrThrow()
+### Community 13 - "Community 13"
+Cohesion: 0.42
+Nodes (9): classifySyncError(), createBreathSessionSyncPayloads(), createSyncTableError(), createWindDownRunSyncPayloads(), getFailedRecordType(), parseUserId(), syncPostValueLocalRecords(), unwrapSyncCause() (+1 more)
 
-### Community 17 - "Community 17"
+### Community 16 - "Community 16"
 Cohesion: 0.6
 Nodes (5): BreatheTechniqueAnchorScreen(), parseDurationSeconds(), parseFirstLaunch(), parsePlanId(), parseTechniqueId()
 
-### Community 19 - "Community 19"
+### Community 18 - "Community 18"
 Cohesion: 0.5
 Nodes (3): assertCondition(), assertEquals(), assertNoAuditRiskPublicCopy()
 
-### Community 20 - "Community 20"
+### Community 19 - "Community 19"
 Cohesion: 0.5
 Nodes (3): TabLayout(), allowsIncompleteOnboardingForRoute(), parseFirstLaunch()
+
+### Community 20 - "Community 20"
+Cohesion: 0.5
+Nodes (2): OnboardingContinueButton(), padTimeNumber()
 
 ### Community 23 - "Community 23"
 Cohesion: 0.67
@@ -138,6 +138,8 @@ Cohesion: 1.0
 Nodes (2): OnboardingRouteScreen(), parseOnboardingStage()
 
 ## Knowledge Gaps
+- **Thin community `Community 20`** (5 nodes): `onboarding-flow-screen.tsx`, `cn()`, `OnboardingContinueButton()`, `OnboardingFlowScreen()`, `padTimeNumber()`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 23`** (4 nodes): `onboarding-personalization-flow.component.jest.test.tsx`, `answerThroughBreathworkQuestion()`, `continueToNextQuestion()`, `expectClassNameContains()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 27`** (3 nodes): `getLocaleMessages()`, `normalizeLocale()`, `index.ts`
@@ -148,12 +150,12 @@ Nodes (2): OnboardingRouteScreen(), parseOnboardingStage()
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `getOrCreateLocalInstallIdentity()` connect `Community 10` to `Community 1`, `Community 2`?**
+- **Why does `getOrCreateLocalInstallIdentity()` connect `Community 0` to `Community 2`?**
+  _High betweenness centrality (0.044) - this node is a cross-community bridge._
+- **Why does `loadRouteState()` connect `Community 2` to `Community 0`, `Community 10`, `Community 5`?**
   _High betweenness centrality (0.042) - this node is a cross-community bridge._
-- **Why does `loadRouteState()` connect `Community 2` to `Community 10`, `Community 11`, `Community 5`?**
-  _High betweenness centrality (0.040) - this node is a cross-community bridge._
-- **Why does `evaluateGate()` connect `Community 1` to `Community 10`, `Community 5`?**
-  _High betweenness centrality (0.030) - this node is a cross-community bridge._
+- **Why does `evaluateGate()` connect `Community 0` to `Community 5`?**
+  _High betweenness centrality (0.031) - this node is a cross-community bridge._
 - **Are the 7 inferred relationships involving `getBreathSessionSnapshot()` (e.g. with `pauseSession()` and `resumeSession()`) actually correct?**
   _`getBreathSessionSnapshot()` has 7 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 2 inferred relationships involving `createPostValueSupabaseClient()` (e.g. with `loadRouteState()` and `createClient()`) actually correct?**
@@ -161,4 +163,4 @@ _Questions this graph is uniquely positioned to answer:_
 - **Are the 4 inferred relationships involving `requestNotificationPermissionFromGate()` (e.g. with `markNotificationPermissionPrompted()` and `captureAnalyticsEvent()`) actually correct?**
   _`requestNotificationPermissionFromGate()` has 4 INFERRED edges - model-reasoned connections that need verification._
 - **Should `Community 0` be split into smaller, more focused modules?**
-  _Cohesion score 0.1 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.08 - nodes in this community are weakly interconnected._

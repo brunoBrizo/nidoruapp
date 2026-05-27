@@ -105,16 +105,48 @@ describe("privacy-safe observability", () => {
   it("allowlists Rescue Me lifecycle events and rejects unknown event names", () => {
     expect(approvedAnalyticsEventNames).toEqual(
       expect.arrayContaining([
+        "wind_down_started",
+        "wind_down_completed",
+        "breath_session_started",
+        "breath_session_completed",
+        "audio_started",
+        "audio_failed",
         "rescue_me_started",
         "rescue_me_completed",
-        "audio_failed",
         "sync_failed",
       ]),
     );
+    expect(isApprovedAnalyticsEventName("wind_down_started")).toBe(true);
+    expect(isApprovedAnalyticsEventName("wind_down_completed")).toBe(true);
     expect(isApprovedAnalyticsEventName("rescue_me_started")).toBe(true);
     expect(isApprovedAnalyticsEventName("rescue_me_completed")).toBe(true);
     expect(isApprovedAnalyticsEventName("rescue_me_started_install_0123456789abcdef")).toBe(false);
     expect(isApprovedAnalyticsEventName("session_details_submitted")).toBe(false);
+  });
+
+  it("keeps Wind-Down analytics to event names and coarse sync failure metadata", () => {
+    const properties = createPrivacySafeAnalyticsProperties({
+      ambient_sound_id: "light-rain",
+      attempt_count: 2,
+      context_goal: "calm_racing_thoughts",
+      exact_bedtime_text: "I need to sleep before my 6am medical appointment",
+      local_install_id: "install_0123456789abcdef",
+      reason_class: "validation_error",
+      record_type: "wind_down_run",
+      routine_id: "wind_down_racing_thoughts",
+      sync_stage: "post_value_sync",
+      user_id: "123e4567-e89b-12d3-a456-426614174000",
+    });
+
+    expect(properties).toEqual({
+      attempt_count: 2,
+      reason_class: "validation_error",
+      record_type: "wind_down_run",
+      sync_stage: "post_value_sync",
+    });
+    expect(JSON.stringify(properties)).not.toMatch(
+      /light-rain|calm_racing_thoughts|wind_down_racing_thoughts|medical|install_|123e4567/i,
+    );
   });
 
   it("redacts sync failure observability to reason classes and non-sensitive counters", () => {
@@ -124,14 +156,14 @@ describe("privacy-safe observability", () => {
         "HTTP 500 while syncing install_0123456789abcdef for user 123e4567-e89b-12d3-a456-426614174000 with token secret",
       ),
       reasonClass: "server_error",
-      recordType: "post_session_reflection",
+      recordType: "wind_down_run",
       syncStage: "post_value_sync",
     });
 
     expect(context.analyticsProperties).toEqual({
       attempt_count: 3,
       reason_class: "server_error",
-      record_type: "post_session_reflection",
+      record_type: "wind_down_run",
       sync_stage: "post_value_sync",
     });
     expect(context.sentryBreadcrumb).toEqual({
@@ -139,7 +171,7 @@ describe("privacy-safe observability", () => {
       data: {
         attempt_count: 3,
         reason_class: "server_error",
-        record_type: "post_session_reflection",
+        record_type: "wind_down_run",
         sync_stage: "post_value_sync",
       },
       level: "warning",

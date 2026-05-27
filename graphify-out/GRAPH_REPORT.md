@@ -1,11 +1,11 @@
 # Graph Report - sleep-app  (2026-05-27)
 
 ## Corpus Check
-- 163 files · ~475,298 words
+- 163 files · ~475,496 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 521 nodes · 559 edges · 20 communities detected
+- 519 nodes · 557 edges · 20 communities detected
 - Extraction: 87% EXTRACTED · 13% INFERRED · 0% AMBIGUOUS · INFERRED: 75 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
@@ -155,7 +155,7 @@ _Questions this graph is uniquely positioned to answer:_
 - **Why does `loadRouteState()` connect `Community 3` to `Community 0`, `Community 10`, `Community 5`?**
   _High betweenness centrality (0.040) - this node is a cross-community bridge._
 - **Why does `evaluateGate()` connect `Community 0` to `Community 5`?**
-  _High betweenness centrality (0.029) - this node is a cross-community bridge._
+  _High betweenness centrality (0.030) - this node is a cross-community bridge._
 - **Are the 7 inferred relationships involving `getBreathSessionSnapshot()` (e.g. with `pauseSession()` and `resumeSession()`) actually correct?**
   _`getBreathSessionSnapshot()` has 7 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 2 inferred relationships involving `createPostValueSupabaseClient()` (e.g. with `loadRouteState()` and `createClient()`) actually correct?**

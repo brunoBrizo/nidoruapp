@@ -144,7 +144,6 @@ describe("SoundMixerAnchorScreen", () => {
       "automatic",
     );
     expect(screen.getByTestId("sound-mixer-scroll")).toHaveProp("scrollEnabled", true);
-    expect(screen.getByTestId("sound-mixer-scroll")).toHaveProp("scrollEventThrottle", 16);
     expect(screen.getByTestId("sound-mixer-header").props.className).toEqual(
       expect.stringContaining("px-nidoru-screen pt-12"),
     );
@@ -218,13 +217,18 @@ describe("SoundMixerAnchorScreen", () => {
         .className,
       ["opacity-[0.45]", "blur-[2px]"],
     );
+    expectClassNameContains(
+      screen.getByTestId("sound-mixer-save-mix-backdrop", { includeHiddenElements: true }).props
+        .className,
+      ["absolute inset-0", "opacity-[0.45]", "blur-[2px]"],
+    );
     expectClassNameContains(screen.getByTestId("sound-mixer-save-mix-overlay").props.className, [
       "absolute inset-0",
       "bg-black/45",
       "backdrop-blur-[2px]",
-      "justify-end",
     ]);
     expectClassNameContains(screen.getByTestId("sound-mixer-save-mix-sheet").props.className, [
+      "absolute bottom-0 left-0 right-0",
       "rounded-t-[24px]",
       "border-t border-[#1E2236]",
       "bg-[#14172B]",

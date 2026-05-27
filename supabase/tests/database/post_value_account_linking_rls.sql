@@ -1,6 +1,6 @@
 begin;
 
-select plan(9);
+select plan(10);
 
 select has_table('public', 'local_install_links', 'local install links table exists');
 select has_table('public', 'first_session_sync_records', 'first session sync table exists');
@@ -92,6 +92,30 @@ select results_eq(
   $$ select local_session_id from public.first_session_sync_records order by local_session_id $$,
   $$ values ('session_aaaaaaaaaaaaaaaa'::text) $$,
   'authenticated users can read only their own synced first sessions'
+);
+
+select lives_ok(
+  $$
+    insert into public.first_session_sync_records (
+      local_session_id,
+      local_install_id,
+      user_id,
+      technique_id,
+      completed_at,
+      duration_seconds,
+      completed_breath_cycles
+    )
+    values (
+      'session_ownerdiaphra',
+      'install_aaaaaaaaaaaaaaaa',
+      '11111111-1111-4111-8111-111111111111',
+      'diaphragmatic-breathing',
+      '2026-05-20T01:08:00Z',
+      240,
+      24
+    )
+  $$,
+  'authenticated users can sync their own diaphragmatic first sessions'
 );
 
 select throws_ok(

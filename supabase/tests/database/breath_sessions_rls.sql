@@ -1,6 +1,6 @@
 begin;
 
-select plan(8);
+select plan(10);
 
 select has_table('public', 'breath_sessions', 'generic breath sessions table exists');
 
@@ -18,7 +18,6 @@ insert into public.breath_sessions (
   local_install_id,
   user_id,
   source,
-  plan_id,
   technique_id,
   audio_cue_mode_id,
   started_at,
@@ -33,7 +32,6 @@ values
     'install_owneraaaaaaaa',
     '11111111-1111-4111-8111-111111111111',
     'breathe_tab',
-    'sleep_focused',
     'coherent-breathing',
     'gentle-bell',
     '2026-05-20T01:00:00Z',
@@ -47,7 +45,6 @@ values
     'install_otherbbbbbbb',
     '22222222-2222-4222-8222-222222222222',
     'rescue_me',
-    null,
     '4-7-8-sleep',
     'none',
     '2026-05-20T01:05:00Z',
@@ -106,6 +103,74 @@ select lives_ok(
     )
   $$,
   'authenticated users can insert their own breath sessions'
+);
+
+select lives_ok(
+  $$
+    insert into public.breath_sessions (
+      local_session_id,
+      local_install_id,
+      user_id,
+      source,
+      technique_id,
+      audio_cue_mode_id,
+      started_at,
+      completed_at,
+      completion_persisted_at,
+      duration_seconds,
+      completed_breath_cycles
+    )
+    values (
+      'session_ownerwinddown',
+      'install_owneraaaaaaaa',
+      '11111111-1111-4111-8111-111111111111',
+      'wind_down',
+      'coherent-breathing',
+      'nature-ambient',
+      '2026-05-20T01:16:00Z',
+      '2026-05-20T01:26:00Z',
+      '2026-05-20T01:26:01Z',
+      600,
+      54
+    )
+  $$,
+  'authenticated users can insert their own wind-down breath sessions'
+);
+
+select throws_ok(
+  $$
+    insert into public.breath_sessions (
+      local_session_id,
+      local_install_id,
+      user_id,
+      source,
+      plan_id,
+      technique_id,
+      audio_cue_mode_id,
+      started_at,
+      completed_at,
+      completion_persisted_at,
+      duration_seconds,
+      completed_breath_cycles
+    )
+    values (
+      'session_ownerplanbad',
+      'install_owneraaaaaaaa',
+      '11111111-1111-4111-8111-111111111111',
+      'breathe_tab',
+      'anxiety_relief',
+      'box-breathing',
+      'none',
+      '2026-05-20T01:27:00Z',
+      '2026-05-20T01:31:00Z',
+      '2026-05-20T01:31:01Z',
+      240,
+      15
+    )
+  $$,
+  '23514',
+  null,
+  'generic breath-session sync rejects health-adjacent plan taxonomy'
 );
 
 select throws_ok(

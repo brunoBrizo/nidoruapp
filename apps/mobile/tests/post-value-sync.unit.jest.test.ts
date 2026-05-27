@@ -175,7 +175,6 @@ describe("post-value local record sync", () => {
           duration_seconds: 240,
           local_install_id: localInstallId,
           local_session_id: "session_generic012345",
-          plan_id: "sleep_focused",
           source: "breathe_tab",
           started_at: "2026-05-20T01:00:30.000Z",
           technique_id: "coherent-breathing",
@@ -186,7 +185,51 @@ describe("post-value local record sync", () => {
       { onConflict: "user_id,local_session_id" },
     );
     expect(JSON.stringify(client.upserts.breath_sessions.mock.calls)).not.toMatch(
-      /current_phase|elapsed_ms|payload_json|raw_reflection/,
+      /current_phase|elapsed_ms|payload_json|plan_id|raw_reflection/,
+    );
+  });
+
+  it("redacts health-adjacent plan taxonomy from generic breath-session sync payloads", async () => {
+    const database = createDatabase();
+    database.getAllAsync.mockImplementation((source) => {
+      if (source.includes("FROM breath_session_records")) {
+        return Promise.resolve([
+          {
+            audio_cue_mode_id: "none",
+            completed_at: "2026-05-20T01:04:30.000Z",
+            completed_breath_cycles: 15,
+            completion_persisted_at: "2026-05-20T01:04:31.000Z",
+            current_phase: "exhale",
+            duration_seconds: 240,
+            elapsed_ms: 240000,
+            local_install_id: localInstallId,
+            plan_id: "anxiety_relief",
+            remaining_ms: 0,
+            session_id: "session_generic012345",
+            source: "breathe_tab",
+            started_at: "2026-05-20T01:00:30.000Z",
+            technique_id: "box-breathing",
+            updated_at: "2026-05-20T01:04:31.000Z",
+          },
+        ] as never);
+      }
+
+      return Promise.resolve([] as never);
+    });
+    const client = createClient();
+
+    await expect(
+      syncPostValueLocalRecords({
+        client,
+        database,
+        localInstallId,
+        now: new Date("2026-05-20T01:07:00.000Z"),
+        userId,
+      }),
+    ).resolves.toEqual({ status: "succeeded" });
+
+    expect(JSON.stringify(client.upserts.breath_sessions.mock.calls)).not.toMatch(
+      /anxiety_relief|plan_id/,
     );
   });
 

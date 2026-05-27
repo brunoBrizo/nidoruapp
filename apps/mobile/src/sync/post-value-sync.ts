@@ -61,7 +61,6 @@ type BreathSessionSyncRow = {
   readonly duration_seconds: number;
   readonly elapsed_ms: number;
   readonly local_install_id: string;
-  readonly plan_id: string | null;
   readonly remaining_ms: number;
   readonly session_id: string;
   readonly source: string;
@@ -143,7 +142,6 @@ export async function syncPostValueLocalRecords({
         session_id,
         local_install_id,
         source,
-        plan_id,
         technique_id,
         audio_cue_mode_id,
         started_at,
@@ -265,7 +263,6 @@ function createBreathSessionSyncPayloads({
         durationSeconds: row.duration_seconds,
         elapsedDurationMs: row.elapsed_ms,
         localInstallId: row.local_install_id,
-        ...(row.plan_id === null ? {} : { planId: row.plan_id }),
         remainingDurationMs: row.remaining_ms,
         sessionId: row.session_id,
         source: row.source,
@@ -284,7 +281,6 @@ function createBreathSessionSyncPayloads({
         duration_seconds: record.durationSeconds,
         local_install_id: record.localInstallId,
         local_session_id: record.sessionId,
-        ...(record.planId === undefined ? {} : { plan_id: record.planId }),
         source: record.source,
         started_at: record.startedAt,
         technique_id: record.techniqueId,

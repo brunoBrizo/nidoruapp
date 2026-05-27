@@ -40,6 +40,7 @@ describe("privacy-safe observability", () => {
   it("allowlists analytics properties and strips prohibited identifiers and user-entered values", () => {
     const properties = createPrivacySafeAnalyticsProperties({
       account_id: "user_123",
+      app_environment: "staging",
       audio_asset_id: "gentle-bell-transition",
       audio_failure_class: "cue_playback_failed",
       audio_file_path: "/private/var/mobile/Containers/Data/session_0123456789abcdef/cue.m4a",
@@ -52,23 +53,52 @@ describe("privacy-safe observability", () => {
       notification_token: "ExponentPushToken[secret]",
       raw_reflection: "I feel anxious about work",
       reason_class: "server_error",
+      release: "nidoru@0.0.0",
       record_type: "first_session_record",
       revenuecat_customer_id: "rc_123",
+      source: "observability_proof",
       sync_stage: "post_value_sync",
     });
 
     expect(properties).toEqual({
+      app_environment: "staging",
       audio_asset_id: "gentle-bell-transition",
       audio_failure_class: "cue_playback_failed",
       audio_mode: "gentle-bell",
       breath_phase: "inhale",
       attempt_count: 2,
       reason_class: "server_error",
+      release: "nidoru@0.0.0",
       record_type: "first_session_record",
+      source: "observability_proof",
       sync_stage: "post_value_sync",
     });
     expect(JSON.stringify(properties)).not.toMatch(
       /Bruno|install_|device-secret|ExponentPushToken|anxious|user_123|rc_123/,
+    );
+  });
+
+  it("rejects allowlisted analytics keys when values contain health-adjacent taxonomy or raw details", () => {
+    const properties = createPrivacySafeAnalyticsProperties({
+      app_environment: "anxiety_relief",
+      audio_asset_id: "/private/session_0123456789abcdef/cue.m4a",
+      audio_failure_class: "panic_audio_trace",
+      audio_mode: "anxiety-relief",
+      breath_phase: "panic",
+      attempt_count: 1.5,
+      proof: true,
+      reason_class: "anxiety",
+      record_type: "goal_anxiety",
+      release: "install_0123456789abcdef",
+      source: "rescue_me_anxiety_relief",
+      sync_stage: "raw_payload_flush",
+    });
+
+    expect(properties).toEqual({
+      proof: true,
+    });
+    expect(JSON.stringify(properties)).not.toMatch(
+      /anxiety|panic|install_|session_|private|raw_payload/i,
     );
   });
 

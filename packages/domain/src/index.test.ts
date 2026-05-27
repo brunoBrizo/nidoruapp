@@ -52,7 +52,8 @@ function assertCondition(condition: boolean, message: string): void {
 }
 
 function assertNoAuditRiskPublicCopy(values: readonly string[]): void {
-  const auditRiskPattern = /\b(anxiety|panic|hrv)\b|stress\s+relief/i;
+  const auditRiskPattern =
+    /\b(anxiety|panic|hrv|cbt-i|medical care)\b|stress\s+relief|insomnia[-\s]+treatment|guaranteed\s+sleep[-\s]+improvement/i;
   const exposedValue = values.find((value) => auditRiskPattern.test(value));
 
   assertEquals(exposedValue, undefined);
@@ -209,6 +210,24 @@ assertNoAuditRiskPublicCopy([
   }),
   ...onboardingGoalOptions.map((option) => option.label),
   ...windDownContextGoalOptions.flatMap((option) => [option.label, option.subtitle]),
+  ...windDownContextGoals.flatMap((goal) => {
+    const routine = resolveWindDownRoutine({ selectedGoal: goal }).routine;
+    const noHoldRoutine = resolveWindDownRoutine({
+      preferNoHoldBreathwork: true,
+      selectedGoal: goal,
+    }).routine;
+
+    return [
+      routine.breathwork.rhythmLabel,
+      routine.breathwork.holdSafety?.safetyCopy ?? "",
+      routine.breathwork.holdSafety?.noHoldActionLabel ?? "",
+      routine.transition.copy,
+      routine.bodyCue.eyebrow,
+      routine.bodyCue.title,
+      routine.bodyCue.subtitle,
+      noHoldRoutine.breathwork.rhythmLabel,
+    ];
+  }),
   ...Object.values(onboardingPlans).flatMap((plan) => [
     plan.label,
     plan.summary,
@@ -435,7 +454,12 @@ assertEquals(resolveWindDownRoutine().routine, {
   breathwork: {
     techniqueId: "4-7-8-sleep",
     durationSeconds: 300,
+    rhythmLabel: "4 in · 7 hold · 8 out",
     uiState: "active_winddown",
+    holdSafety: {
+      safetyCopy: "Skip holds or stop if you feel dizzy, breathless, or uncomfortable.",
+      noHoldActionLabel: "Switch to no-hold breathing",
+    },
   },
   transition: {
     durationSeconds: 5,
@@ -445,6 +469,7 @@ assertEquals(resolveWindDownRoutine().routine, {
   bodyCue: {
     durationSeconds: 120,
     uiState: "body_cue",
+    relaxationMode: "general_relaxation",
     eyebrow: "BODY RELAXATION",
     title: "Soften your shoulders.",
     subtitle: "Let the weight of the day drop a little.",
@@ -471,7 +496,12 @@ assertEquals(resolveWindDownRoutine({ selectedGoal: "calm_racing_thoughts" }), {
     breathwork: {
       techniqueId: "box-breathing",
       durationSeconds: 300,
+      rhythmLabel: "4 in · 4 hold · 4 out · 4 hold",
       uiState: "active_winddown",
+      holdSafety: {
+        safetyCopy: "Skip holds or stop if you feel dizzy, breathless, or uncomfortable.",
+        noHoldActionLabel: "Switch to no-hold breathing",
+      },
     },
     transition: {
       durationSeconds: 5,
@@ -481,6 +511,7 @@ assertEquals(resolveWindDownRoutine({ selectedGoal: "calm_racing_thoughts" }), {
     bodyCue: {
       durationSeconds: 120,
       uiState: "body_cue",
+      relaxationMode: "body_scan_pmr",
       eyebrow: "BODY SCAN",
       title: "Give your busy mind a body scan.",
       subtitle: "Move from forehead to feet, then release the tension.",
@@ -500,7 +531,12 @@ assertEquals(resolveWindDownRoutine({ selectedGoal: "calm_racing_thoughts" }), {
 assertEquals(resolveWindDownRoutine({ selectedGoal: "calm_racing_thoughts" }).routine.breathwork, {
   techniqueId: "box-breathing",
   durationSeconds: 300,
+  rhythmLabel: "4 in · 4 hold · 4 out · 4 hold",
   uiState: "active_winddown",
+  holdSafety: {
+    safetyCopy: "Skip holds or stop if you feel dizzy, breathless, or uncomfortable.",
+    noHoldActionLabel: "Switch to no-hold breathing",
+  },
 });
 assertCondition(
   !/insomnia treatment|anxiety relief|panic relief|CBT-I/i.test(
@@ -511,8 +547,47 @@ assertCondition(
 assertEquals(resolveWindDownRoutine({ selectedGoal: "wake_up_fewer_times" }).routine.breathwork, {
   techniqueId: "coherent-breathing",
   durationSeconds: 600,
+  rhythmLabel: "5.5 in · 5.5 out",
   uiState: "daily_calm",
 });
+assertEquals(
+  resolveWindDownRoutine({
+    preferNoHoldBreathwork: true,
+    selectedGoal: "fall_asleep_faster",
+  }).routine.breathwork,
+  {
+    techniqueId: "diaphragmatic-breathing",
+    durationSeconds: 300,
+    rhythmLabel: "4 in · 6 out",
+    uiState: "no_hold_fallback",
+    fallbackForTechniqueId: "4-7-8-sleep",
+  },
+);
+assertEquals(
+  resolveWindDownRoutine({
+    preferNoHoldBreathwork: true,
+    selectedGoal: "calm_racing_thoughts",
+  }).routine.breathwork,
+  {
+    techniqueId: "diaphragmatic-breathing",
+    durationSeconds: 300,
+    rhythmLabel: "4 in · 6 out",
+    uiState: "no_hold_fallback",
+    fallbackForTechniqueId: "box-breathing",
+  },
+);
+assertEquals(
+  resolveWindDownRoutine({
+    preferNoHoldBreathwork: true,
+    selectedGoal: "wake_up_fewer_times",
+  }).routine.breathwork,
+  {
+    techniqueId: "coherent-breathing",
+    durationSeconds: 600,
+    rhythmLabel: "5.5 in · 5.5 out",
+    uiState: "daily_calm",
+  },
+);
 assertCondition(
   resolveWindDownRoutine({ selectedGoal: "wake_up_fewer_times" }).routine.ambient
     .timerDurationSeconds >

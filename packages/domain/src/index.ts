@@ -253,6 +253,13 @@ export const breathTechniqueNoHoldFallbacks = {
   "box-breathing": "diaphragmatic-breathing",
 } as const satisfies Partial<Record<MvpBreathTechniqueId, MvpBreathTechniqueId>>;
 
+export const breathTechniqueRhythmLabels = {
+  "4-7-8-sleep": "4 in · 7 hold · 8 out",
+  "box-breathing": "4 in · 4 hold · 4 out · 4 hold",
+  "coherent-breathing": "5.5 in · 5.5 out",
+  "diaphragmatic-breathing": "4 in · 6 out",
+} as const satisfies Record<MvpBreathTechniqueId, string>;
+
 export function getNoHoldFallbackTechniqueId(
   techniqueId: BreathTechniqueId,
 ): MvpBreathTechniqueId | null {
@@ -352,6 +359,7 @@ export type WindDownRoutineStepId = (typeof windDownRoutineStepIds)[number];
 export type WindDownRoutineUiState =
   | "active_winddown"
   | "daily_calm"
+  | "no_hold_fallback"
   | "transition_card"
   | "body_cue"
   | "ambient_handoff";
@@ -371,7 +379,16 @@ export type WindDownStartupRequirements = typeof windDownStartupRequirements;
 export type WindDownBreathworkStep = {
   readonly techniqueId: BreathTechniqueId;
   readonly durationSeconds: number;
-  readonly uiState: Extract<WindDownRoutineUiState, "active_winddown" | "daily_calm">;
+  readonly rhythmLabel: (typeof breathTechniqueRhythmLabels)[MvpBreathTechniqueId];
+  readonly uiState: Extract<
+    WindDownRoutineUiState,
+    "active_winddown" | "daily_calm" | "no_hold_fallback"
+  >;
+  readonly holdSafety?: {
+    readonly safetyCopy: "Skip holds or stop if you feel dizzy, breathless, or uncomfortable.";
+    readonly noHoldActionLabel: "Switch to no-hold breathing";
+  };
+  readonly fallbackForTechniqueId?: MvpBreathTechniqueId;
 };
 
 export type WindDownTransitionStep = {
@@ -383,6 +400,7 @@ export type WindDownTransitionStep = {
 export type WindDownBodyCueStep = {
   readonly durationSeconds: 120;
   readonly uiState: "body_cue";
+  readonly relaxationMode: "general_relaxation" | "body_scan_pmr";
   readonly eyebrow: string;
   readonly title: string;
   readonly subtitle: string;
@@ -425,6 +443,7 @@ const defaultWindDownTransition = {
 const defaultWindDownBodyCue = {
   durationSeconds: 120,
   uiState: "body_cue",
+  relaxationMode: "general_relaxation",
   eyebrow: "BODY RELAXATION",
   title: "Soften your shoulders.",
   subtitle: "Let the weight of the day drop a little.",
@@ -433,6 +452,7 @@ const defaultWindDownBodyCue = {
 const busyMindWindDownBodyCue = {
   durationSeconds: 120,
   uiState: "body_cue",
+  relaxationMode: "body_scan_pmr",
   eyebrow: "BODY SCAN",
   title: "Give your busy mind a body scan.",
   subtitle: "Move from forehead to feet, then release the tension.",
@@ -456,7 +476,12 @@ export const windDownRoutines = {
     breathwork: {
       techniqueId: "4-7-8-sleep",
       durationSeconds: 300,
+      rhythmLabel: breathTechniqueRhythmLabels["4-7-8-sleep"],
       uiState: "active_winddown",
+      holdSafety: {
+        safetyCopy: "Skip holds or stop if you feel dizzy, breathless, or uncomfortable.",
+        noHoldActionLabel: "Switch to no-hold breathing",
+      },
     },
     transition: defaultWindDownTransition,
     bodyCue: defaultWindDownBodyCue,
@@ -470,7 +495,12 @@ export const windDownRoutines = {
     breathwork: {
       techniqueId: "box-breathing",
       durationSeconds: 300,
+      rhythmLabel: breathTechniqueRhythmLabels["box-breathing"],
       uiState: "active_winddown",
+      holdSafety: {
+        safetyCopy: "Skip holds or stop if you feel dizzy, breathless, or uncomfortable.",
+        noHoldActionLabel: "Switch to no-hold breathing",
+      },
     },
     transition: defaultWindDownTransition,
     bodyCue: busyMindWindDownBodyCue,
@@ -484,6 +514,7 @@ export const windDownRoutines = {
     breathwork: {
       techniqueId: "coherent-breathing",
       durationSeconds: 600,
+      rhythmLabel: breathTechniqueRhythmLabels["coherent-breathing"],
       uiState: "daily_calm",
     },
     transition: defaultWindDownTransition,
@@ -578,9 +609,11 @@ function resolveNoHoldWindDownBreathwork(
   return {
     ...routine,
     breathwork: {
-      ...routine.breathwork,
       techniqueId: fallbackTechniqueId,
-      uiState: "active_winddown",
+      durationSeconds: routine.breathwork.durationSeconds,
+      rhythmLabel: breathTechniqueRhythmLabels[fallbackTechniqueId],
+      uiState: "no_hold_fallback",
+      fallbackForTechniqueId: routine.breathwork.techniqueId as MvpBreathTechniqueId,
     },
   };
 }

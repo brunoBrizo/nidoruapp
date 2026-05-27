@@ -16,7 +16,7 @@ import {
   Wind,
   type LucideIcon,
 } from "lucide-react-native";
-import { useContext, type ReactNode } from "react";
+import { useContext, useEffect, type ReactNode } from "react";
 import { SafeAreaInsetsContext } from "react-native-safe-area-context";
 import Svg, {
   Circle as SvgCircle,
@@ -31,6 +31,7 @@ import { StatusBar } from "expo-status-bar";
 import { NidoruButton, OrbStage } from "../design-system";
 import { breathHoldSafetyGuidance } from "../session/breath-hold-safety-guidance";
 import { Pressable, Text, View, cn } from "../tw";
+import { recordWindDownPerformanceMeasure } from "./wind-down-performance-proof";
 
 export type WindDownActiveRoutineView = {
   readonly breathworkDurationSeconds: number;
@@ -141,6 +142,32 @@ const iconByGoal: Record<WindDownContextGoal, LucideIcon> = {
 };
 
 export function WindDownScreen(props: WindDownScreenProps) {
+  const performanceState = props.state === "active" ? props.activeRoutine?.uiState : props.state;
+
+  useEffect(() => {
+    if (!performanceState || performanceState === "preparing") {
+      return;
+    }
+
+    if (
+      performanceState === "quick_context" ||
+      performanceState === "active_winddown" ||
+      performanceState === "daily_calm" ||
+      performanceState === "no_hold_fallback"
+    ) {
+      recordWindDownPerformanceMeasure("startup_first_visual", {
+        state: performanceState,
+      });
+      return;
+    }
+
+    if (performanceState === "tap_to_wake") {
+      recordWindDownPerformanceMeasure("tap_to_wake_first_visual", {
+        state: performanceState,
+      });
+    }
+  }, [performanceState]);
+
   if (props.state === "preparing") {
     return (
       <WindDownFrame centered>

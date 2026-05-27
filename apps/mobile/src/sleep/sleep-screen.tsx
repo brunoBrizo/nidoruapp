@@ -2,6 +2,7 @@ import { type Href, useRouter } from "expo-router";
 
 import { CardFade } from "../surfaces/card-fade";
 import { Pressable, ScrollView, Text, View, cn } from "../tw";
+import { markWindDownPerformanceStart } from "../wind-down/wind-down-performance-proof";
 import {
   SolarAltArrowRightLinearIcon,
   SolarBookBookmarkLinearIcon,
@@ -99,6 +100,7 @@ export function SleepScreen() {
           accessibilityRole="link"
           className="relative z-10 h-[44px] rounded-[16px] bg-[#7C6FCD] w-full flex-row items-center justify-center shadow-[inset_0_1px_0_rgba(238,240,255,0.2)] active:scale-[0.96] transition-transform duration-200"
           onPress={() => {
+            markWindDownPerformanceStart("entry_tap");
             router.push(sleepRoutes.windDown);
           }}
           testID="sleep-primary-cta"

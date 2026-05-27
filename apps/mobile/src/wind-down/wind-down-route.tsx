@@ -50,6 +50,10 @@ import {
   type WindDownActiveRoutineView,
   type WindDownVisualStateId,
 } from "./wind-down-screen";
+import {
+  markWindDownPerformanceStart,
+  recordWindDownPerformanceMeasure,
+} from "./wind-down-performance-proof";
 
 type WindDownRouteState =
   | { readonly status: "preparing" }
@@ -243,6 +247,7 @@ function WindDownLiveRoute() {
 
       ambientStartedAtMsRef.current = startedAtMs;
       audioControllerRef.current?.release();
+      markWindDownPerformanceStart("ambient_handoff_start");
 
       const snapshot = await ambientAudioControllerRef.current?.start({
         appState: getSleepTimerAppState(),
@@ -255,6 +260,10 @@ function WindDownLiveRoute() {
 
       if (snapshot) {
         setAmbientAudioSnapshot(snapshot);
+        recordWindDownPerformanceMeasure("ambient_audio_start", {
+          status: snapshot.status,
+          volume: snapshot.volume,
+        });
       }
 
       await saveSessionProgress(session, {
@@ -975,6 +984,7 @@ function WindDownLiveRoute() {
           }).finally(() => switchSessionToNoHoldFallback(session));
         }}
         onWake={() => {
+          markWindDownPerformanceStart("dimmed_tap");
           moveSession(session, "tap_to_wake");
         }}
         state={visualState}
@@ -986,6 +996,7 @@ function WindDownLiveRoute() {
     return (
       <WindDownScreen
         onSelectGoal={(goal) => {
+          markWindDownPerformanceStart("context_choice");
           void startRoutine({
             bootstrap: {
               database: routeState.database,

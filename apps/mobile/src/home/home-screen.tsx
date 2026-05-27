@@ -31,6 +31,7 @@ import Svg, {
 import { useReduceMotionPreference } from "../motion/use-reduce-motion-enabled";
 import { markRescueMeHomeTap } from "../rescue/rescue-me-launch-performance";
 import { Link, Pressable, ReactNativeAnimatedView, ScrollView, Text, View, cn } from "../tw";
+import { markWindDownPerformanceStart } from "../wind-down/wind-down-performance-proof";
 import { type HomeQuickActionId, type HomeRouteTarget } from "./home-actions";
 import { createHomeOverview } from "./home-state";
 
@@ -212,6 +213,12 @@ const markRescueMeTapIfNeeded = (actionId: string) => {
   }
 };
 
+const markWindDownTapIfNeeded = (routeTarget: HomeRouteTarget) => {
+  if (routeTarget === "/sleep/wind-down") {
+    markWindDownPerformanceStart("entry_tap");
+  }
+};
+
 export function HomeScreen({
   hasMorningCheckIn = true,
   notificationGateController = null,
@@ -224,6 +231,7 @@ export function HomeScreen({
   const timestamp = useMemo(() => formatHomeTimestamp(now), [now]);
   const handleHomeActionPress = (actionId: string, routeTarget: HomeRouteTarget) => {
     markRescueMeTapIfNeeded(actionId);
+    markWindDownTapIfNeeded(routeTarget);
     router.push(routeTarget);
   };
 

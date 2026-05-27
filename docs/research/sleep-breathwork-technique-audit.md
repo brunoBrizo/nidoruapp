@@ -26,11 +26,17 @@ Scope: Current documentation and implementation for sleep, wind-down, Rescue Me,
 | Ambient sound / colored noise | Sleep Sound Mixer includes nature, white/pink/brown noise, 432 Hz tone, and delta-wave binaural | Good for masking and preference; weak evidence for broad sleep claims | Keep as preference tools. Do not sell tones or binaural tracks as scientifically proven sleep enhancers |
 | Sleep stories | Post-MVP low-stimulation narrative content | Reasonable cognitive-distraction and routine-support pattern | Keep post-MVP with low-stimulation UX and no treatment claims |
 
-## Implementation updates from this audit
+## Documentation updates from this audit
 
-- Standardized coherent breathing labels to `5.5 in · 5.5 out` where UI had drifted from the domain cadence.
-- Replaced reflection copy that claimed deep breathing shifts the nervous system into a deterministic "rest mode" with softer support language.
-- Softened product and source-document claims around 4-7-8, box breathing, physiological sigh, body scan, sequential wind-down benefits, and Day 3 habit messaging.
+- Standardized documentation guidance for coherent breathing around the domain cadence: `5.5 in · 5.5 out`.
+- Replaced documentation language that implied deterministic nervous-system, panic, anxiety, insomnia, HRV, sound-frequency, or guaranteed sleep outcomes with softer wellness, routine, preference, and self-observed-pattern language.
+- Softened product and source-document claims around 4-7-8, box breathing, physiological sigh, body scan, sequential wind-down benefits, insight cards, sound mixer copy, challenges, sleep stories, onboarding, and growth/App Store wording.
+
+## Final app-copy alignment check
+
+The built Feature 01-05 app surfaces have been re-checked against this audit. Home, Breathe, onboarding personalization, first-session reflection, Rescue Me, Wind-Down, shared i18n strings, and shared domain copy now avoid diagnostic, treatment, deterministic sleep, autonomic, panic-outcome, and special sound-frequency efficacy claims.
+
+Remaining risky terms in code search are limited to internal identifiers, validation schemas, tests, source quotes, or explicit guardrails. For example, `anxiety_relief` remains a local plan identifier, `daily_practice_hrv` remains internal taxonomy, and 432 Hz / delta-wave sound IDs remain catalog identifiers without efficacy copy.
 
 ## Recommended next product changes
 
@@ -51,4 +57,4 @@ Scope: Current documentation and implementation for sleep, wind-down, Rescue Me,
 - Noise as a sleep aid systematic review: https://pubmed.ncbi.nlm.nih.gov/33007706/
 - Diaphragmatic breathing systematic review: https://www.sciencedirect.com/science/article/pii/S0965229925001931
 
-Note: The Life Science Research Entrez helper was checked for literature retrieval, but it could not run in this local environment because the required Python `requests` package was unavailable. The evidence above was retrieved from primary-source web, PubMed, PMC, Nature, and ScienceDirect pages.
+Note: The evidence above was retrieved from primary-source web, PubMed, PMC, Nature, and ScienceDirect pages.

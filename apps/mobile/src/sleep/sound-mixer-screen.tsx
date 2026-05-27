@@ -366,23 +366,13 @@ function SaveMixSheet({
       transparent
       visible
     >
-      <View accessibilityViewIsModal className="absolute inset-0 z-[100] bg-[#0D0F1A]">
+      <View
+        accessibilityViewIsModal
+        className="absolute inset-0 z-[100] justify-end bg-black/45 backdrop-blur-[2px]"
+        testID="sound-mixer-save-mix-overlay"
+      >
         <View
-          accessibilityElementsHidden
-          className="absolute inset-0 opacity-[0.45] blur-[2px]"
-          importantForAccessibility="no-hide-descendants"
-          pointerEvents="none"
-          testID="sound-mixer-save-mix-backdrop"
-        >
-          <SoundMixerModalBackdrop />
-        </View>
-        <View
-          className="absolute inset-0 bg-black/45 backdrop-blur-[2px]"
-          pointerEvents="none"
-          testID="sound-mixer-save-mix-overlay"
-        />
-        <View
-          className="absolute bottom-0 left-0 right-0 w-full rounded-t-[24px] border-t border-[#1E2236] bg-[#14172B] px-5 pt-3 pb-11 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]"
+          className="w-full rounded-t-[24px] border-t border-[#1E2236] bg-[#14172B] px-5 pt-3 pb-11 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]"
           testID="sound-mixer-save-mix-sheet"
         >
           <View
@@ -485,91 +475,6 @@ function SaveMixSheet({
         </View>
       </View>
     </Modal>
-  );
-}
-
-function SoundMixerModalBackdrop() {
-  return (
-    <View className="flex-1 bg-[#0D0F1A]">
-      <View className="px-nidoru-screen pt-12 pb-2">
-        <View className="mb-1 min-h-8 flex-row items-center justify-between">
-          <View className="-ml-2 h-11 w-11 items-center justify-center rounded-[14px]">
-            <ChevronLeft color={colors.text} size={22} strokeWidth={1.5} />
-          </View>
-
-          <Text className="-ml-1 flex-1 text-center font-nidoru-primary-regular text-[22px] font-medium leading-[28px] text-[#EEF0FF]">
-            Sound Mixer
-          </Text>
-
-          <View className="ml-2 min-h-[29px] items-center justify-center rounded-full border border-[#1E2236] bg-[#1C2040] px-2.5 py-[5px]">
-            <Text className="font-nidoru-primary-semibold text-[11px] leading-[14px] tracking-wide text-[#A89CE0]">
-              Offline pack
-            </Text>
-          </View>
-        </View>
-
-        <Text className="ml-1 mt-0.5 font-nidoru-primary-regular text-sm font-light leading-5 text-[#8A8FA8]">
-          Layer sounds for tonight.
-        </Text>
-      </View>
-
-      <View className="mt-1 pl-nidoru-screen">
-        <Text className="ml-1 mb-3 font-nidoru-primary-semibold text-[11px] leading-4 tracking-[0.1em] text-[#4A4E6A]">
-          SAVED MIXES
-        </Text>
-        <View className="w-full flex-row gap-2 overflow-hidden pr-nidoru-screen pb-2">
-          {savedMixes.map((mix) => (
-            <SavedMixChip key={mix.id} mix={mix} />
-          ))}
-          <View className="h-10 shrink-0 flex-row items-center gap-1.5 rounded-[14px] border border-dashed border-[#1E2236] px-3.5">
-            <PlusCircle color={colors.inactive} size={16} strokeWidth={1.5} />
-            <Text className="font-nidoru-primary-regular text-[13px] leading-[18px] tracking-wide text-[#A1A7C4]">
-              New mix
-            </Text>
-          </View>
-        </View>
-      </View>
-
-      <View className="mt-4 px-nidoru-screen">
-        <View className="h-[52px] flex-row items-center justify-between rounded-[16px] border border-[#1E2236]/50 bg-[#14172B]/70 px-4">
-          <View className="flex-row items-center gap-3.5">
-            <Timer color={colors.active} size={20} strokeWidth={1.5} />
-            <View>
-              <Text className="font-nidoru-primary-regular text-sm leading-[18px] tracking-wide text-[#EEF0FF]">
-                Timer <Text className="text-[#4A4E6A]">·</Text>{" "}
-                <Text className="font-nidoru-data-regular text-[#A89CE0] tabular-nums">30 min</Text>
-              </Text>
-              <Text className="mt-0.5 font-nidoru-primary-regular text-xs font-light leading-4 tracking-wide text-[#8A8FA8]">
-                Fade starts in <Text className="font-nidoru-data-regular tabular-nums">28 min</Text>
-              </Text>
-            </View>
-          </View>
-          <View className="h-8 w-8 items-center justify-center">
-            <ProgressRing
-              progress={0.93}
-              size={32}
-              strokeColor={colors.active}
-              strokeWidth={2}
-              trackColor="#1E2236"
-            />
-            <View className="absolute inset-0 items-center justify-center">
-              <MoonStar color={colors.activeSoft} size={14} strokeWidth={1.5} />
-            </View>
-          </View>
-        </View>
-      </View>
-
-      <View className="mt-5 px-nidoru-screen">
-        <Text className="ml-1 mb-3 font-nidoru-primary-semibold text-[11px] leading-4 tracking-[0.1em] text-[#4A4E6A]">
-          RAIN
-        </Text>
-        <View className="flex-row gap-3">
-          {soundCategories[0]?.sounds.slice(0, 2).map((sound) => (
-            <SoundCardButton key={sound.id} sound={sound} />
-          ))}
-        </View>
-      </View>
-    </View>
   );
 }
 

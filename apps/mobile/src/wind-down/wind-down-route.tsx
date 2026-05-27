@@ -402,7 +402,10 @@ function WindDownLiveRoute() {
           }).finally(() => moveSession(session, "completion"));
         }}
         onUseNoHoldFallback={() => {
-          switchSessionToNoHoldFallback(session);
+          void saveSessionProgress(session, {
+            recoveryState: "no_hold_fallback",
+            status: "started",
+          }).finally(() => switchSessionToNoHoldFallback(session));
         }}
         onWake={() => {
           moveSession(session, "tap_to_wake");

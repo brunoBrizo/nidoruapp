@@ -566,6 +566,29 @@ Deno.test("supports Wind-Down local persistence and strict recovery constraints"
         '2026-05-25T01:06:20.000Z'
       );
 
+      INSERT INTO wind_down_runs (
+        run_id,
+        local_install_id,
+        routine_id,
+        context_goal,
+        ambient_sound_id,
+        status,
+        recovery_state,
+        started_at,
+        updated_at
+      )
+      VALUES (
+        'winddown_nohold123456',
+        'install_0123456789abcdef',
+        'wind_down_sleep_starter',
+        'fall_asleep_faster',
+        'light-rain',
+        'started',
+        'no_hold_fallback',
+        '2026-05-25T01:10:00.000Z',
+        '2026-05-25T01:10:00.000Z'
+      );
+
       INSERT INTO breath_session_records (
         session_id,
         local_install_id,
@@ -669,6 +692,14 @@ Deno.test("supports Wind-Down local persistence and strict recovery constraints"
         wind_down_run_id: "winddown_0123456789abcdef",
       },
     ]);
+
+    const noHoldRows = await database.getAllAsync<{ recovery_state: string }>(`
+      SELECT recovery_state
+      FROM wind_down_runs
+      WHERE run_id = 'winddown_nohold123456';
+    `);
+
+    assertEquals(noHoldRows, [{ recovery_state: "no_hold_fallback" }]);
 
     await assertRejects(
       () =>

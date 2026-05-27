@@ -373,6 +373,13 @@ describe("WindDownRoute", () => {
     expect(screen.getByRole("header", { name: "No-hold breathing" })).toBeTruthy();
     expect(screen.getByText("Diaphragmatic breathing for wind-down")).toBeTruthy();
     expect(mockSaveRememberedWindDownContextChoiceLocally).not.toHaveBeenCalled();
+    expect(mockSaveWindDownStepProgressLocally).toHaveBeenCalledWith(
+      expect.any(Object),
+      expect.objectContaining({
+        recoveryState: "no_hold_fallback",
+        status: "started",
+      }),
+    );
 
     await act(async () => {
       jest.advanceTimersByTime(300_000);

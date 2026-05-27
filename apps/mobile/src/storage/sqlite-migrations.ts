@@ -401,6 +401,7 @@ export const sqliteMigrations = [
           recovery_state IN (
             'quick_context',
             'active_winddown',
+            'no_hold_fallback',
             'daily_calm',
             'transition_card',
             'body_cue',

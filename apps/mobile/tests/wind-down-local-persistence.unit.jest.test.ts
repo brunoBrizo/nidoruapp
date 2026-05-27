@@ -142,6 +142,29 @@ describe("wind-down local persistence", () => {
     );
   });
 
+  it("persists tonight-only no-hold fallback as a recoverable active state", async () => {
+    const database = createMockDatabase();
+
+    await saveWindDownStepProgressLocally(database, {
+      localInstallId: "install_0123456789abcdef",
+      recoveryState: "no_hold_fallback",
+      runId: "winddown_0123456789abcdef",
+      status: "started",
+      updatedAt: "2026-05-25T01:01:00.000Z",
+    });
+
+    expect(database.runAsync).toHaveBeenCalledWith(
+      expect.stringContaining("UPDATE wind_down_runs"),
+      expect.arrayContaining([
+        "started",
+        "no_hold_fallback",
+        "2026-05-25T01:01:00.000Z",
+        "winddown_0123456789abcdef",
+        "install_0123456789abcdef",
+      ]),
+    );
+  });
+
   it("loads the remembered context choice with local-install scoping", async () => {
     const database = createMockDatabase();
     database.getFirstAsync.mockResolvedValue({
@@ -240,7 +263,7 @@ describe("wind-down local persistence", () => {
       completed_at: null,
       context_goal: "fall_asleep_faster",
       local_install_id: "install_0123456789abcdef",
-      recovery_state: "background_recovery",
+      recovery_state: "no_hold_fallback",
       routine_id: "wind_down_sleep_starter",
       run_id: "winddown_0123456789abcdef",
       started_at: "2026-05-25T01:00:00.000Z",
@@ -262,7 +285,7 @@ describe("wind-down local persistence", () => {
       breathworkStartedAt: "2026-05-25T01:00:00.000Z",
       contextGoal: "fall_asleep_faster",
       localInstallId: "install_0123456789abcdef",
-      recoveryState: "background_recovery",
+      recoveryState: "no_hold_fallback",
       routineId: "wind_down_sleep_starter",
       runId: "winddown_0123456789abcdef",
       startedAt: "2026-05-25T01:00:00.000Z",

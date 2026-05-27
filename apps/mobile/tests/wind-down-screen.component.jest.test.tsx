@@ -34,10 +34,10 @@ describe("WindDownScreen", () => {
       "Starts 4-7-8 breath with sleep sounds and remembers this Wind-Down goal.",
     );
     expect(screen.getByRole("button", { name: "Calm racing thoughts" })).toBeTruthy();
-    expect(screen.getByText("Box breathing · body scan")).toBeTruthy();
+    expect(screen.getByText("Box breathing · body relax")).toBeTruthy();
     expect(screen.getByRole("button", { name: "Calm racing thoughts" })).toHaveProp(
       "accessibilityHint",
-      "Starts Box breathing with body scan and remembers this Wind-Down goal.",
+      "Starts Box breathing with body relaxation and remembers this Wind-Down goal.",
     );
     expect(screen.getByRole("button", { name: "Wake up fewer times" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Skip" })).toHaveProp(
@@ -46,7 +46,7 @@ describe("WindDownScreen", () => {
     );
     expect(screen.queryByRole("textbox")).toBeNull();
     expect(screen.queryByText(/account|paywall|notification|permission|loading/i)).toBeNull();
-    expect(screen.queryByText("Box breathing · body relax")).toBeNull();
+    expect(screen.queryByText("Box breathing · body scan")).toBeNull();
   });
 
   it("keeps the quick context choices as the only primary decision controls", () => {

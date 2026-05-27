@@ -326,7 +326,7 @@ export const windDownContextGoalOptions = [
   {
     value: "calm_racing_thoughts",
     label: "Calm racing thoughts",
-    subtitle: "Box breathing · body scan",
+    subtitle: "Box breathing · body relax",
   },
   {
     value: "wake_up_fewer_times",

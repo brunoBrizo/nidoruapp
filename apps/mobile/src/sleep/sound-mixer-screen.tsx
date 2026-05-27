@@ -131,11 +131,11 @@ export function SoundMixerScreen() {
       <ScrollView
         className="flex-1 bg-[#0D0F1A]"
         contentContainerClassName="pb-[252px]"
-        contentInsetAdjustmentBehavior="never"
+        contentInsetAdjustmentBehavior="automatic"
         showsVerticalScrollIndicator={false}
         testID="sound-mixer-scroll"
       >
-        <View className="px-5 pt-12 pb-2">
+        <View className="px-nidoru-screen pt-12 pb-2" testID="sound-mixer-header">
           <View className="mb-1 min-h-8 flex-row items-center justify-between">
             <Pressable
               accessibilityHint="Returns to the previous sleep screen."
@@ -176,13 +176,13 @@ export function SoundMixerScreen() {
           </Text>
         </View>
 
-        <View className="mt-1 pl-5">
+        <View className="mt-1 pl-nidoru-screen">
           <Text className="ml-1 mb-3 font-nidoru-primary-semibold text-[11px] leading-4 tracking-[0.1em] text-[#4A4E6A]">
             SAVED MIXES
           </Text>
           <ScrollView
             className="w-full"
-            contentContainerClassName="gap-2 pr-5 pb-2"
+            contentContainerClassName="gap-2 pr-nidoru-screen pb-2"
             horizontal
             showsHorizontalScrollIndicator={false}
             testID="sound-mixer-saved-mixes-row"
@@ -204,7 +204,7 @@ export function SoundMixerScreen() {
           </ScrollView>
         </View>
 
-        <View className="mt-4 px-5">
+        <View className="mt-4 px-nidoru-screen">
           <View
             className="h-[52px] flex-row items-center justify-between rounded-[16px] border border-[#1E2236]/50 bg-[#14172B]/70 px-4"
             testID="sound-mixer-timer-card"
@@ -239,7 +239,7 @@ export function SoundMixerScreen() {
           </View>
         </View>
 
-        <View className="mt-5 gap-6 px-5 pb-10">
+        <View className="mt-5 gap-6 px-nidoru-screen pb-10">
           {soundCategories.map((category) => (
             <View key={category.id}>
               <Text className="ml-1 mb-3 font-nidoru-primary-semibold text-[11px] leading-4 tracking-[0.1em] text-[#4A4E6A]">
@@ -256,7 +256,7 @@ export function SoundMixerScreen() {
       </ScrollView>
 
       <View
-        className="absolute bottom-[96px] left-4 right-4 z-40 gap-3.5 rounded-[24px] border border-[#1E2236]/80 bg-[#14172B]/95 p-3.5 shadow-[0_-8px_30px_rgba(13,15,26,0.9)]"
+        className="absolute bottom-[96px] left-nidoru-screen right-nidoru-screen z-40 gap-3.5 rounded-[24px] border border-[#1E2236]/80 bg-[#14172B]/95 p-3.5 shadow-[0_-8px_30px_rgba(13,15,26,0.9)]"
         testID="sound-mixer-active-strip"
       >
         <View className="flex-row items-center justify-between px-1">

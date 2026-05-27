@@ -141,7 +141,10 @@ describe("SoundMixerAnchorScreen", () => {
     );
     expect(screen.getByTestId("sound-mixer-scroll")).toHaveProp(
       "contentInsetAdjustmentBehavior",
-      "never",
+      "automatic",
+    );
+    expect(screen.getByTestId("sound-mixer-header").props.className).toEqual(
+      expect.stringContaining("px-nidoru-screen pt-12"),
     );
     expect(screen.getByTestId("sound-mixer-saved-mixes-row")).toHaveProp("horizontal", true);
     expect(screen.getByTestId("sound-mixer-timer-card").props.className).toEqual(
@@ -157,7 +160,7 @@ describe("SoundMixerAnchorScreen", () => {
       expect.stringContaining("border-[#1E2236]/60 bg-[#14172B]"),
     );
     expect(screen.getByTestId("sound-mixer-active-strip").props.className).toEqual(
-      expect.stringContaining("absolute bottom-[96px] left-4 right-4"),
+      expect.stringContaining("absolute bottom-[96px] left-nidoru-screen right-nidoru-screen"),
     );
     expect(screen.getByTestId("sound-mixer-active-strip").props.className).toEqual(
       expect.stringContaining("rounded-[24px] border border-[#1E2236]/80 bg-[#14172B]/95"),

@@ -13,6 +13,7 @@ import {
   Leaf,
   Magnet,
   MoonStar,
+  MoreHorizontal,
   Pause,
   PlusCircle,
   Radio,
@@ -41,13 +42,14 @@ type SavedMix = {
   readonly id: string;
   readonly label: string;
   readonly icons: readonly MixerIcon[];
+  readonly timerLabel?: string;
 };
 
 type SoundCard = {
   readonly id: string;
   readonly label: string;
   readonly Icon: MixerIcon;
-  readonly volume?: 34 | 58 | 72;
+  readonly volume?: number;
 };
 
 type SoundCategory = {
@@ -57,6 +59,22 @@ type SoundCategory = {
 };
 
 type PlaybackMode = "mixer" | "idle" | "controls" | "interrupted";
+export type SoundMixerUIVariant =
+  | "default"
+  | "volume-editing"
+  | "empty-mixer"
+  | "empty-saved-mixes"
+  | "full-saved-mixes"
+  | "full-save-mix-sheet";
+
+type MixerState = {
+  readonly activeSounds: readonly SoundCard[];
+  readonly editingSoundId?: string;
+  readonly isSavedMixesExpanded: boolean;
+  readonly savedMixes: readonly SavedMix[];
+  readonly showEmptySavedMixes: boolean;
+  readonly soundCategories: readonly SoundCategory[];
+};
 
 const colors = {
   active: "#7C6FCD",
@@ -67,8 +85,18 @@ const colors = {
 } as const;
 
 const savedMixes: readonly SavedMix[] = [
-  { id: "rain-hearth", label: "Rain Hearth", icons: [CloudRain, Flame] },
-  { id: "forest-fan", label: "Forest Fan", icons: [Leaf, Asterisk] },
+  { id: "rain-hearth", label: "Rain Hearth", icons: [CloudRain, Flame], timerLabel: "30 min" },
+  { id: "forest-fan", label: "Forest Fan", icons: [Leaf, Asterisk], timerLabel: "45 min" },
+] as const;
+
+const fullSavedMixes: readonly SavedMix[] = [
+  ...savedMixes,
+  {
+    id: "ocean-noise",
+    label: "Ocean Noise",
+    icons: [Waves, ChartNoAxesColumn],
+    timerLabel: "60 min",
+  },
 ] as const;
 
 const soundCategories: readonly SoundCategory[] = [
@@ -126,14 +154,79 @@ const activeSounds = soundCategories
 
 const timerOptions = ["20", "30", "45", "60", "∞"] as const;
 
+function getMixerState(variant: SoundMixerUIVariant): MixerState {
+  const volumesByVariant: Record<SoundMixerUIVariant, Readonly<Partial<Record<string, number>>>> = {
+    default: {
+      "brown-noise": 58,
+      "fireplace-crackling": 34,
+      "light-rain": 72,
+    },
+    "empty-mixer": {},
+    "empty-saved-mixes": {
+      "brown-noise": 58,
+      "light-rain": 72,
+    },
+    "full-save-mix-sheet": {
+      "brown-noise": 58,
+      "fireplace-crackling": 34,
+      "light-rain": 72,
+    },
+    "full-saved-mixes": {
+      "brown-noise": 58,
+      "fireplace-crackling": 34,
+      "light-rain": 72,
+    },
+    "volume-editing": {
+      "brown-noise": 58,
+      "fireplace-crackling": 34,
+      "light-rain": 84,
+    },
+  };
+  const soundCategoriesForVariant: readonly SoundCategory[] = soundCategories.map((category) => ({
+    id: category.id,
+    label: category.label,
+    sounds: category.sounds.map((sound): SoundCard => {
+      const volume = volumesByVariant[variant][sound.id];
+      const baseSound = { Icon: sound.Icon, id: sound.id, label: sound.label };
+
+      return volume === undefined ? baseSound : { ...baseSound, volume };
+    }),
+  }));
+
+  const state: MixerState = {
+    activeSounds: soundCategoriesForVariant
+      .flatMap((category) => category.sounds)
+      .filter((sound) => sound.volume !== undefined),
+    isSavedMixesExpanded: variant === "full-saved-mixes",
+    savedMixes:
+      variant === "full-saved-mixes" || variant === "full-save-mix-sheet"
+        ? fullSavedMixes
+        : savedMixes,
+    showEmptySavedMixes: variant === "empty-saved-mixes",
+    soundCategories: soundCategoriesForVariant,
+  };
+
+  return variant === "volume-editing" ? { ...state, editingSoundId: "light-rain" } : state;
+}
+
+function formatActiveLayerCount(count: number) {
+  return `${count} active ${count === 1 ? "layer" : "layers"}`;
+}
+
 export function SoundMixerScreen({
   initialPlaybackMode = "mixer",
+  uiVariant = "default",
 }: {
   readonly initialPlaybackMode?: PlaybackMode;
+  readonly uiVariant?: SoundMixerUIVariant;
 } = {}) {
   const router = useRouter();
-  const [isSaveMixSheetOpen, setIsSaveMixSheetOpen] = useState(false);
+  const mixerState = getMixerState(uiVariant);
+  const isFullSaveMixSheet = uiVariant === "full-save-mix-sheet";
+  const [isSaveMixSheetOpen, setIsSaveMixSheetOpen] = useState(isFullSaveMixSheet);
   const [playbackMode, setPlaybackMode] = useState<PlaybackMode>(initialPlaybackMode);
+  const activeLayerLabel = formatActiveLayerCount(mixerState.activeSounds.length);
+  const hasActiveSounds = mixerState.activeSounds.length > 0;
 
   if (playbackMode !== "mixer") {
     return (
@@ -224,33 +317,7 @@ export function SoundMixerScreen({
             </Text>
           </View>
 
-          <View className="mt-1 pl-nidoru-screen">
-            <Text className="ml-1 mb-3 font-nidoru-primary-semibold text-[11px] leading-4 tracking-[0.1em] text-[#4A4E6A]">
-              SAVED MIXES
-            </Text>
-            <ScrollView
-              className="w-full"
-              contentContainerClassName="gap-2 pr-nidoru-screen pb-2"
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              testID="sound-mixer-saved-mixes-row"
-            >
-              {savedMixes.map((mix) => (
-                <SavedMixChip key={mix.id} mix={mix} />
-              ))}
-              <Pressable
-                accessibilityLabel="Create new saved mix"
-                accessibilityRole="button"
-                className="h-10 shrink-0 flex-row items-center gap-1.5 rounded-[14px] border border-dashed border-[#1E2236] px-3.5 active:scale-[0.96]"
-                testID="sound-mixer-new-mix-chip"
-              >
-                <PlusCircle color={colors.inactive} size={16} strokeWidth={1.5} />
-                <Text className="font-nidoru-primary-regular text-[13px] leading-[18px] tracking-wide text-[#A1A7C4]">
-                  New mix
-                </Text>
-              </Pressable>
-            </ScrollView>
-          </View>
+          <SavedMixesSection state={mixerState} />
 
           <View className="mt-4 px-nidoru-screen">
             <View
@@ -267,8 +334,10 @@ export function SoundMixerScreen({
                     </Text>
                   </Text>
                   <Text className="mt-0.5 font-nidoru-primary-regular text-xs font-light leading-4 tracking-wide text-[#8A8FA8]">
-                    Fade starts in{" "}
-                    <Text className="font-nidoru-data-regular tabular-nums">28 min</Text>
+                    {hasActiveSounds ? "Fade starts in " : "Starts when a sound plays."}
+                    {hasActiveSounds ? (
+                      <Text className="font-nidoru-data-regular tabular-nums">28 min</Text>
+                    ) : null}
                   </Text>
                 </View>
               </View>
@@ -288,14 +357,18 @@ export function SoundMixerScreen({
           </View>
 
           <View className="mt-5 gap-6 px-nidoru-screen pb-10">
-            {soundCategories.map((category) => (
+            {mixerState.soundCategories.map((category) => (
               <View key={category.id}>
                 <Text className="ml-1 mb-3 font-nidoru-primary-semibold text-[11px] leading-4 tracking-[0.1em] text-[#4A4E6A]">
                   {category.label.toUpperCase()}
                 </Text>
                 <View className="flex-row flex-wrap gap-3">
                   {category.sounds.map((sound) => (
-                    <SoundCardButton key={sound.id} sound={sound} />
+                    <SoundCardButton
+                      isEditing={mixerState.editingSoundId === sound.id}
+                      key={sound.id}
+                      sound={sound}
+                    />
                   ))}
                 </View>
               </View>
@@ -311,7 +384,9 @@ export function SoundMixerScreen({
             accessibilityHint="Opens the low-light playback screen."
             accessibilityLabel="Show dark playback mode"
             accessibilityRole="button"
+            accessibilityState={hasActiveSounds ? undefined : { disabled: true }}
             className="min-h-11 flex-row items-center justify-between rounded-[14px] px-1 active:scale-[0.98]"
+            disabled={hasActiveSounds ? undefined : true}
             onPress={() => {
               setPlaybackMode("idle");
             }}
@@ -322,11 +397,11 @@ export function SoundMixerScreen({
                 Tonight mix
               </Text>
               <Text className="mt-0.5 font-nidoru-primary-regular text-xs leading-4 tracking-wide text-[#A1A7C4]">
-                3 active layers
+                {hasActiveSounds ? activeLayerLabel : "Choose up to 3 layers"}
               </Text>
             </View>
-            <View className="flex-row gap-1.5">
-              {activeSounds.map((sound) => (
+            <View className="flex-row gap-1.5" testID="sound-mixer-active-icons">
+              {mixerState.activeSounds.map((sound) => (
                 <ActiveMiniIcon key={sound.id} sound={sound} />
               ))}
             </View>
@@ -334,7 +409,10 @@ export function SoundMixerScreen({
 
           <View className="h-11 flex-row gap-3">
             <View
-              className="flex-1 flex-row items-center rounded-[14px] border border-[#1E2236]/60 bg-[#0D0F1A] p-1"
+              className={cn(
+                "flex-1 flex-row items-center rounded-[14px] border border-[#1E2236]/60 bg-[#0D0F1A] p-1",
+                hasActiveSounds ? null : "opacity-50",
+              )}
               testID="sound-mixer-timer-segments"
             >
               {timerOptions.map((option) => {
@@ -344,11 +422,14 @@ export function SoundMixerScreen({
                   <Pressable
                     accessibilityLabel={`${option} minute timer${selected ? ", selected" : ""}`}
                     accessibilityRole="button"
-                    accessibilityState={{ selected }}
+                    accessibilityState={
+                      hasActiveSounds ? { selected } : { disabled: true, selected }
+                    }
                     className={cn(
                       "h-full flex-1 items-center justify-center rounded-[10px]",
                       selected ? "border border-[#2D3359]/50 bg-[#1C2040]" : null,
                     )}
+                    disabled={hasActiveSounds ? undefined : true}
                     key={option}
                     testID={`sound-mixer-timer-option-${option}`}
                   >
@@ -369,7 +450,14 @@ export function SoundMixerScreen({
               accessibilityHint="Opens the Save Mix sheet."
               accessibilityLabel="Save Mix"
               accessibilityRole="button"
-              className="h-full shrink-0 items-center justify-center rounded-[14px] bg-[#7C6FCD] px-4 shadow-[0_0_15px_rgba(124,111,205,0.25)] active:scale-[0.96]"
+              accessibilityState={hasActiveSounds ? undefined : { disabled: true }}
+              className={cn(
+                "h-full shrink-0 items-center justify-center rounded-[14px] px-4 active:scale-[0.96]",
+                hasActiveSounds
+                  ? "bg-[#7C6FCD] shadow-[0_0_15px_rgba(124,111,205,0.25)]"
+                  : "bg-[#1C2040] opacity-60",
+              )}
+              disabled={hasActiveSounds ? undefined : true}
               onPress={() => {
                 setIsSaveMixSheetOpen(true);
               }}
@@ -385,10 +473,12 @@ export function SoundMixerScreen({
 
       {isSaveMixSheetOpen ? (
         <SaveMixSheet
-          activeSounds={activeSounds}
+          activeSounds={mixerState.activeSounds}
+          savedMixes={mixerState.savedMixes}
           onDismiss={() => {
             setIsSaveMixSheetOpen(false);
           }}
+          variant={isFullSaveMixSheet ? "full" : "default"}
         />
       ) : null}
     </View>
@@ -759,13 +849,94 @@ function getPlaybackLayerLabel(sound: SoundCard) {
   return sound.label;
 }
 
+function SavedMixesSection({ state }: { readonly state: MixerState }) {
+  if (state.isSavedMixesExpanded) {
+    return (
+      <View className="mt-1 px-nidoru-screen" testID="sound-mixer-saved-mixes-full-section">
+        <View className="mb-3 min-h-4 flex-row items-center justify-between px-1">
+          <Text className="font-nidoru-primary-semibold text-[11px] leading-4 tracking-[0.1em] text-[#4A4E6A]">
+            SAVED MIXES
+          </Text>
+          <Text className="font-nidoru-data-regular text-xs font-medium leading-4 text-[#A89CE0] tabular-nums">
+            3 of 3 saved
+          </Text>
+        </View>
+        <View
+          className="gap-2 rounded-[18px] border border-[#1E2236]/70 bg-[#14172B]/70 p-2.5"
+          testID="sound-mixer-saved-mixes-full-panel"
+        >
+          <View className="flex-row flex-wrap gap-2">
+            {state.savedMixes.map((mix) => (
+              <SavedMixManagementChip key={mix.id} mix={mix} />
+            ))}
+            <Pressable
+              accessibilityLabel="Saved mixes full"
+              accessibilityRole="button"
+              accessibilityState={{ disabled: true }}
+              className="h-10 shrink-0 flex-row items-center gap-1.5 rounded-[14px] border border-[#1E2236]/80 bg-[#0D0F1A] px-3.5 opacity-60"
+              disabled
+              testID="sound-mixer-saved-mixes-full-chip"
+            >
+              <Text className="font-nidoru-primary-semibold text-[13px] leading-[18px] tracking-wide text-[#6A7095]">
+                Full
+              </Text>
+            </Pressable>
+          </View>
+        </View>
+      </View>
+    );
+  }
+
+  if (state.showEmptySavedMixes) {
+    return (
+      <View className="mt-1 pl-nidoru-screen" testID="sound-mixer-saved-mixes-empty-section">
+        <Text className="ml-1 mb-3 font-nidoru-primary-semibold text-[11px] leading-4 tracking-[0.1em] text-[#4A4E6A]">
+          SAVED MIXES
+        </Text>
+        <View className="min-h-10 flex-row items-center gap-3 pr-nidoru-screen">
+          <NewMixChip />
+          <Text className="font-nidoru-primary-regular text-[13px] leading-[18px] tracking-wide text-[#6A7095]">
+            No saved mixes yet.
+          </Text>
+        </View>
+      </View>
+    );
+  }
+
+  return (
+    <View className="mt-1 pl-nidoru-screen">
+      <Text className="ml-1 mb-3 font-nidoru-primary-semibold text-[11px] leading-4 tracking-[0.1em] text-[#4A4E6A]">
+        SAVED MIXES
+      </Text>
+      <ScrollView
+        className="w-full"
+        contentContainerClassName="gap-2 pr-nidoru-screen pb-2"
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        testID="sound-mixer-saved-mixes-row"
+      >
+        {state.savedMixes.map((mix) => (
+          <SavedMixChip key={mix.id} mix={mix} />
+        ))}
+        <NewMixChip />
+      </ScrollView>
+    </View>
+  );
+}
+
 function SaveMixSheet({
   activeSounds,
+  savedMixes,
   onDismiss,
+  variant,
 }: {
   readonly activeSounds: readonly SoundCard[];
+  readonly savedMixes: readonly SavedMix[];
   readonly onDismiss: () => void;
+  readonly variant: "default" | "full";
 }) {
+  const isFull = variant === "full";
+
   return (
     <Modal
       animationType="none"
@@ -852,20 +1023,22 @@ function SaveMixSheet({
                 You can save up to 3 mixes.
               </Text>
               <Text className="font-nidoru-data-regular text-xs font-medium leading-4 text-[#A89CE0] tabular-nums">
-                2 of 3 saved
+                {isFull ? "3 of 3 saved" : "2 of 3 saved"}
               </Text>
             </View>
           </View>
 
+          {isFull ? <ReplacementMixSelector savedMixes={savedMixes} /> : null}
+
           <View className="gap-2">
             <Pressable
-              accessibilityLabel="Save Mix"
+              accessibilityLabel={isFull ? "Replace existing mix" : "Save Mix"}
               accessibilityRole="button"
               className="h-12 items-center justify-center rounded-[14px] bg-[#7C6FCD] shadow-[0_0_15px_rgba(124,111,205,0.25)] active:scale-[0.98]"
               testID="sound-mixer-save-mix-submit"
             >
               <Text className="font-nidoru-primary-semibold text-[15px] leading-5 tracking-wide text-white">
-                Save Mix
+                {isFull ? "Replace existing" : "Save Mix"}
               </Text>
             </Pressable>
             <Pressable
@@ -889,10 +1062,11 @@ function SaveMixSheet({
 
 function SaveMixLayerRow({ sound }: { readonly sound: SoundCard }) {
   const Icon = sound.Icon;
+  const volume = sound.volume ?? 0;
 
   return (
     <View
-      accessibilityLabel={`${sound.label} active layer at ${sound.volume}% volume`}
+      accessibilityLabel={`${sound.label} active layer at ${volume}% volume`}
       accessible
       className="min-h-8 flex-row items-center justify-between"
       testID={`sound-mixer-save-mix-layer-${sound.id}`}
@@ -906,8 +1080,47 @@ function SaveMixLayerRow({ sound }: { readonly sound: SoundCard }) {
         </Text>
       </View>
       <Text className="font-nidoru-data-regular text-sm font-medium leading-[18px] text-[#A89CE0] tabular-nums">
-        {`${sound.volume}%`}
+        {`${volume}%`}
       </Text>
+    </View>
+  );
+}
+
+function ReplacementMixSelector({ savedMixes }: { readonly savedMixes: readonly SavedMix[] }) {
+  return (
+    <View className="mb-5 gap-2" testID="sound-mixer-replace-mix-selector">
+      <View className="flex-row items-center justify-between px-1">
+        <Text className="font-nidoru-primary-semibold text-[13px] leading-[18px] tracking-wide text-[#EEF0FF]">
+          Replace saved mix
+        </Text>
+        <Text className="font-nidoru-primary-regular text-xs leading-4 tracking-wide text-[#6A7095]">
+          Capacity reached
+        </Text>
+      </View>
+      <View className="gap-2 rounded-[16px] border border-[#1E2236]/60 bg-[#0D0F1A] p-2">
+        {savedMixes.map((mix, index) => (
+          <Pressable
+            accessibilityLabel={`Replace ${mix.label} saved mix`}
+            accessibilityRole="button"
+            className={cn(
+              "min-h-10 flex-row items-center justify-between rounded-[12px] border px-3 py-2 active:scale-[0.98]",
+              index === 0
+                ? "border-[#7C6FCD]/50 bg-[#1C2040]"
+                : "border-transparent bg-transparent",
+            )}
+            key={mix.id}
+            testID={`sound-mixer-replace-mix-${mix.id}`}
+          >
+            <SavedMixIconStack icons={mix.icons} size="sm" />
+            <Text className="ml-2 flex-1 font-nidoru-primary-regular text-[13px] leading-[18px] tracking-wide text-[#EEF0FF]">
+              {mix.label}
+            </Text>
+            <Text className="font-nidoru-data-regular text-xs leading-4 text-[#A89CE0] tabular-nums">
+              {mix.timerLabel}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
     </View>
   );
 }
@@ -920,16 +1133,7 @@ function SavedMixChip({ mix }: { readonly mix: SavedMix }) {
       className="h-10 shrink-0 flex-row items-center gap-2 rounded-[14px] border border-[#1E2236]/60 bg-[#14172B] px-3.5 active:scale-[0.96]"
       testID={`sound-mixer-saved-mix-${mix.id}`}
     >
-      <View className="flex-row -space-x-1 opacity-80">
-        {mix.icons.map((Icon, index) => (
-          <View
-            className="h-5 w-5 items-center justify-center rounded-full border border-[#1E2236] bg-[#1C2040]"
-            key={`${mix.id}-${index}`}
-          >
-            <Icon color={colors.activeSoft} size={10} strokeWidth={1.5} />
-          </View>
-        ))}
-      </View>
+      <SavedMixIconStack icons={mix.icons} size="sm" />
       <Text className="font-nidoru-primary-regular text-[13px] leading-[18px] tracking-wide text-[#EEF0FF]">
         {mix.label}
       </Text>
@@ -937,12 +1141,83 @@ function SavedMixChip({ mix }: { readonly mix: SavedMix }) {
   );
 }
 
-function SoundCardButton({ sound }: { readonly sound: SoundCard }) {
+function SavedMixManagementChip({ mix }: { readonly mix: SavedMix }) {
+  return (
+    <Pressable
+      accessibilityLabel={`${mix.label} saved mix, ${mix.timerLabel}`}
+      accessibilityRole="button"
+      className="h-10 shrink-0 flex-row items-center gap-2 rounded-[14px] border border-[#1E2236]/60 bg-[#0D0F1A] pl-3 pr-2 active:scale-[0.96]"
+      testID={`sound-mixer-saved-mix-full-${mix.id}`}
+    >
+      <SavedMixIconStack icons={mix.icons} size="sm" />
+      <Text className="font-nidoru-primary-regular text-[13px] leading-[18px] tracking-wide text-[#EEF0FF]">
+        {mix.label}
+      </Text>
+      <Text className="font-nidoru-data-regular text-xs leading-4 text-[#A89CE0] tabular-nums">
+        {mix.timerLabel}
+      </Text>
+      <MoreHorizontal color={colors.muted} size={14} strokeWidth={1.5} />
+    </Pressable>
+  );
+}
+
+function NewMixChip() {
+  return (
+    <Pressable
+      accessibilityLabel="Create new saved mix"
+      accessibilityRole="button"
+      className="h-10 shrink-0 flex-row items-center gap-1.5 rounded-[14px] border border-dashed border-[#1E2236] px-3.5 active:scale-[0.96]"
+      testID="sound-mixer-new-mix-chip"
+    >
+      <PlusCircle color={colors.inactive} size={16} strokeWidth={1.5} />
+      <Text className="font-nidoru-primary-regular text-[13px] leading-[18px] tracking-wide text-[#A1A7C4]">
+        New mix
+      </Text>
+    </Pressable>
+  );
+}
+
+function SavedMixIconStack({
+  icons,
+  size,
+}: {
+  readonly icons: readonly MixerIcon[];
+  readonly size: "sm";
+}) {
+  const iconFrameClassName = size === "sm" ? "h-5 w-5" : "h-6 w-6";
+  const iconSize = size === "sm" ? 10 : 12;
+
+  return (
+    <View className="flex-row -space-x-1 opacity-80">
+      {icons.map((Icon, index) => (
+        <View
+          className={cn(
+            "items-center justify-center rounded-full border border-[#1E2236] bg-[#1C2040]",
+            iconFrameClassName,
+          )}
+          key={index}
+        >
+          <Icon color={colors.activeSoft} size={iconSize} strokeWidth={1.5} />
+        </View>
+      ))}
+    </View>
+  );
+}
+
+function SoundCardButton({
+  isEditing,
+  sound,
+}: {
+  readonly isEditing: boolean;
+  readonly sound: SoundCard;
+}) {
   const isActive = sound.volume !== undefined;
   const Icon = sound.Icon;
-  const accessibilityLabel = isActive
-    ? `${sound.label} active sound at ${sound.volume}% volume`
-    : `${sound.label} sound`;
+  const accessibilityLabel = isEditing
+    ? `${sound.label} active sound being edited at ${sound.volume}% volume`
+    : isActive
+      ? `${sound.label} active sound at ${sound.volume}% volume`
+      : `${sound.label} sound`;
 
   return (
     <Pressable
@@ -951,9 +1226,11 @@ function SoundCardButton({ sound }: { readonly sound: SoundCard }) {
       accessibilityState={{ selected: isActive }}
       className={cn(
         "h-[128px] grow basis-[47.2%] items-center justify-center rounded-[20px] border p-3.5 active:scale-[0.98]",
-        isActive
-          ? "overflow-hidden border-[#7C6FCD]/40 bg-[#1C2040] shadow-[0_0_25px_rgba(124,111,205,0.15)]"
-          : "border-[#1E2236]/60 bg-[#14172B]",
+        isEditing
+          ? "overflow-hidden border-[#A89CE0]/70 bg-[#1C2040] shadow-[0_0_35px_rgba(124,111,205,0.28)]"
+          : isActive
+            ? "overflow-hidden border-[#7C6FCD]/40 bg-[#1C2040] shadow-[0_0_25px_rgba(124,111,205,0.15)]"
+            : "border-[#1E2236]/60 bg-[#14172B]",
       )}
       testID={`sound-mixer-sound-${sound.id}`}
     >
@@ -974,7 +1251,14 @@ function SoundCardButton({ sound }: { readonly sound: SoundCard }) {
             strokeColor={colors.active}
             strokeWidth={2.5}
             trackColor={colors.active}
-            trackOpacity={0.2}
+            trackOpacity={isEditing ? 0.28 : 0.2}
+            {...(isEditing
+              ? {
+                  showDetents: true,
+                  showKnob: true,
+                  testIDPrefix: `sound-mixer-volume-ring-${sound.id}`,
+                }
+              : {})}
           />
         ) : (
           <ProgressRing
@@ -1036,9 +1320,12 @@ function ActiveMiniIcon({ sound }: { readonly sound: SoundCard }) {
 function ProgressRing({
   progress,
   progressOpacity = 1,
+  showDetents = false,
+  showKnob = false,
   size,
   strokeColor,
   strokeWidth,
+  testIDPrefix,
   trackColor,
   trackOpacity = 1,
 }: {
@@ -1048,17 +1335,43 @@ function ProgressRing({
   readonly strokeWidth: number;
   readonly trackColor: string;
   readonly progressOpacity?: number;
+  readonly showDetents?: boolean;
+  readonly showKnob?: boolean;
+  readonly testIDPrefix?: string;
   readonly trackOpacity?: number;
 }) {
   const radius = size / 2 - strokeWidth * 2;
+  const center = size / 2;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference * (1 - progress);
+  const knobAngle = progress * Math.PI * 2 - Math.PI / 2;
+  const knobX = center + radius * Math.cos(knobAngle);
+  const knobY = center + radius * Math.sin(knobAngle);
 
   return (
     <Svg height={size} viewBox={`0 0 ${size} ${size}`} width={size}>
+      {showDetents
+        ? Array.from({ length: 10 }, (_, index) => {
+            const angle = (index / 10) * Math.PI * 2 - Math.PI / 2;
+            const tickRadius = radius + 4;
+            const testProps = testIDPrefix ? { testID: `${testIDPrefix}-detent-${index}` } : {};
+
+            return (
+              <Circle
+                cx={center + tickRadius * Math.cos(angle)}
+                cy={center + tickRadius * Math.sin(angle)}
+                fill={strokeColor}
+                key={index}
+                opacity={0.22}
+                r={1}
+                {...testProps}
+              />
+            );
+          })
+        : null}
       <Circle
-        cx={size / 2}
-        cy={size / 2}
+        cx={center}
+        cy={center}
         fill="none"
         opacity={trackOpacity}
         r={radius}
@@ -1067,19 +1380,31 @@ function ProgressRing({
       />
       {progress > 0 ? (
         <Circle
-          cx={size / 2}
-          cy={size / 2}
+          cx={center}
+          cy={center}
           fill="none"
           r={radius}
           opacity={progressOpacity}
           rotation="-90"
-          originX={size / 2}
-          originY={size / 2}
+          originX={center}
+          originY={center}
           stroke={strokeColor}
           strokeDasharray={`${circumference}`}
           strokeDashoffset={strokeDashoffset}
           strokeLinecap="round"
           strokeWidth={strokeWidth}
+        />
+      ) : null}
+      {showKnob && progress > 0 ? (
+        <Circle
+          cx={knobX}
+          cy={knobY}
+          fill={strokeColor}
+          r={3.2}
+          stroke={colors.text}
+          strokeOpacity={0.85}
+          strokeWidth={1}
+          {...(testIDPrefix ? { testID: `${testIDPrefix}-knob` } : {})}
         />
       ) : null}
     </Svg>

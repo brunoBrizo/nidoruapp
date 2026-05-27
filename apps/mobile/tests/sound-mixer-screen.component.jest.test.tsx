@@ -131,6 +131,105 @@ describe("SoundMixerAnchorScreen", () => {
     expect(screen.getByRole("button", { name: "∞ minute timer" })).toBeTruthy();
   });
 
+  it("renders the circular volume editing variant with visible detents and live volume", () => {
+    render(<SoundMixerScreen uiVariant="volume-editing" />);
+
+    expect(
+      screen.getByRole("button", {
+        name: "Light Rain active sound being edited at 84% volume",
+      }),
+    ).toBeTruthy();
+    expect(screen.getByText("84%")).toBeTruthy();
+    expect(screen.getByText("58%")).toBeTruthy();
+    expect(screen.getByText("34%")).toBeTruthy();
+    expect(screen.getByText("3 active layers")).toBeTruthy();
+    expect(screen.getByTestId("sound-mixer-volume-ring-light-rain-knob")).toBeTruthy();
+
+    for (const index of [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]) {
+      expect(screen.getByTestId(`sound-mixer-volume-ring-light-rain-detent-${index}`)).toBeTruthy();
+    }
+
+    expect(screen.getByTestId("sound-mixer-sound-light-rain").props.className).toEqual(
+      expect.stringContaining("border-[#A89CE0]/70"),
+    );
+  });
+
+  it("renders the empty mixer state without active layers or save affordance", () => {
+    render(<SoundMixerScreen uiVariant="empty-mixer" />);
+
+    expect(screen.getByText("Starts when a sound plays.")).toBeTruthy();
+    expect(screen.getByText("Choose up to 3 layers")).toBeTruthy();
+    expect(screen.queryByText("72%")).toBeNull();
+    expect(screen.queryByTestId("sound-mixer-active-layer-light-rain")).toBeNull();
+    expect(screen.queryByTestId("sound-mixer-active-layer-brown-noise")).toBeNull();
+    expect(screen.queryByTestId("sound-mixer-active-layer-fireplace-crackling")).toBeNull();
+
+    expect(screen.getByRole("button", { name: "Show dark playback mode" })).toHaveProp(
+      "accessibilityState",
+      { disabled: true },
+    );
+    expect(screen.getByRole("button", { name: "Save Mix" })).toHaveProp("accessibilityState", {
+      disabled: true,
+    });
+    expect(screen.getByRole("button", { name: "30 minute timer, selected" })).toHaveProp(
+      "accessibilityState",
+      { disabled: true, selected: true },
+    );
+  });
+
+  it("renders the empty saved mixes variant while preserving a valid active mix", () => {
+    render(<SoundMixerScreen uiVariant="empty-saved-mixes" />);
+
+    expect(screen.getByTestId("sound-mixer-saved-mixes-empty-section")).toBeTruthy();
+    expect(screen.getByText("No saved mixes yet.")).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Rain Hearth saved mix" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Forest Fan saved mix" })).toBeNull();
+    expect(screen.getByRole("button", { name: "Create new saved mix" })).toBeTruthy();
+    expect(screen.getByText("2 active layers")).toBeTruthy();
+    expect(
+      screen.getByRole("button", { name: "Light Rain active sound at 72% volume" }),
+    ).toBeTruthy();
+    expect(
+      screen.getByRole("button", { name: "Brown Noise active sound at 58% volume" }),
+    ).toBeTruthy();
+    expect(
+      screen.queryByRole("button", {
+        name: "Fireplace Crackling active sound at 34% volume",
+      }),
+    ).toBeNull();
+  });
+
+  it("renders the full saved mixes management variant at capacity", () => {
+    render(<SoundMixerScreen uiVariant="full-saved-mixes" />);
+
+    expect(screen.getByTestId("sound-mixer-saved-mixes-full-panel")).toBeTruthy();
+    expect(screen.getByText("3 of 3 saved")).toBeTruthy();
+    expect(screen.getByTestId("sound-mixer-saved-mix-full-rain-hearth")).toBeTruthy();
+    expect(screen.getByTestId("sound-mixer-saved-mix-full-forest-fan")).toBeTruthy();
+    expect(screen.getByTestId("sound-mixer-saved-mix-full-ocean-noise")).toBeTruthy();
+    expect(screen.getByText("Ocean Noise")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Saved mixes full" })).toHaveProp(
+      "accessibilityState",
+      { disabled: true },
+    );
+    expect(screen.getByText("Full")).toBeTruthy();
+  });
+
+  it("renders the full-capacity Save Mix sheet with replacement action", () => {
+    render(<SoundMixerScreen uiVariant="full-save-mix-sheet" />);
+
+    expect(screen.getByRole("header", { name: "Save mix" })).toBeTruthy();
+    expect(screen.getByText("You can save up to 3 mixes.")).toBeTruthy();
+    expect(screen.getByText("3 of 3 saved")).toBeTruthy();
+    expect(screen.getByText("Replace saved mix")).toBeTruthy();
+    expect(screen.getByText("Capacity reached")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Replace existing mix" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Replace Rain Hearth saved mix" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Replace Forest Fan saved mix" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Replace Ocean Noise saved mix" })).toBeTruthy();
+    expect(screen.getByTestId("sound-mixer-replace-mix-selector")).toBeTruthy();
+  });
+
   it("matches the handoff layout classes for the main screen and active strip", () => {
     render(<SoundMixerAnchorScreen />);
 

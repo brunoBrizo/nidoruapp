@@ -1,11 +1,11 @@
 # Graph Report - sleep-app  (2026-05-27)
 
 ## Corpus Check
-- 163 files · ~476,367 words
+- 163 files · ~477,650 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 519 nodes · 557 edges · 20 communities detected
+- 522 nodes · 560 edges · 20 communities detected
 - Extraction: 87% EXTRACTED · 13% INFERRED · 0% AMBIGUOUS · INFERRED: 75 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
@@ -28,8 +28,8 @@
 - [[_COMMUNITY_Community 19|Community 19]]
 - [[_COMMUNITY_Community 20|Community 20]]
 - [[_COMMUNITY_Community 23|Community 23]]
-- [[_COMMUNITY_Community 27|Community 27]]
-- [[_COMMUNITY_Community 35|Community 35]]
+- [[_COMMUNITY_Community 28|Community 28]]
+- [[_COMMUNITY_Community 36|Community 36]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `getBreathSessionSnapshot()` - 14 edges
@@ -129,11 +129,11 @@ Nodes (2): OnboardingContinueButton(), padTimeNumber()
 Cohesion: 0.67
 Nodes (2): answerThroughBreathworkQuestion(), continueToNextQuestion()
 
-### Community 27 - "Community 27"
+### Community 28 - "Community 28"
 Cohesion: 1.0
 Nodes (2): getLocaleMessages(), normalizeLocale()
 
-### Community 35 - "Community 35"
+### Community 36 - "Community 36"
 Cohesion: 1.0
 Nodes (2): OnboardingRouteScreen(), parseOnboardingStage()
 
@@ -142,9 +142,9 @@ Nodes (2): OnboardingRouteScreen(), parseOnboardingStage()
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 23`** (4 nodes): `onboarding-personalization-flow.component.jest.test.tsx`, `answerThroughBreathworkQuestion()`, `continueToNextQuestion()`, `expectClassNameContains()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 27`** (3 nodes): `getLocaleMessages()`, `normalizeLocale()`, `index.ts`
+- **Thin community `Community 28`** (3 nodes): `getLocaleMessages()`, `normalizeLocale()`, `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 35`** (3 nodes): `onboarding.tsx`, `OnboardingRouteScreen()`, `parseOnboardingStage()`
+- **Thin community `Community 36`** (3 nodes): `onboarding.tsx`, `OnboardingRouteScreen()`, `parseOnboardingStage()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 
 ## Suggested Questions
@@ -155,7 +155,7 @@ _Questions this graph is uniquely positioned to answer:_
 - **Why does `loadRouteState()` connect `Community 3` to `Community 0`, `Community 10`, `Community 5`?**
   _High betweenness centrality (0.040) - this node is a cross-community bridge._
 - **Why does `evaluateGate()` connect `Community 0` to `Community 5`?**
-  _High betweenness centrality (0.030) - this node is a cross-community bridge._
+  _High betweenness centrality (0.029) - this node is a cross-community bridge._
 - **Are the 7 inferred relationships involving `getBreathSessionSnapshot()` (e.g. with `pauseSession()` and `resumeSession()`) actually correct?**
   _`getBreathSessionSnapshot()` has 7 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 2 inferred relationships involving `createPostValueSupabaseClient()` (e.g. with `loadRouteState()` and `createClient()`) actually correct?**

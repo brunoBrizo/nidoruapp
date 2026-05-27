@@ -17,7 +17,8 @@ export type BreathSessionSource =
   | "breathe_tab"
   | "first_session"
   | "morning_check_in"
-  | "rescue_me";
+  | "rescue_me"
+  | "wind_down";
 
 export type BreathSessionControllerInput = {
   readonly localInstallId: string;

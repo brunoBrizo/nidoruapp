@@ -2,13 +2,32 @@ import {
   getNoHoldFallbackTechniqueId,
   parseWindDownContextGoalInput,
   resolveWindDownRoutine,
+  type BreathAudioCueModeId,
   type WindDownContextGoal,
   type WindDownRoutine,
 } from "@nidoru/domain";
+import * as Haptics from "expo-haptics";
 import { useLocalSearchParams } from "expo-router";
 import type { SQLiteDatabase } from "expo-sqlite";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { AppState } from "react-native";
 
+import {
+  createActiveSessionAudioController,
+  type ActiveSessionAudioController,
+} from "../audio/active-session-audio-controller";
+import {
+  completeBreathSessionLocally,
+  recordBreathSessionStartedLocally,
+  saveBreathSessionDraftLocally,
+} from "../session/breath-session-local-persistence";
+import {
+  completeBreathSessionIfDue,
+  createBreathSessionController,
+  getBreathSessionSnapshot,
+  type BreathSessionController,
+  type BreathSessionSnapshot,
+} from "../session/breath-session-runtime";
 import { getOrCreateLocalInstallIdentity } from "../storage/local-install-identity";
 import { openMigratedLocalDatabase } from "../storage/local-database";
 import {
@@ -47,9 +66,25 @@ type WindDownBootstrap = {
 type WindDownRouteSession = WindDownBootstrap & {
   readonly activeRoutine: WindDownActiveRoutineView;
   readonly ambientTimerDurationSeconds: number;
+  readonly audioCueModeId: BreathAudioCueModeId;
+  readonly breathSessionController: WindDownBreathSessionController;
+  readonly breathSessionId: string;
   readonly routine: WindDownRoutine;
   readonly runId: string;
 };
+
+type WindDownBreathSessionController = BreathSessionController<{
+  readonly localInstallId: string;
+  readonly sessionId: string;
+  readonly source: "wind_down";
+  readonly startedAtMs: number;
+  readonly techniqueId: WindDownRoutine["breathwork"]["techniqueId"];
+  readonly totalDurationSeconds: number;
+}>;
+
+const windDownAudioCueModeId = "nature-ambient" as const satisfies BreathAudioCueModeId;
+const breathworkTickIntervalMs = 1000;
+const breathworkDraftPersistIntervalMs = 15000;
 
 export function WindDownRoute() {
   const params = useLocalSearchParams();
@@ -65,6 +100,23 @@ export function WindDownRoute() {
 
 function WindDownLiveRoute() {
   const [routeState, setRouteState] = useState<WindDownRouteState>({ status: "preparing" });
+  const [liveActiveRoutine, setLiveActiveRoutine] = useState<WindDownActiveRoutineView>();
+  const audioControllerRef = useRef<ActiveSessionAudioController | undefined>(undefined);
+  const completionPersistingRunIdsRef = useRef(new Set<string>());
+  const currentAppStateRef = useRef(AppState.currentState);
+  const lastDraftPersistedAtMsRef = useRef<number | undefined>(undefined);
+  const previousPhaseNameRef = useRef<BreathSessionSnapshot["phaseName"] | undefined>(undefined);
+
+  if (!audioControllerRef.current) {
+    audioControllerRef.current = createActiveSessionAudioController();
+  }
+
+  useEffect(
+    () => () => {
+      audioControllerRef.current?.release();
+    },
+    [],
+  );
 
   const moveSession = useCallback(
     (
@@ -85,6 +137,27 @@ function WindDownLiveRoute() {
     [],
   );
 
+  const persistBreathworkDraft = useCallback(
+    (session: WindDownRouteSession, snapshot: BreathSessionSnapshot) =>
+      saveBreathSessionDraftLocally(session.database, {
+        audioCueModeId: session.audioCueModeId,
+        completedBreathCycles: snapshot.completedBreathCycles,
+        currentPhaseName: snapshot.phaseName,
+        durationSeconds: session.breathSessionController.totalDurationSeconds,
+        elapsedDurationMs: snapshot.elapsedDurationMs,
+        localInstallId: session.localInstallId,
+        remainingDurationMs: snapshot.remainingDurationMs,
+        sessionId: session.breathSessionId,
+        source: "wind_down",
+        startedAt: new Date(session.breathSessionController.startedAtMs).toISOString(),
+        status: "draft",
+        techniqueId: session.breathSessionController.techniqueId,
+        updatedAt: new Date(snapshot.observedAtMs).toISOString(),
+        windDownRunId: session.runId,
+      }),
+    [],
+  );
+
   const saveSessionProgress = useCallback(
     async (
       session: WindDownRouteSession,
@@ -98,6 +171,7 @@ function WindDownLiveRoute() {
         readonly ambientStartedAt: string;
         readonly bodyCueCompletedAt: string;
         readonly bodyCueStartedAt: string;
+        readonly breathSessionId: string;
         readonly breathworkCompletedAt: string;
         readonly breathworkStartedAt: string;
       }>,
@@ -112,25 +186,89 @@ function WindDownLiveRoute() {
     [],
   );
 
+  const completeBreathworkAndMoveToTransition = useCallback(
+    async (session: WindDownRouteSession, observedAtMs = Date.now()) => {
+      if (completionPersistingRunIdsRef.current.has(session.runId)) {
+        return;
+      }
+
+      const snapshot = getBreathSessionSnapshot(session.breathSessionController, observedAtMs);
+      const completedRecord = completeBreathSessionIfDue(
+        session.breathSessionController,
+        observedAtMs,
+      );
+
+      if (!completedRecord) {
+        await persistBreathworkDraft(session, snapshot);
+        return;
+      }
+
+      completionPersistingRunIdsRef.current.add(session.runId);
+
+      try {
+        await completeBreathSessionLocally(session.database, {
+          audioCueModeId: session.audioCueModeId,
+          completedAt: completedRecord.completedAt,
+          completedBreathCycles: completedRecord.completedBreathCycles,
+          completionPersistedAt: completedRecord.completionPersistedAt,
+          currentPhaseName: snapshot.phaseName,
+          durationSeconds: completedRecord.durationSeconds,
+          elapsedDurationMs: snapshot.elapsedDurationMs,
+          localInstallId: completedRecord.localInstallId,
+          remainingDurationMs: 0,
+          sessionId: completedRecord.sessionId,
+          source: "wind_down",
+          startedAt: completedRecord.startedAt,
+          status: "completed",
+          techniqueId: completedRecord.techniqueId,
+          updatedAt: completedRecord.completionPersistedAt,
+          windDownRunId: session.runId,
+        });
+        await saveSessionProgress(session, {
+          breathSessionId: session.breathSessionId,
+          breathworkCompletedAt: completedRecord.completedAt,
+          recoveryState: "transition_card",
+          status: "breath_completed",
+        });
+        moveSession(session, "transition_card");
+      } finally {
+        completionPersistingRunIdsRef.current.delete(session.runId);
+      }
+    },
+    [moveSession, persistBreathworkDraft, saveSessionProgress],
+  );
+
   const switchSessionToNoHoldFallback = useCallback((session: WindDownRouteSession) => {
+    const fallbackRoutine = resolveWindDownRoutine({
+      preferNoHoldBreathwork: true,
+      selectedGoal: session.routine.contextGoal,
+    }).routine;
+    const activeRoutine = createActiveRoutineView(fallbackRoutine, {
+      isNoHoldFallback:
+        fallbackRoutine.breathwork.techniqueId !== session.routine.breathwork.techniqueId,
+    });
+    const breathSessionController = createWindDownBreathSessionController({
+      durationSeconds: fallbackRoutine.breathwork.durationSeconds,
+      localInstallId: session.localInstallId,
+      sessionId: session.breathSessionId,
+      startedAtMs: Date.now(),
+      techniqueId: fallbackRoutine.breathwork.techniqueId,
+    });
+
+    setLiveActiveRoutine(activeRoutine);
+    lastDraftPersistedAtMsRef.current = undefined;
+
     setRouteState((currentState) => {
       if (currentState.status !== "session" || currentState.session.runId !== session.runId) {
         return currentState;
       }
 
-      const fallbackRoutine = resolveWindDownRoutine({
-        preferNoHoldBreathwork: true,
-        selectedGoal: session.routine.contextGoal,
-      }).routine;
-      const activeRoutine = createActiveRoutineView(fallbackRoutine, {
-        isNoHoldFallback:
-          fallbackRoutine.breathwork.techniqueId !== session.routine.breathwork.techniqueId,
-      });
-
       return {
         session: {
           ...currentState.session,
           activeRoutine,
+          breathSessionController,
+          routine: fallbackRoutine,
         },
         status: "session",
         visualState: activeRoutine.uiState,
@@ -149,8 +287,18 @@ function WindDownLiveRoute() {
       readonly rememberChoice: boolean;
     }) => {
       const selectedAt = new Date().toISOString();
+      const selectedAtMs = Date.parse(selectedAt);
       const resolution = resolveWindDownRoutine({ selectedGoal: goal });
       const runId = createWindDownRunId();
+      const breathSessionId = createBreathSessionId();
+      const breathSessionController = createWindDownBreathSessionController({
+        durationSeconds: resolution.routine.breathwork.durationSeconds,
+        localInstallId: bootstrap.localInstallId,
+        sessionId: breathSessionId,
+        startedAtMs: selectedAtMs,
+        techniqueId: resolution.routine.breathwork.techniqueId,
+      });
+      const snapshot = getBreathSessionSnapshot(breathSessionController, selectedAtMs);
 
       if (rememberChoice) {
         await saveRememberedWindDownContextChoiceLocally(bootstrap.database, {
@@ -163,6 +311,7 @@ function WindDownLiveRoute() {
 
       await recordWindDownStartedLocally(bootstrap.database, {
         ambientSoundId: resolution.routine.ambient.soundId,
+        breathSessionId,
         contextGoal: resolution.routine.contextGoal,
         localInstallId: bootstrap.localInstallId,
         routineId: resolution.routine.id,
@@ -170,13 +319,31 @@ function WindDownLiveRoute() {
         startedAt: selectedAt,
       });
 
-      const activeRoutine = createActiveRoutineView(resolution.routine);
+      await recordBreathSessionStartedLocally(bootstrap.database, {
+        audioCueModeId: windDownAudioCueModeId,
+        currentPhaseName: snapshot.phaseName,
+        durationSeconds: resolution.routine.breathwork.durationSeconds,
+        localInstallId: bootstrap.localInstallId,
+        sessionId: breathSessionId,
+        source: "wind_down",
+        startedAt: selectedAt,
+        status: "started",
+        techniqueId: resolution.routine.breathwork.techniqueId,
+        windDownRunId: runId,
+      });
+
+      const activeRoutine = createActiveRoutineView(resolution.routine, {}, snapshot);
+      setLiveActiveRoutine(activeRoutine);
+      lastDraftPersistedAtMsRef.current = selectedAtMs;
 
       setRouteState({
         session: {
           ...bootstrap,
           activeRoutine,
           ambientTimerDurationSeconds: resolution.routine.ambient.timerDurationSeconds,
+          audioCueModeId: windDownAudioCueModeId,
+          breathSessionController,
+          breathSessionId,
           routine: resolution.routine,
           runId,
         },
@@ -216,9 +383,20 @@ function WindDownLiveRoute() {
         });
         const runId = createWindDownRunId();
         const startedAt = new Date().toISOString();
+        const startedAtMs = Date.parse(startedAt);
+        const breathSessionId = createBreathSessionId();
+        const breathSessionController = createWindDownBreathSessionController({
+          durationSeconds: rememberedResolution.routine.breathwork.durationSeconds,
+          localInstallId,
+          sessionId: breathSessionId,
+          startedAtMs,
+          techniqueId: rememberedResolution.routine.breathwork.techniqueId,
+        });
+        const snapshot = getBreathSessionSnapshot(breathSessionController, startedAtMs);
 
         await recordWindDownStartedLocally(localDatabase, {
           ambientSoundId: rememberedResolution.routine.ambient.soundId,
+          breathSessionId,
           contextGoal: rememberedResolution.routine.contextGoal,
           localInstallId,
           routineId: rememberedResolution.routine.id,
@@ -226,14 +404,32 @@ function WindDownLiveRoute() {
           startedAt,
         });
 
+        await recordBreathSessionStartedLocally(localDatabase, {
+          audioCueModeId: windDownAudioCueModeId,
+          currentPhaseName: snapshot.phaseName,
+          durationSeconds: rememberedResolution.routine.breathwork.durationSeconds,
+          localInstallId,
+          sessionId: breathSessionId,
+          source: "wind_down",
+          startedAt,
+          status: "started",
+          techniqueId: rememberedResolution.routine.breathwork.techniqueId,
+          windDownRunId: runId,
+        });
+
         if (isMounted) {
-          const activeRoutine = createActiveRoutineView(rememberedResolution.routine);
+          const activeRoutine = createActiveRoutineView(rememberedResolution.routine, {}, snapshot);
+          setLiveActiveRoutine(activeRoutine);
+          lastDraftPersistedAtMsRef.current = startedAtMs;
 
           setRouteState({
             session: {
               activeRoutine,
               ambientTimerDurationSeconds:
                 rememberedResolution.routine.ambient.timerDurationSeconds,
+              audioCueModeId: windDownAudioCueModeId,
+              breathSessionController,
+              breathSessionId,
               database: localDatabase,
               localInstallId,
               routine: rememberedResolution.routine,
@@ -254,6 +450,142 @@ function WindDownLiveRoute() {
       isMounted = false;
     };
   }, []);
+
+  const activeBreathworkRoute =
+    routeState.status === "session" && isActiveBreathworkState(routeState.visualState)
+      ? {
+          key: [
+            routeState.session.runId,
+            routeState.visualState,
+            routeState.session.breathSessionController.techniqueId,
+            routeState.session.breathSessionController.startedAtMs,
+          ].join(":"),
+          session: routeState.session,
+          visualState: routeState.visualState,
+        }
+      : null;
+
+  useEffect(() => {
+    if (!activeBreathworkRoute) {
+      return undefined;
+    }
+
+    const { session, visualState } = activeBreathworkRoute;
+
+    audioControllerRef.current?.setMode(session.audioCueModeId);
+    previousPhaseNameRef.current = undefined;
+
+    const refreshBreathwork = () => {
+      const snapshot = getBreathSessionSnapshot(session.breathSessionController, Date.now());
+
+      setLiveActiveRoutine(
+        createActiveRoutineView(
+          session.routine,
+          { isNoHoldFallback: session.activeRoutine.isNoHoldFallback },
+          snapshot,
+        ),
+      );
+
+      void audioControllerRef.current?.handleSnapshot(snapshot).catch(() => undefined);
+
+      if (snapshot.status !== "active") {
+        return;
+      }
+
+      const previousPhaseName = previousPhaseNameRef.current;
+      previousPhaseNameRef.current = snapshot.phaseName;
+
+      if (previousPhaseName && previousPhaseName !== snapshot.phaseName) {
+        const feedbackStyle =
+          snapshot.phaseName === "exhale"
+            ? Haptics.ImpactFeedbackStyle.Soft
+            : snapshot.phaseName === "inhale"
+              ? Haptics.ImpactFeedbackStyle.Light
+              : null;
+
+        if (feedbackStyle && currentAppStateRef.current === "active") {
+          void Haptics.impactAsync(feedbackStyle).catch(() => undefined);
+        }
+      }
+
+      const lastDraftPersistedAtMs = lastDraftPersistedAtMsRef.current;
+      const shouldPersistDraft =
+        lastDraftPersistedAtMs === undefined ||
+        snapshot.observedAtMs - lastDraftPersistedAtMs >= breathworkDraftPersistIntervalMs;
+
+      if (!shouldPersistDraft) {
+        return;
+      }
+
+      lastDraftPersistedAtMsRef.current = snapshot.observedAtMs;
+
+      void Promise.all([
+        persistBreathworkDraft(session, snapshot),
+        saveSessionProgress(session, {
+          breathSessionId: session.breathSessionId,
+          recoveryState: visualState,
+          status: "started",
+        }),
+      ]).catch(() => undefined);
+    };
+
+    refreshBreathwork();
+
+    const tick = setInterval(refreshBreathwork, breathworkTickIntervalMs);
+
+    return () => clearInterval(tick);
+  }, [activeBreathworkRoute?.key, persistBreathworkDraft, saveSessionProgress]);
+
+  useEffect(() => {
+    if (!activeBreathworkRoute) {
+      return undefined;
+    }
+
+    const { session } = activeBreathworkRoute;
+    const snapshot = getBreathSessionSnapshot(session.breathSessionController, Date.now());
+    const timeout = setTimeout(() => {
+      void completeBreathworkAndMoveToTransition(session);
+    }, snapshot.remainingDurationMs);
+
+    return () => clearTimeout(timeout);
+  }, [activeBreathworkRoute?.key, completeBreathworkAndMoveToTransition]);
+
+  useEffect(() => {
+    if (!activeBreathworkRoute) {
+      return undefined;
+    }
+
+    const { session, visualState } = activeBreathworkRoute;
+    const subscription = AppState.addEventListener("change", (nextState) => {
+      currentAppStateRef.current = nextState;
+      const snapshot = getBreathSessionSnapshot(session.breathSessionController, Date.now());
+
+      if (snapshot.status === "completed") {
+        void completeBreathworkAndMoveToTransition(session, snapshot.observedAtMs);
+        return;
+      }
+
+      if (nextState === "active") {
+        void audioControllerRef.current?.handleAppWake(snapshot).catch(() => undefined);
+      }
+
+      void Promise.all([
+        persistBreathworkDraft(session, snapshot),
+        saveSessionProgress(session, {
+          breathSessionId: session.breathSessionId,
+          recoveryState: visualState,
+          status: "started",
+        }),
+      ]).catch(() => undefined);
+    });
+
+    return () => subscription.remove();
+  }, [
+    activeBreathworkRoute?.key,
+    completeBreathworkAndMoveToTransition,
+    persistBreathworkDraft,
+    saveSessionProgress,
+  ]);
 
   useEffect(() => {
     if (routeState.status !== "session") {
@@ -284,15 +616,7 @@ function WindDownLiveRoute() {
       visualState === "daily_calm" ||
       visualState === "no_hold_fallback"
     ) {
-      return scheduleTransition(
-        session.activeRoutine.remainingSeconds * 1000,
-        "transition_card",
-        () => ({
-          breathworkCompletedAt: new Date().toISOString(),
-          recoveryState: "transition_card",
-          status: "breath_completed",
-        }),
-      );
+      return undefined;
     }
 
     if (visualState === "transition_card") {
@@ -343,7 +667,7 @@ function WindDownLiveRoute() {
 
     return (
       <WindDownScreen
-        activeRoutine={session.activeRoutine}
+        activeRoutine={liveActiveRoutine ?? session.activeRoutine}
         onClose={() => {
           moveSession(session, "completion");
         }}
@@ -403,6 +727,7 @@ function WindDownLiveRoute() {
         }}
         onUseNoHoldFallback={() => {
           void saveSessionProgress(session, {
+            breathSessionId: session.breathSessionId,
             recoveryState: "no_hold_fallback",
             status: "started",
           }).finally(() => switchSessionToNoHoldFallback(session));
@@ -470,6 +795,7 @@ function createWindDownLocalPersistenceDatabase(
 function createActiveRoutineView(
   routine: WindDownRoutine,
   options: { readonly isNoHoldFallback?: boolean } = {},
+  snapshot?: BreathSessionSnapshot,
 ): WindDownActiveRoutineView {
   return {
     breathworkDurationSeconds: routine.breathwork.durationSeconds,
@@ -478,14 +804,56 @@ function createActiveRoutineView(
       title: routine.bodyCue.title,
       subtitle: routine.bodyCue.subtitle,
     },
-    phaseLabel: "Inhale",
-    remainingSeconds: routine.breathwork.durationSeconds,
+    phaseLabel: snapshot ? getPhaseLabel(snapshot.phaseName) : "Inhale",
+    remainingSeconds: snapshot?.remainingSeconds ?? routine.breathwork.durationSeconds,
     isNoHoldFallback: options.isNoHoldFallback === true,
     noHoldFallbackTechniqueId: getNoHoldFallbackTechniqueId(routine.breathwork.techniqueId),
     soundLabel: routine.ambient.soundLabel,
     techniqueId: routine.breathwork.techniqueId,
     uiState: routine.breathwork.uiState,
   };
+}
+
+function createWindDownBreathSessionController({
+  durationSeconds,
+  localInstallId,
+  sessionId,
+  startedAtMs,
+  techniqueId,
+}: {
+  readonly durationSeconds: number;
+  readonly localInstallId: string;
+  readonly sessionId: string;
+  readonly startedAtMs: number;
+  readonly techniqueId: WindDownRoutine["breathwork"]["techniqueId"];
+}): WindDownBreathSessionController {
+  return createBreathSessionController({
+    localInstallId,
+    sessionId,
+    source: "wind_down",
+    startedAtMs,
+    techniqueId,
+    totalDurationSeconds: durationSeconds,
+  });
+}
+
+function isActiveBreathworkState(
+  state: Exclude<WindDownVisualStateId, "quick_context">,
+): state is Extract<WindDownVisualStateId, "active_winddown" | "daily_calm" | "no_hold_fallback"> {
+  return state === "active_winddown" || state === "daily_calm" || state === "no_hold_fallback";
+}
+
+function getPhaseLabel(phaseName: BreathSessionSnapshot["phaseName"]) {
+  switch (phaseName) {
+    case "exhale":
+      return "Exhale";
+    case "hold":
+      return "Hold";
+    case "inhale":
+      return "Inhale";
+    case "second-inhale":
+      return "Inhale";
+  }
 }
 
 const windDownVisualProofStates = [
@@ -517,6 +885,14 @@ function parseVisualProofGoal(value: unknown): WindDownContextGoal | null {
 }
 
 function createWindDownRunId(): string {
+  return createLocalRecordId("winddown");
+}
+
+function createBreathSessionId(): string {
+  return createLocalRecordId("session");
+}
+
+function createLocalRecordId(prefix: "session" | "winddown"): string {
   const randomUuid = globalThis.crypto?.randomUUID?.();
   const rawSegment = randomUuid
     ? randomUuid.replaceAll("-", "_")
@@ -527,5 +903,5 @@ function createWindDownRunId(): string {
       ? randomSegment
       : `${randomSegment}${"0".repeat(8 - randomSegment.length)}`;
 
-  return `winddown_${paddedSegment}`;
+  return `${prefix}_${paddedSegment}`;
 }

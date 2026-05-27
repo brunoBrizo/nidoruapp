@@ -116,6 +116,7 @@ const noHoldFallbackRoutine = {
   ...defaultActiveRoutine,
   isNoHoldFallback: true,
   noHoldFallbackTechniqueId: null,
+  remainingSeconds: 300,
   techniqueId: "diaphragmatic-breathing",
   uiState: "no_hold_fallback",
 } as const satisfies WindDownActiveRoutineView;

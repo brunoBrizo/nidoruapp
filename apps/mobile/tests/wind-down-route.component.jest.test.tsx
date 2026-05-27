@@ -1,7 +1,10 @@
 import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 import { act, fireEvent, render, screen } from "@testing-library/react-native";
+import { AppState, type AppStateStatus } from "react-native";
 
 const mockUseLocalSearchParams = jest.fn(() => ({}));
+const mockAppStateListeners = new Set<(state: AppStateStatus) => void>();
+const mockAppStateAddEventListener = jest.spyOn(AppState, "addEventListener");
 
 jest.mock("expo-router", () => {
   const React = jest.requireActual<typeof import("react")>("react");
@@ -27,6 +30,25 @@ jest.mock("../src/storage/local-install-identity", () => ({
   getOrCreateLocalInstallIdentity: jest.fn(),
 }));
 
+jest.mock("../src/audio/active-session-audio-controller", () => ({
+  createActiveSessionAudioController: jest.fn(() => ({
+    handleAppWake: jest.fn(() => Promise.resolve()),
+    handleAudioInterruption: jest.fn(() => Promise.resolve()),
+    handleRouteChange: jest.fn(() => Promise.resolve()),
+    handleSnapshot: jest.fn(() => Promise.resolve()),
+    release: jest.fn(),
+    setMode: jest.fn(),
+  })),
+}));
+
+jest.mock("../src/session/breath-session-local-persistence", () => ({
+  completeBreathSessionLocally: jest.fn(() => Promise.resolve()),
+  loadPendingBreathSessionCompletion: jest.fn(() => Promise.resolve(null)),
+  loadRecoverableBreathSessionDraft: jest.fn(() => Promise.resolve(null)),
+  recordBreathSessionStartedLocally: jest.fn(() => Promise.resolve()),
+  saveBreathSessionDraftLocally: jest.fn(() => Promise.resolve()),
+}));
+
 jest.mock("../src/wind-down/wind-down-local-persistence", () => ({
   completeWindDownRunLocally: jest.fn(() => Promise.resolve()),
   loadRememberedWindDownContextChoiceLocally: jest.fn(),
@@ -38,6 +60,11 @@ jest.mock("../src/wind-down/wind-down-local-persistence", () => ({
 
 import { getOrCreateLocalInstallIdentity } from "../src/storage/local-install-identity";
 import { openMigratedLocalDatabase } from "../src/storage/local-database";
+import {
+  completeBreathSessionLocally,
+  recordBreathSessionStartedLocally,
+  saveBreathSessionDraftLocally,
+} from "../src/session/breath-session-local-persistence";
 import {
   completeWindDownRunLocally,
   loadRememberedWindDownContextChoiceLocally,
@@ -53,6 +80,16 @@ const mockOpenMigratedLocalDatabase = openMigratedLocalDatabase as jest.MockedFu
 >;
 const mockGetOrCreateLocalInstallIdentity = getOrCreateLocalInstallIdentity as jest.MockedFunction<
   typeof getOrCreateLocalInstallIdentity
+>;
+const mockRecordBreathSessionStartedLocally =
+  recordBreathSessionStartedLocally as jest.MockedFunction<
+    typeof recordBreathSessionStartedLocally
+  >;
+const mockSaveBreathSessionDraftLocally = saveBreathSessionDraftLocally as jest.MockedFunction<
+  typeof saveBreathSessionDraftLocally
+>;
+const mockCompleteBreathSessionLocally = completeBreathSessionLocally as jest.MockedFunction<
+  typeof completeBreathSessionLocally
 >;
 const mockLoadRememberedWindDownContextChoiceLocally =
   loadRememberedWindDownContextChoiceLocally as jest.MockedFunction<
@@ -83,6 +120,18 @@ const database = {
 describe("WindDownRoute", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockAppStateListeners.clear();
+    mockAppStateAddEventListener.mockImplementation((eventName, listener) => {
+      if (eventName === "change") {
+        mockAppStateListeners.add(listener as (state: AppStateStatus) => void);
+      }
+
+      return {
+        remove: () => {
+          mockAppStateListeners.delete(listener as (state: AppStateStatus) => void);
+        },
+      };
+    });
     jest.useFakeTimers();
     jest.setSystemTime(Date.parse("2026-05-25T23:18:00.000Z"));
     mockOpenMigratedLocalDatabase.mockResolvedValue(database);
@@ -164,6 +213,26 @@ describe("WindDownRoute", () => {
       );
       expect(mockRecordWindDownStartedLocally.mock.calls[0]?.[1].runId).toMatch(
         /^winddown_[A-Za-z0-9_-]{8,64}$/,
+      );
+      expect(mockRecordWindDownStartedLocally.mock.calls[0]?.[1].breathSessionId).toMatch(
+        /^session_[A-Za-z0-9_-]{8,64}$/,
+      );
+      expect(mockRecordBreathSessionStartedLocally).toHaveBeenCalledWith(
+        expect.any(Object),
+        expect.objectContaining({
+          currentPhaseName: "inhale",
+          durationSeconds: 300,
+          localInstallId: "install_0123456789abcdef",
+          sessionId: mockRecordWindDownStartedLocally.mock.calls[0]?.[1].breathSessionId,
+          source: "wind_down",
+          startedAt: "2026-05-25T23:18:00.000Z",
+          status: "started",
+          techniqueId: "box-breathing",
+          windDownRunId: mockRecordWindDownStartedLocally.mock.calls[0]?.[1].runId,
+        }),
+      );
+      expect(mockRecordWindDownStartedLocally.mock.invocationCallOrder[0]).toBeLessThan(
+        mockRecordBreathSessionStartedLocally.mock.invocationCallOrder[0],
       );
       expect(screen.queryByText("What’s your goal tonight?")).toBeNull();
       expect(screen.getByRole("header", { name: "Let's wind down." })).toBeTruthy();
@@ -274,18 +343,70 @@ describe("WindDownRoute", () => {
       expect(screen.getByTestId("wind-down-state-active_winddown")).toBeTruthy();
 
       await act(async () => {
-        jest.advanceTimersByTime(300_000);
+        jest.advanceTimersByTime(15_000);
+        await flushPromises();
+      });
+
+      expect(mockSaveBreathSessionDraftLocally).toHaveBeenCalledWith(
+        expect.any(Object),
+        expect.objectContaining({
+          currentPhaseName: expect.any(String),
+          durationSeconds: 300,
+          localInstallId: "install_0123456789abcdef",
+          sessionId: mockRecordWindDownStartedLocally.mock.calls[0]?.[1].breathSessionId,
+          source: "wind_down",
+          status: "draft",
+          techniqueId: "4-7-8-sleep",
+          windDownRunId: mockRecordWindDownStartedLocally.mock.calls[0]?.[1].runId,
+        }),
+      );
+      expect(mockSaveWindDownStepProgressLocally).toHaveBeenCalledWith(
+        expect.any(Object),
+        expect.objectContaining({
+          breathSessionId: mockRecordWindDownStartedLocally.mock.calls[0]?.[1].breathSessionId,
+          recoveryState: "active_winddown",
+          status: "started",
+        }),
+      );
+
+      await act(async () => {
+        jest.advanceTimersByTime(285_000);
         await flushPromises();
       });
 
       expect(screen.getByTestId("wind-down-state-transition_card")).toBeTruthy();
+      expect(mockCompleteBreathSessionLocally).toHaveBeenCalledWith(
+        expect.any(Object),
+        expect.objectContaining({
+          currentPhaseName: expect.any(String),
+          durationSeconds: 300,
+          elapsedDurationMs: 300_000,
+          localInstallId: "install_0123456789abcdef",
+          remainingDurationMs: 0,
+          sessionId: mockRecordWindDownStartedLocally.mock.calls[0]?.[1].breathSessionId,
+          source: "wind_down",
+          status: "completed",
+          techniqueId: "4-7-8-sleep",
+          windDownRunId: mockRecordWindDownStartedLocally.mock.calls[0]?.[1].runId,
+        }),
+      );
       expect(mockSaveWindDownStepProgressLocally).toHaveBeenCalledWith(
         expect.any(Object),
         expect.objectContaining({
+          breathSessionId: mockRecordWindDownStartedLocally.mock.calls[0]?.[1].breathSessionId,
           recoveryState: "transition_card",
           status: "breath_completed",
         }),
       );
+      const breathCompletedOrder = mockCompleteBreathSessionLocally.mock.invocationCallOrder[0];
+      const windDownBreathCompletedOrder =
+        mockSaveWindDownStepProgressLocally.mock.invocationCallOrder.find((order, index) => {
+          const progress = mockSaveWindDownStepProgressLocally.mock.calls[index]?.[1];
+
+          return progress?.status === "breath_completed";
+        });
+
+      expect(breathCompletedOrder).toBeLessThan(windDownBreathCompletedOrder ?? 0);
 
       await act(async () => {
         jest.advanceTimersByTime(5_000);
@@ -347,6 +468,54 @@ describe("WindDownRoute", () => {
     } finally {
       restoreFetch();
     }
+  });
+
+  it("saves breathwork completion on app wake before showing the transition state", async () => {
+    mockLoadRememberedWindDownContextChoiceLocally.mockResolvedValue({
+      contextGoal: "fall_asleep_faster",
+      localInstallId: "install_0123456789abcdef",
+      routineId: "wind_down_sleep_starter",
+      selectedAt: "2026-05-24T23:18:00.000Z",
+    });
+
+    render(<WindDownRoute />);
+
+    await act(async () => {
+      await flushPromises();
+    });
+
+    expect(screen.getByTestId("wind-down-state-active_winddown")).toBeTruthy();
+
+    jest.setSystemTime(Date.parse("2026-05-25T23:23:01.000Z"));
+
+    await act(async () => {
+      for (const listener of mockAppStateListeners) {
+        listener("active");
+      }
+
+      await flushPromises();
+    });
+
+    expect(mockCompleteBreathSessionLocally).toHaveBeenCalledWith(
+      expect.any(Object),
+      expect.objectContaining({
+        elapsedDurationMs: 300_000,
+        remainingDurationMs: 0,
+        sessionId: mockRecordWindDownStartedLocally.mock.calls[0]?.[1].breathSessionId,
+        source: "wind_down",
+        status: "completed",
+        windDownRunId: mockRecordWindDownStartedLocally.mock.calls[0]?.[1].runId,
+      }),
+    );
+    expect(mockSaveWindDownStepProgressLocally).toHaveBeenCalledWith(
+      expect.any(Object),
+      expect.objectContaining({
+        breathSessionId: mockRecordWindDownStartedLocally.mock.calls[0]?.[1].breathSessionId,
+        recoveryState: "transition_card",
+        status: "breath_completed",
+      }),
+    );
+    expect(screen.getByTestId("wind-down-state-transition_card")).toBeTruthy();
   });
 
   it("switches remembered hold-based Wind-Down breathing to the no-hold fallback for tonight only", async () => {

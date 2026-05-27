@@ -145,7 +145,7 @@ describe("WindDownScreen", () => {
           breathworkDurationSeconds: 300,
           bodyCue: defaultBodyCue,
           phaseLabel: "Inhale",
-          remainingSeconds: 298,
+          remainingSeconds: 300,
           isNoHoldFallback: true,
           noHoldFallbackTechniqueId: null,
           soundLabel: "Rain",
@@ -159,6 +159,7 @@ describe("WindDownScreen", () => {
     expect(screen.getByTestId("wind-down-state-no_hold_fallback")).toBeTruthy();
     expect(screen.getByRole("header", { name: "No-hold breathing" })).toBeTruthy();
     expect(screen.getByText("Diaphragmatic breathing for wind-down")).toBeTruthy();
+    expect(screen.getByText("05:00")).toBeTruthy();
     expect(screen.queryByText(holdSafetyCopy)).toBeNull();
     expect(screen.queryByRole("button", { name: "Switch to no-hold breathing" })).toBeNull();
     expect(screen.queryByText(/panic|anxiety|insomnia|medical/i)).toBeNull();

@@ -18,6 +18,7 @@ ClickUp task: `06.UI.15 Final UI migration cleanup, dead-code removal, and pixel
 | `docs/design/screens/home/home.html`, `home-1.png`, `home-2.png` | `apps/mobile/src/home/home-screen.tsx`, `apps/mobile/src/app/(tabs)/index.tsx` | Migrated Tailwind surface. The ClickUp task names `home.png`, but the repo currently contains `home-1.png` and `home-2.png`, not `home.png`. |
 | Home-derived global tab menu in `home.html` | `apps/mobile/src/navigation/app-tab-bar.tsx`, `apps/mobile/src/design-system/global-tab-bar.tsx`, `apps/mobile/src/app/(tabs)/_layout.tsx` | Migrated shared shell. Home, Sleep, Breathe, Progress, and Profile all route through the same `AppTabBar` / `GlobalTabBarSurface` implementation. |
 | `docs/design/screens/sleep/sleep.html`, `sleep.png` | `apps/mobile/src/sleep/sleep-screen.tsx`, `apps/mobile/src/app/(tabs)/sleep.tsx` | Migrated Tailwind surface using the Home-derived shared tab shell. |
+| `docs/design/screens/sleep/README.md`, `sound-mixer-main.html`, `sound-mixer-main.png`, `sound-mixer-save-mix.html`, `sound-mixer-save-mix.png`, `sound-mixer-dark.html`, `sound-mixer-dark.png` | `apps/mobile/src/app/(tabs)/sleep/sounds.tsx` | Accepted Feature 06 Sound Mixer source contract is frozen; route implementation remains pending. |
 | `docs/design/screens/breath/breathe.html`, `breathe.png` | `apps/mobile/src/app/(tabs)/breathe.tsx` | Migrated Tailwind surface using the Home-derived shared tab shell. |
 | `docs/design/screens/progress/progress.html`, `progress.png` | `apps/mobile/src/progress/progress-screen.tsx`, `apps/mobile/src/app/(tabs)/progress.tsx` | Migrated Tailwind surface using the Home-derived shared tab shell. |
 | `docs/design/screens/profile/profile.html`, `profile.png` | `apps/mobile/src/profile/profile-screen.tsx`, `apps/mobile/src/app/(tabs)/profile.tsx` | Migrated Tailwind surface using the Home-derived shared tab shell. |
@@ -61,7 +62,7 @@ Intentional future-scope placeholders:
 | Route | Reason retained |
 | --- | --- |
 | `apps/mobile/src/app/(tabs)/check-in.tsx` | Morning check-in anchor. No accepted `docs/design/screens/check-in` handoff exists. |
-| `apps/mobile/src/app/(tabs)/sleep/sounds.tsx` | Sound mixer anchor. No accepted dedicated sound-mixer handoff exists. |
+| `apps/mobile/src/app/(tabs)/sleep/sounds.tsx` | Sound mixer anchor. Accepted source contract exists at `docs/design/screens/sleep/README.md` with dedicated main mixer, Save Mix sheet, and idle dark playback handoffs; implementation remains pending. |
 | `apps/mobile/src/app/(tabs)/sleep/stories.tsx` | Sleep stories anchor. No accepted sleep-stories handoff exists. |
 | `apps/mobile/src/app/(tabs)/progress/[anchor].tsx` | Future progress detail anchors. Main Progress design is implemented in `progress.tsx`. |
 | `apps/mobile/src/app/(tabs)/profile/[...anchor].tsx` | Future settings/support/privacy anchors. Main Profile design is implemented in `profile.tsx`. |

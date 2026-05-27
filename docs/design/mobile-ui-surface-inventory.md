@@ -16,6 +16,7 @@ The updated Home handoff owns the global tab menu for all tabbed surfaces:
 
 - Pixel-migrated: implemented from an accepted `docs/design/screens` HTML/PNG handoff.
 - Global Home menu source: tab shell/menu only; content still uses its own screen handoff.
+- Accepted handoff, implementation pending: source contract exists, but the route still intentionally renders a placeholder until its implementation ticket.
 - Dev-only Tailwind primitive: retained non-product tooling UI using shared Tailwind primitives.
 - Reusable Tailwind primitive: shared component used by product or tooling surfaces.
 - Future-scope placeholder: intentionally reachable stub for a future subroute.
@@ -73,7 +74,7 @@ These are the only routes currently allowed to render `TabPlaceholderScreen`.
 | `apps/mobile/src/app/(tabs)/check-in.tsx` | Future-scope placeholder | Morning Check-In tab anchor; no accepted product handoff yet. |
 | `apps/mobile/src/app/(tabs)/progress/[anchor].tsx` | Future-scope placeholder | Progress subroute anchor; accepted Progress dashboard remains visible at `/progress`. |
 | `apps/mobile/src/app/(tabs)/profile/[...anchor].tsx` | Future-scope placeholder | Profile settings/support/subscription anchors; accepted Profile dashboard remains visible at `/profile`. |
-| `apps/mobile/src/app/(tabs)/sleep/sounds.tsx` | Future-scope placeholder | Sound Mixer anchor; no accepted product handoff yet. |
+| `apps/mobile/src/app/(tabs)/sleep/sounds.tsx` | Accepted handoff, implementation pending | Sound Mixer anchor. Accepted Feature 06 source contract: `docs/design/screens/sleep/README.md`, `docs/design/screens/sleep/sound-mixer-main.html`, `docs/design/screens/sleep/sound-mixer-main.png`, `docs/design/screens/sleep/sound-mixer-save-mix.html`, `docs/design/screens/sleep/sound-mixer-save-mix.png`, `docs/design/screens/sleep/sound-mixer-dark.html`, `docs/design/screens/sleep/sound-mixer-dark.png`; Sleep tab entry remains `docs/design/screens/sleep/sleep.html` and `docs/design/screens/sleep/sleep.png`. |
 | `apps/mobile/src/app/(tabs)/sleep/stories.tsx` | Future-scope placeholder | Sleep Stories anchor; no accepted product handoff yet. |
 
 ## Developer And Foundation Surfaces

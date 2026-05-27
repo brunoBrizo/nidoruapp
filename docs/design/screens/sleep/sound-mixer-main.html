@@ -1,0 +1,445 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Nidoru - Sound Mixer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&amp;family=Nunito:wght@300;400;500&amp;display=swap" rel="stylesheet">
+    <style>
+      body {
+        font-family: 'Nunito', sans-serif;
+        background-color: #000;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        margin: 0;
+        padding: 0;
+      }
+      .font-inter {
+        font-family: 'Inter', sans-serif;
+      }
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+      .pb-safe {
+        padding-bottom: env(safe-area-inset-bottom, 16px);
+      }
+    </style>
+  </head>
+  <body class="flex justify-center min-h-screen text-[#EEF0FF] overflow-hidden bg-black">
+    <!-- Edge-to-Edge Native Screen Container -->
+    <div class="w-full max-w-[390px] h-[100dvh] bg-[#0D0F1A] relative flex flex-col z-0 shadow-2xl overflow-hidden">
+      <!-- Scrollable Main Content -->
+      <main class="flex-1 overflow-y-auto no-scrollbar pb-[220px]">
+        <!-- Header -->
+        <header class="px-5 pt-12 pb-2">
+          <div class="flex items-center justify-between mb-1">
+            <button class="w-8 h-8 flex items-center justify-center -ml-2 cursor-pointer active:opacity-60 transition-opacity">
+              <iconify-icon icon="solar:alt-arrow-left-linear" stroke-width="1.5" class="text-[22px] text-[#EEF0FF]"></iconify-icon>
+            </button>
+            <h1 class="text-[22px] font-medium tracking-tight text-[#EEF0FF]">
+              Sound Mixer
+            </h1>
+            <div class="px-2.5 py-[5px] rounded-full bg-[#1C2040] border border-[#1E2236] text-[11px] font-medium text-[#A89CE0] tracking-wide ml-2">
+              Offline pack
+            </div>
+          </div>
+          <p class="text-[14px] font-light text-[#8A8FA8] ml-1 mt-0.5">
+            Layer sounds for tonight.
+          </p>
+        </header>
+
+        <!-- Saved Mixes Shortcut -->
+        <section class="mt-1 pl-5">
+          <h2 class="text-[11px] uppercase font-medium tracking-[0.1em] text-[#4A4E6A] mb-3 ml-1">
+            Saved mixes
+          </h2>
+          <div class="flex overflow-x-auto no-scrollbar pb-2 gap-2 pr-5">
+            <button class="h-[40px] px-3.5 rounded-[14px] bg-[#14172B] border border-[#1E2236]/60 flex items-center gap-2 shrink-0 active:scale-95 transition-transform cursor-pointer">
+              <div class="flex -space-x-1 opacity-80">
+                <div class="w-5 h-5 rounded-full bg-[#1C2040] border border-[#1E2236] flex items-center justify-center">
+                  <iconify-icon icon="solar:cloud-water-linear" stroke-width="1.5" class="text-[10px] text-[#A89CE0]"></iconify-icon>
+                </div>
+                <div class="w-5 h-5 rounded-full bg-[#1C2040] border border-[#1E2236] flex items-center justify-center">
+                  <iconify-icon icon="solar:fire-linear" stroke-width="1.5" class="text-[10px] text-[#A89CE0]"></iconify-icon>
+                </div>
+              </div>
+              <span class="text-[13px] font-normal text-[#EEF0FF] tracking-wide">
+                Rain Hearth
+              </span>
+            </button>
+            <button class="h-[40px] px-3.5 rounded-[14px] bg-[#14172B] border border-[#1E2236]/60 flex items-center gap-2 shrink-0 active:scale-95 transition-transform cursor-pointer">
+              <div class="flex -space-x-1 opacity-80">
+                <div class="w-5 h-5 rounded-full bg-[#1C2040] border border-[#1E2236] flex items-center justify-center">
+                  <iconify-icon icon="solar:leaf-linear" stroke-width="1.5" class="text-[10px] text-[#A89CE0]"></iconify-icon>
+                </div>
+                <div class="w-5 h-5 rounded-full bg-[#1C2040] border border-[#1E2236] flex items-center justify-center">
+                  <iconify-icon icon="solar:asterisk-circle-linear" stroke-width="1.5" class="text-[10px] text-[#A89CE0]"></iconify-icon>
+                </div>
+              </div>
+              <span class="text-[13px] font-normal text-[#EEF0FF] tracking-wide">
+                Forest Fan
+              </span>
+            </button>
+            <button class="h-[40px] px-3.5 rounded-[14px] border border-[#1E2236] border-dashed text-[#A1A7C4] text-[13px] font-normal flex items-center gap-1.5 shrink-0 active:scale-95 transition-transform cursor-pointer hover:text-[#EEF0FF] hover:border-[#6A7095]">
+              <iconify-icon icon="solar:add-circle-linear" stroke-width="1.5" class="text-[16px]"></iconify-icon>
+              New mix
+            </button>
+          </div>
+        </section>
+
+        <!-- Timer Summary Card -->
+        <section class="px-5 mt-4">
+          <div class="rounded-[16px] bg-[#14172B]/70 border border-[#1E2236]/50 px-4 flex items-center justify-between backdrop-blur-sm h-[52px]">
+            <div class="flex items-center gap-3.5">
+              <iconify-icon icon="solar:stopwatch-linear" stroke-width="1.5" class="text-[20px] text-[#7C6FCD]"></iconify-icon>
+              <div class="flex flex-col">
+                <span class="text-[14px] font-normal text-[#EEF0FF] tracking-wide flex items-center gap-1.5">
+                  Timer
+                  <span class="text-[#4A4E6A] text-[10px]">•</span>
+                  <span class="font-inter tabular-nums text-[#A89CE0]">
+                    30 min
+                  </span>
+                </span>
+                <span class="text-[12px] font-light text-[#8A8FA8] mt-0.5 tracking-wide">
+                  Fade starts in
+                  <span class="font-inter tabular-nums">28 min</span>
+                </span>
+              </div>
+            </div>
+            <!-- Subtle ring progress -->
+            <div class="w-8 h-8 relative flex items-center justify-center">
+              <svg class="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 32 32">
+                <circle cx="16" cy="16" r="14" fill="none" stroke="#1E2236" stroke-width="2"></circle>
+                <circle cx="16" cy="16" r="14" fill="none" stroke="#7C6FCD" stroke-width="2" stroke-dasharray="88" stroke-dashoffset="6" stroke-linecap="round"></circle>
+              </svg>
+              <iconify-icon icon="solar:moon-sleep-linear" stroke-width="1.5" class="text-[14px] text-[#A89CE0]"></iconify-icon>
+            </div>
+          </div>
+        </section>
+
+        <!-- Sound Library Grid -->
+        <div class="px-5 flex flex-col pb-10 mt-5 gap-6">
+          <!-- Category: Rain -->
+          <section>
+            <h3 class="text-[11px] uppercase font-medium tracking-[0.1em] text-[#4A4E6A] mb-3 ml-1">
+              Rain
+            </h3>
+            <div class="grid grid-cols-2 gap-3">
+              <button class="bg-[#1C2040] border border-[#7C6FCD]/40 shadow-[0_0_25px_rgba(124,111,205,0.15)] rounded-[20px] p-5 flex flex-col items-center justify-center relative overflow-hidden group cursor-pointer active:scale-[0.98] transition-all">
+                <div class="absolute inset-0 bg-gradient-to-b from-[#7C6FCD]/[0.12] to-transparent pointer-events-none"></div>
+                <div class="relative w-[72px] h-[72px] flex items-center justify-center mb-3">
+                  <svg class="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 72 72">
+                    <circle cx="36" cy="36" r="32" fill="none" stroke="#7C6FCD" stroke-opacity="0.2" stroke-width="2.5"></circle>
+                    <circle cx="36" cy="36" r="32" fill="none" stroke="#7C6FCD" stroke-width="2.5" stroke-dasharray="201" stroke-dashoffset="56.3" stroke-linecap="round" class="drop-shadow-[0_0_6px_rgba(124,111,205,0.6)]"></circle>
+                  </svg>
+                  <iconify-icon icon="solar:cloud-water-linear" stroke-width="1.5" class="text-[32px] text-[#EEF0FF] relative z-10"></iconify-icon>
+                  <div class="absolute -bottom-1 bg-[#1C2040] px-2 py-1 rounded-[8px] text-[12px] font-medium font-inter tabular-nums text-[#EEF0FF] border border-[#7C6FCD]/60 z-20 shadow-sm leading-none">
+                    72%
+                  </div>
+                </div>
+                <span class="text-[14px] font-medium text-[#EEF0FF] text-center leading-tight relative z-10 tracking-wide">
+                  Light Rain
+                </span>
+              </button>
+              <button class="bg-[#14172B] border border-[#1E2236]/60 rounded-[20px] p-5 flex flex-col items-center justify-center relative group active:scale-[0.98] transition-transform cursor-pointer hover:border-[#1E2236]">
+                <div class="relative w-[64px] h-[64px] flex items-center justify-center mb-3">
+                  <svg class="absolute inset-0 w-full h-full" viewBox="0 0 64 64">
+                    <circle cx="32" cy="32" r="28" fill="none" stroke="#6A7095" stroke-opacity="0.4" stroke-width="1.5"></circle>
+                  </svg>
+                  <iconify-icon icon="solar:cloud-bold-linear" stroke-width="1.5" class="text-[28px] text-[#A1A7C4] group-hover:text-[#A89CE0] transition-colors"></iconify-icon>
+                </div>
+                <span class="text-[14px] font-normal text-[#A1A7C4] text-center leading-tight tracking-wide">
+                  Heavy Rain
+                </span>
+              </button>
+              <button class="bg-[#14172B] border border-[#1E2236]/60 rounded-[20px] p-5 flex flex-col items-center justify-center relative group active:scale-[0.98] transition-transform cursor-pointer hover:border-[#1E2236]">
+                <div class="relative w-[64px] h-[64px] flex items-center justify-center mb-3">
+                  <svg class="absolute inset-0 w-full h-full" viewBox="0 0 64 64">
+                    <circle cx="32" cy="32" r="28" fill="none" stroke="#6A7095" stroke-opacity="0.4" stroke-width="1.5"></circle>
+                  </svg>
+                  <iconify-icon icon="solar:window-frame-linear" stroke-width="1.5" class="text-[28px] text-[#A1A7C4] group-hover:text-[#A89CE0] transition-colors"></iconify-icon>
+                </div>
+                <span class="text-[14px] font-normal text-[#A1A7C4] text-center leading-tight tracking-wide">
+                  Rain on Window
+                </span>
+              </button>
+              <button class="bg-[#14172B] border border-[#1E2236]/60 rounded-[20px] p-5 flex flex-col items-center justify-center relative group active:scale-[0.98] transition-transform cursor-pointer hover:border-[#1E2236]">
+                <div class="relative w-[64px] h-[64px] flex items-center justify-center mb-3">
+                  <svg class="absolute inset-0 w-full h-full" viewBox="0 0 64 64">
+                    <circle cx="32" cy="32" r="28" fill="none" stroke="#6A7095" stroke-opacity="0.4" stroke-width="1.5"></circle>
+                  </svg>
+                  <iconify-icon icon="solar:cloud-storm-linear" stroke-width="1.5" class="text-[28px] text-[#A1A7C4] group-hover:text-[#A89CE0] transition-colors"></iconify-icon>
+                </div>
+                <span class="text-[14px] font-normal text-[#A1A7C4] text-center leading-tight tracking-wide">
+                  Thunderstorm
+                </span>
+              </button>
+            </div>
+          </section>
+
+          <!-- Category: Nature -->
+          <section>
+            <h3 class="text-[11px] uppercase font-medium tracking-[0.1em] text-[#4A4E6A] mb-3 ml-1">
+              Nature
+            </h3>
+            <div class="grid grid-cols-2 gap-3">
+              <button class="bg-[#14172B] border border-[#1E2236]/60 rounded-[20px] p-5 flex flex-col items-center justify-center relative group active:scale-[0.98] transition-transform cursor-pointer hover:border-[#1E2236]">
+                <div class="relative w-[64px] h-[64px] flex items-center justify-center mb-3">
+                  <svg class="absolute inset-0 w-full h-full" viewBox="0 0 64 64">
+                    <circle cx="32" cy="32" r="28" fill="none" stroke="#6A7095" stroke-opacity="0.4" stroke-width="1.5"></circle>
+                  </svg>
+                  <iconify-icon icon="solar:water-sun-linear" stroke-width="1.5" class="text-[28px] text-[#A1A7C4] group-hover:text-[#A89CE0] transition-colors"></iconify-icon>
+                </div>
+                <span class="text-[14px] font-normal text-[#A1A7C4] text-center leading-tight tracking-wide">
+                  Ocean Waves
+                </span>
+              </button>
+              <button class="bg-[#14172B] border border-[#1E2236]/60 rounded-[20px] p-5 flex flex-col items-center justify-center relative group active:scale-[0.98] transition-transform cursor-pointer hover:border-[#1E2236]">
+                <div class="relative w-[64px] h-[64px] flex items-center justify-center mb-3">
+                  <svg class="absolute inset-0 w-full h-full" viewBox="0 0 64 64">
+                    <circle cx="32" cy="32" r="28" fill="none" stroke="#6A7095" stroke-opacity="0.4" stroke-width="1.5"></circle>
+                  </svg>
+                  <iconify-icon icon="solar:leaf-linear" stroke-width="1.5" class="text-[28px] text-[#A1A7C4] group-hover:text-[#A89CE0] transition-colors"></iconify-icon>
+                </div>
+                <span class="text-[14px] font-normal text-[#A1A7C4] text-center leading-tight tracking-wide">
+                  Forest
+                </span>
+              </button>
+              <button class="bg-[#14172B] border border-[#1E2236]/60 rounded-[20px] p-5 flex flex-col items-center justify-center relative group active:scale-[0.98] transition-transform cursor-pointer hover:border-[#1E2236]">
+                <div class="relative w-[64px] h-[64px] flex items-center justify-center mb-3">
+                  <svg class="absolute inset-0 w-full h-full" viewBox="0 0 64 64">
+                    <circle cx="32" cy="32" r="28" fill="none" stroke="#6A7095" stroke-opacity="0.4" stroke-width="1.5"></circle>
+                  </svg>
+                  <iconify-icon icon="solar:waterdrop-linear" stroke-width="1.5" class="text-[28px] text-[#A1A7C4] group-hover:text-[#A89CE0] transition-colors"></iconify-icon>
+                </div>
+                <span class="text-[14px] font-normal text-[#A1A7C4] text-center leading-tight tracking-wide">
+                  River Stream
+                </span>
+              </button>
+              <button class="bg-[#14172B] border border-[#1E2236]/60 rounded-[20px] p-5 flex flex-col items-center justify-center relative group active:scale-[0.98] transition-transform cursor-pointer hover:border-[#1E2236]">
+                <div class="relative w-[64px] h-[64px] flex items-center justify-center mb-3">
+                  <svg class="absolute inset-0 w-full h-full" viewBox="0 0 64 64">
+                    <circle cx="32" cy="32" r="28" fill="none" stroke="#6A7095" stroke-opacity="0.4" stroke-width="1.5"></circle>
+                  </svg>
+                  <iconify-icon icon="solar:wind-linear" stroke-width="1.5" class="text-[28px] text-[#A1A7C4] group-hover:text-[#A89CE0] transition-colors"></iconify-icon>
+                </div>
+                <span class="text-[14px] font-normal text-[#A1A7C4] text-center leading-tight tracking-wide">
+                  Wind
+                </span>
+              </button>
+            </div>
+          </section>
+
+          <!-- Category: Noise -->
+          <section>
+            <h3 class="text-[11px] uppercase font-medium tracking-[0.1em] text-[#4A4E6A] mb-3 ml-1">
+              Noise
+            </h3>
+            <div class="grid grid-cols-2 gap-3">
+              <button class="bg-[#14172B] border border-[#1E2236]/60 rounded-[20px] p-5 flex flex-col items-center justify-center relative group active:scale-[0.98] transition-transform cursor-pointer hover:border-[#1E2236]">
+                <div class="relative w-[64px] h-[64px] flex items-center justify-center mb-3">
+                  <svg class="absolute inset-0 w-full h-full" viewBox="0 0 64 64">
+                    <circle cx="32" cy="32" r="28" fill="none" stroke="#6A7095" stroke-opacity="0.4" stroke-width="1.5"></circle>
+                  </svg>
+                  <iconify-icon icon="solar:radio-linear" stroke-width="1.5" class="text-[28px] text-[#A1A7C4] group-hover:text-[#A89CE0] transition-colors"></iconify-icon>
+                </div>
+                <span class="text-[14px] font-normal text-[#A1A7C4] text-center leading-tight tracking-wide">
+                  White Noise
+                </span>
+              </button>
+              <button class="bg-[#1C2040] border border-[#7C6FCD]/40 shadow-[0_0_25px_rgba(124,111,205,0.15)] rounded-[20px] p-5 flex flex-col items-center justify-center relative overflow-hidden group cursor-pointer active:scale-[0.98] transition-all">
+                <div class="absolute inset-0 bg-gradient-to-b from-[#7C6FCD]/[0.12] to-transparent pointer-events-none"></div>
+                <div class="relative w-[72px] h-[72px] flex items-center justify-center mb-3">
+                  <svg class="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 72 72">
+                    <circle cx="36" cy="36" r="32" fill="none" stroke="#7C6FCD" stroke-opacity="0.2" stroke-width="2.5"></circle>
+                    <circle cx="36" cy="36" r="32" fill="none" stroke="#7C6FCD" stroke-width="2.5" stroke-dasharray="201" stroke-dashoffset="84.4" stroke-linecap="round" class="drop-shadow-[0_0_6px_rgba(124,111,205,0.6)]"></circle>
+                  </svg>
+                  <iconify-icon icon="solar:chart-square-linear" stroke-width="1.5" class="text-[32px] text-[#EEF0FF] relative z-10"></iconify-icon>
+                  <div class="absolute -bottom-1 bg-[#1C2040] px-2 py-1 rounded-[8px] text-[12px] font-medium font-inter tabular-nums text-[#EEF0FF] border border-[#7C6FCD]/60 z-20 shadow-sm leading-none">
+                    58%
+                  </div>
+                </div>
+                <span class="text-[14px] font-medium text-[#EEF0FF] text-center leading-tight relative z-10 tracking-wide">
+                  Brown Noise
+                </span>
+              </button>
+              <button class="bg-[#14172B] border border-[#1E2236]/60 rounded-[20px] p-5 flex flex-col items-center justify-center relative group active:scale-[0.98] transition-transform cursor-pointer hover:border-[#1E2236]">
+                <div class="relative w-[64px] h-[64px] flex items-center justify-center mb-3">
+                  <svg class="absolute inset-0 w-full h-full" viewBox="0 0 64 64">
+                    <circle cx="32" cy="32" r="28" fill="none" stroke="#6A7095" stroke-opacity="0.4" stroke-width="1.5"></circle>
+                  </svg>
+                  <iconify-icon icon="solar:vinyl-linear" stroke-width="1.5" class="text-[28px] text-[#A1A7C4] group-hover:text-[#A89CE0] transition-colors"></iconify-icon>
+                </div>
+                <span class="text-[14px] font-normal text-[#A1A7C4] text-center leading-tight tracking-wide">
+                  Pink Noise
+                </span>
+              </button>
+            </div>
+          </section>
+
+          <!-- Category: Environment -->
+          <section>
+            <h3 class="text-[11px] uppercase font-medium tracking-[0.1em] text-[#4A4E6A] mb-3 ml-1">
+              Environment
+            </h3>
+            <div class="grid grid-cols-2 gap-3">
+              <button class="bg-[#1C2040] border border-[#7C6FCD]/40 shadow-[0_0_25px_rgba(124,111,205,0.15)] rounded-[20px] p-5 flex flex-col items-center justify-center relative overflow-hidden group cursor-pointer active:scale-[0.98] transition-all">
+                <div class="absolute inset-0 bg-gradient-to-b from-[#7C6FCD]/[0.12] to-transparent pointer-events-none"></div>
+                <div class="relative w-[72px] h-[72px] flex items-center justify-center mb-3">
+                  <svg class="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 72 72">
+                    <circle cx="36" cy="36" r="32" fill="none" stroke="#7C6FCD" stroke-opacity="0.2" stroke-width="2.5"></circle>
+                    <circle cx="36" cy="36" r="32" fill="none" stroke="#7C6FCD" stroke-width="2.5" stroke-dasharray="201" stroke-dashoffset="132.7" stroke-linecap="round" class="drop-shadow-[0_0_6px_rgba(124,111,205,0.6)]"></circle>
+                  </svg>
+                  <iconify-icon icon="solar:fire-linear" stroke-width="1.5" class="text-[32px] text-[#EEF0FF] relative z-10"></iconify-icon>
+                  <div class="absolute -bottom-1 bg-[#1C2040] px-2 py-1 rounded-[8px] text-[12px] font-medium font-inter tabular-nums text-[#EEF0FF] border border-[#7C6FCD]/60 z-20 shadow-sm leading-none">
+                    34%
+                  </div>
+                </div>
+                <span class="text-[14px] font-medium text-[#EEF0FF] text-center leading-tight relative z-10 tracking-wide">
+                  Fireplace Crackling
+                </span>
+              </button>
+              <button class="bg-[#14172B] border border-[#1E2236]/60 rounded-[20px] p-5 flex flex-col items-center justify-center relative group active:scale-[0.98] transition-transform cursor-pointer hover:border-[#1E2236]">
+                <div class="relative w-[64px] h-[64px] flex items-center justify-center mb-3">
+                  <svg class="absolute inset-0 w-full h-full" viewBox="0 0 64 64">
+                    <circle cx="32" cy="32" r="28" fill="none" stroke="#6A7095" stroke-opacity="0.4" stroke-width="1.5"></circle>
+                  </svg>
+                  <iconify-icon icon="solar:cup-hot-linear" stroke-width="1.5" class="text-[28px] text-[#A1A7C4] group-hover:text-[#A89CE0] transition-colors"></iconify-icon>
+                </div>
+                <span class="text-[14px] font-normal text-[#A1A7C4] text-center leading-tight tracking-wide">
+                  Cafe Ambience
+                </span>
+              </button>
+              <button class="bg-[#14172B] border border-[#1E2236]/60 rounded-[20px] p-5 flex flex-col items-center justify-center relative group active:scale-[0.98] transition-transform cursor-pointer hover:border-[#1E2236]">
+                <div class="relative w-[64px] h-[64px] flex items-center justify-center mb-3">
+                  <svg class="absolute inset-0 w-full h-full" viewBox="0 0 64 64">
+                    <circle cx="32" cy="32" r="28" fill="none" stroke="#6A7095" stroke-opacity="0.4" stroke-width="1.5"></circle>
+                  </svg>
+                  <iconify-icon icon="solar:asterisk-circle-linear" stroke-width="1.5" class="text-[28px] text-[#A1A7C4] group-hover:text-[#A89CE0] transition-colors"></iconify-icon>
+                </div>
+                <span class="text-[14px] font-normal text-[#A1A7C4] text-center leading-tight tracking-wide">
+                  Fan
+                </span>
+              </button>
+            </div>
+          </section>
+
+          <!-- Category: Tones -->
+          <section>
+            <h3 class="text-[11px] uppercase font-medium tracking-[0.1em] text-[#4A4E6A] mb-3 ml-1">
+              Tones
+            </h3>
+            <div class="grid grid-cols-2 gap-3">
+              <button class="bg-[#14172B] border border-[#1E2236]/60 rounded-[20px] p-5 flex flex-col items-center justify-center relative group active:scale-[0.98] transition-transform cursor-pointer hover:border-[#1E2236]">
+                <div class="relative w-[64px] h-[64px] flex items-center justify-center mb-3">
+                  <svg class="absolute inset-0 w-full h-full" viewBox="0 0 64 64">
+                    <circle cx="32" cy="32" r="28" fill="none" stroke="#6A7095" stroke-opacity="0.4" stroke-width="1.5"></circle>
+                  </svg>
+                  <iconify-icon icon="solar:magnet-linear" stroke-width="1.5" class="text-[28px] text-[#A1A7C4] group-hover:text-[#A89CE0] transition-colors"></iconify-icon>
+                </div>
+                <span class="text-[14px] font-normal text-[#A1A7C4] text-center leading-tight tracking-wide">
+                  432Hz Tone
+                </span>
+              </button>
+              <button class="bg-[#14172B] border border-[#1E2236]/60 rounded-[20px] p-5 flex flex-col items-center justify-center relative group active:scale-[0.98] transition-transform cursor-pointer hover:border-[#1E2236]">
+                <div class="relative w-[64px] h-[64px] flex items-center justify-center mb-3">
+                  <svg class="absolute inset-0 w-full h-full" viewBox="0 0 64 64">
+                    <circle cx="32" cy="32" r="28" fill="none" stroke="#6A7095" stroke-opacity="0.4" stroke-width="1.5"></circle>
+                  </svg>
+                  <iconify-icon icon="solar:headphones-linear" stroke-width="1.5" class="text-[28px] text-[#A1A7C4] group-hover:text-[#A89CE0] transition-colors"></iconify-icon>
+                </div>
+                <span class="text-[14px] font-normal text-[#A1A7C4] text-center leading-tight tracking-wide">
+                  Delta Wave Binaural
+                </span>
+              </button>
+            </div>
+          </section>
+        </div>
+      </main>
+
+      <!-- Active Mixer Strip -->
+      <div class="absolute bottom-[92px] left-4 right-4 bg-[#14172B]/95 backdrop-blur-xl border border-[#1E2236]/80 rounded-[24px] flex flex-col shadow-[0_-8px_30px_rgba(13,15,26,0.9)] z-40 p-3.5 gap-3.5">
+        <!-- Top Row -->
+        <div class="flex items-center justify-between px-1">
+          <div class="flex flex-col">
+            <span class="text-[15px] font-medium text-[#EEF0FF] tracking-wide">
+              Tonight mix
+            </span>
+            <span class="text-[12px] font-normal text-[#A1A7C4] tracking-wide mt-0.5">
+              3 active layers
+            </span>
+          </div>
+          <div class="flex gap-1.5">
+            <div class="w-9 h-9 rounded-full bg-[#1C2040] border border-[#2D3359] flex items-center justify-center">
+              <iconify-icon icon="solar:cloud-water-linear" class="text-[16px] text-[#A89CE0]"></iconify-icon>
+            </div>
+            <div class="w-9 h-9 rounded-full bg-[#1C2040] border border-[#2D3359] flex items-center justify-center">
+              <iconify-icon icon="solar:chart-square-linear" class="text-[16px] text-[#A89CE0]"></iconify-icon>
+            </div>
+            <div class="w-9 h-9 rounded-full bg-[#1C2040] border border-[#2D3359] flex items-center justify-center">
+              <iconify-icon icon="solar:fire-linear" class="text-[16px] text-[#A89CE0]"></iconify-icon>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Row (Timer + Save Button) -->
+        <div class="flex gap-3 h-[44px]">
+          <div class="flex flex-1 items-center bg-[#0D0F1A] border border-[#1E2236]/60 rounded-[14px] p-1">
+            <button class="flex-1 h-full rounded-[10px] flex items-center justify-center text-[13px] font-medium text-[#6A7095] hover:text-[#EEF0FF] transition-colors font-inter tabular-nums cursor-pointer">
+              20
+            </button>
+            <button class="flex-1 h-full rounded-[10px] flex items-center justify-center text-[13px] font-medium bg-[#1C2040] text-[#EEF0FF] shadow-sm font-inter tabular-nums cursor-pointer border border-[#2D3359]/50">
+              30
+            </button>
+            <button class="flex-1 h-full rounded-[10px] flex items-center justify-center text-[13px] font-medium text-[#6A7095] hover:text-[#EEF0FF] transition-colors font-inter tabular-nums cursor-pointer">
+              45
+            </button>
+            <button class="flex-1 h-full rounded-[10px] flex items-center justify-center text-[13px] font-medium text-[#6A7095] hover:text-[#EEF0FF] transition-colors font-inter tabular-nums cursor-pointer">
+              60
+            </button>
+            <button class="flex-1 h-full rounded-[10px] flex items-center justify-center text-[15px] font-medium text-[#6A7095] hover:text-[#EEF0FF] transition-colors font-inter cursor-pointer">
+              ∞
+            </button>
+          </div>
+          <button class="h-full px-4 bg-[#7C6FCD] hover:bg-[#6A5EBA] text-white rounded-[14px] text-[13px] font-medium flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(124,111,205,0.25)] transition-colors tracking-wide cursor-pointer">
+            Save Mix
+          </button>
+        </div>
+      </div>
+
+      <!-- Bottom Tab Bar -->
+      <nav class="absolute bottom-0 left-0 right-0 h-[80px] bg-[#0D0F1A]/95 backdrop-blur-lg border-t border-[#1E2236]/80 flex items-start justify-around px-2 pt-3 pb-safe z-50">
+        <button class="flex flex-col items-center gap-1.5 min-w-[60px] hover:text-[#8A8FA8] transition-colors cursor-pointer text-[#6A7095]">
+          <iconify-icon icon="solar:home-2-linear" stroke-width="1.5" class="text-[22px]"></iconify-icon>
+          <span class="text-[10px] font-medium tracking-wide">Home</span>
+        </button>
+
+        <button class="flex flex-col items-center gap-1.5 min-w-[60px] text-[#7C6FCD] cursor-pointer">
+          <iconify-icon icon="solar:moon-sleep-linear" stroke-width="1.5" class="text-[22px]"></iconify-icon>
+          <span class="text-[10px] font-medium tracking-wide">Sleep</span>
+        </button>
+
+        <button class="flex flex-col items-center gap-1.5 min-w-[60px] hover:text-[#8A8FA8] transition-colors cursor-pointer text-[#6A7095]">
+          <iconify-icon icon="solar:leaf-linear" stroke-width="1.5" class="text-[22px]"></iconify-icon>
+          <span class="text-[10px] font-medium tracking-wide">Breathe</span>
+        </button>
+
+        <button class="flex flex-col items-center gap-1.5 min-w-[60px] hover:text-[#8A8FA8] transition-colors cursor-pointer text-[#6A7095]">
+          <iconify-icon icon="solar:chart-linear" stroke-width="1.5" class="text-[22px]"></iconify-icon>
+          <span class="text-[10px] font-medium tracking-wide">Progress</span>
+        </button>
+
+        <button class="flex flex-col items-center gap-1.5 min-w-[60px] hover:text-[#8A8FA8] transition-colors cursor-pointer text-[#6A7095]">
+          <iconify-icon icon="solar:user-linear" stroke-width="1.5" class="text-[22px]"></iconify-icon>
+          <span class="text-[10px] font-medium tracking-wide">Profile</span>
+        </button>
+      </nav>
+    </div>
+
+</body></html>

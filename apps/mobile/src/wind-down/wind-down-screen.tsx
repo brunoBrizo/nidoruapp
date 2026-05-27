@@ -62,6 +62,12 @@ export type WindDownVisualStateId =
   | "partial_stop"
   | "background_recovery";
 
+export type WindDownAmbientAudioView = {
+  readonly remainingSeconds: number;
+  readonly soundLabel: string;
+  readonly status: "playing" | "fading" | "stopped" | "completed";
+};
+
 type WindDownSessionState = Exclude<WindDownVisualStateId, "quick_context">;
 
 type WindDownSessionHandlers = {
@@ -84,6 +90,7 @@ type WindDownScreenProps =
     }
   | (WindDownSessionHandlers & {
       readonly activeRoutine?: WindDownActiveRoutineView;
+      readonly ambientAudio?: WindDownAmbientAudioView;
       readonly state: "active" | WindDownSessionState;
     });
 
@@ -120,6 +127,12 @@ const noHoldFallbackRoutine = {
   techniqueId: "diaphragmatic-breathing",
   uiState: "no_hold_fallback",
 } as const satisfies WindDownActiveRoutineView;
+
+const defaultAmbientAudio = {
+  remainingSeconds: 29 * 60 + 58,
+  soundLabel: "Rain",
+  status: "playing",
+} as const satisfies WindDownAmbientAudioView;
 
 const iconByGoal: Record<WindDownContextGoal, LucideIcon> = {
   calm_racing_thoughts: Wind,
@@ -342,6 +355,8 @@ export function WindDownScreen(props: WindDownScreenProps) {
   }
 
   if (state === "ambient_handoff") {
+    const ambientAudio = props.ambientAudio ?? defaultAmbientAudio;
+
     return (
       <WindDownFrame stateId="ambient_handoff">
         <View className="flex-1 px-nidoru-screen pt-[74px] pb-[32px]">
@@ -357,7 +372,7 @@ export function WindDownScreen(props: WindDownScreenProps) {
               className="font-nidoru-primary-semibold text-[21px] leading-7 text-[#EEF0FF]"
               selectable
             >
-              Rain is playing
+              {ambientAudio.soundLabel} is {ambientAudio.status === "fading" ? "fading" : "playing"}
             </Text>
             <Text
               className="text-center font-nidoru-primary-regular text-sm leading-5 text-[#8A8FA8]"
@@ -367,7 +382,7 @@ export function WindDownScreen(props: WindDownScreenProps) {
             </Text>
           </View>
           <View className="mt-14 items-center">
-            <TimerHalo value="29:58" />
+            <TimerHalo value={formatRemainingTime(ambientAudio.remainingSeconds)} />
           </View>
           <View className="mt-11 gap-2 rounded-[24px] border border-white/[0.04] bg-[#0D0F1A]/58 p-5 shadow-[inset_0_1px_0_rgba(238,240,255,0.04)]">
             <AmbientOption
@@ -404,6 +419,11 @@ export function WindDownScreen(props: WindDownScreenProps) {
   }
 
   if (state === "dimmed_idle") {
+    const ambientAudio = props.ambientAudio ?? {
+      ...defaultAmbientAudio,
+      remainingSeconds: 29 * 60 + 28,
+    };
+
     return (
       <WindDownFrame dimmed onPress={props.onWake} stateId="dimmed_idle">
         <View className="flex-1 items-center justify-center px-nidoru-screen">
@@ -412,15 +432,15 @@ export function WindDownScreen(props: WindDownScreenProps) {
             className="font-nidoru-data-light text-[48px] leading-[58px] text-[#EEF0FF]/74 tabular-nums"
             selectable
           >
-            29:28
+            {formatRemainingTime(ambientAudio.remainingSeconds)}
           </Text>
           <Text
             className="mt-1 text-center font-nidoru-primary-regular text-sm leading-5 text-[#8A8FA8]"
             selectable
           >
-            Rain continues
+            {ambientAudio.soundLabel} continues
           </Text>
-          <View className="absolute bottom-[84px] items-center gap-1">
+          <View className="absolute bottom-[84px] items-center gap-1 will-change-variable">
             <Text
               className="font-nidoru-primary-regular text-sm leading-5 text-[#8A8FA8]"
               selectable
@@ -440,6 +460,11 @@ export function WindDownScreen(props: WindDownScreenProps) {
   }
 
   if (state === "tap_to_wake") {
+    const ambientAudio = props.ambientAudio ?? {
+      ...defaultAmbientAudio,
+      remainingSeconds: 29 * 60 + 21,
+    };
+
     return (
       <WindDownFrame stateId="tap_to_wake">
         <View className="flex-1 items-center px-nidoru-screen pt-[82px] pb-[34px]">
@@ -454,13 +479,13 @@ export function WindDownScreen(props: WindDownScreenProps) {
             className="mt-2 font-nidoru-primary-semibold text-[21px] leading-7 text-[#EEF0FF]"
             selectable
           >
-            Rain is playing
+            {ambientAudio.soundLabel} is {ambientAudio.status === "fading" ? "fading" : "playing"}
           </Text>
           <Text className="font-nidoru-primary-regular text-sm leading-5 text-[#8A8FA8]" selectable>
             Audio keeps going while locked
           </Text>
           <View className="mt-20">
-            <TimerHalo value="29:21" />
+            <TimerHalo value={formatRemainingTime(ambientAudio.remainingSeconds)} />
           </View>
           <View className="mt-10 flex-row gap-3">
             <QuietPill label="Stop" onPress={props.onStop} subdued />
@@ -479,6 +504,12 @@ export function WindDownScreen(props: WindDownScreenProps) {
   }
 
   if (state === "audio_interruption") {
+    const ambientAudio = props.ambientAudio ?? {
+      ...defaultAmbientAudio,
+      remainingSeconds: 24 * 60 + 18,
+      status: "playing",
+    };
+
     return (
       <WindDownFrame stateId="audio_interruption">
         <View className="flex-1 px-[28px] pt-[76px] pb-[34px]">
@@ -494,7 +525,9 @@ export function WindDownScreen(props: WindDownScreenProps) {
               className="font-nidoru-primary-semibold text-[21px] leading-7 text-[#EEF0FF]"
               selectable
             >
-              Rain resumed
+              {ambientAudio.status === "fading"
+                ? `${ambientAudio.soundLabel} faded`
+                : `${ambientAudio.soundLabel} resumed`}
             </Text>
             <Text
               className="text-center font-nidoru-primary-regular text-sm leading-5 text-[#8A8FA8]"
@@ -517,7 +550,7 @@ export function WindDownScreen(props: WindDownScreenProps) {
               className="font-nidoru-data-regular text-xs leading-4 text-[#8A8FA8] tabular-nums"
               selectable
             >
-              24:18 remaining
+              {formatRemainingTime(ambientAudio.remainingSeconds)} remaining
             </Text>
           </View>
           <View className="mt-10 gap-4 rounded-[24px] border border-white/[0.04] bg-[#0D0F1A]/58 p-5">

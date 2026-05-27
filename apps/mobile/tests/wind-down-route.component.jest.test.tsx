@@ -41,6 +41,45 @@ jest.mock("../src/audio/active-session-audio-controller", () => ({
   })),
 }));
 
+const mockWindDownAmbientAudioController = {
+  fadeNow: jest.fn(() => Promise.resolve({ status: "fading" })),
+  getSnapshot: jest.fn(() => ({
+    elapsedSeconds: 0,
+    fadeOutDurationSeconds: 120,
+    remainingSeconds: 1_800,
+    status: "playing",
+    timerDurationSeconds: 1_800,
+    volume: 0.32,
+  })),
+  handleAudioInterruption: jest.fn(() => Promise.resolve({ status: "playing" })),
+  handleTimerTick: jest.fn(() =>
+    Promise.resolve({
+      elapsedSeconds: 0,
+      fadeOutDurationSeconds: 120,
+      remainingSeconds: 1_800,
+      status: "playing",
+      timerDurationSeconds: 1_800,
+      volume: 0.32,
+    }),
+  ),
+  release: jest.fn(),
+  start: jest.fn(() =>
+    Promise.resolve({
+      elapsedSeconds: 0,
+      fadeOutDurationSeconds: 120,
+      remainingSeconds: 1_800,
+      status: "playing",
+      timerDurationSeconds: 1_800,
+      volume: 0.32,
+    }),
+  ),
+  stop: jest.fn(() => Promise.resolve({ status: "stopped" })),
+};
+
+jest.mock("../src/audio/wind-down-ambient-audio", () => ({
+  createWindDownAmbientAudioController: jest.fn(() => mockWindDownAmbientAudioController),
+}));
+
 jest.mock("../src/session/breath-session-local-persistence", () => ({
   completeBreathSessionLocally: jest.fn(() => Promise.resolve()),
   loadPendingBreathSessionCompletion: jest.fn(() => Promise.resolve(null)),
@@ -60,6 +99,7 @@ jest.mock("../src/wind-down/wind-down-local-persistence", () => ({
 
 import { getOrCreateLocalInstallIdentity } from "../src/storage/local-install-identity";
 import { openMigratedLocalDatabase } from "../src/storage/local-database";
+import { createWindDownAmbientAudioController } from "../src/audio/wind-down-ambient-audio";
 import {
   completeBreathSessionLocally,
   recordBreathSessionStartedLocally,
@@ -111,6 +151,10 @@ const mockCompleteWindDownRunLocally = completeWindDownRunLocally as jest.Mocked
 const mockStopWindDownRunLocally = stopWindDownRunLocally as jest.MockedFunction<
   typeof stopWindDownRunLocally
 >;
+const mockCreateWindDownAmbientAudioController =
+  createWindDownAmbientAudioController as jest.MockedFunction<
+    typeof createWindDownAmbientAudioController
+  >;
 
 const database = {
   getFirstAsync: jest.fn(),
@@ -120,6 +164,10 @@ const database = {
 describe("WindDownRoute", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    Object.defineProperty(AppState, "currentState", {
+      configurable: true,
+      value: "active",
+    });
     mockAppStateListeners.clear();
     mockAppStateAddEventListener.mockImplementation((eventName, listener) => {
       if (eventName === "change") {
@@ -137,6 +185,10 @@ describe("WindDownRoute", () => {
     mockOpenMigratedLocalDatabase.mockResolvedValue(database);
     mockGetOrCreateLocalInstallIdentity.mockResolvedValue("install_0123456789abcdef");
     mockUseLocalSearchParams.mockReturnValue({});
+    mockCreateWindDownAmbientAudioController.mockClear();
+    for (const method of Object.values(mockWindDownAmbientAudioController)) {
+      method.mockClear();
+    }
   });
 
   it("renders a dev-only visual proof state without bootstrapping local storage", () => {
@@ -459,9 +511,30 @@ describe("WindDownRoute", () => {
       });
 
       expect(screen.getByTestId("wind-down-state-ambient_handoff")).toBeTruthy();
+      expect(mockWindDownAmbientAudioController.start).toHaveBeenCalledWith({
+        appState: "active",
+        fadeOutDurationSeconds: 120,
+        nowMs: Date.parse("2026-05-25T23:25:05.000Z"),
+        soundId: "light-rain",
+        soundLabel: "Rain",
+        timerDurationSeconds: 1_800,
+      });
+      expect(mockSaveWindDownStepProgressLocally).toHaveBeenCalledWith(
+        expect.any(Object),
+        expect.objectContaining({
+          ambientStartedAt: "2026-05-25T23:25:05.000Z",
+          bodyCueCompletedAt: "2026-05-25T23:25:05.000Z",
+          queuedEvent: {
+            eventName: "audio_started",
+            occurredAt: "2026-05-25T23:25:05.000Z",
+          },
+          recoveryState: "ambient_handoff",
+          status: "ambient_playing",
+        }),
+      );
 
       await act(async () => {
-        fireEvent.press(screen.getByRole("button", { name: "Continue" }));
+        jest.advanceTimersByTime(30_000);
         await flushPromises();
       });
 
@@ -479,6 +552,10 @@ describe("WindDownRoute", () => {
         await flushPromises();
       });
 
+      expect(mockWindDownAmbientAudioController.fadeNow).toHaveBeenCalledWith({
+        appState: "active",
+        nowMs: Date.parse("2026-05-25T23:25:35.000Z"),
+      });
       expect(screen.getByTestId("wind-down-state-audio_interruption")).toBeTruthy();
 
       await act(async () => {
@@ -489,14 +566,21 @@ describe("WindDownRoute", () => {
       expect(screen.getByTestId("wind-down-state-dimmed_idle")).toBeTruthy();
 
       await act(async () => {
-        jest.advanceTimersByTime(1_800_000);
+        jest.advanceTimersByTime(1_770_000);
         await flushPromises();
       });
 
+      expect(mockWindDownAmbientAudioController.stop).toHaveBeenCalledWith({
+        appState: "active",
+        nowMs: Date.parse("2026-05-25T23:55:05.000Z"),
+        reason: "timer-ended",
+      });
       expect(screen.getByTestId("wind-down-state-completion")).toBeTruthy();
       expect(mockCompleteWindDownRunLocally).toHaveBeenCalledWith(
         expect.any(Object),
         expect.objectContaining({
+          ambientCompletedAt: "2026-05-25T23:55:05.000Z",
+          completedAt: "2026-05-25T23:55:05.000Z",
           recoveryState: "completion",
           totalDurationSeconds: 1_800,
         }),
@@ -570,6 +654,58 @@ describe("WindDownRoute", () => {
         status: "breath_completed",
       }),
     );
+  });
+
+  it("releases ambient playback and persists a stopped run when the user stops the handoff sound", async () => {
+    mockLoadRememberedWindDownContextChoiceLocally.mockResolvedValue({
+      contextGoal: "fall_asleep_faster",
+      localInstallId: "install_0123456789abcdef",
+      routineId: "wind_down_sleep_starter",
+      selectedAt: "2026-05-24T23:18:00.000Z",
+    });
+
+    render(<WindDownRoute />);
+
+    await act(async () => {
+      await flushPromises();
+    });
+
+    await act(async () => {
+      jest.advanceTimersByTime(300_000);
+      await flushPromises();
+    });
+
+    await act(async () => {
+      jest.advanceTimersByTime(5_000);
+      await flushPromises();
+    });
+
+    await act(async () => {
+      jest.advanceTimersByTime(120_000);
+      await flushPromises();
+    });
+
+    expect(screen.getByTestId("wind-down-state-ambient_handoff")).toBeTruthy();
+
+    await act(async () => {
+      fireEvent.press(screen.getByRole("button", { name: "Stop sound" }));
+      await flushPromises();
+    });
+
+    expect(mockWindDownAmbientAudioController.stop).toHaveBeenCalledWith({
+      appState: "active",
+      nowMs: Date.parse("2026-05-25T23:25:05.000Z"),
+      reason: "manual-stop",
+    });
+    expect(mockStopWindDownRunLocally).toHaveBeenCalledWith(
+      expect.any(Object),
+      expect.objectContaining({
+        recoveryState: "completion",
+        stopReason: "user_stop",
+        stoppedAt: "2026-05-25T23:25:05.000Z",
+      }),
+    );
+    expect(screen.getByTestId("wind-down-state-completion")).toBeTruthy();
   });
 
   it("persists body cue start when the user taps the transition affordance", async () => {

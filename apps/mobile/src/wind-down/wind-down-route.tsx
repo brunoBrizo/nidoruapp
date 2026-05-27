@@ -10,12 +10,18 @@ import * as Haptics from "expo-haptics";
 import { useLocalSearchParams } from "expo-router";
 import type { SQLiteDatabase } from "expo-sqlite";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { AppState } from "react-native";
+import { AppState, type AppStateStatus } from "react-native";
 
 import {
   createActiveSessionAudioController,
   type ActiveSessionAudioController,
 } from "../audio/active-session-audio-controller";
+import {
+  createWindDownAmbientAudioController,
+  type WindDownAmbientAudioController,
+  type WindDownAmbientAudioSnapshot,
+} from "../audio/wind-down-ambient-audio";
+import type { SleepTimerAppState } from "../audio/sleep-timer-power-management";
 import {
   completeBreathSessionLocally,
   recordBreathSessionStartedLocally,
@@ -85,6 +91,8 @@ type WindDownBreathSessionController = BreathSessionController<{
 const windDownAudioCueModeId = "nature-ambient" as const satisfies BreathAudioCueModeId;
 const breathworkTickIntervalMs = 1000;
 const breathworkDraftPersistIntervalMs = 15000;
+const ambientAudioTickIntervalMs = 1000;
+const ambientInactivityDimMs = 30_000;
 
 export function WindDownRoute() {
   const params = useLocalSearchParams();
@@ -100,7 +108,12 @@ export function WindDownRoute() {
 
 function WindDownLiveRoute() {
   const [routeState, setRouteState] = useState<WindDownRouteState>({ status: "preparing" });
+  const [ambientAudioSnapshot, setAmbientAudioSnapshot] =
+    useState<WindDownAmbientAudioSnapshot>();
   const [liveActiveRoutine, setLiveActiveRoutine] = useState<WindDownActiveRoutineView>();
+  const ambientAudioControllerRef = useRef<WindDownAmbientAudioController | undefined>(undefined);
+  const ambientCompletionPersistingRunIdsRef = useRef(new Set<string>());
+  const ambientStartedAtMsRef = useRef<number | undefined>(undefined);
   const audioControllerRef = useRef<ActiveSessionAudioController | undefined>(undefined);
   const bodyCueStartedAtMsRef = useRef<number | undefined>(undefined);
   const completionPersistingRunIdsRef = useRef(new Set<string>());
@@ -112,12 +125,25 @@ function WindDownLiveRoute() {
     audioControllerRef.current = createActiveSessionAudioController();
   }
 
+  if (!ambientAudioControllerRef.current) {
+    ambientAudioControllerRef.current = createWindDownAmbientAudioController();
+  }
+
   useEffect(
     () => () => {
       audioControllerRef.current?.release();
+      ambientAudioControllerRef.current?.release();
     },
     [],
   );
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (nextState) => {
+      currentAppStateRef.current = nextState;
+    });
+
+    return () => subscription.remove();
+  }, []);
 
   const moveSession = useCallback(
     (
@@ -175,6 +201,9 @@ function WindDownLiveRoute() {
         readonly breathSessionId: string;
         readonly breathworkCompletedAt: string;
         readonly breathworkStartedAt: string;
+        readonly queuedEvent: NonNullable<
+          Parameters<typeof saveWindDownStepProgressLocally>[1]["queuedEvent"]
+        >;
       }>,
     ) => {
       await saveWindDownStepProgressLocally(session.database, {
@@ -184,6 +213,11 @@ function WindDownLiveRoute() {
         ...input,
       });
     },
+    [],
+  );
+
+  const getSleepTimerAppState = useCallback(
+    () => mapAppStateToSleepTimerAppState(currentAppStateRef.current),
     [],
   );
 
@@ -200,6 +234,113 @@ function WindDownLiveRoute() {
       }).finally(() => moveSession(session, "body_cue"));
     },
     [moveSession, saveSessionProgress],
+  );
+
+  const startAmbientHandoff = useCallback(
+    async (session: WindDownRouteSession) => {
+      const startedAtMs = Date.now();
+      const startedAt = new Date(startedAtMs).toISOString();
+
+      ambientStartedAtMsRef.current = startedAtMs;
+      audioControllerRef.current?.release();
+
+      const snapshot = await ambientAudioControllerRef.current?.start({
+        appState: getSleepTimerAppState(),
+        fadeOutDurationSeconds: session.routine.ambient.fadeOutDurationSeconds,
+        nowMs: startedAtMs,
+        soundId: session.routine.ambient.soundId,
+        soundLabel: session.routine.ambient.soundLabel,
+        timerDurationSeconds: session.ambientTimerDurationSeconds,
+      });
+
+      if (snapshot) {
+        setAmbientAudioSnapshot(snapshot);
+      }
+
+      await saveSessionProgress(session, {
+        ambientStartedAt: startedAt,
+        bodyCueCompletedAt: startedAt,
+        queuedEvent: {
+          eventName: "audio_started",
+          occurredAt: startedAt,
+        },
+        recoveryState: "ambient_handoff",
+        status: "ambient_playing",
+      });
+      moveSession(session, "ambient_handoff");
+    },
+    [getSleepTimerAppState, moveSession, saveSessionProgress],
+  );
+
+  const completeAmbientTimer = useCallback(
+    async (session: WindDownRouteSession, observedAtMs = Date.now()) => {
+      if (ambientCompletionPersistingRunIdsRef.current.has(session.runId)) {
+        return;
+      }
+
+      ambientCompletionPersistingRunIdsRef.current.add(session.runId);
+
+      try {
+        const completedAt = new Date(observedAtMs).toISOString();
+
+        const snapshot = await ambientAudioControllerRef.current?.stop({
+          appState: getSleepTimerAppState(),
+          nowMs: observedAtMs,
+          reason: "timer-ended",
+        });
+
+        if (snapshot) {
+          setAmbientAudioSnapshot(snapshot);
+        }
+
+        await completeWindDownRunLocally(session.database, {
+          ambientCompletedAt: completedAt,
+          completedAt,
+          localInstallId: session.localInstallId,
+          recoveryState: "completion",
+          runId: session.runId,
+          status: "completed",
+          totalDurationSeconds: session.ambientTimerDurationSeconds,
+          updatedAt: completedAt,
+        });
+        moveSession(session, "completion");
+      } finally {
+        ambientCompletionPersistingRunIdsRef.current.delete(session.runId);
+      }
+    },
+    [getSleepTimerAppState, moveSession],
+  );
+
+  const stopAmbientPlayback = useCallback(
+    async (session: WindDownRouteSession, observedAtMs = Date.now()) => {
+      const stoppedAt = new Date(observedAtMs).toISOString();
+      const snapshot = await ambientAudioControllerRef.current?.stop({
+        appState: getSleepTimerAppState(),
+        nowMs: observedAtMs,
+        reason: "manual-stop",
+      });
+
+      if (snapshot) {
+        setAmbientAudioSnapshot(snapshot);
+      }
+
+      await stopWindDownRunLocally(session.database, {
+        localInstallId: session.localInstallId,
+        recoveryState: "completion",
+        runId: session.runId,
+        stopReason: "user_stop",
+        status: "stopped",
+        stoppedAt,
+        totalDurationSeconds: getAmbientElapsedTotalSeconds(
+          session,
+          observedAtMs,
+          ambientStartedAtMsRef.current,
+        ),
+        updatedAt: stoppedAt,
+      });
+      moveSession(session, "completion");
+    },
+    [getSleepTimerAppState, moveSession],
   );
 
   const completeBreathworkAndMoveToTransition = useCallback(
@@ -485,6 +626,15 @@ function WindDownLiveRoute() {
           ].join(":"),
           session: routeState.session,
           visualState: routeState.visualState,
+      }
+      : null;
+
+  const ambientRoute =
+    routeState.status === "session" && isAmbientAudioState(routeState.visualState)
+      ? {
+          key: [routeState.session.runId, routeState.visualState].join(":"),
+          session: routeState.session,
+          visualState: routeState.visualState,
         }
       : null;
 
@@ -620,23 +770,6 @@ function WindDownLiveRoute() {
     }
 
     const { session, visualState } = routeState;
-    const scheduleTransition = (
-      delayMs: number,
-      nextState: Exclude<WindDownVisualStateId, "quick_context">,
-      createPersistInput?: () => Parameters<typeof saveSessionProgress>[1],
-    ) => {
-      const timeout = setTimeout(() => {
-        const persistInput = createPersistInput?.();
-
-        void (persistInput
-          ? saveSessionProgress(session, persistInput).finally(() =>
-              moveSession(session, nextState),
-            )
-          : Promise.resolve().then(() => moveSession(session, nextState)));
-      }, delayMs);
-
-      return () => clearTimeout(timeout);
-    };
 
     if (
       visualState === "active_winddown" ||
@@ -655,39 +788,77 @@ function WindDownLiveRoute() {
     }
 
     if (visualState === "body_cue") {
-      return scheduleTransition(120_000, "ambient_handoff", () => {
-        const completedAt = new Date().toISOString();
-
-        return {
-          ambientStartedAt: completedAt,
-          bodyCueCompletedAt: completedAt,
-          recoveryState: "ambient_handoff",
-          status: "body_cue_completed",
-        };
-      });
-    }
-
-    if (visualState === "dimmed_idle") {
       const timeout = setTimeout(() => {
-        const completedAt = new Date().toISOString();
-
-        void completeWindDownRunLocally(session.database, {
-          ambientCompletedAt: completedAt,
-          completedAt,
-          localInstallId: session.localInstallId,
-          recoveryState: "completion",
-          runId: session.runId,
-          status: "completed",
-          totalDurationSeconds: session.ambientTimerDurationSeconds,
-          updatedAt: completedAt,
-        }).finally(() => moveSession(session, "completion"));
-      }, session.ambientTimerDurationSeconds * 1000);
+        void startAmbientHandoff(session).catch(() => undefined);
+      }, 120_000);
 
       return () => clearTimeout(timeout);
     }
 
     return undefined;
-  }, [moveSession, routeState, saveSessionProgress, startBodyCue]);
+  }, [routeState, startAmbientHandoff, startBodyCue]);
+
+  useEffect(() => {
+    if (!ambientRoute) {
+      return undefined;
+    }
+
+    const { session } = ambientRoute;
+    const tickAmbientTimer = () => {
+      void ambientAudioControllerRef.current
+        ?.handleTimerTick({
+          appState: getSleepTimerAppState(),
+          nowMs: Date.now(),
+        })
+        .then((snapshot) => {
+          setAmbientAudioSnapshot(snapshot);
+
+          if (snapshot.status === "completed") {
+            void completeAmbientTimer(session);
+          }
+        })
+        .catch(() => undefined);
+    };
+
+    tickAmbientTimer();
+    const interval = setInterval(tickAmbientTimer, ambientAudioTickIntervalMs);
+
+    return () => clearInterval(interval);
+  }, [ambientRoute?.key, completeAmbientTimer, getSleepTimerAppState]);
+
+  useEffect(() => {
+    if (!ambientRoute) {
+      return undefined;
+    }
+
+    const { session } = ambientRoute;
+    const ambientStartedAtMs = ambientStartedAtMsRef.current ?? Date.now();
+    const elapsedMs = Math.max(0, Date.now() - ambientStartedAtMs);
+    const remainingMs = Math.max(0, session.ambientTimerDurationSeconds * 1000 - elapsedMs);
+    const timeout = setTimeout(() => {
+      void completeAmbientTimer(session).catch(() => undefined);
+    }, remainingMs);
+
+    return () => clearTimeout(timeout);
+  }, [ambientRoute?.session.runId, completeAmbientTimer]);
+
+  useEffect(() => {
+    if (
+      !ambientRoute ||
+      (ambientRoute.visualState !== "ambient_handoff" &&
+        ambientRoute.visualState !== "audio_interruption" &&
+        ambientRoute.visualState !== "tap_to_wake")
+    ) {
+      return undefined;
+    }
+
+    const { session } = ambientRoute;
+    const timeout = setTimeout(() => {
+      moveSession(session, "dimmed_idle");
+    }, ambientInactivityDimMs);
+
+    return () => clearTimeout(timeout);
+  }, [ambientRoute?.key, moveSession]);
 
   if (routeState.status === "session") {
     const { session, visualState } = routeState;
@@ -695,6 +866,16 @@ function WindDownLiveRoute() {
     return (
       <WindDownScreen
         activeRoutine={liveActiveRoutine ?? session.activeRoutine}
+        {...(ambientAudioSnapshot
+          ? {
+              ambientAudio: {
+                remainingSeconds: ambientAudioSnapshot.remainingSeconds,
+                soundLabel: session.routine.ambient.soundLabel,
+                status:
+                  ambientAudioSnapshot.status === "idle" ? "playing" : ambientAudioSnapshot.status,
+              },
+            }
+          : {})}
         onClose={() => {
           moveSession(session, "completion");
         }}
@@ -714,17 +895,27 @@ function WindDownLiveRoute() {
           }
 
           if (visualState === "partial_stop") {
-            moveSession(session, "ambient_handoff");
+            void startAmbientHandoff(session);
             return;
           }
 
           moveSession(session, "body_cue");
         }}
         onFadeNow={() => {
-          void saveSessionProgress(session, {
-            recoveryState: "audio_interruption",
-            status: "ambient_playing",
-          }).finally(() => moveSession(session, "audio_interruption"));
+          void ambientAudioControllerRef.current
+            ?.fadeNow({
+              appState: getSleepTimerAppState(),
+              nowMs: Date.now(),
+            })
+            .then((snapshot) => {
+              setAmbientAudioSnapshot(snapshot);
+
+              return saveSessionProgress(session, {
+                recoveryState: "audio_interruption",
+                status: "ambient_playing",
+              });
+            })
+            .finally(() => moveSession(session, "audio_interruption"));
         }}
         onSkipForTonight={() => {
           if (visualState === "background_recovery") {
@@ -769,16 +960,12 @@ function WindDownLiveRoute() {
             return;
           }
 
-          void completeWindDownRunLocally(session.database, {
-            ambientCompletedAt: stoppedAt,
-            completedAt: stoppedAt,
-            localInstallId: session.localInstallId,
-            recoveryState: "completion",
-            runId: session.runId,
-            status: "completed",
-            totalDurationSeconds: session.ambientTimerDurationSeconds,
-            updatedAt: stoppedAt,
-          }).finally(() => moveSession(session, "completion"));
+          if (isAmbientAudioState(visualState)) {
+            void stopAmbientPlayback(session);
+            return;
+          }
+
+          void completeAmbientTimer(session, Date.parse(stoppedAt));
         }}
         onUseNoHoldFallback={() => {
           void saveSessionProgress(session, {
@@ -896,6 +1083,40 @@ function isActiveBreathworkState(
   state: Exclude<WindDownVisualStateId, "quick_context">,
 ): state is Extract<WindDownVisualStateId, "active_winddown" | "daily_calm" | "no_hold_fallback"> {
   return state === "active_winddown" || state === "daily_calm" || state === "no_hold_fallback";
+}
+
+function isAmbientAudioState(
+  state: Exclude<WindDownVisualStateId, "quick_context">,
+): state is Extract<
+  WindDownVisualStateId,
+  "ambient_handoff" | "audio_interruption" | "dimmed_idle" | "tap_to_wake"
+> {
+  return (
+    state === "ambient_handoff" ||
+    state === "audio_interruption" ||
+    state === "dimmed_idle" ||
+    state === "tap_to_wake"
+  );
+}
+
+function mapAppStateToSleepTimerAppState(appState: AppStateStatus): SleepTimerAppState {
+  return appState === "active" ? "active" : "background";
+}
+
+function getAmbientElapsedTotalSeconds(
+  session: WindDownRouteSession,
+  observedAtMs: number,
+  ambientStartedAtMs: number | undefined,
+) {
+  const startedAtMs = ambientStartedAtMs ?? observedAtMs;
+  const ambientElapsedSeconds = Math.max(0, Math.floor((observedAtMs - startedAtMs) / 1000));
+
+  return (
+    session.routine.breathwork.durationSeconds +
+    session.routine.transition.durationSeconds +
+    session.routine.bodyCue.durationSeconds +
+    ambientElapsedSeconds
+  );
 }
 
 function getPhaseLabel(phaseName: BreathSessionSnapshot["phaseName"]) {

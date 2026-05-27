@@ -161,7 +161,42 @@ describe("WindDownRoute", () => {
     expect(screen.getByText("BODY SCAN")).toBeTruthy();
     expect(screen.getByRole("header", { name: "Give your busy mind a body scan." })).toBeTruthy();
     expect(screen.getByText("Move from forehead to feet, then release the tension.")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Stop body relaxation" })).toBeTruthy();
+    expect(screen.getByText("Swipe down to exit")).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Stop" })).toBeNull();
     expect(mockOpenMigratedLocalDatabase).not.toHaveBeenCalled();
+  });
+
+  it("renders the accepted partial-stop and background-recovery proof copy", () => {
+    mockUseLocalSearchParams.mockReturnValue({ windDownState: "partial_stop" });
+
+    const { rerender } = render(<WindDownRoute />);
+
+    expect(screen.getByText("WIND-DOWN SAVED")).toBeTruthy();
+    expect(screen.getByRole("header", { name: "You can stop here." })).toBeTruthy();
+    expect(screen.getByText("We saved what you completed tonight.")).toBeTruthy();
+    expect(screen.getByText("Body cue paused")).toBeTruthy();
+    expect(screen.getByText("Progress saved")).toBeTruthy();
+    expect(screen.getByText("Sound available")).toBeTruthy();
+    expect(screen.getByText("Optional, no setup")).toBeTruthy();
+    expect(screen.getByText("Nothing else needed tonight")).toBeTruthy();
+
+    mockUseLocalSearchParams.mockReturnValue({ windDownState: "background_recovery" });
+    rerender(<WindDownRoute />);
+
+    expect(screen.getByText("WIND-DOWN SAVED")).toBeTruthy();
+    expect(screen.getByRole("header", { name: "You’re back." })).toBeTruthy();
+    expect(screen.getByText("Breathwork was saved while you were away.")).toBeTruthy();
+    expect(screen.getByText("Breathwork complete")).toBeTruthy();
+    expect(screen.getByText("Ready for body relaxation")).toBeTruthy();
+    expect(screen.getByText("Breathwork saved")).toBeTruthy();
+    expect(screen.getByText("Completed")).toBeTruthy();
+    expect(screen.getByText("Routine paused")).toBeTruthy();
+    expect(screen.getByText("Waiting at the next step")).toBeTruthy();
+    expect(screen.getByText("Rain ready")).toBeTruthy();
+    expect(screen.getByText("Sound can continue softly")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Stop for tonight" })).toBeTruthy();
+    expect(screen.getByText("Nothing was lost")).toBeTruthy();
   });
 
   it("renders a calm fallback before local bootstrap resolves", () => {
@@ -414,6 +449,9 @@ describe("WindDownRoute", () => {
       });
 
       expect(screen.getByTestId("wind-down-state-body_cue")).toBeTruthy();
+      expect(screen.getByRole("button", { name: "Stop body relaxation" })).toBeTruthy();
+      expect(screen.getByText("Swipe down to exit")).toBeTruthy();
+      expect(screen.queryByRole("button", { name: "Stop" })).toBeNull();
 
       await act(async () => {
         jest.advanceTimersByTime(120_000);
@@ -470,7 +508,7 @@ describe("WindDownRoute", () => {
     }
   });
 
-  it("saves breathwork completion on app wake before showing the transition state", async () => {
+  it("saves breathwork completion on app wake before showing the background recovery state", async () => {
     mockLoadRememberedWindDownContextChoiceLocally.mockResolvedValue({
       contextGoal: "fall_asleep_faster",
       localInstallId: "install_0123456789abcdef",
@@ -511,11 +549,64 @@ describe("WindDownRoute", () => {
       expect.any(Object),
       expect.objectContaining({
         breathSessionId: mockRecordWindDownStartedLocally.mock.calls[0]?.[1].breathSessionId,
-        recoveryState: "transition_card",
+        recoveryState: "background_recovery",
         status: "breath_completed",
       }),
     );
+    expect(screen.getByTestId("wind-down-state-background_recovery")).toBeTruthy();
+    expect(screen.getByRole("header", { name: "You’re back." })).toBeTruthy();
+
+    await act(async () => {
+      fireEvent.press(screen.getByRole("button", { name: "Continue" }));
+      await flushPromises();
+    });
+
+    expect(screen.getByTestId("wind-down-state-body_cue")).toBeTruthy();
+    expect(mockSaveWindDownStepProgressLocally).toHaveBeenCalledWith(
+      expect.any(Object),
+      expect.objectContaining({
+        bodyCueStartedAt: "2026-05-25T23:23:01.000Z",
+        recoveryState: "body_cue",
+        status: "breath_completed",
+      }),
+    );
+  });
+
+  it("persists body cue start when the user taps the transition affordance", async () => {
+    mockLoadRememberedWindDownContextChoiceLocally.mockResolvedValue({
+      contextGoal: "fall_asleep_faster",
+      localInstallId: "install_0123456789abcdef",
+      routineId: "wind_down_sleep_starter",
+      selectedAt: "2026-05-24T23:18:00.000Z",
+    });
+
+    render(<WindDownRoute />);
+
+    await act(async () => {
+      await flushPromises();
+    });
+
+    await act(async () => {
+      jest.advanceTimersByTime(300_000);
+      await flushPromises();
+    });
+
     expect(screen.getByTestId("wind-down-state-transition_card")).toBeTruthy();
+
+    await act(async () => {
+      fireEvent.press(screen.getByRole("button", { name: "Next: Body relaxation" }));
+      await flushPromises();
+    });
+
+    expect(screen.getByTestId("wind-down-state-body_cue")).toBeTruthy();
+    expect(mockSaveWindDownStepProgressLocally).toHaveBeenCalledWith(
+      expect.any(Object),
+      expect.objectContaining({
+        bodyCueStartedAt: "2026-05-25T23:23:00.000Z",
+        recoveryState: "body_cue",
+        status: "breath_completed",
+      }),
+    );
   });
 
   it("switches remembered hold-based Wind-Down breathing to the no-hold fallback for tonight only", async () => {

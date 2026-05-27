@@ -102,6 +102,7 @@ function WindDownLiveRoute() {
   const [routeState, setRouteState] = useState<WindDownRouteState>({ status: "preparing" });
   const [liveActiveRoutine, setLiveActiveRoutine] = useState<WindDownActiveRoutineView>();
   const audioControllerRef = useRef<ActiveSessionAudioController | undefined>(undefined);
+  const bodyCueStartedAtMsRef = useRef<number | undefined>(undefined);
   const completionPersistingRunIdsRef = useRef(new Set<string>());
   const currentAppStateRef = useRef(AppState.currentState);
   const lastDraftPersistedAtMsRef = useRef<number | undefined>(undefined);
@@ -186,8 +187,30 @@ function WindDownLiveRoute() {
     [],
   );
 
+  const startBodyCue = useCallback(
+    (session: WindDownRouteSession) => {
+      const startedAtMs = Date.now();
+      const startedAt = new Date(startedAtMs).toISOString();
+      bodyCueStartedAtMsRef.current = startedAtMs;
+
+      return saveSessionProgress(session, {
+        bodyCueStartedAt: startedAt,
+        recoveryState: "body_cue",
+        status: "breath_completed",
+      }).finally(() => moveSession(session, "body_cue"));
+    },
+    [moveSession, saveSessionProgress],
+  );
+
   const completeBreathworkAndMoveToTransition = useCallback(
-    async (session: WindDownRouteSession, observedAtMs = Date.now()) => {
+    async (
+      session: WindDownRouteSession,
+      observedAtMs = Date.now(),
+      nextVisualState: Extract<
+        WindDownVisualStateId,
+        "background_recovery" | "transition_card"
+      > = "transition_card",
+    ) => {
       if (completionPersistingRunIdsRef.current.has(session.runId)) {
         return;
       }
@@ -227,10 +250,10 @@ function WindDownLiveRoute() {
         await saveSessionProgress(session, {
           breathSessionId: session.breathSessionId,
           breathworkCompletedAt: completedRecord.completedAt,
-          recoveryState: "transition_card",
+          recoveryState: nextVisualState,
           status: "breath_completed",
         });
-        moveSession(session, "transition_card");
+        moveSession(session, nextVisualState);
       } finally {
         completionPersistingRunIdsRef.current.delete(session.runId);
       }
@@ -561,7 +584,11 @@ function WindDownLiveRoute() {
       const snapshot = getBreathSessionSnapshot(session.breathSessionController, Date.now());
 
       if (snapshot.status === "completed") {
-        void completeBreathworkAndMoveToTransition(session, snapshot.observedAtMs);
+        void completeBreathworkAndMoveToTransition(
+          session,
+          snapshot.observedAtMs,
+          "background_recovery",
+        );
         return;
       }
 
@@ -620,11 +647,11 @@ function WindDownLiveRoute() {
     }
 
     if (visualState === "transition_card") {
-      return scheduleTransition(5_000, "body_cue", () => ({
-        bodyCueStartedAt: new Date().toISOString(),
-        recoveryState: "body_cue",
-        status: "breath_completed",
-      }));
+      const timeout = setTimeout(() => {
+        void startBodyCue(session);
+      }, 5_000);
+
+      return () => clearTimeout(timeout);
     }
 
     if (visualState === "body_cue") {
@@ -660,7 +687,7 @@ function WindDownLiveRoute() {
     }
 
     return undefined;
-  }, [moveSession, routeState, saveSessionProgress]);
+  }, [moveSession, routeState, saveSessionProgress, startBodyCue]);
 
   if (routeState.status === "session") {
     const { session, visualState } = routeState;
@@ -672,6 +699,11 @@ function WindDownLiveRoute() {
           moveSession(session, "completion");
         }}
         onContinue={() => {
+          if (visualState === "transition_card" || visualState === "background_recovery") {
+            void startBodyCue(session);
+            return;
+          }
+
           if (visualState === "ambient_handoff" || visualState === "audio_interruption") {
             void saveSessionProgress(session, {
               ambientStartedAt: new Date().toISOString(),
@@ -681,7 +713,7 @@ function WindDownLiveRoute() {
             return;
           }
 
-          if (visualState === "partial_stop" || visualState === "background_recovery") {
+          if (visualState === "partial_stop") {
             moveSession(session, "ambient_handoff");
             return;
           }
@@ -695,12 +727,34 @@ function WindDownLiveRoute() {
           }).finally(() => moveSession(session, "audio_interruption"));
         }}
         onSkipForTonight={() => {
+          if (visualState === "background_recovery") {
+            const stoppedAt = new Date().toISOString();
+
+            void stopWindDownRunLocally(session.database, {
+              localInstallId: session.localInstallId,
+              recoveryState: "partial_stop",
+              runId: session.runId,
+              stopReason: "app_backgrounded_after_main_exercise",
+              status: "stopped",
+              stoppedAt,
+              totalDurationSeconds: session.routine.breathwork.durationSeconds,
+              updatedAt: stoppedAt,
+            }).finally(() => moveSession(session, "partial_stop"));
+            return;
+          }
+
           moveSession(session, "completion");
         }}
         onStop={() => {
           const stoppedAt = new Date().toISOString();
 
           if (visualState === "body_cue") {
+            const bodyCueStartedAtMs = bodyCueStartedAtMsRef.current;
+            const bodyCueElapsedSeconds =
+              bodyCueStartedAtMs === undefined
+                ? 0
+                : Math.max(0, Math.floor((Date.now() - bodyCueStartedAtMs) / 1000));
+
             void stopWindDownRunLocally(session.database, {
               localInstallId: session.localInstallId,
               recoveryState: "partial_stop",
@@ -708,7 +762,8 @@ function WindDownLiveRoute() {
               stopReason: "user_stop",
               status: "stopped",
               stoppedAt,
-              totalDurationSeconds: 380,
+              totalDurationSeconds:
+                session.routine.breathwork.durationSeconds + bodyCueElapsedSeconds,
               updatedAt: stoppedAt,
             }).finally(() => moveSession(session, "partial_stop"));
             return;

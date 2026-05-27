@@ -1,11 +1,11 @@
 # Graph Report - sleep-app  (2026-05-27)
 
 ## Corpus Check
-- 158 files · ~455,891 words
+- 158 files · ~456,395 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 497 nodes · 529 edges · 19 communities detected
+- 498 nodes · 530 edges · 20 communities detected
 - Extraction: 87% EXTRACTED · 13% INFERRED · 0% AMBIGUOUS · INFERRED: 71 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
@@ -26,9 +26,10 @@
 - [[_COMMUNITY_Community 16|Community 16]]
 - [[_COMMUNITY_Community 18|Community 18]]
 - [[_COMMUNITY_Community 19|Community 19]]
-- [[_COMMUNITY_Community 22|Community 22]]
-- [[_COMMUNITY_Community 26|Community 26]]
-- [[_COMMUNITY_Community 33|Community 33]]
+- [[_COMMUNITY_Community 20|Community 20]]
+- [[_COMMUNITY_Community 23|Community 23]]
+- [[_COMMUNITY_Community 27|Community 27]]
+- [[_COMMUNITY_Community 34|Community 34]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `getBreathSessionSnapshot()` - 14 edges
@@ -57,8 +58,8 @@
 ## Communities
 
 ### Community 0 - "Community 0"
-Cohesion: 0.06
-Nodes (32): shouldStartFirstLaunchOnboarding(), canPromptForNotificationPermission(), completeFirstSessionLocally(), completeOnboardingPersonalizationLocally(), createDefaultRandomSegment(), createLocalEventId(), createLocalReflectionId(), getLocalCalendarDayDifference() (+24 more)
+Cohesion: 0.07
+Nodes (30): shouldStartFirstLaunchOnboarding(), canPromptForNotificationPermission(), completeFirstSessionLocally(), completeOnboardingPersonalizationLocally(), createDefaultRandomSegment(), createLocalEventId(), createLocalReflectionId(), getLocalCalendarDayDifference() (+22 more)
 
 ### Community 1 - "Community 1"
 Cohesion: 0.09
@@ -120,24 +121,30 @@ Nodes (3): assertCondition(), assertEquals(), assertNoAuditRiskPublicCopy()
 Cohesion: 0.5
 Nodes (3): TabLayout(), allowsIncompleteOnboardingForRoute(), parseFirstLaunch()
 
-### Community 22 - "Community 22"
+### Community 20 - "Community 20"
+Cohesion: 0.5
+Nodes (2): OnboardingContinueButton(), padTimeNumber()
+
+### Community 23 - "Community 23"
 Cohesion: 0.67
 Nodes (2): answerThroughBreathworkQuestion(), continueToNextQuestion()
 
-### Community 26 - "Community 26"
+### Community 27 - "Community 27"
 Cohesion: 1.0
 Nodes (2): getLocaleMessages(), normalizeLocale()
 
-### Community 33 - "Community 33"
+### Community 34 - "Community 34"
 Cohesion: 1.0
 Nodes (2): OnboardingRouteScreen(), parseOnboardingStage()
 
 ## Knowledge Gaps
-- **Thin community `Community 22`** (4 nodes): `onboarding-personalization-flow.component.jest.test.tsx`, `answerThroughBreathworkQuestion()`, `continueToNextQuestion()`, `expectClassNameContains()`
+- **Thin community `Community 20`** (5 nodes): `onboarding-flow-screen.tsx`, `cn()`, `OnboardingContinueButton()`, `OnboardingFlowScreen()`, `padTimeNumber()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 26`** (3 nodes): `getLocaleMessages()`, `normalizeLocale()`, `index.ts`
+- **Thin community `Community 23`** (4 nodes): `onboarding-personalization-flow.component.jest.test.tsx`, `answerThroughBreathworkQuestion()`, `continueToNextQuestion()`, `expectClassNameContains()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 33`** (3 nodes): `onboarding.tsx`, `OnboardingRouteScreen()`, `parseOnboardingStage()`
+- **Thin community `Community 27`** (3 nodes): `getLocaleMessages()`, `normalizeLocale()`, `index.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 34`** (3 nodes): `onboarding.tsx`, `OnboardingRouteScreen()`, `parseOnboardingStage()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 
 ## Suggested Questions
@@ -154,6 +161,6 @@ _Questions this graph is uniquely positioned to answer:_
 - **Are the 4 inferred relationships involving `requestNotificationPermissionFromGate()` (e.g. with `markNotificationPermissionPrompted()` and `captureAnalyticsEvent()`) actually correct?**
   _`requestNotificationPermissionFromGate()` has 4 INFERRED edges - model-reasoned connections that need verification._
 - **Should `Community 0` be split into smaller, more focused modules?**
-  _Cohesion score 0.06 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.07 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
   _Cohesion score 0.09 - nodes in this community are weakly interconnected._

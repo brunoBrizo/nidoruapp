@@ -236,32 +236,34 @@ export function WindDownScreen(props: WindDownScreenProps) {
   if (state === "transition_card") {
     return (
       <WindDownFrame stateId="transition_card">
-        <View className="flex-1 justify-center px-nidoru-screen pb-24">
-          <Text
-            accessibilityRole="header"
-            className="max-w-[260px] font-nidoru-primary-semibold text-[28px] leading-[34px] text-[#EEF0FF]"
-            selectable
-          >
-            Good. Now let your body relax.
-          </Text>
-          <View className="mt-8 flex-row items-center gap-2">
+        <View className="flex-1 px-nidoru-screen">
+          <View className="absolute left-0 right-0 top-[282px] items-center px-nidoru-screen">
             <Text
-              className="font-nidoru-primary-regular text-xs leading-4 text-[#8A8FA8]"
+              accessibilityRole="header"
+              className="max-w-[330px] text-center font-nidoru-primary-semibold text-[28px] leading-[34px] text-[#EEF0FF]"
               selectable
             >
-              Body relaxation starts in
+              Good. Now let your body relax.
             </Text>
-            <View className="h-6 w-6 items-center justify-center rounded-full border border-[#7C6FCD]/40 bg-[#14172B]/70">
+            <View className="mt-8 flex-row items-center gap-2">
               <Text
-                className="font-nidoru-data-regular text-xs leading-4 text-[#EEF0FF] tabular-nums"
+                className="font-nidoru-primary-regular text-xs leading-4 text-[#8A8FA8]"
                 selectable
               >
-                5
+                Body relaxation starts in
               </Text>
+              <View className="h-6 w-6 items-center justify-center rounded-full border border-[#7C6FCD]/40 bg-[#14172B]/70">
+                <Text
+                  className="font-nidoru-data-regular text-xs leading-4 text-[#EEF0FF] tabular-nums"
+                  selectable
+                >
+                  5
+                </Text>
+              </View>
             </View>
           </View>
-          <View className="mt-auto items-center gap-4">
-            <QuietPill label="Next. Body relaxation" onPress={props.onContinue} />
+          <View className="absolute bottom-[56px] left-0 right-0 items-center gap-4 px-nidoru-screen">
+            <QuietPill label="Next: Body relaxation" onPress={props.onContinue} />
             <Text
               className="text-center font-nidoru-primary-regular text-sm leading-5 text-[#8A8FA8]"
               selectable
@@ -279,47 +281,60 @@ export function WindDownScreen(props: WindDownScreenProps) {
 
     return (
       <WindDownFrame stateId="body_cue">
-        <View className="flex-1 justify-between px-nidoru-screen pt-[82px] pb-[34px]">
-          <View className="items-center">
-            <View className="h-1 w-10 rounded-full bg-[#EEF0FF]/24" />
-          </View>
-          <View className="gap-3">
+        <View className="flex-1 px-nidoru-screen">
+          <View className="absolute left-0 right-0 top-[52px] items-center px-nidoru-screen">
             <Text
-              className="font-nidoru-data-regular text-[11px] uppercase leading-4 tracking-[0.22em] text-[#4A4E6A]"
+              className="text-center font-nidoru-data-regular text-[11px] uppercase leading-4 tracking-[0.22em] text-[#4A4E6A]"
               selectable
             >
               {bodyCue.eyebrow}
             </Text>
+          </View>
+          <View className="absolute left-0 right-0 top-[270px] items-center gap-3 px-nidoru-screen">
             <Text
               accessibilityRole="header"
-              className="font-nidoru-primary-semibold text-[25px] leading-[32px] text-[#EEF0FF]"
+              className="text-center font-nidoru-primary-semibold text-[25px] leading-[32px] text-[#EEF0FF]"
               selectable
             >
               {bodyCue.title}
             </Text>
             <Text
-              className="font-nidoru-primary-regular text-sm leading-5 text-[#8A8FA8]"
+              className="text-center font-nidoru-primary-regular text-sm leading-5 text-[#8A8FA8]"
               selectable
             >
               {bodyCue.subtitle}
             </Text>
           </View>
-          <View className="items-center gap-24">
+          <View className="absolute left-0 right-0 top-[330px] h-[180px] items-center">
+            <BodyCueArc />
             <Text
-              className="font-nidoru-data-light text-base leading-6 text-[#A89CE0] tabular-nums"
+              className="absolute top-[54px] font-nidoru-data-light text-[22px] leading-7 text-[#A89CE0] tabular-nums"
               selectable
             >
               01:42
             </Text>
-            <View className="items-center gap-5">
+          </View>
+          <View className="absolute bottom-[34px] left-0 right-0 items-center gap-5 px-nidoru-screen">
+            <Text
+              className="font-nidoru-primary-regular text-sm leading-5 text-[#8A8FA8]"
+              selectable
+            >
+              Rain softly playing
+            </Text>
+            <Pressable
+              accessibilityHint="Saves the breathwork and body relaxation progress from tonight."
+              accessibilityLabel="Stop body relaxation"
+              accessibilityRole="button"
+              className="min-h-11 min-w-[160px] items-center justify-center rounded-full active:scale-[0.96]"
+              onPress={props.onStop}
+            >
               <Text
-                className="font-nidoru-primary-regular text-sm leading-5 text-[#8A8FA8]"
-                selectable
+                className="text-center font-nidoru-primary-regular text-sm leading-5 text-[#4A4E6A]"
+                selectable={false}
               >
-                Rain softly playing
+                Swipe down to exit
               </Text>
-              <QuietPill label="Stop" onPress={props.onStop} subdued />
-            </View>
+            </Pressable>
           </View>
         </View>
       </WindDownFrame>
@@ -549,12 +564,15 @@ export function WindDownScreen(props: WindDownScreenProps) {
       <WindDownFrame stateId="partial_stop">
         <TerminalState
           actionLabel="Continue with rain"
-          eyebrow="WIND-DOWN PAUSED"
+          bottomNote="Nothing else needed tonight"
+          eyebrow="WIND-DOWN SAVED"
+          heroSubtitle="01:12 completed"
+          heroTitle="Body relaxation paused"
           icon={Pause}
           items={[
             ["Breathwork saved", "Completed earlier"],
-            ["Body cue paused", "Nothing lost"],
-            ["Sound available", "Continue any time"],
+            ["Body cue paused", "Progress saved"],
+            ["Sound available", "Optional, no setup"],
           ]}
           onAction={props.onContinue}
           secondaryActionLabel="Close"
@@ -570,15 +588,18 @@ export function WindDownScreen(props: WindDownScreenProps) {
     <WindDownFrame stateId="background_recovery">
       <TerminalState
         actionLabel="Continue"
+        bottomNote="Nothing was lost"
         eyebrow="WIND-DOWN SAVED"
+        heroSubtitle="Ready for body relaxation"
+        heroTitle="Breathwork complete"
         icon={CloudRain}
         items={[
-          ["Breathwork saved", "Completed before backgrounding"],
+          ["Breathwork saved", "Completed"],
           ["Routine paused", "Waiting at the next step"],
-          ["Rain ready", "Sound can continue safely"],
+          ["Rain ready", "Sound can continue softly"],
         ]}
         onAction={props.onContinue}
-        secondaryActionLabel="Skip for tonight"
+        secondaryActionLabel="Stop for tonight"
         onSecondaryAction={props.onSkipForTonight}
         title="You’re back."
         subtitle="Breathwork was saved while you were away."
@@ -887,6 +908,37 @@ function TimerHalo({ value }: { readonly value: string }) {
   );
 }
 
+function BodyCueArc() {
+  return (
+    <View className="h-[170px] w-[330px] opacity-45" pointerEvents="none">
+      <Svg height="170" width="330">
+        <SvgCircle
+          cx="165"
+          cy="150"
+          fill="transparent"
+          r="124"
+          stroke="#272C56"
+          strokeDasharray="238 540"
+          strokeLinecap="round"
+          strokeWidth="2"
+          transform="rotate(205 165 150)"
+        />
+        <SvgCircle
+          cx="165"
+          cy="150"
+          fill="transparent"
+          r="78"
+          stroke="#1D2245"
+          strokeDasharray="154 410"
+          strokeLinecap="round"
+          strokeWidth="1.5"
+          transform="rotate(205 165 150)"
+        />
+      </Svg>
+    </View>
+  );
+}
+
 function AmbientOption({
   description,
   icon: Icon,
@@ -990,7 +1042,10 @@ function StatusLine({
 
 function TerminalState({
   actionLabel,
+  bottomNote = "Nothing else needs attention tonight.",
   eyebrow,
+  heroSubtitle,
+  heroTitle,
   icon: Icon,
   items,
   onAction,
@@ -1000,7 +1055,10 @@ function TerminalState({
   title,
 }: {
   readonly actionLabel: string;
+  readonly bottomNote?: string;
   readonly eyebrow: string;
+  readonly heroSubtitle?: string;
+  readonly heroTitle?: string;
   readonly icon: LucideIcon;
   readonly items: readonly (readonly [string, string])[];
   readonly onAction?: (() => void) | undefined;
@@ -1043,13 +1101,13 @@ function TerminalState({
           className="mt-7 text-center font-nidoru-primary-semibold text-sm leading-5 text-[#EEF0FF]"
           selectable
         >
-          {items[0]?.[0]}
+          {heroTitle ?? items[0]?.[0]}
         </Text>
         <Text
           className="text-center font-nidoru-primary-regular text-xs leading-4 text-[#4A4E6A]"
           selectable
         >
-          {items[0]?.[1]}
+          {heroSubtitle ?? items[0]?.[1]}
         </Text>
       </View>
 
@@ -1068,7 +1126,7 @@ function TerminalState({
           className="text-center font-nidoru-primary-regular text-xs leading-4 text-[#4A4E6A]"
           selectable
         >
-          Nothing else needs attention tonight.
+          {bottomNote}
         </Text>
       </View>
     </View>

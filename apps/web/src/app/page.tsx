@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { ReactElement } from "react";
 
 import { routeShellById } from "./route-shells";
 import { ShellPage } from "./shell-page";
@@ -10,6 +11,6 @@ export const metadata: Metadata = {
   description: shell.summary,
 };
 
-export default function MarketingPage() {
+export default function MarketingPage(): ReactElement {
   return <ShellPage shell={shell} />;
 }

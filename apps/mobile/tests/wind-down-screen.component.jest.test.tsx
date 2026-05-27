@@ -150,12 +150,13 @@ describe("WindDownScreen", () => {
           noHoldFallbackTechniqueId: null,
           soundLabel: "Rain",
           techniqueId: "diaphragmatic-breathing",
-          uiState: "active_winddown",
+          uiState: "no_hold_fallback",
         }}
         state="active"
       />,
     );
 
+    expect(screen.getByTestId("wind-down-state-no_hold_fallback")).toBeTruthy();
     expect(screen.getByRole("header", { name: "No-hold breathing" })).toBeTruthy();
     expect(screen.getByText("Diaphragmatic breathing for wind-down")).toBeTruthy();
     expect(screen.queryByText(holdSafetyCopy)).toBeNull();
@@ -193,6 +194,11 @@ describe("WindDownScreen", () => {
         state: "active_winddown",
         header: "Let's wind down.",
         expectedCopy: "Rain softly playing",
+      },
+      {
+        state: "no_hold_fallback",
+        header: "No-hold breathing",
+        expectedCopy: "Diaphragmatic breathing for wind-down",
       },
       {
         state: "daily_calm",

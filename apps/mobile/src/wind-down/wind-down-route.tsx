@@ -89,7 +89,9 @@ function WindDownLiveRoute() {
     async (
       session: WindDownRouteSession,
       input: {
-        readonly recoveryState: Exclude<WindDownVisualStateId, "quick_context">;
+        readonly recoveryState: Parameters<
+          typeof saveWindDownStepProgressLocally
+        >[1]["recoveryState"];
         readonly status: "started" | "breath_completed" | "body_cue_completed" | "ambient_playing";
       } & Partial<{
         readonly ambientCompletedAt: string;
@@ -277,7 +279,11 @@ function WindDownLiveRoute() {
       return () => clearTimeout(timeout);
     };
 
-    if (visualState === "active_winddown" || visualState === "daily_calm") {
+    if (
+      visualState === "active_winddown" ||
+      visualState === "daily_calm" ||
+      visualState === "no_hold_fallback"
+    ) {
       return scheduleTransition(
         session.activeRoutine.remainingSeconds * 1000,
         "transition_card",
@@ -482,6 +488,7 @@ function createActiveRoutineView(
 const windDownVisualProofStates = [
   "quick_context",
   "active_winddown",
+  "no_hold_fallback",
   "daily_calm",
   "transition_card",
   "body_cue",

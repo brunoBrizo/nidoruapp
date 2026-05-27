@@ -41,12 +41,16 @@ export type WindDownActiveRoutineView = {
   readonly noHoldFallbackTechniqueId: BreathTechniqueId | null;
   readonly soundLabel: string;
   readonly techniqueId: BreathTechniqueId;
-  readonly uiState: Extract<WindDownRoutineUiState, "active_winddown" | "daily_calm">;
+  readonly uiState: Extract<
+    WindDownRoutineUiState,
+    "active_winddown" | "daily_calm" | "no_hold_fallback"
+  >;
 };
 
 export type WindDownVisualStateId =
   | "quick_context"
   | "active_winddown"
+  | "no_hold_fallback"
   | "daily_calm"
   | "transition_card"
   | "body_cue"
@@ -106,6 +110,14 @@ const dailyCalmRoutine = {
   noHoldFallbackTechniqueId: null,
   techniqueId: "coherent-breathing",
   uiState: "daily_calm",
+} as const satisfies WindDownActiveRoutineView;
+
+const noHoldFallbackRoutine = {
+  ...defaultActiveRoutine,
+  isNoHoldFallback: true,
+  noHoldFallbackTechniqueId: null,
+  techniqueId: "diaphragmatic-breathing",
+  uiState: "no_hold_fallback",
 } as const satisfies WindDownActiveRoutineView;
 
 const iconByGoal: Record<WindDownContextGoal, LucideIcon> = {
@@ -203,11 +215,16 @@ export function WindDownScreen(props: WindDownScreenProps) {
   const state =
     props.state === "active" ? (props.activeRoutine?.uiState ?? "active_winddown") : props.state;
 
-  if (state === "active_winddown" || state === "daily_calm") {
+  if (state === "active_winddown" || state === "daily_calm" || state === "no_hold_fallback") {
     return (
       <BreathworkState
         activeRoutine={
-          props.activeRoutine ?? (state === "daily_calm" ? dailyCalmRoutine : defaultActiveRoutine)
+          props.activeRoutine ??
+          (state === "daily_calm"
+            ? dailyCalmRoutine
+            : state === "no_hold_fallback"
+              ? noHoldFallbackRoutine
+              : defaultActiveRoutine)
         }
         onUseNoHoldFallback={props.onUseNoHoldFallback}
         state={state}
@@ -689,7 +706,10 @@ function BreathworkState({
 }: {
   readonly activeRoutine: WindDownActiveRoutineView;
   readonly onUseNoHoldFallback?: (() => void) | undefined;
-  readonly state: Extract<WindDownVisualStateId, "active_winddown" | "daily_calm">;
+  readonly state: Extract<
+    WindDownVisualStateId,
+    "active_winddown" | "daily_calm" | "no_hold_fallback"
+  >;
 }) {
   const isDailyCalm = state === "daily_calm";
   const title = activeRoutine.isNoHoldFallback

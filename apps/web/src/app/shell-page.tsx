@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { ReactElement } from "react";
 
 import { routeShells, sharedWebFoundation, type RouteShell } from "./route-shells";
 
@@ -6,7 +7,7 @@ type ShellPageProps = {
   readonly shell: RouteShell;
 };
 
-export function ShellPage({ shell }: ShellPageProps) {
+export function ShellPage({ shell }: ShellPageProps): ReactElement {
   return (
     <div className="site-shell">
       <header className="site-header">

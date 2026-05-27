@@ -99,7 +99,6 @@ describe("Tailwind migration guardrails", () => {
       "src/app/(tabs)/check-in.tsx",
       "src/app/(tabs)/progress/[anchor].tsx",
       "src/app/(tabs)/profile/[...anchor].tsx",
-      "src/app/(tabs)/sleep/sounds.tsx",
       "src/app/(tabs)/sleep/stories.tsx",
     ];
 
@@ -114,6 +113,7 @@ describe("Tailwind migration guardrails", () => {
       "src/app/(tabs)/progress.tsx",
       "src/app/(tabs)/profile.tsx",
       "src/app/(tabs)/rescue-me.tsx",
+      "src/app/(tabs)/sleep/sounds.tsx",
       "src/app/(tabs)/sleep/wind-down.tsx",
       "src/app/(tabs)/breathe/[technique].tsx",
     ]) {

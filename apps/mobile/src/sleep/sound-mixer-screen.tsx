@@ -13,6 +13,7 @@ import {
   Leaf,
   Magnet,
   MoonStar,
+  Pause,
   PlusCircle,
   Radio,
   Timer,
@@ -54,6 +55,8 @@ type SoundCategory = {
   readonly label: string;
   readonly sounds: readonly SoundCard[];
 };
+
+type PlaybackMode = "mixer" | "idle" | "controls" | "interrupted";
 
 const colors = {
   active: "#7C6FCD",
@@ -123,9 +126,42 @@ const activeSounds = soundCategories
 
 const timerOptions = ["20", "30", "45", "60", "∞"] as const;
 
-export function SoundMixerScreen() {
+export function SoundMixerScreen({
+  initialPlaybackMode = "mixer",
+}: {
+  readonly initialPlaybackMode?: PlaybackMode;
+} = {}) {
   const router = useRouter();
   const [isSaveMixSheetOpen, setIsSaveMixSheetOpen] = useState(false);
+  const [playbackMode, setPlaybackMode] = useState<PlaybackMode>(initialPlaybackMode);
+
+  if (playbackMode !== "mixer") {
+    return (
+      <Modal
+        animationType="none"
+        presentationStyle="overFullScreen"
+        statusBarTranslucent
+        transparent
+        visible
+      >
+        <SoundMixerPlaybackScreen
+          mode={playbackMode}
+          onReturnToMixer={() => {
+            setPlaybackMode("mixer");
+          }}
+          onResumeSound={() => {
+            setPlaybackMode("controls");
+          }}
+          onShowIdle={() => {
+            setPlaybackMode("idle");
+          }}
+          onWake={() => {
+            setPlaybackMode("controls");
+          }}
+        />
+      </Modal>
+    );
+  }
 
   return (
     <View className="flex-1 bg-[#0D0F1A]" testID="sound-mixer-screen">
@@ -271,7 +307,16 @@ export function SoundMixerScreen() {
           className="absolute bottom-[96px] left-nidoru-screen right-nidoru-screen z-40 gap-3.5 rounded-[24px] border border-[#1E2236]/80 bg-[#14172B]/95 p-3.5 shadow-[0_-8px_30px_rgba(13,15,26,0.9)]"
           testID="sound-mixer-active-strip"
         >
-          <View className="flex-row items-center justify-between px-1">
+          <Pressable
+            accessibilityHint="Opens the low-light playback screen."
+            accessibilityLabel="Show dark playback mode"
+            accessibilityRole="button"
+            className="min-h-11 flex-row items-center justify-between rounded-[14px] px-1 active:scale-[0.98]"
+            onPress={() => {
+              setPlaybackMode("idle");
+            }}
+            testID="sound-mixer-show-dark-playback"
+          >
             <View>
               <Text className="font-nidoru-primary-semibold text-[15px] leading-5 tracking-wide text-[#EEF0FF]">
                 Tonight mix
@@ -285,7 +330,7 @@ export function SoundMixerScreen() {
                 <ActiveMiniIcon key={sound.id} sound={sound} />
               ))}
             </View>
-          </View>
+          </Pressable>
 
           <View className="h-11 flex-row gap-3">
             <View
@@ -348,6 +393,370 @@ export function SoundMixerScreen() {
       ) : null}
     </View>
   );
+}
+
+function SoundMixerPlaybackScreen({
+  mode,
+  onReturnToMixer,
+  onResumeSound,
+  onShowIdle,
+  onWake,
+}: {
+  readonly mode: Exclude<PlaybackMode, "mixer">;
+  readonly onReturnToMixer: () => void;
+  readonly onResumeSound: () => void;
+  readonly onShowIdle: () => void;
+  readonly onWake: () => void;
+}) {
+  if (mode === "idle") {
+    return <SoundMixerIdlePlaybackScreen onWake={onWake} />;
+  }
+
+  if (mode === "interrupted") {
+    return (
+      <SoundMixerInterruptedPlaybackScreen
+        onKeepStopped={onReturnToMixer}
+        onResumeSound={onResumeSound}
+      />
+    );
+  }
+
+  return (
+    <View
+      className="flex-1 bg-[#03040A] px-nidoru-screen pt-12 pb-8"
+      testID="sound-mixer-dark-playback-controls"
+    >
+      <StatusBar hidden />
+      <View className="absolute inset-0 bg-gradient-to-b from-[#0D0F1A]/25 to-transparent" />
+
+      <View className="min-h-11 flex-row items-center justify-between">
+        <Pressable
+          accessibilityLabel="Back to mixer"
+          accessibilityRole="button"
+          className="-ml-2 h-11 w-11 items-center justify-center rounded-[14px] active:scale-[0.96]"
+          onPress={onReturnToMixer}
+          testID="sound-mixer-playback-back"
+        >
+          <ChevronLeft color={colors.inactive} size={22} strokeWidth={1.5} />
+        </Pressable>
+        <Text className="font-nidoru-primary-regular text-sm font-light leading-5 tracking-wide text-[#8A8FA8]">
+          Playing softly
+        </Text>
+        <Pressable
+          accessibilityLabel="Dim playback controls"
+          accessibilityRole="button"
+          className="-mr-2 h-11 w-11 items-center justify-center rounded-[14px] active:scale-[0.96]"
+          onPress={onShowIdle}
+          testID="sound-mixer-playback-dim"
+        >
+          <MoonStar color={colors.activeSoft} size={20} strokeWidth={1.5} />
+        </Pressable>
+      </View>
+
+      <View className="flex-1 justify-between pt-12">
+        <View className="items-center">
+          <View
+            className="mb-7 h-[148px] w-[148px] items-center justify-center"
+            testID="sound-mixer-playback-controls-ring"
+          >
+            <ProgressRing
+              progress={0.93}
+              progressOpacity={0.42}
+              size={148}
+              strokeColor={colors.active}
+              strokeWidth={2}
+              trackColor={colors.muted}
+              trackOpacity={0.16}
+            />
+            <Pressable
+              accessibilityHint="Pauses the active sleep sound mix."
+              accessibilityLabel="Pause sound"
+              accessibilityRole="button"
+              className="absolute h-16 w-16 items-center justify-center rounded-full border border-[#2D3359] bg-[#14172B]/80 active:scale-[0.96]"
+              testID="sound-mixer-playback-pause"
+            >
+              <Pause color={colors.text} size={26} strokeWidth={1.6} />
+            </Pressable>
+          </View>
+
+          <Text
+            accessibilityRole="header"
+            className="font-nidoru-primary-regular text-[24px] font-medium leading-[30px] text-[#EEF0FF]"
+            selectable
+          >
+            Rain Hearth
+          </Text>
+          <Text className="mt-2 font-nidoru-primary-regular text-sm font-medium leading-5 tracking-wide text-[#EEF0FF]/60">
+            Fade starts in <Text className="font-nidoru-data-regular tabular-nums">28 min</Text>
+          </Text>
+          <Text className="mt-1 font-nidoru-primary-regular text-xs font-light leading-4 tracking-wide text-[#4A4E6A]">
+            Timer <Text>·</Text>{" "}
+            <Text className="font-nidoru-data-regular tabular-nums">30 min</Text>
+          </Text>
+        </View>
+
+        <View className="gap-4">
+          <View
+            className="gap-3 rounded-[22px] border border-[#1E2236]/70 bg-[#0D0F1A]/80 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]"
+            testID="sound-mixer-playback-layer-tray"
+          >
+            {activeSounds.map((sound) => (
+              <PlaybackLayerRow key={sound.id} sound={sound} />
+            ))}
+          </View>
+
+          <View className="flex-row gap-3">
+            <Pressable
+              accessibilityLabel="Save Mix"
+              accessibilityRole="button"
+              className="h-12 flex-1 items-center justify-center rounded-[14px] border border-[#2D3359]/70 bg-[#14172B]/70 active:scale-[0.98]"
+              testID="sound-mixer-playback-save"
+            >
+              <Text className="font-nidoru-primary-semibold text-sm leading-[18px] tracking-wide text-[#A89CE0]">
+                Save Mix
+              </Text>
+            </Pressable>
+            <Pressable
+              accessibilityLabel="Adjust mix"
+              accessibilityRole="button"
+              className="h-12 flex-1 items-center justify-center rounded-[14px] bg-[#7C6FCD] shadow-[0_0_15px_rgba(124,111,205,0.18)] active:scale-[0.98]"
+              onPress={onReturnToMixer}
+              testID="sound-mixer-playback-adjust"
+            >
+              <Text className="font-nidoru-primary-semibold text-sm leading-[18px] tracking-wide text-white">
+                Adjust mix
+              </Text>
+            </Pressable>
+          </View>
+        </View>
+      </View>
+    </View>
+  );
+}
+
+function SoundMixerInterruptedPlaybackScreen({
+  onKeepStopped,
+  onResumeSound,
+}: {
+  readonly onKeepStopped: () => void;
+  readonly onResumeSound: () => void;
+}) {
+  return (
+    <View
+      className="flex-1 bg-[#03040A] px-nidoru-screen pt-12 pb-8"
+      testID="sound-mixer-dark-playback-interrupted"
+    >
+      <StatusBar hidden />
+      <View className="absolute inset-0 bg-gradient-to-b from-[#0D0F1A]/25 to-transparent" />
+
+      <View className="min-h-11 flex-row items-center justify-start">
+        <Pressable
+          accessibilityLabel="Back to mixer"
+          accessibilityRole="button"
+          className="-ml-2 h-11 w-11 items-center justify-center rounded-[14px] active:scale-[0.96]"
+          onPress={onKeepStopped}
+          testID="sound-mixer-interrupted-back"
+        >
+          <ChevronLeft color={colors.inactive} size={22} strokeWidth={1.5} />
+        </Pressable>
+      </View>
+
+      <View className="flex-1 justify-between pt-12">
+        <View className="items-center">
+          <View
+            className="mb-7 h-[132px] w-[132px] items-center justify-center opacity-80"
+            testID="sound-mixer-interrupted-ring"
+          >
+            <ProgressRing
+              progress={0.72}
+              progressOpacity={0.18}
+              size={132}
+              strokeColor={colors.active}
+              strokeWidth={2}
+              trackColor={colors.muted}
+              trackOpacity={0.16}
+            />
+            <View className="absolute inset-0 items-center justify-center">
+              <View className="h-16 w-16 items-center justify-center rounded-full border border-[#2D3359] bg-[#14172B]/70">
+                <Headphones color={colors.activeSoft} size={28} strokeWidth={1.5} />
+              </View>
+            </View>
+          </View>
+
+          <Text
+            accessibilityRole="header"
+            className="font-nidoru-primary-regular text-[24px] font-medium leading-[30px] text-[#EEF0FF]"
+            selectable
+          >
+            Playback paused
+          </Text>
+          <Text className="mt-2 font-nidoru-primary-regular text-sm font-light leading-5 tracking-wide text-[#8A8FA8]">
+            Audio was interrupted.
+          </Text>
+          <Text className="mt-1 font-nidoru-primary-regular text-xs font-light leading-4 tracking-wide text-[#4A4E6A]">
+            Timer is paused until you resume.
+          </Text>
+
+          <View className="mt-9 max-w-[280px] flex-row flex-wrap justify-center gap-2">
+            {activeSounds.map((sound) => (
+              <PlaybackLayerChip key={sound.id} sound={sound} />
+            ))}
+          </View>
+        </View>
+
+        <View className="gap-4">
+          <View className="rounded-[18px] border border-[#1E2236]/60 bg-[#0D0F1A]/70 p-4">
+            <Text className="text-center font-nidoru-primary-regular text-xs font-light leading-5 tracking-wide text-[#8A8FA8]">
+              Check your audio output if this keeps happening.
+            </Text>
+          </View>
+
+          <View className="gap-2">
+            <Pressable
+              accessibilityLabel="Resume sound"
+              accessibilityRole="button"
+              className="h-12 items-center justify-center rounded-[14px] bg-[#7C6FCD] shadow-[0_0_15px_rgba(124,111,205,0.18)] active:scale-[0.98]"
+              onPress={onResumeSound}
+              testID="sound-mixer-interrupted-resume"
+            >
+              <Text className="font-nidoru-primary-semibold text-[15px] leading-5 tracking-wide text-white">
+                Resume sound
+              </Text>
+            </Pressable>
+            <Pressable
+              accessibilityLabel="Keep stopped"
+              accessibilityRole="button"
+              className="h-12 items-center justify-center rounded-[14px] bg-transparent active:scale-[0.98]"
+              onPress={onKeepStopped}
+              testID="sound-mixer-interrupted-stop"
+            >
+              <Text className="font-nidoru-primary-semibold text-[15px] leading-5 tracking-wide text-[#8A8FA8]">
+                Keep stopped
+              </Text>
+            </Pressable>
+          </View>
+        </View>
+      </View>
+    </View>
+  );
+}
+
+function SoundMixerIdlePlaybackScreen({ onWake }: { readonly onWake: () => void }) {
+  return (
+    <Pressable
+      accessibilityLabel="Tap to show controls"
+      accessibilityRole="button"
+      className="relative flex-1 bg-[#03040A] items-center justify-center overflow-hidden active:scale-[0.99]"
+      onPress={onWake}
+      testID="sound-mixer-dark-playback-idle"
+    >
+      <StatusBar hidden />
+      <View className="absolute inset-0 bg-gradient-to-b from-[#0D0F1A]/20 to-transparent" />
+
+      <View className="relative z-10 -mt-10 w-full items-center px-6">
+        <View
+          className="mb-8 h-28 w-28 items-center justify-center opacity-80"
+          testID="sound-mixer-dark-playback-ring"
+        >
+          <ProgressRing
+            progress={0.93}
+            progressOpacity={0.35}
+            size={112}
+            strokeColor={colors.active}
+            strokeWidth={1.5}
+            trackColor={colors.muted}
+            trackOpacity={0.15}
+          />
+          <View className="absolute inset-0 items-center justify-center">
+            <MoonStar color={colors.active} size={36} strokeWidth={1.5} />
+          </View>
+        </View>
+
+        <Text
+          accessibilityRole="header"
+          className="mb-1 font-nidoru-primary-regular text-2xl font-medium leading-[31px] text-[#EEF0FF]/80"
+          selectable
+        >
+          Rain Hearth
+        </Text>
+        <Text className="mb-10 font-nidoru-primary-regular text-sm font-light leading-5 tracking-wide text-[#8A8FA8]/70">
+          Playing softly
+        </Text>
+
+        <View className="mb-12 max-w-[280px] flex-row flex-wrap justify-center gap-2">
+          {activeSounds.map((sound) => (
+            <PlaybackLayerChip key={sound.id} sound={sound} />
+          ))}
+        </View>
+
+        <Text className="mb-1.5 font-nidoru-primary-regular text-sm font-medium leading-5 tracking-wide text-[#EEF0FF]/60">
+          Fade starts in <Text className="font-nidoru-data-regular tabular-nums">28 min</Text>
+        </Text>
+        <Text className="font-nidoru-primary-regular text-xs font-light leading-4 tracking-wide text-[#4A4E6A]">
+          Then fades out softly
+        </Text>
+      </View>
+
+      <View className="absolute bottom-10 left-0 right-0 items-center pb-6">
+        <Text className="font-nidoru-primary-semibold text-xs leading-4 tracking-[0.18em] text-[#8A8FA8]/40">
+          TAP TO SHOW CONTROLS
+        </Text>
+      </View>
+    </Pressable>
+  );
+}
+
+function PlaybackLayerChip({ sound }: { readonly sound: SoundCard }) {
+  const Icon = sound.Icon;
+
+  return (
+    <View className="flex-row items-center gap-1.5 rounded-full border border-[#1E2236]/30 bg-[#0D0F1A]/40 px-3 py-1.5">
+      <Icon color={colors.active} size={14} strokeWidth={1.5} />
+      <Text className="font-nidoru-primary-semibold text-xs leading-4 tracking-wide text-[#8A8FA8]/60">
+        {getPlaybackLayerLabel(sound)}
+      </Text>
+    </View>
+  );
+}
+
+function PlaybackLayerRow({ sound }: { readonly sound: SoundCard }) {
+  const Icon = sound.Icon;
+  const volume = sound.volume ?? 0;
+  const volumeWidth = `${volume}%` as const;
+
+  return (
+    <View
+      accessibilityLabel={`${sound.label} active layer at ${volume}% volume`}
+      accessible
+      className="min-h-11 flex-row items-center justify-between gap-3"
+      testID={`sound-mixer-playback-layer-${sound.id}`}
+    >
+      <View className="flex-1 flex-row items-center gap-3">
+        <View className="h-9 w-9 items-center justify-center rounded-full border border-[#2D3359] bg-[#1C2040]/70">
+          <Icon color={colors.activeSoft} size={16} strokeWidth={1.5} />
+        </View>
+        <Text className="font-nidoru-primary-regular text-sm leading-[18px] tracking-wide text-[#EEF0FF]/85">
+          {sound.label}
+        </Text>
+      </View>
+      <View className="w-[72px] items-end gap-1">
+        <Text className="font-nidoru-data-regular text-sm font-medium leading-[18px] text-[#A89CE0] tabular-nums">
+          {volumeWidth}
+        </Text>
+        <View className="h-1.5 w-full overflow-hidden rounded-full bg-[#1E2236]">
+          <View className="h-full rounded-full bg-[#7C6FCD]/70" style={{ width: volumeWidth }} />
+        </View>
+      </View>
+    </View>
+  );
+}
+
+function getPlaybackLayerLabel(sound: SoundCard) {
+  if (sound.id === "fireplace-crackling") {
+    return "Fireplace";
+  }
+
+  return sound.label;
 }
 
 function SaveMixSheet({
@@ -626,6 +1035,7 @@ function ActiveMiniIcon({ sound }: { readonly sound: SoundCard }) {
 
 function ProgressRing({
   progress,
+  progressOpacity = 1,
   size,
   strokeColor,
   strokeWidth,
@@ -637,6 +1047,7 @@ function ProgressRing({
   readonly strokeColor: string;
   readonly strokeWidth: number;
   readonly trackColor: string;
+  readonly progressOpacity?: number;
   readonly trackOpacity?: number;
 }) {
   const radius = size / 2 - strokeWidth * 2;
@@ -660,6 +1071,7 @@ function ProgressRing({
           cy={size / 2}
           fill="none"
           r={radius}
+          opacity={progressOpacity}
           rotation="-90"
           originX={size / 2}
           originY={size / 2}

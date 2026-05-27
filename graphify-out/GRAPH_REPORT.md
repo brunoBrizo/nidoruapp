@@ -1,7 +1,7 @@
 # Graph Report - sleep-app  (2026-05-27)
 
 ## Corpus Check
-- 163 files · ~475,212 words
+- 163 files · ~476,367 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary

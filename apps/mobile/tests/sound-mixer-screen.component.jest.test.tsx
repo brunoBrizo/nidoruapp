@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 import SoundMixerAnchorScreen from "../src/app/(tabs)/sleep/sounds";
+import { SoundMixerScreen } from "../src/sleep/sound-mixer-screen";
 
 const mockRouterBack = jest.fn();
 
@@ -205,6 +206,52 @@ describe("SoundMixerAnchorScreen", () => {
     );
     expect(screen.getByRole("button", { name: "Close Save Mix sheet" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Cancel Save Mix" })).toBeTruthy();
+  });
+
+  it("opens the dark playback base and wakes the temporary controls", () => {
+    render(<SoundMixerAnchorScreen />);
+
+    fireEvent.press(screen.getByRole("button", { name: "Show dark playback mode" }));
+
+    expect(screen.getByRole("button", { name: "Tap to show controls" })).toBeTruthy();
+    expect(screen.getByText("Rain Hearth")).toBeTruthy();
+    expect(screen.getByText("Playing softly")).toBeTruthy();
+    expect(screen.getByText("TAP TO SHOW CONTROLS")).toBeTruthy();
+    expect(screen.getByTestId("sound-mixer-dark-playback-idle").props.className).toEqual(
+      expect.stringContaining("flex-1 bg-[#03040A]"),
+    );
+    expect(screen.getByTestId("sound-mixer-dark-playback-ring").props.className).toEqual(
+      expect.stringContaining("h-28 w-28"),
+    );
+
+    fireEvent.press(screen.getByRole("button", { name: "Tap to show controls" }));
+
+    expect(screen.getByTestId("sound-mixer-dark-playback-controls")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Pause sound" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Dim playback controls" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Adjust mix" })).toBeTruthy();
+    expect(screen.getByLabelText("Light Rain active layer at 72% volume")).toBeTruthy();
+    expect(screen.getByLabelText("Brown Noise active layer at 58% volume")).toBeTruthy();
+    expect(screen.getByLabelText("Fireplace Crackling active layer at 34% volume")).toBeTruthy();
+  });
+
+  it("renders the calm audio interruption recovery state", () => {
+    render(<SoundMixerScreen initialPlaybackMode="interrupted" />);
+
+    expect(screen.getByTestId("sound-mixer-dark-playback-interrupted")).toBeTruthy();
+    expect(screen.getByRole("header", { name: "Playback paused" })).toBeTruthy();
+    expect(screen.getByText("Audio was interrupted.")).toBeTruthy();
+    expect(screen.getByText("Timer is paused until you resume.")).toBeTruthy();
+    expect(screen.getByText("Check your audio output if this keeps happening.")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Resume sound" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Keep stopped" })).toBeTruthy();
+    expect(screen.getByText("Light Rain")).toBeTruthy();
+    expect(screen.getByText("Brown Noise")).toBeTruthy();
+    expect(screen.getByText("Fireplace")).toBeTruthy();
+
+    fireEvent.press(screen.getByRole("button", { name: "Resume sound" }));
+
+    expect(screen.getByRole("button", { name: "Pause sound" })).toBeTruthy();
   });
 
   it("matches the Save Mix sheet layout classes and touch-target requirements", () => {

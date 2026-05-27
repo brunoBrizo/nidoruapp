@@ -582,7 +582,7 @@ describe("WindDownRoute", () => {
           ambientCompletedAt: "2026-05-25T23:55:05.000Z",
           completedAt: "2026-05-25T23:55:05.000Z",
           recoveryState: "completion",
-          totalDurationSeconds: 1_800,
+          totalDurationSeconds: 2_225,
         }),
       );
       expect(mockStopWindDownRunLocally).not.toHaveBeenCalled();

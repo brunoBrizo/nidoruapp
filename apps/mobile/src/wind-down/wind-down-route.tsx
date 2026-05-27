@@ -309,7 +309,7 @@ function WindDownLiveRoute() {
           recoveryState: "completion",
           runId: session.runId,
           status: "completed",
-          totalDurationSeconds: session.ambientTimerDurationSeconds,
+          totalDurationSeconds: getFullWindDownTotalSeconds(session),
           updatedAt: completedAt,
         });
         moveSession(session, "completion");
@@ -1127,6 +1127,15 @@ function getAmbientElapsedTotalSeconds(
     session.routine.transition.durationSeconds +
     session.routine.bodyCue.durationSeconds +
     ambientElapsedSeconds
+  );
+}
+
+function getFullWindDownTotalSeconds(session: WindDownRouteSession) {
+  return (
+    session.routine.breathwork.durationSeconds +
+    session.routine.transition.durationSeconds +
+    session.routine.bodyCue.durationSeconds +
+    session.ambientTimerDurationSeconds
   );
 }
 

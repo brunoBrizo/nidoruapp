@@ -741,7 +741,7 @@ function WindDownContextOption({
   const Icon = iconByGoal[option.value];
   const accessibilityHint =
     option.value === "calm_racing_thoughts"
-      ? "Starts Box breathing with body relaxation and remembers this Wind-Down goal."
+      ? "Starts Box breathing with body scan and remembers this Wind-Down goal."
       : `Starts ${option.subtitle.replace(" · ", " with ")} and remembers this Wind-Down goal.`;
 
   return (

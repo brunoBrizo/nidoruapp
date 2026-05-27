@@ -19,8 +19,13 @@ import {
   Waves,
   Wind,
 } from "lucide-react-native";
-import { useState, type ElementType } from "react";
-import { Modal } from "react-native";
+import { useEffect, useRef, useState, type ElementRef, type ElementType } from "react";
+import {
+  Modal,
+  ScrollView as NativeScrollView,
+  type NativeScrollEvent,
+  type NativeSyntheticEvent,
+} from "react-native";
 import Svg, { Circle, Line, Rect } from "react-native-svg";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -126,6 +131,43 @@ const timerOptions = ["20", "30", "45", "60", "∞"] as const;
 export function SoundMixerScreen() {
   const router = useRouter();
   const [isSaveMixSheetOpen, setIsSaveMixSheetOpen] = useState(false);
+  const mixerScrollViewRef = useRef<ElementRef<typeof NativeScrollView>>(null);
+  const mixerScrollYRef = useRef(0);
+  const frozenMixerScrollYRef = useRef(0);
+
+  useEffect(() => {
+    if (!isSaveMixSheetOpen) {
+      return;
+    }
+
+    const frame = requestAnimationFrame(() => {
+      mixerScrollViewRef.current?.scrollTo({
+        animated: false,
+        y: frozenMixerScrollYRef.current,
+      });
+    });
+
+    return () => {
+      cancelAnimationFrame(frame);
+    };
+  }, [isSaveMixSheetOpen]);
+
+  const handleMixerScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    if (isSaveMixSheetOpen) {
+      return;
+    }
+
+    mixerScrollYRef.current = event.nativeEvent.contentOffset.y;
+  };
+
+  const openSaveMixSheet = () => {
+    frozenMixerScrollYRef.current = mixerScrollYRef.current;
+    mixerScrollViewRef.current?.scrollTo({
+      animated: false,
+      y: frozenMixerScrollYRef.current,
+    });
+    setIsSaveMixSheetOpen(true);
+  };
 
   return (
     <View className="flex-1 bg-[#0D0F1A]" testID="sound-mixer-screen">
@@ -143,6 +185,10 @@ export function SoundMixerScreen() {
           className="flex-1 bg-[#0D0F1A]"
           contentContainerClassName="pb-[252px]"
           contentInsetAdjustmentBehavior="automatic"
+          onScroll={handleMixerScroll}
+          ref={mixerScrollViewRef}
+          scrollEnabled={!isSaveMixSheetOpen}
+          scrollEventThrottle={16}
           showsVerticalScrollIndicator={false}
           testID="sound-mixer-scroll"
         >
@@ -324,9 +370,7 @@ export function SoundMixerScreen() {
               accessibilityLabel="Save Mix"
               accessibilityRole="button"
               className="h-full shrink-0 items-center justify-center rounded-[14px] bg-[#7C6FCD] px-4 shadow-[0_0_15px_rgba(124,111,205,0.25)] active:scale-[0.96]"
-              onPress={() => {
-                setIsSaveMixSheetOpen(true);
-              }}
+              onPress={openSaveMixSheet}
               testID="sound-mixer-save-mix"
             >
               <Text className="font-nidoru-primary-semibold text-[13px] leading-[18px] tracking-wide text-white">

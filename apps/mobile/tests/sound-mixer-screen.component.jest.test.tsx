@@ -143,6 +143,8 @@ describe("SoundMixerAnchorScreen", () => {
       "contentInsetAdjustmentBehavior",
       "automatic",
     );
+    expect(screen.getByTestId("sound-mixer-scroll")).toHaveProp("scrollEnabled", true);
+    expect(screen.getByTestId("sound-mixer-scroll")).toHaveProp("scrollEventThrottle", 16);
     expect(screen.getByTestId("sound-mixer-header").props.className).toEqual(
       expect.stringContaining("px-nidoru-screen pt-12"),
     );
@@ -198,6 +200,10 @@ describe("SoundMixerAnchorScreen", () => {
     expect(
       screen.getByTestId("sound-mixer-main-content", { includeHiddenElements: true }),
     ).toHaveProp("importantForAccessibility", "no-hide-descendants");
+    expect(screen.getByTestId("sound-mixer-scroll", { includeHiddenElements: true })).toHaveProp(
+      "scrollEnabled",
+      false,
+    );
     expect(screen.getByRole("button", { name: "Close Save Mix sheet" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Cancel Save Mix" })).toBeTruthy();
   });
@@ -264,6 +270,7 @@ describe("SoundMixerAnchorScreen", () => {
 
     expect(screen.queryByText("Save mix")).toBeNull();
     expect(screen.getByTestId("sound-mixer-main-content")).toHaveProp("pointerEvents", "auto");
+    expect(screen.getByTestId("sound-mixer-scroll")).toHaveProp("scrollEnabled", true);
 
     fireEvent.press(screen.getByRole("button", { name: "Save Mix" }));
     fireEvent.press(screen.getByRole("button", { name: "Close Save Mix sheet" }));

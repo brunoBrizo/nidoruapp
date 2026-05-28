@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it, jest } from "@jest/globals";
-import { fireEvent, render, screen } from "@testing-library/react-native";
+import { afterEach, beforeEach, describe, expect, it, jest } from "@jest/globals";
+import { act, fireEvent, render, screen } from "@testing-library/react-native";
 import * as Haptics from "expo-haptics";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -65,6 +65,10 @@ describe("SoundMixerAnchorScreen", () => {
     mockRouterBack.mockClear();
     mockUseLocalSearchParams.mockReset();
     mockUseLocalSearchParams.mockReturnValue({});
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
   });
 
   it("renders the accepted Sound Mixer main handoff content", () => {
@@ -531,9 +535,17 @@ describe("SoundMixerAnchorScreen", () => {
     expect(screen.getByRole("button", { name: "Tap to show controls" })).toBeTruthy();
     expect(screen.getByText("Rain Hearth")).toBeTruthy();
     expect(screen.getByText("Playing softly")).toBeTruthy();
+    expect(screen.getByText(/Fade starts in/)).toBeTruthy();
     expect(screen.getByText("TAP TO SHOW CONTROLS")).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Save Mix" })).toBeNull();
+    expect(screen.queryByText("RAIN")).toBeNull();
     expect(screen.getByTestId("sound-mixer-dark-playback-idle").props.className).toEqual(
       expect.stringContaining("flex-1 bg-[#03040A]"),
+    );
+    expect(screen.getByTestId("sound-mixer-dark-playback-idle").props.entering).toBeTruthy();
+    expect(screen.getByTestId("sound-mixer-dark-playback-idle").props.exiting).toBeTruthy();
+    expect(screen.getByTestId("sound-mixer-app-dimming-surface").props.className).toEqual(
+      expect.stringContaining("bg-black"),
     );
     expect(screen.getByTestId("sound-mixer-dark-playback-ring").props.className).toEqual(
       expect.stringContaining("h-28 w-28"),
@@ -548,6 +560,75 @@ describe("SoundMixerAnchorScreen", () => {
     expect(screen.getByLabelText("Light Rain active layer at 72% volume")).toBeTruthy();
     expect(screen.getByLabelText("Brown Noise active layer at 58% volume")).toBeTruthy();
     expect(screen.getByLabelText("Fireplace Crackling active layer at 34% volume")).toBeTruthy();
+  });
+
+  it("automatically dims to dark playback after 30 seconds while preserving the active mix", () => {
+    jest.useFakeTimers();
+    jest.setSystemTime(Date.parse("2026-05-28T23:00:00.000Z"));
+
+    render(<SoundMixerAnchorScreen />);
+
+    expect(screen.getByTestId("sound-mixer-main-content")).toBeTruthy();
+
+    act(() => {
+      jest.advanceTimersByTime(29_999);
+    });
+
+    expect(screen.queryByTestId("sound-mixer-dark-playback-idle")).toBeNull();
+
+    act(() => {
+      jest.advanceTimersByTime(1);
+    });
+
+    expect(screen.getByTestId("sound-mixer-dark-playback-idle")).toBeTruthy();
+    expect(screen.getByText("Rain Hearth")).toBeTruthy();
+    expect(screen.getByText("Light Rain")).toBeTruthy();
+    expect(screen.getByText("Brown Noise")).toBeTruthy();
+    expect(screen.getByText("Fireplace")).toBeTruthy();
+    expect(screen.getByText(/Fade starts in/)).toBeTruthy();
+    expect(screen.getByText("28 min")).toBeTruthy();
+    expect(screen.queryByTestId("sound-mixer-main-content")).toBeNull();
+    expect(screen.queryByRole("button", { name: "Save Mix" })).toBeNull();
+  });
+
+  it("resets the idle dimming timer after mixer interaction", () => {
+    jest.useFakeTimers();
+    jest.setSystemTime(Date.parse("2026-05-28T23:00:00.000Z"));
+
+    render(<SoundMixerAnchorScreen />);
+
+    act(() => {
+      jest.advanceTimersByTime(25_000);
+    });
+
+    act(() => {
+      fireEvent(screen.getByTestId("sound-mixer-main-content"), "touchStart");
+    });
+
+    act(() => {
+      jest.advanceTimersByTime(29_999);
+    });
+
+    expect(screen.queryByTestId("sound-mixer-dark-playback-idle")).toBeNull();
+
+    act(() => {
+      jest.advanceTimersByTime(1);
+    });
+
+    expect(screen.getByTestId("sound-mixer-dark-playback-idle")).toBeTruthy();
+  });
+
+  it("uses an immediate dimming transition for reduced-motion users", () => {
+    render(<SoundMixerScreen reduceMotionOverride />);
+
+    fireEvent.press(screen.getByRole("button", { name: "Show dark playback mode" }));
+
+    expect(screen.getByTestId("sound-mixer-dark-playback-idle").props.entering).toBeUndefined();
+    expect(screen.getByTestId("sound-mixer-dark-playback-idle").props.exiting).toBeUndefined();
+
+    fireEvent.press(screen.getByRole("button", { name: "Tap to show controls" }));
+
+    expect(screen.getByTestId("sound-mixer-dark-playback-controls").props.entering).toBeUndefined();
   });
 
   it("renders the calm audio interruption recovery state", () => {

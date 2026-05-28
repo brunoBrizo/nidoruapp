@@ -1,12 +1,12 @@
 # Graph Report - sleep-app  (2026-05-28)
 
 ## Corpus Check
-- 166 files · ~493,514 words
+- 166 files · ~494,149 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 569 nodes · 638 edges · 21 communities detected
-- Extraction: 87% EXTRACTED · 13% INFERRED · 0% AMBIGUOUS · INFERRED: 80 edges (avg confidence: 0.8)
+- 573 nodes · 644 edges · 21 communities detected
+- Extraction: 88% EXTRACTED · 12% INFERRED · 0% AMBIGUOUS · INFERRED: 80 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
@@ -51,20 +51,20 @@
   packages/domain/src/index.ts → apps/mobile/src/sleep/sound-mixer-screen.tsx
 - `createSoundMixerController()` --calls--> `createInitialSoundMixerController()`  [INFERRED]
   packages/domain/src/index.ts → apps/mobile/src/sleep/sound-mixer-screen.tsx
+- `getOnboardingPlanForGoal()` --calls--> `completeOnboardingPersonalizationLocally()`  [INFERRED]
+  packages/domain/src/index.ts → apps/mobile/src/onboarding/local-first-onboarding.ts
 - `canPromptForNotificationPermission()` --calls--> `evaluateGate()`  [INFERRED]
   packages/domain/src/index.ts → apps/mobile/src/notifications/notification-permission-gate-controller.tsx
-- `getNextEveningReminderDate()` --calls--> `reconcileEveningReminderSchedule()`  [INFERRED]
-  packages/domain/src/index.ts → apps/mobile/src/notifications/notification-permission-service.ts
 
 ## Communities
 
 ### Community 0 - "Community 0"
-Cohesion: 0.07
-Nodes (31): shouldStartFirstLaunchOnboarding(), canPromptForNotificationPermission(), getOnboardingPlanForGoal(), completeFirstSessionLocally(), completeOnboardingPersonalizationLocally(), createDefaultRandomSegment(), createLocalEventId(), createLocalReflectionId() (+23 more)
+Cohesion: 0.08
+Nodes (38): activateSoundMixerLayer(), assertLaunchSoundId(), assertSoundMixerStateLabel(), assertSoundMixerTimerPreference(), clampEveningReminderMinuteOfDay(), clampSoundMixerVolume(), createLocalDateAtMinuteOfDay(), createPersonalizedOnboardingPlan() (+30 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.08
-Nodes (37): activateSoundMixerLayer(), assertLaunchSoundId(), assertSoundMixerStateLabel(), assertSoundMixerTimerPreference(), clampEveningReminderMinuteOfDay(), clampSoundMixerVolume(), createLocalDateAtMinuteOfDay(), createPersonalizedOnboardingPlan() (+29 more)
+Cohesion: 0.07
+Nodes (30): shouldStartFirstLaunchOnboarding(), canPromptForNotificationPermission(), completeFirstSessionLocally(), completeOnboardingPersonalizationLocally(), createDefaultRandomSegment(), createLocalEventId(), createLocalReflectionId(), getLocalCalendarDayDifference() (+22 more)
 
 ### Community 2 - "Community 2"
 Cohesion: 0.1
@@ -95,16 +95,16 @@ Cohesion: 0.18
 Nodes (9): openAndMigrateLocalDatabase(), openMigratedLocalDatabase(), applyMigration(), runSqliteMigrations(), assertCondition(), assertRejects(), runSqlite(), SqliteCliDatabase (+1 more)
 
 ### Community 9 - "Community 9"
+Cohesion: 0.16
+Nodes (6): createInitialSoundMixerController(), formatSoundMixerTimerDuration(), formatSoundMixerTimerPreference(), getInitialActiveLayersForVariant(), getSavedMixesForVariant(), getSoundMixerTimerStatus()
+
+### Community 10 - "Community 10"
 Cohesion: 0.17
 Nodes (8): AppTabBar(), getTabIndicatorMotionConfig(), NotificationPermissionGateScreen(), splitHeadline(), getOnboardingSplashOrbPulseConfig(), OnboardingSplashScreen(), useReduceMotionEnabled(), useReduceMotionPreference()
 
-### Community 10 - "Community 10"
+### Community 11 - "Community 11"
 Cohesion: 0.29
 Nodes (12): createBlockedEligibility(), formatDurationLabel(), getEligibleReason(), isPostSessionFeeling(), linkPostValueAccount(), loadPostRewardPaywallEligibility(), mapLocalRecordsToUser(), parseUserId() (+4 more)
-
-### Community 11 - "Community 11"
-Cohesion: 0.2
-Nodes (3): createInitialSoundMixerController(), getInitialActiveLayersForVariant(), getSavedMixesForVariant()
 
 ### Community 12 - "Community 12"
 Cohesion: 0.35
@@ -155,10 +155,10 @@ Nodes (2): OnboardingRouteScreen(), parseOnboardingStage()
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `getOrCreateLocalInstallIdentity()` connect `Community 0` to `Community 4`?**
-  _High betweenness centrality (0.051) - this node is a cross-community bridge._
-- **Why does `loadRouteState()` connect `Community 4` to `Community 8`, `Community 0`, `Community 10`?**
-  _High betweenness centrality (0.045) - this node is a cross-community bridge._
+- **Why does `getOrCreateLocalInstallIdentity()` connect `Community 1` to `Community 4`?**
+  _High betweenness centrality (0.052) - this node is a cross-community bridge._
+- **Why does `loadRouteState()` connect `Community 4` to `Community 8`, `Community 1`, `Community 11`?**
+  _High betweenness centrality (0.046) - this node is a cross-community bridge._
 - **Are the 7 inferred relationships involving `getBreathSessionSnapshot()` (e.g. with `pauseSession()` and `resumeSession()`) actually correct?**
   _`getBreathSessionSnapshot()` has 7 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 7 inferred relationships involving `captureAnalyticsEventDeferred()` (e.g. with `captureRescueMeSoundHandoffAudioFailedDeferred()` and `captureWindDownAmbientAudioFailedDeferred()`) actually correct?**
@@ -166,6 +166,6 @@ _Questions this graph is uniquely positioned to answer:_
 - **Are the 2 inferred relationships involving `createPostValueSupabaseClient()` (e.g. with `loadRouteState()` and `createClient()`) actually correct?**
   _`createPostValueSupabaseClient()` has 2 INFERRED edges - model-reasoned connections that need verification._
 - **Should `Community 0` be split into smaller, more focused modules?**
-  _Cohesion score 0.07 - nodes in this community are weakly interconnected._
-- **Should `Community 1` be split into smaller, more focused modules?**
   _Cohesion score 0.08 - nodes in this community are weakly interconnected._
+- **Should `Community 1` be split into smaller, more focused modules?**
+  _Cohesion score 0.07 - nodes in this community are weakly interconnected._

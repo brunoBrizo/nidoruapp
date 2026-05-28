@@ -3,14 +3,17 @@ import {
   clampSoundMixerVolume,
   createSoundMixerController,
   deactivateSoundMixerLayer,
+  getSoundMixerSnapshot,
   launchSoundCatalog,
   setSoundMixerLayerVolume,
   soundMixerLimits,
+  startSoundMixerPlayback,
   type LaunchSoundCategoryId,
   type LaunchSoundId,
   type SoundMixerActiveLayer,
   type SoundMixerController,
   type SoundMixerSavedMix as DomainSoundMixerSavedMix,
+  type SoundMixerSnapshot,
 } from "@nidoru/domain";
 import * as Haptics from "expo-haptics";
 import {
@@ -38,7 +41,7 @@ import {
 } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useRef, useState, type ElementType } from "react";
 import { AppState, Modal } from "react-native";
-import { FadeInUp, FadeOutUp, LinearTransition } from "react-native-reanimated";
+import { FadeIn, FadeInUp, FadeOut, FadeOutUp, LinearTransition } from "react-native-reanimated";
 import Svg, { Circle, Line, Rect } from "react-native-svg";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -128,6 +131,8 @@ const colors = {
 const soundMixerVolumeRingHitAreaSize = 96;
 const soundMixerVolumeDragThreshold = 6;
 const soundMixerVolumeStep = 10;
+export const soundMixerIdleDimmingDelayMs = 30_000;
+const soundMixerTimerTickMs = 1_000;
 
 const savedMixes: readonly SavedMix[] = [
   {
@@ -332,6 +337,61 @@ function formatActiveLayerCount(count: number) {
   return `${count} active ${count === 1 ? "layer" : "layers"}`;
 }
 
+function formatSoundMixerTimerPreference(preference: SoundMixerSnapshot["timerPreference"]) {
+  return preference === "infinity" ? "∞" : `${preference} min`;
+}
+
+function formatSoundMixerTimerDuration(ms: number) {
+  const totalSeconds = Math.max(0, Math.ceil(ms / 1000));
+
+  if (totalSeconds < 60) {
+    return `${totalSeconds} sec`;
+  }
+
+  return `${Math.ceil(totalSeconds / 60)} min`;
+}
+
+function getSoundMixerTimerStatus(snapshot: SoundMixerSnapshot) {
+  if (snapshot.timerPreference === "infinity" || snapshot.timerDurationMs === null) {
+    return {
+      primaryLabel: "Sound continues",
+      primaryValue: undefined,
+      secondaryLabel: "Timer is off",
+      timerLabel: "∞",
+    };
+  }
+
+  if (snapshot.state === "ended") {
+    return {
+      primaryLabel: "Timer ended",
+      primaryValue: undefined,
+      secondaryLabel: "Audio will stop",
+      timerLabel: formatSoundMixerTimerPreference(snapshot.timerPreference),
+    };
+  }
+
+  if (snapshot.state === "fading-out") {
+    return {
+      primaryLabel: "Fading out",
+      primaryValue: formatSoundMixerTimerDuration(snapshot.remainingMs ?? 0),
+      secondaryLabel: "Audio is lowering softly",
+      timerLabel: formatSoundMixerTimerPreference(snapshot.timerPreference),
+    };
+  }
+
+  const fadeStartsInMs = Math.max(
+    0,
+    (snapshot.remainingMs ?? 0) - soundMixerLimits.fadeOutDurationSeconds * 1000,
+  );
+
+  return {
+    primaryLabel: "Fade starts in",
+    primaryValue: formatSoundMixerTimerDuration(fadeStartsInMs),
+    secondaryLabel: "Then fades out softly",
+    timerLabel: formatSoundMixerTimerPreference(snapshot.timerPreference),
+  };
+}
+
 export function getSoundMixerActiveStripMotionConfig(reduceMotionEnabled: boolean) {
   return reduceMotionEnabled
     ? {
@@ -347,6 +407,18 @@ export function getSoundMixerActiveStripMotionConfig(reduceMotionEnabled: boolea
         enterTranslateY: 12,
         exitDurationMs: 150,
         exitTranslateY: -8,
+      };
+}
+
+export function getSoundMixerIdleDimmingMotionConfig(reduceMotionEnabled: boolean) {
+  return reduceMotionEnabled
+    ? {
+        enabled: false,
+      }
+    : {
+        enabled: true,
+        enterDurationMs: 600,
+        exitDurationMs: 400,
       };
 }
 
@@ -387,16 +459,23 @@ export function SoundMixerScreen({
     reduceMotionOverride ??
     (!reduceMotionPreference.isResolved || reduceMotionPreference.reduceMotionEnabled);
   const activeStripMotionConfig = getSoundMixerActiveStripMotionConfig(reduceMotionEnabled);
+  const idleDimmingMotionConfig = getSoundMixerIdleDimmingMotionConfig(reduceMotionEnabled);
   const appStateRef = useRef(AppState.currentState);
   const savedMixCatalog = getSavedMixesForVariant(uiVariant);
   const [controller, setController] = useState(() => createInitialSoundMixerController(uiVariant));
   const [editingSoundId, setEditingSoundId] = useState<LaunchSoundId | undefined>(() =>
     getInitialEditingSoundId(uiVariant),
   );
+  const [mixTitle, setMixTitle] = useState("Rain Hearth");
   const [maxLayerSoundId, setMaxLayerSoundId] = useState<LaunchSoundId | undefined>();
   const isFullSaveMixSheet = uiVariant === "full-save-mix-sheet";
   const [isSaveMixSheetOpen, setIsSaveMixSheetOpen] = useState(isFullSaveMixSheet);
   const [playbackMode, setPlaybackMode] = useState<PlaybackMode>(initialPlaybackMode);
+  const [interactionSequence, setInteractionSequence] = useState(0);
+  const [observedAtMs, setObservedAtMs] = useState(() => Date.now());
+  const [playbackStartedAtMs, setPlaybackStartedAtMs] = useState<number | undefined>(() =>
+    getInitialActiveLayersForVariant(uiVariant).length > 0 ? Date.now() : undefined,
+  );
   const mixerState = useMemo(
     () =>
       getMixerState({
@@ -410,6 +489,32 @@ export function SoundMixerScreen({
   const activeLayerLabel = formatActiveLayerCount(mixerState.activeSounds.length);
   const hasActiveSounds = mixerState.activeSounds.length > 0;
   const showMaxLayerNotice = maxLayerSoundId !== undefined;
+  const timerController = useMemo(() => {
+    if (!hasActiveSounds || playbackStartedAtMs === undefined) {
+      return controller;
+    }
+
+    return startSoundMixerPlayback(controller, playbackStartedAtMs);
+  }, [controller, hasActiveSounds, playbackStartedAtMs]);
+  const timerSnapshot = useMemo(
+    () => getSoundMixerSnapshot(timerController, observedAtMs),
+    [observedAtMs, timerController],
+  );
+  const timerStatus = useMemo(() => getSoundMixerTimerStatus(timerSnapshot), [timerSnapshot]);
+
+  const markMixerInteraction = useCallback(() => {
+    setObservedAtMs(Date.now());
+    setInteractionSequence((currentSequence) => currentSequence + 1);
+  }, []);
+
+  const syncPlaybackStartForController = useCallback((nextController: SoundMixerController) => {
+    if (nextController.activeLayers.length === 0) {
+      setPlaybackStartedAtMs(undefined);
+      return;
+    }
+
+    setPlaybackStartedAtMs((currentStartedAtMs) => currentStartedAtMs ?? Date.now());
+  }, []);
 
   useEffect(() => {
     const subscription = AppState.addEventListener("change", (nextAppState) => {
@@ -426,10 +531,43 @@ export function SoundMixerScreen({
   }, [isFullSaveMixSheet]);
 
   useEffect(() => {
-    setController(createInitialSoundMixerController(uiVariant));
+    const nextController = createInitialSoundMixerController(uiVariant);
+
+    setController(nextController);
     setEditingSoundId(getInitialEditingSoundId(uiVariant));
+    setMixTitle("Rain Hearth");
     setMaxLayerSoundId(undefined);
+    setObservedAtMs(Date.now());
+    setPlaybackStartedAtMs(nextController.activeLayers.length > 0 ? Date.now() : undefined);
   }, [uiVariant]);
+
+  useEffect(() => {
+    if (
+      !hasActiveSounds ||
+      isSaveMixSheetOpen ||
+      (playbackMode !== "mixer" && playbackMode !== "controls")
+    ) {
+      return undefined;
+    }
+
+    const timeout = setTimeout(() => {
+      setPlaybackMode("idle");
+    }, soundMixerIdleDimmingDelayMs);
+
+    return () => clearTimeout(timeout);
+  }, [hasActiveSounds, interactionSequence, isSaveMixSheetOpen, playbackMode]);
+
+  useEffect(() => {
+    if (!hasActiveSounds || playbackStartedAtMs === undefined) {
+      return undefined;
+    }
+
+    const timeout = setTimeout(() => {
+      setObservedAtMs(Date.now());
+    }, soundMixerTimerTickMs);
+
+    return () => clearTimeout(timeout);
+  }, [hasActiveSounds, observedAtMs, playbackStartedAtMs]);
 
   const triggerSelectionHaptic = useCallback(() => {
     if (
@@ -454,6 +592,7 @@ export function SoundMixerScreen({
 
   const updateLayerVolume = useCallback(
     (soundId: LaunchSoundId, volume: number) => {
+      markMixerInteraction();
       setController((currentController) => {
         const previousVolume = currentController.activeLayers.find(
           (layer) => layer.soundId === soundId,
@@ -475,11 +614,12 @@ export function SoundMixerScreen({
       setEditingSoundId(soundId);
       setMaxLayerSoundId(undefined);
     },
-    [triggerVolumeDetentHaptic],
+    [markMixerInteraction, triggerVolumeDetentHaptic],
   );
 
   const adjustLayerVolume = useCallback(
     (soundId: LaunchSoundId, delta: number) => {
+      markMixerInteraction();
       setController((currentController) => {
         const previousVolume = currentController.activeLayers.find(
           (layer) => layer.soundId === soundId,
@@ -501,21 +641,26 @@ export function SoundMixerScreen({
       setEditingSoundId(soundId);
       setMaxLayerSoundId(undefined);
     },
-    [triggerVolumeDetentHaptic],
+    [markMixerInteraction, triggerVolumeDetentHaptic],
   );
 
   const handleSoundCardPress = useCallback(
     (sound: SoundCard) => {
+      markMixerInteraction();
       setController((currentController) => {
         const isActive = currentController.activeLayers.some((layer) => layer.soundId === sound.id);
+        let nextController: SoundMixerController;
 
         if (isActive) {
           setEditingSoundId((currentEditingSoundId) =>
             currentEditingSoundId === sound.id ? undefined : currentEditingSoundId,
           );
           setMaxLayerSoundId(undefined);
+          setMixTitle("Tonight mix");
           triggerSelectionHaptic();
-          return deactivateSoundMixerLayer(currentController, sound.id);
+          nextController = deactivateSoundMixerLayer(currentController, sound.id);
+          syncPlaybackStartForController(nextController);
+          return nextController;
         }
 
         if (currentController.activeLayers.length >= soundMixerLimits.maxActiveLayers) {
@@ -525,28 +670,36 @@ export function SoundMixerScreen({
 
         setEditingSoundId(undefined);
         setMaxLayerSoundId(undefined);
+        setMixTitle("Tonight mix");
         triggerSelectionHaptic();
-        return activateSoundMixerLayer(currentController, sound.id);
+        nextController = activateSoundMixerLayer(currentController, sound.id);
+        syncPlaybackStartForController(nextController);
+        return nextController;
       });
     },
-    [triggerSelectionHaptic],
+    [markMixerInteraction, syncPlaybackStartForController, triggerSelectionHaptic],
   );
 
   const handleSavedMixPress = useCallback(
     (mix: SavedMix) => {
-      setController((currentController) =>
-        createSoundMixerController({
+      markMixerInteraction();
+      setController((currentController) => {
+        const nextController = createSoundMixerController({
           ...currentController,
           activeLayers: mix.layers,
           state: mix.layers.length === 0 ? "idle-dark" : "playing",
           timerPreference: mix.timerPreference,
-        }),
-      );
+        });
+
+        syncPlaybackStartForController(nextController);
+        return nextController;
+      });
       setEditingSoundId(undefined);
+      setMixTitle(mix.name);
       setMaxLayerSoundId(undefined);
       triggerSelectionHaptic();
     },
-    [triggerSelectionHaptic],
+    [markMixerInteraction, syncPlaybackStartForController, triggerSelectionHaptic],
   );
 
   if (playbackMode !== "mixer") {
@@ -560,19 +713,25 @@ export function SoundMixerScreen({
       >
         <SoundMixerPlaybackScreen
           activeSounds={mixerState.activeSounds}
+          idleDimmingMotionConfig={idleDimmingMotionConfig}
+          mixTitle={mixTitle}
           mode={playbackMode}
           onReturnToMixer={() => {
+            markMixerInteraction();
             setPlaybackMode("mixer");
           }}
           onResumeSound={() => {
+            markMixerInteraction();
             setPlaybackMode("controls");
           }}
           onShowIdle={() => {
             setPlaybackMode("idle");
           }}
           onWake={() => {
+            markMixerInteraction();
             setPlaybackMode("controls");
           }}
+          timerStatus={timerStatus}
         />
       </Modal>
     );
@@ -587,6 +746,7 @@ export function SoundMixerScreen({
           isSaveMixSheetOpen ? "opacity-[0.45] blur-[2px]" : null,
         )}
         importantForAccessibility={isSaveMixSheetOpen ? "no-hide-descendants" : "auto"}
+        onTouchStart={markMixerInteraction}
         pointerEvents={isSaveMixSheetOpen ? "none" : "auto"}
         testID="sound-mixer-main-content"
       >
@@ -652,13 +812,15 @@ export function SoundMixerScreen({
                   <Text className="font-nidoru-primary-regular text-sm leading-[18px] tracking-wide text-[#EEF0FF]">
                     Timer <Text className="text-[#4A4E6A]">·</Text>{" "}
                     <Text className="font-nidoru-data-regular text-[#A89CE0] tabular-nums">
-                      30 min
+                      {timerStatus.timerLabel}
                     </Text>
                   </Text>
                   <Text className="mt-0.5 font-nidoru-primary-regular text-xs font-light leading-4 tracking-wide text-[#8A8FA8]">
-                    {hasActiveSounds ? "Fade starts in " : "Starts when a sound plays."}
+                    {hasActiveSounds ? `${timerStatus.primaryLabel} ` : "Starts when a sound plays."}
                     {hasActiveSounds ? (
-                      <Text className="font-nidoru-data-regular tabular-nums">28 min</Text>
+                      <Text className="font-nidoru-data-regular tabular-nums">
+                        {timerStatus.primaryValue}
+                      </Text>
                     ) : null}
                   </Text>
                 </View>
@@ -723,6 +885,7 @@ export function SoundMixerScreen({
             className="min-h-11 flex-row items-center justify-between rounded-[14px] px-1 active:scale-[0.98]"
             disabled={hasActiveSounds ? undefined : true}
             onPress={() => {
+              markMixerInteraction();
               setPlaybackMode("idle");
             }}
             testID="sound-mixer-show-dark-playback"
@@ -810,6 +973,7 @@ export function SoundMixerScreen({
               )}
               disabled={hasActiveSounds ? undefined : true}
               onPress={() => {
+                markMixerInteraction();
                 setIsSaveMixSheetOpen(true);
               }}
               testID="sound-mixer-save-mix"
@@ -838,21 +1002,35 @@ export function SoundMixerScreen({
 
 function SoundMixerPlaybackScreen({
   activeSounds,
+  idleDimmingMotionConfig,
+  mixTitle,
   mode,
   onReturnToMixer,
   onResumeSound,
   onShowIdle,
   onWake,
+  timerStatus,
 }: {
   readonly activeSounds: readonly SoundCard[];
+  readonly idleDimmingMotionConfig: ReturnType<typeof getSoundMixerIdleDimmingMotionConfig>;
+  readonly mixTitle: string;
   readonly mode: Exclude<PlaybackMode, "mixer">;
   readonly onReturnToMixer: () => void;
   readonly onResumeSound: () => void;
   readonly onShowIdle: () => void;
   readonly onWake: () => void;
+  readonly timerStatus: ReturnType<typeof getSoundMixerTimerStatus>;
 }) {
   if (mode === "idle") {
-    return <SoundMixerIdlePlaybackScreen activeSounds={activeSounds} onWake={onWake} />;
+    return (
+      <SoundMixerIdlePlaybackScreen
+        activeSounds={activeSounds}
+        idleDimmingMotionConfig={idleDimmingMotionConfig}
+        mixTitle={mixTitle}
+        onWake={onWake}
+        timerStatus={timerStatus}
+      />
+    );
   }
 
   if (mode === "interrupted") {
@@ -866,7 +1044,10 @@ function SoundMixerPlaybackScreen({
   }
 
   return (
-    <View
+    <Animated.View
+      {...(idleDimmingMotionConfig.enabled
+        ? { entering: FadeIn.duration(idleDimmingMotionConfig.enterDurationMs ?? 0) }
+        : {})}
       className="flex-1 bg-[#03040A] px-nidoru-screen pt-12 pb-8"
       testID="sound-mixer-dark-playback-controls"
     >
@@ -928,14 +1109,20 @@ function SoundMixerPlaybackScreen({
             className="font-nidoru-primary-regular text-[24px] font-medium leading-[30px] text-[#EEF0FF]"
             selectable
           >
-            Rain Hearth
+            {mixTitle}
           </Text>
           <Text className="mt-2 font-nidoru-primary-regular text-sm font-medium leading-5 tracking-wide text-[#EEF0FF]/60">
-            Fade starts in <Text className="font-nidoru-data-regular tabular-nums">28 min</Text>
+            {timerStatus.primaryLabel}
+            {timerStatus.primaryValue ? (
+              <Text className="font-nidoru-data-regular tabular-nums">
+                {" "}
+                {timerStatus.primaryValue}
+              </Text>
+            ) : null}
           </Text>
           <Text className="mt-1 font-nidoru-primary-regular text-xs font-light leading-4 tracking-wide text-[#4A4E6A]">
             Timer <Text>·</Text>{" "}
-            <Text className="font-nidoru-data-regular tabular-nums">30 min</Text>
+            <Text className="font-nidoru-data-regular tabular-nums">{timerStatus.timerLabel}</Text>
           </Text>
         </View>
 
@@ -974,7 +1161,7 @@ function SoundMixerPlaybackScreen({
           </View>
         </View>
       </View>
-    </View>
+    </Animated.View>
   );
 }
 
@@ -1089,20 +1276,33 @@ function SoundMixerInterruptedPlaybackScreen({
 
 function SoundMixerIdlePlaybackScreen({
   activeSounds,
+  idleDimmingMotionConfig,
+  mixTitle,
   onWake,
+  timerStatus,
 }: {
   readonly activeSounds: readonly SoundCard[];
+  readonly idleDimmingMotionConfig: ReturnType<typeof getSoundMixerIdleDimmingMotionConfig>;
+  readonly mixTitle: string;
   readonly onWake: () => void;
+  readonly timerStatus: ReturnType<typeof getSoundMixerTimerStatus>;
 }) {
   return (
-    <Pressable
+    <Animated.Pressable
       accessibilityLabel="Tap to show controls"
       accessibilityRole="button"
+      {...(idleDimmingMotionConfig.enabled
+        ? {
+            entering: FadeIn.duration(idleDimmingMotionConfig.enterDurationMs ?? 0),
+            exiting: FadeOut.duration(idleDimmingMotionConfig.exitDurationMs ?? 0),
+          }
+        : {})}
       className="relative flex-1 bg-[#03040A] items-center justify-center overflow-hidden active:scale-[0.99]"
       onPress={onWake}
       testID="sound-mixer-dark-playback-idle"
     >
       <StatusBar hidden />
+      <View className="absolute inset-0 bg-black" testID="sound-mixer-app-dimming-surface" />
       <View className="absolute inset-0 bg-gradient-to-b from-[#0D0F1A]/20 to-transparent" />
 
       <View className="relative z-10 -mt-10 w-full items-center px-6">
@@ -1129,7 +1329,7 @@ function SoundMixerIdlePlaybackScreen({
           className="mb-1 font-nidoru-primary-regular text-2xl font-medium leading-[31px] text-[#EEF0FF]/80"
           selectable
         >
-          Rain Hearth
+          {mixTitle}
         </Text>
         <Text className="mb-10 font-nidoru-primary-regular text-sm font-light leading-5 tracking-wide text-[#8A8FA8]/70">
           Playing softly
@@ -1142,10 +1342,16 @@ function SoundMixerIdlePlaybackScreen({
         </View>
 
         <Text className="mb-1.5 font-nidoru-primary-regular text-sm font-medium leading-5 tracking-wide text-[#EEF0FF]/60">
-          Fade starts in <Text className="font-nidoru-data-regular tabular-nums">28 min</Text>
+          {timerStatus.primaryLabel}
+          {timerStatus.primaryValue ? (
+            <Text className="font-nidoru-data-regular tabular-nums">
+              {" "}
+              {timerStatus.primaryValue}
+            </Text>
+          ) : null}
         </Text>
         <Text className="font-nidoru-primary-regular text-xs font-light leading-4 tracking-wide text-[#4A4E6A]">
-          Then fades out softly
+          {timerStatus.secondaryLabel}
         </Text>
       </View>
 
@@ -1154,7 +1360,7 @@ function SoundMixerIdlePlaybackScreen({
           TAP TO SHOW CONTROLS
         </Text>
       </View>
-    </Pressable>
+    </Animated.Pressable>
   );
 }
 

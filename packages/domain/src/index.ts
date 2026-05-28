@@ -303,7 +303,7 @@ export type LaunchSoundCatalogItem = {
   readonly minimumDurationSeconds: 240;
   readonly durationSeconds: number | null;
   readonly loop: true;
-  readonly loopReviewStatus: "blocked_missing_audio" | "passed";
+  readonly loopReviewStatus: "blocked_missing_audio" | "blocked_loop_review_pending" | "passed";
   readonly licenseStatus: "blocked_missing_license" | "licensed";
   readonly licenseSource: string;
   readonly shipStatus: "blocked_missing_licensed_audio" | "bundled_verified";
@@ -312,6 +312,33 @@ export type LaunchSoundCatalogItem = {
 
 const missingLaunchAudioLicenseSource =
   "BLOCKED: no licensed launch sleep loop source is committed for this asset.";
+
+const launchSoundLicenseSources = {
+  "brown-noise":
+    "Brownoisebasstretch.mp3 by stoicalm -- https://freesound.org/s/148869/ -- License: Creative Commons 0",
+  "cafe-ambience":
+    "NYC-diner-2-ambience-ambiance-by-EDLUNDART.wav by edlundart -- https://freesound.org/s/515719/ -- License: Creative Commons 0",
+  "fireplace-crackling":
+    "Aachen_Burning Fireplace Crackling Fire Sounds.wav by visionear -- https://freesound.org/s/501417/ -- License: Creative Commons 0",
+  forest:
+    "a morning in spring by leserhia -- https://freesound.org/s/648731/ -- License: Creative Commons 0",
+  "heavy-rain":
+    "FloridaRainUnderTinRoofPorch20170828.mp3 by LonnieWest -- https://freesound.org/s/400825/ -- License: Creative Commons 0",
+  "light-rain":
+    "Rain heavy 1 (rural) by jmbphilmes -- https://freesound.org/s/200270/ -- License: Creative Commons 0",
+  "ocean-waves":
+    "waves_1.wav by haldigital97 -- https://freesound.org/s/241824/ -- License: Creative Commons 0",
+  "pink-noise":
+    "pink_noise_ref_-14dB.wav by lartti -- https://freesound.org/s/517215/ -- License: Creative Commons 0",
+  "rain-on-window":
+    "NATURE_RAIN_THUNDER_WINDOW_INTERIOR.wav by keng-wai-chane-chick-te -- https://freesound.org/s/554660/ -- License: Creative Commons 0",
+  "river-stream":
+    "Relaxing River Sound by IceVFX -- https://freesound.org/s/722875/ -- License: Creative Commons 0",
+  thunderstorm:
+    "LONG THUNDER ROLLS AND HEAVY RAIN.wav by Alex_hears_things -- https://freesound.org/s/376810/ -- License: Creative Commons 0",
+  wind:
+    "Pink Lakes Wind Atmos #2 by kangaroovindaloo -- https://freesound.org/s/266656/ -- License: Creative Commons 0",
+} as const satisfies Partial<Record<LaunchSoundId, string>>;
 
 function createBlockedLaunchSoundCatalogItem({
   categoryId,
@@ -346,79 +373,126 @@ function createBlockedLaunchSoundCatalogItem({
   };
 }
 
+function createLicensedLaunchSoundCatalogItem({
+  categoryId,
+  categoryLabel,
+  displayName,
+  durationSeconds,
+  evidenceSafeNote,
+  id,
+}: {
+  readonly categoryId: LaunchSoundCategoryId;
+  readonly categoryLabel: string;
+  readonly displayName: string;
+  readonly durationSeconds: number;
+  readonly evidenceSafeNote?: string;
+  readonly id: keyof typeof launchSoundLicenseSources;
+}): LaunchSoundCatalogItem {
+  return {
+    audioFormat: "aac-lc-m4a",
+    bundledAssetPath: `apps/mobile/assets/audio/sleep/${id}.m4a`,
+    categoryId,
+    categoryLabel,
+    defaultVolume: 0.7,
+    defaultVolumeBehavior: "activate_at_70_percent",
+    displayName,
+    durationSeconds,
+    ...(evidenceSafeNote === undefined ? {} : { evidenceSafeNote }),
+    id,
+    licenseSource: launchSoundLicenseSources[id],
+    licenseStatus: "licensed",
+    loop: true,
+    loopReviewStatus: "blocked_loop_review_pending",
+    minimumDurationSeconds: 240,
+    shipStatus: "blocked_missing_licensed_audio",
+  };
+}
+
 export const launchSoundCatalog = [
-  createBlockedLaunchSoundCatalogItem({
+  createLicensedLaunchSoundCatalogItem({
     categoryId: "rain",
     categoryLabel: "Rain",
     displayName: "Light Rain",
+    durationSeconds: 400,
     id: "light-rain",
   }),
-  createBlockedLaunchSoundCatalogItem({
+  createLicensedLaunchSoundCatalogItem({
     categoryId: "rain",
     categoryLabel: "Rain",
     displayName: "Heavy Rain",
+    durationSeconds: 254.208,
     id: "heavy-rain",
   }),
-  createBlockedLaunchSoundCatalogItem({
+  createLicensedLaunchSoundCatalogItem({
     categoryId: "rain",
     categoryLabel: "Rain",
     displayName: "Rain on Window",
+    durationSeconds: 861.465,
     id: "rain-on-window",
   }),
-  createBlockedLaunchSoundCatalogItem({
+  createLicensedLaunchSoundCatalogItem({
     categoryId: "rain",
     categoryLabel: "Rain",
     displayName: "Thunderstorm",
+    durationSeconds: 268.925,
     id: "thunderstorm",
   }),
-  createBlockedLaunchSoundCatalogItem({
+  createLicensedLaunchSoundCatalogItem({
     categoryId: "nature",
     categoryLabel: "Nature",
     displayName: "Ocean Waves",
+    durationSeconds: 292.48,
     id: "ocean-waves",
   }),
-  createBlockedLaunchSoundCatalogItem({
+  createLicensedLaunchSoundCatalogItem({
     categoryId: "nature",
     categoryLabel: "Nature",
     displayName: "Forest",
+    durationSeconds: 287.845,
     id: "forest",
   }),
-  createBlockedLaunchSoundCatalogItem({
+  createLicensedLaunchSoundCatalogItem({
     categoryId: "nature",
     categoryLabel: "Nature",
     displayName: "River Stream",
+    durationSeconds: 366.1,
     id: "river-stream",
   }),
-  createBlockedLaunchSoundCatalogItem({
+  createLicensedLaunchSoundCatalogItem({
     categoryId: "nature",
     categoryLabel: "Nature",
     displayName: "Wind",
+    durationSeconds: 407.389,
     id: "wind",
   }),
-  createBlockedLaunchSoundCatalogItem({
+  createLicensedLaunchSoundCatalogItem({
     categoryId: "noise",
     categoryLabel: "Noise",
     displayName: "Brown Noise",
+    durationSeconds: 604.251,
     evidenceSafeNote: "Preference and masking audio only; no clinical sleep efficacy claim.",
     id: "brown-noise",
   }),
-  createBlockedLaunchSoundCatalogItem({
+  createLicensedLaunchSoundCatalogItem({
     categoryId: "noise",
     categoryLabel: "Noise",
     displayName: "Pink Noise",
+    durationSeconds: 243.213,
     evidenceSafeNote: "Preference and masking audio only; no clinical sleep efficacy claim.",
     id: "pink-noise",
   }),
-  createBlockedLaunchSoundCatalogItem({
+  createLicensedLaunchSoundCatalogItem({
     categoryId: "environment",
     categoryLabel: "Environment",
     displayName: "Fireplace Crackling",
+    durationSeconds: 714,
     id: "fireplace-crackling",
   }),
-  createBlockedLaunchSoundCatalogItem({
+  createLicensedLaunchSoundCatalogItem({
     categoryId: "environment",
     categoryLabel: "Environment",
     displayName: "Cafe Ambience",
+    durationSeconds: 266.433,
     id: "cafe-ambience",
   }),
   createBlockedLaunchSoundCatalogItem({

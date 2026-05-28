@@ -5,9 +5,9 @@ ClickUp task: `06.IMP.10 Prove all bundled sounds offline, loop quality, and sta
 
 ## Result
 
-This ticket cannot be completed in the current checkout because only 12 of the 14 launch Sound Mixer audio files are committed, no license records are attached, and manual loop review plus physical locked-device startup proof are still outstanding.
+This ticket cannot be completed in the current checkout because only 12 of the 14 launch Sound Mixer audio files are committed, the two Tones files are still missing, and manual loop review plus physical locked-device startup proof are still outstanding.
 
-The 12 committed files are normalized to the expected catalog slugs, statically imported into the Expo asset graph, and wired through the Sound Mixer route into the native playback controller.
+The 12 committed files are normalized to the expected catalog slugs, carry CC0 source records, statically import into the Expo asset graph, and wire through the Sound Mixer route into the native playback controller.
 
 Current file inventory:
 
@@ -77,7 +77,7 @@ Bundle weight:
 
 `apps/mobile/tests/sound-mixer-screen.component.jest.test.tsx` verifies that the screen starts the default three active layers when a native playback controller is provided. `SoundMixerRouteScreen` now provides the static asset-backed controller in app runtime.
 
-This proves automated route/controller behavior for the available files, not final shippability, because there are currently zero licensed and manually loop-reviewed launch Sound Mixer assets.
+This proves automated route/controller behavior for the available files, not final shippability, because there are currently zero manually loop-reviewed launch Sound Mixer assets.
 
 ## Verification
 
@@ -121,12 +121,12 @@ Result: passed on iPhone 17 simulator. The development build launched and loaded
 
 Blocked or failed:
 
-Native network-disabled playback proof on a physical locked device was not completed in this pass. With two missing Tones files, missing license records, and no manual loop review, final startup latency or all-sound loop-quality numbers would still be incomplete.
+Native network-disabled playback proof on a physical locked device was not completed in this pass. With two missing Tones files and no manual loop review, final startup latency or all-sound loop-quality numbers would still be incomplete.
 
 ## Closeout Decision
 
 Move ClickUp task `86e1k5hm1` to `Needs Review`, not `complete`.
 
-Exact next step: add the two missing licensed AAC-LC `.m4a` files, attach license records for all 14 sounds, complete manual loop review, update the catalog entries from blocked to verified, then rerun native network-disabled startup and locked-device loop review for each sound.
+Exact next step: add the two missing licensed AAC-LC `.m4a` files, attach license records for those Tones sounds, complete manual loop review, update the catalog entries from blocked to verified, then rerun native network-disabled startup and locked-device loop review for each sound.
 
 No audio assets, lockfiles, dependency inventories, or scan results were uploaded to external services for this proof.

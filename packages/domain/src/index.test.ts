@@ -165,15 +165,35 @@ assertCondition(
       sound.audioFormat === "aac-lc-m4a" &&
       sound.defaultVolume === 0.7 &&
       sound.defaultVolumeBehavior === "activate_at_70_percent" &&
-      sound.durationSeconds === null &&
-      sound.licenseStatus === "blocked_missing_license" &&
-      sound.licenseSource.startsWith("BLOCKED:") &&
       sound.loop &&
-      sound.loopReviewStatus === "blocked_missing_audio" &&
       sound.minimumDurationSeconds === 240 &&
       sound.shipStatus === "blocked_missing_licensed_audio",
   ),
-  "missing launch sleep loops must stay blocked until licensed AAC-LC files are committed",
+  "launch sleep loops must stay blocked until full ship proof passes",
+);
+assertCondition(
+  launchSoundCatalog
+    .filter((sound) => sound.id !== "432hz-tone" && sound.id !== "delta-wave-binaural")
+    .every(
+      (sound) =>
+        sound.durationSeconds !== null &&
+        sound.licenseStatus === "licensed" &&
+        sound.licenseSource.includes("License: Creative Commons 0") &&
+        sound.loopReviewStatus === "blocked_loop_review_pending",
+    ),
+  "committed launch sleep loops must keep CC0 license records but stay blocked for loop review",
+);
+assertCondition(
+  launchSoundCatalog
+    .filter((sound) => sound.id === "432hz-tone" || sound.id === "delta-wave-binaural")
+    .every(
+      (sound) =>
+        sound.durationSeconds === null &&
+        sound.licenseStatus === "blocked_missing_license" &&
+        sound.licenseSource.startsWith("BLOCKED:") &&
+        sound.loopReviewStatus === "blocked_missing_audio",
+    ),
+  "missing launch tone loops must stay blocked until audio and license records are committed",
 );
 assertNoAuditRiskPublicCopy(
   launchSoundCatalog.flatMap((sound) => [

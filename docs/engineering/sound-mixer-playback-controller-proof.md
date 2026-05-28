@@ -31,10 +31,12 @@ Twelve launch Sound Mixer loop files are now committed under `apps/mobile/assets
 - `apps/mobile/assets/audio/sleep/432hz-tone.m4a`
 - `apps/mobile/assets/audio/sleep/delta-wave-binaural.m4a`
 
-The source of truth in `docs/engineering/sound-mixer-launch-catalog-manifest.md`, `packages/domain/src/index.ts`, and `apps/mobile/tests/launch-catalog.unit.jest.test.ts` intentionally keeps every launch sound blocked with:
+The source of truth in `docs/engineering/sound-mixer-launch-catalog-manifest.md`, `packages/domain/src/index.ts`, and `apps/mobile/tests/launch-catalog.unit.jest.test.ts` intentionally keeps every launch sound blocked from shipping. The 12 committed loops now carry CC0 source records, while the two missing Tones files still carry missing-license status:
 
-- `licenseStatus = blocked_missing_license`
-- `loopReviewStatus = blocked_missing_audio`
+- `licenseStatus = licensed` for the 12 committed CC0 loops.
+- `licenseStatus = blocked_missing_license` for the two missing Tones files.
+- `loopReviewStatus = blocked_loop_review_pending` for the 12 committed loops.
+- `loopReviewStatus = blocked_missing_audio` for the two missing Tones files.
 - `shipStatus = blocked_missing_licensed_audio`
 
-Because license records, manual loop review, two Tones files, and physical locked-device audio proof are still outstanding, this work proves controller behavior and route wiring for the available files, but it cannot honestly close all 14 launch sounds as shippable.
+Because manual loop review, two Tones files, and physical locked-device audio proof are still outstanding, this work proves controller behavior and route wiring for the available files, but it cannot honestly close all 14 launch sounds as shippable.

@@ -155,6 +155,35 @@ function createStoppedWindDownSyncRow(overrides: SyncRow = {}) {
   });
 }
 
+function createSoundMixSyncRows(overrides: SyncRow = {}) {
+  return [
+    {
+      created_at: "2026-05-28T12:00:00.000Z",
+      layer_position: 0,
+      local_install_id: localInstallId,
+      mix_id: "soundmix_0123456789abcdef",
+      name: "Rain Hearth",
+      sound_id: "light-rain",
+      timer_preference: "30",
+      updated_at: "2026-05-28T12:05:00.000Z",
+      volume: 72,
+      ...overrides,
+    },
+    {
+      created_at: "2026-05-28T12:00:00.000Z",
+      layer_position: 1,
+      local_install_id: localInstallId,
+      mix_id: "soundmix_0123456789abcdef",
+      name: "Rain Hearth",
+      sound_id: "brown-noise",
+      timer_preference: "30",
+      updated_at: "2026-05-28T12:05:00.000Z",
+      volume: 58,
+      ...overrides,
+    },
+  ];
+}
+
 describe("post-value local record sync", () => {
   it("upserts linked install, first session, and reflection records with idempotent conflicts", async () => {
     const database = createDatabase();
@@ -390,6 +419,85 @@ describe("post-value local record sync", () => {
     );
   });
 
+  it("syncs saved sound mixes idempotently and maps server ids back to local rows", async () => {
+    const database = createDatabase();
+    database.getAllAsync.mockImplementation((source) => {
+      if (source.includes("FROM sound_mixer_saved_mixes")) {
+        return Promise.resolve(createSoundMixSyncRows() as never);
+      }
+
+      return Promise.resolve([] as never);
+    });
+    const client = createClient();
+    const soundMixUpsert = jest.fn((values) =>
+      Promise.resolve({
+        data: [
+          {
+            id: "123e4567-e89b-42d3-a456-426614174000",
+            local_mix_id: "soundmix_0123456789abcdef",
+          },
+        ],
+        error: null,
+      }),
+    );
+    client.from.mockImplementation((tableName) => ({
+      upsert: jest.fn((values, options) => {
+        if (tableName === "sound_mixes") {
+          return soundMixUpsert(values, options);
+        }
+
+        return Promise.resolve({ error: null });
+      }),
+    }));
+
+    await expect(
+      syncPostValueLocalRecords({
+        client,
+        database,
+        localInstallId,
+        now: new Date("2026-05-28T12:06:00.000Z"),
+        userId,
+      }),
+    ).resolves.toEqual({ status: "succeeded" });
+
+    expect(client.from).toHaveBeenCalledWith("sound_mixes");
+    expect(soundMixUpsert).toHaveBeenCalledWith(
+      [
+        {
+          layer_0_sound_id: "light-rain",
+          layer_0_volume: 72,
+          layer_1_sound_id: "brown-noise",
+          layer_1_volume: 58,
+          layer_2_sound_id: null,
+          layer_2_volume: null,
+          local_install_id: localInstallId,
+          local_mix_id: "soundmix_0123456789abcdef",
+          mix_created_at: "2026-05-28T12:00:00.000Z",
+          mix_updated_at: "2026-05-28T12:05:00.000Z",
+          name: "Rain Hearth",
+          timer_preference: "30",
+          updated_at: "2026-05-28T12:06:00.000Z",
+          user_id: userId,
+        },
+      ],
+      {
+        onConflict: "user_id,local_mix_id",
+        returning: "representation",
+        select: "id,local_mix_id",
+      },
+    );
+    expect(database.runAsync).toHaveBeenCalledWith(
+      expect.stringContaining("UPDATE sound_mixer_saved_mixes"),
+      [
+        "123e4567-e89b-42d3-a456-426614174000",
+        "2026-05-28T12:06:00.000Z",
+        localInstallId,
+        "soundmix_0123456789abcdef",
+      ],
+    );
+    expect(JSON.stringify(soundMixUpsert.mock.calls)).not.toMatch(/remote_mix_id|payload_json|r2/i);
+  });
+
   it("rejects invalid completed breath-session rows before any network upsert", async () => {
     const database = createDatabase();
     database.getAllAsync.mockImplementation((source) => {
@@ -470,6 +578,37 @@ describe("post-value local record sync", () => {
       attemptCount: 1,
       reasonClass: "validation_error",
       recordType: "wind_down_run",
+      syncStage: "post_value_sync",
+    });
+  });
+
+  it("rejects invalid saved sound mixes before any network upsert", async () => {
+    const database = createDatabase();
+    database.getAllAsync.mockImplementation((source) => {
+      if (source.includes("FROM sound_mixer_saved_mixes")) {
+        return Promise.resolve(createSoundMixSyncRows({ sound_id: "private-r2-key" }) as never);
+      }
+
+      return Promise.resolve([] as never);
+    });
+    const client = createClient();
+    const observeFailure = jest.fn();
+
+    await expect(
+      syncPostValueLocalRecords({
+        client,
+        database,
+        localInstallId,
+        observeFailure,
+        userId,
+      }),
+    ).resolves.toEqual({ reason: "validation_error", status: "retry_pending" });
+
+    expect(client.from).not.toHaveBeenCalled();
+    expect(observeFailure).toHaveBeenCalledWith({
+      attemptCount: 1,
+      reasonClass: "validation_error",
+      recordType: "sound_mix",
       syncStage: "post_value_sync",
     });
   });
@@ -586,6 +725,49 @@ describe("post-value local record sync", () => {
     });
     expect(database.runAsync).not.toHaveBeenCalledWith(
       expect.stringMatching(/DELETE FROM wind_down_runs|UPDATE wind_down_runs/),
+      expect.anything(),
+    );
+  });
+
+  it("classifies saved sound mix sync failures without deleting or remapping local mixes", async () => {
+    const database = createDatabase();
+    database.getAllAsync.mockImplementation((source) => {
+      if (source.includes("FROM sound_mixer_saved_mixes")) {
+        return Promise.resolve(createSoundMixSyncRows() as never);
+      }
+
+      return Promise.resolve([] as never);
+    });
+    const client = createClient();
+    client.from.mockImplementation((tableName) => ({
+      upsert: jest.fn(() => {
+        if (tableName === "sound_mixes") {
+          return Promise.reject(new TypeError("Network request failed"));
+        }
+
+        return Promise.resolve({ error: null });
+      }),
+    }));
+    const observeFailure = jest.fn();
+
+    await expect(
+      syncPostValueLocalRecords({
+        client,
+        database,
+        localInstallId,
+        observeFailure,
+        userId,
+      }),
+    ).resolves.toEqual({ reason: "offline", status: "retry_pending" });
+
+    expect(observeFailure).toHaveBeenCalledWith({
+      attemptCount: 1,
+      reasonClass: "offline",
+      recordType: "sound_mix",
+      syncStage: "post_value_sync",
+    });
+    expect(database.runAsync).not.toHaveBeenCalledWith(
+      expect.stringMatching(/DELETE FROM sound_mixer_saved_mixes|UPDATE sound_mixer_saved_mixes/),
       expect.anything(),
     );
   });

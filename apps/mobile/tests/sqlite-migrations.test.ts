@@ -923,6 +923,30 @@ Deno.test("supports Sound Mixer saved mixes with local max-3 constraints", async
 
     assertEquals(savedMixRows, [{ mix_count: 3, layer_count: 3 }]);
 
+    await database.execAsync(`
+      UPDATE sound_mixer_saved_mixes
+      SET
+        remote_mix_id = '123e4567-e89b-42d3-a456-426614174000',
+        remote_synced_at = '2026-05-28T12:06:00.000Z'
+      WHERE mix_id = 'soundmix_0123456789abcdef';
+    `);
+
+    const remoteMappingRows = await database.getAllAsync<{
+      remote_mix_id: string;
+      remote_synced_at: string;
+    }>(`
+      SELECT remote_mix_id, remote_synced_at
+      FROM sound_mixer_saved_mixes
+      WHERE mix_id = 'soundmix_0123456789abcdef';
+    `);
+
+    assertEquals(remoteMappingRows, [
+      {
+        remote_mix_id: "123e4567-e89b-42d3-a456-426614174000",
+        remote_synced_at: "2026-05-28T12:06:00.000Z",
+      },
+    ]);
+
     await assertRejects(
       () =>
         database.execAsync(`
@@ -1003,6 +1027,24 @@ Deno.test("supports Sound Mixer saved mixes with local max-3 constraints", async
             'unlicensed-drone',
             70
           );
+        `),
+      /CHECK constraint failed/,
+    );
+    await assertRejects(
+      () =>
+        database.execAsync(`
+          UPDATE sound_mixer_saved_mixes
+          SET remote_mix_id = 'not-a-server-id'
+          WHERE mix_id = 'soundmix_1123456789abcdef';
+        `),
+      /CHECK constraint failed/,
+    );
+    await assertRejects(
+      () =>
+        database.execAsync(`
+          UPDATE sound_mixer_saved_mixes
+          SET remote_synced_at = '2026-05-28T12:07:00.000Z'
+          WHERE mix_id = 'soundmix_1123456789abcdef';
         `),
       /CHECK constraint failed/,
     );

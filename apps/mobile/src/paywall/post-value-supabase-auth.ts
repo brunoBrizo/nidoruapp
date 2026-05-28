@@ -23,12 +23,14 @@ type PostValueAuthClient = Pick<
   SupabaseAuthClient,
   "getSession" | "getUser" | "linkIdentity" | "signInAnonymously"
 >;
+type PostValueSyncReturning = "minimal" | "representation";
 
 const postValueSyncTables = {
   breath_sessions: "user_id,local_session_id",
   first_session_sync_records: "user_id,local_session_id",
   local_install_links: "local_install_id",
   post_session_reflection_sync_records: "user_id,local_reflection_id",
+  sound_mixes: "user_id,local_mix_id",
   wind_down_runs: "user_id,local_run_id",
 } as const;
 
@@ -85,12 +87,14 @@ export function createPostValueSupabaseClient(): PostValueSupabaseClient | undef
     linkIdentity: (credentials) => authClient.linkIdentity(credentials),
     signInAnonymously: (credentials) => authClient.signInAnonymously(credentials),
     from: (tableName) => ({
-      upsert: (values, { onConflict }) =>
+      upsert: (values, { onConflict, returning, select }) =>
         upsertPostValueRecords({
           authClient,
           baseUrl,
           onConflict,
           publishableKey,
+          returning: returning ?? "minimal",
+          ...(select === undefined ? {} : { select }),
           tableName,
           values,
         }),
@@ -168,6 +172,8 @@ async function upsertPostValueRecords({
   baseUrl,
   onConflict,
   publishableKey,
+  returning = "minimal",
+  select,
   tableName,
   values,
 }: {
@@ -175,9 +181,11 @@ async function upsertPostValueRecords({
   readonly baseUrl: URL;
   readonly onConflict: string;
   readonly publishableKey: string;
+  readonly returning?: PostValueSyncReturning;
+  readonly select?: string;
   readonly tableName: string;
   readonly values: Record<string, unknown> | readonly Record<string, unknown>[];
-}): Promise<{ readonly error?: unknown }> {
+}): Promise<{ readonly data?: unknown; readonly error?: unknown }> {
   if (!isAllowedPostValueSyncTarget(tableName, onConflict)) {
     return {
       error: {
@@ -202,13 +210,17 @@ async function upsertPostValueRecords({
   const syncUrl = new URL(`rest/v1/${tableName}`, baseUrl);
   syncUrl.searchParams.set("on_conflict", onConflict);
 
+  if (returning === "representation" && select) {
+    syncUrl.searchParams.set("select", select);
+  }
+
   try {
     const response = await fetch(syncUrl.href, {
       body: JSON.stringify(values),
       headers: {
         Authorization: `Bearer ${accessToken}`,
         "Content-Type": "application/json",
-        Prefer: "resolution=merge-duplicates,return=minimal",
+        Prefer: `resolution=merge-duplicates,return=${returning}`,
         apikey: publishableKey,
       },
       method: "POST",
@@ -216,6 +228,10 @@ async function upsertPostValueRecords({
 
     if (!response.ok) {
       return { error: await createPostValueSyncHttpError(response) };
+    }
+
+    if (returning === "representation") {
+      return { data: await response.json(), error: null };
     }
 
     return { error: null };

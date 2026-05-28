@@ -700,6 +700,25 @@ export const sqliteMigrations = [
       END;
     `,
   },
+  {
+    id: "0008_sound_mixer_saved_mix_remote_mapping",
+    sql: `
+      ALTER TABLE sound_mixer_saved_mixes
+        ADD COLUMN remote_mix_id TEXT
+          CHECK (
+            remote_mix_id IS NULL
+            OR remote_mix_id GLOB '????????-????-????-????-????????????'
+          );
+
+      ALTER TABLE sound_mixer_saved_mixes
+        ADD COLUMN remote_synced_at TEXT
+          CHECK (remote_synced_at IS NULL OR remote_mix_id IS NOT NULL);
+
+      CREATE UNIQUE INDEX sound_mixer_saved_mixes_remote_mix_id_idx
+        ON sound_mixer_saved_mixes (remote_mix_id)
+        WHERE remote_mix_id IS NOT NULL;
+    `,
+  },
 ] as const satisfies readonly SQLiteMigration[];
 
 export async function runSqliteMigrations(

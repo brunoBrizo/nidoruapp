@@ -1,6 +1,8 @@
 import {
   completedBreathSessionRecordSchema,
   localInstallIdSchema,
+  soundMixerSavedMixRecordSchema,
+  type SoundMixerSavedMixRecord,
   windDownRunRecordSchema,
 } from "@nidoru/validation";
 
@@ -22,8 +24,12 @@ export type PostValueSyncClient = {
   from(tableName: string): {
     upsert(
       values: Record<string, unknown> | readonly Record<string, unknown>[],
-      options: { readonly onConflict: string },
-    ): PromiseLike<{ readonly error?: unknown }>;
+      options: {
+        readonly onConflict: string;
+        readonly returning?: "minimal" | "representation";
+        readonly select?: string;
+      },
+    ): PromiseLike<{ readonly data?: unknown; readonly error?: unknown }>;
   };
 };
 
@@ -93,6 +99,27 @@ type WindDownRunSyncRow = {
   readonly stopped_at: string | null;
   readonly total_duration_seconds: number | null;
   readonly updated_at: string;
+};
+
+type SoundMixSyncRow = {
+  readonly created_at: string;
+  readonly layer_position: number | null;
+  readonly local_install_id: string;
+  readonly mix_id: string;
+  readonly name: string;
+  readonly sound_id: string | null;
+  readonly timer_preference: string;
+  readonly updated_at: string;
+  readonly volume: number | null;
+};
+
+type SoundMixRemoteIdRow = {
+  readonly id: string;
+  readonly local_mix_id: string;
+};
+
+type MutableSoundMixRecord = Omit<SoundMixerSavedMixRecord, "layers"> & {
+  layers: SoundMixerSavedMixRecord["layers"][number][];
 };
 
 const userIdPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -218,6 +245,29 @@ export async function syncPostValueLocalRecords({
     `,
     [parsedLocalInstallId],
   );
+  const soundMixRows = await database.getAllAsync<SoundMixSyncRow>(
+    `
+      SELECT
+        sound_mixer_saved_mixes.mix_id,
+        sound_mixer_saved_mixes.local_install_id,
+        sound_mixer_saved_mixes.name,
+        sound_mixer_saved_mixes.timer_preference,
+        sound_mixer_saved_mixes.created_at,
+        sound_mixer_saved_mixes.updated_at,
+        sound_mixer_saved_mix_layers.layer_position,
+        sound_mixer_saved_mix_layers.sound_id,
+        sound_mixer_saved_mix_layers.volume
+      FROM sound_mixer_saved_mixes
+      LEFT JOIN sound_mixer_saved_mix_layers
+        ON sound_mixer_saved_mix_layers.mix_id = sound_mixer_saved_mixes.mix_id
+      WHERE sound_mixer_saved_mixes.local_install_id = ?
+      ORDER BY
+        sound_mixer_saved_mixes.updated_at DESC,
+        sound_mixer_saved_mixes.created_at DESC,
+        sound_mixer_saved_mix_layers.layer_position ASC;
+    `,
+    [parsedLocalInstallId],
+  );
 
   try {
     const breathSessionPayloads = createBreathSessionSyncPayloads({
@@ -228,6 +278,11 @@ export async function syncPostValueLocalRecords({
     const windDownRunPayloads = createWindDownRunSyncPayloads({
       nowIso,
       rows: windDownRunRows,
+      userId: parsedUserId,
+    });
+    const soundMixPayloads = createSoundMixSyncPayloads({
+      nowIso,
+      rows: soundMixRows,
       userId: parsedUserId,
     });
 
@@ -293,6 +348,23 @@ export async function syncPostValueLocalRecords({
     if (windDownRunPayloads.length > 0) {
       await upsertOrThrow(client, "wind_down_runs", windDownRunPayloads, "user_id,local_run_id");
     }
+
+    if (soundMixPayloads.length > 0) {
+      const soundMixRemoteIdRows = parseSoundMixRemoteIdRows(
+        await upsertOrThrow(client, "sound_mixes", soundMixPayloads, "user_id,local_mix_id", {
+          returning: "representation",
+          select: "id,local_mix_id",
+        }),
+        soundMixPayloads.map((payload) => String(payload.local_mix_id)),
+      );
+
+      await markSoundMixesSyncedLocally({
+        database,
+        localInstallId: parsedLocalInstallId,
+        rows: soundMixRemoteIdRows,
+        syncedAt: nowIso,
+      });
+    }
   } catch (error) {
     const reason = classifySyncError(error);
 
@@ -307,6 +379,83 @@ export async function syncPostValueLocalRecords({
   }
 
   return { status: "succeeded" };
+}
+
+function createSoundMixSyncPayloads({
+  nowIso,
+  rows,
+  userId,
+}: {
+  readonly nowIso: string;
+  readonly rows: readonly SoundMixSyncRow[];
+  readonly userId: string;
+}): readonly Record<string, unknown>[] {
+  try {
+    const recordsById = new Map<string, MutableSoundMixRecord>();
+
+    for (const row of rows) {
+      const existingRecord = recordsById.get(row.mix_id);
+      const record =
+        existingRecord ??
+        ({
+          createdAt: row.created_at,
+          layers: [],
+          localInstallId: row.local_install_id,
+          mixId: row.mix_id,
+          name: row.name,
+          timerPreference: parseSoundMixerTimerPreference(row.timer_preference),
+          updatedAt: row.updated_at,
+        } satisfies MutableSoundMixRecord);
+
+      if (!existingRecord) {
+        recordsById.set(row.mix_id, record);
+      }
+
+      const hasNoLayer =
+        row.layer_position === null && row.sound_id === null && row.volume === null;
+
+      if (hasNoLayer) {
+        continue;
+      }
+
+      if (row.layer_position === null || row.sound_id === null || row.volume === null) {
+        throw new Error("Incomplete sound mix layer.");
+      }
+
+      record.layers.push({
+        soundId: row.sound_id as SoundMixerSavedMixRecord["layers"][number]["soundId"],
+        volume: row.volume,
+      });
+    }
+
+    return Array.from(recordsById.values()).map((record) => {
+      const savedMixRecord = soundMixerSavedMixRecordSchema.parse(record);
+      const [layer0, layer1, layer2] = savedMixRecord.layers;
+
+      return {
+        layer_0_sound_id: layer0?.soundId ?? null,
+        layer_0_volume: layer0?.volume ?? null,
+        layer_1_sound_id: layer1?.soundId ?? null,
+        layer_1_volume: layer1?.volume ?? null,
+        layer_2_sound_id: layer2?.soundId ?? null,
+        layer_2_volume: layer2?.volume ?? null,
+        local_install_id: savedMixRecord.localInstallId,
+        local_mix_id: savedMixRecord.mixId,
+        mix_created_at: savedMixRecord.createdAt,
+        mix_updated_at: savedMixRecord.updatedAt,
+        name: savedMixRecord.name,
+        timer_preference: String(savedMixRecord.timerPreference),
+        updated_at: nowIso,
+        user_id: userId,
+      };
+    });
+  } catch {
+    throw createSyncTableError("sound_mixes", {
+      code: "LOCAL_VALIDATION_ERROR",
+      message: "Invalid local sound mix sync payload.",
+      status: 400,
+    });
+  }
 }
 
 function createWindDownRunSyncPayloads({
@@ -442,15 +591,101 @@ async function upsertOrThrow(
   tableName: string,
   values: Record<string, unknown> | readonly Record<string, unknown>[],
   onConflict: string,
-): Promise<void> {
+  options: {
+    readonly returning?: "minimal" | "representation";
+    readonly select?: string;
+  } = {},
+): Promise<unknown> {
   try {
-    const result = await client.from(tableName).upsert(values, { onConflict });
+    const result = await client.from(tableName).upsert(values, { onConflict, ...options });
 
     if (result.error) {
       throw createSyncTableError(tableName, result.error);
     }
+
+    return result.data;
   } catch (error) {
     throw createSyncTableError(tableName, error);
+  }
+}
+
+function parseSoundMixRemoteIdRows(
+  data: unknown,
+  expectedLocalMixIds: readonly string[],
+): readonly SoundMixRemoteIdRow[] {
+  const expectedIds = new Set(expectedLocalMixIds);
+
+  if (!Array.isArray(data) || data.length !== expectedIds.size) {
+    throw createSyncTableError("sound_mixes", {
+      code: "REMOTE_ID_MAPPING_ERROR",
+      message: "Saved mix sync did not return every remote mix id.",
+      status: 500,
+    });
+  }
+
+  const rows = data.map((row) => {
+    if (
+      !row ||
+      typeof row !== "object" ||
+      !("id" in row) ||
+      !("local_mix_id" in row) ||
+      typeof row.id !== "string" ||
+      typeof row.local_mix_id !== "string" ||
+      !userIdPattern.test(row.id) ||
+      !/^soundmix_[A-Za-z0-9_-]{8,64}$/.test(row.local_mix_id) ||
+      !expectedIds.has(row.local_mix_id)
+    ) {
+      throw createSyncTableError("sound_mixes", {
+        code: "REMOTE_ID_MAPPING_ERROR",
+        message: "Saved mix sync returned an invalid remote mix id.",
+        status: 500,
+      });
+    }
+
+    return {
+      id: row.id,
+      local_mix_id: row.local_mix_id,
+    };
+  });
+
+  if (new Set(rows.map((row) => row.local_mix_id)).size !== expectedIds.size) {
+    throw createSyncTableError("sound_mixes", {
+      code: "REMOTE_ID_MAPPING_ERROR",
+      message: "Saved mix sync returned duplicate remote mix ids.",
+      status: 500,
+    });
+  }
+
+  return rows;
+}
+
+async function markSoundMixesSyncedLocally({
+  database,
+  localInstallId,
+  rows,
+  syncedAt,
+}: {
+  readonly database: PostValueSyncDatabase;
+  readonly localInstallId: string;
+  readonly rows: readonly SoundMixRemoteIdRow[];
+  readonly syncedAt: string;
+}): Promise<void> {
+  try {
+    for (const row of rows) {
+      await database.runAsync(
+        `
+          UPDATE sound_mixer_saved_mixes
+          SET
+            remote_mix_id = ?,
+            remote_synced_at = ?
+          WHERE local_install_id = ?
+            AND mix_id = ?;
+        `,
+        [row.id, syncedAt, localInstallId, row.local_mix_id],
+      );
+    }
+  } catch (error) {
+    throw createSyncTableError("sound_mixes", error);
   }
 }
 
@@ -469,13 +704,15 @@ function createSyncTableError(
   wrappedError.syncRecordType =
     tableName === "wind_down_runs"
       ? "wind_down_run"
-      : tableName === "breath_sessions"
-        ? "breath_session"
-        : tableName === "first_session_sync_records"
-          ? "first_session_record"
-          : tableName === "post_session_reflection_sync_records"
-            ? "post_session_reflection"
-            : "local_install_link";
+      : tableName === "sound_mixes"
+        ? "sound_mix"
+        : tableName === "breath_sessions"
+          ? "breath_session"
+          : tableName === "first_session_sync_records"
+            ? "first_session_record"
+            : tableName === "post_session_reflection_sync_records"
+              ? "post_session_reflection"
+              : "local_install_link";
 
   return wrappedError;
 }
@@ -546,4 +783,20 @@ function parseUserId(userId: string): string {
   }
 
   return userId;
+}
+
+function parseSoundMixerTimerPreference(
+  value: string,
+): SoundMixerSavedMixRecord["timerPreference"] {
+  if (value === "infinity") {
+    return value;
+  }
+
+  const parsedValue = Number(value);
+
+  if (parsedValue === 20 || parsedValue === 30 || parsedValue === 45 || parsedValue === 60) {
+    return parsedValue;
+  }
+
+  throw new Error(`Unsupported sound mixer timer: ${value}`);
 }

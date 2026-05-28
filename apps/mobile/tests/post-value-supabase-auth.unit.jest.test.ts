@@ -156,6 +156,61 @@ describe("post-value Supabase auth client", () => {
     );
   });
 
+  it("returns only remote ids for allowlisted saved sound mix sync", async () => {
+    const fetchMock = jest.fn(() =>
+      Promise.resolve({
+        json: () =>
+          Promise.resolve([
+            {
+              id: "123e4567-e89b-42d3-a456-426614174000",
+              local_mix_id: "soundmix_0123456789abcdef",
+            },
+          ]),
+        ok: true,
+        status: 201,
+      }),
+    );
+    global.fetch = fetchMock as typeof fetch;
+    mockAuthMethods.getSession.mockResolvedValue({
+      data: { session: { access_token: "user-access-token" } },
+      error: null,
+    });
+
+    const client = createPostValueSupabaseClient();
+
+    await expect(
+      client?.from("sound_mixes").upsert(
+        {
+          local_mix_id: "soundmix_0123456789abcdef",
+          user_id: "123e4567-e89b-12d3-a456-426614174000",
+        },
+        {
+          onConflict: "user_id,local_mix_id",
+          returning: "representation",
+          select: "id,local_mix_id",
+        },
+      ),
+    ).resolves.toEqual({
+      data: [
+        {
+          id: "123e4567-e89b-42d3-a456-426614174000",
+          local_mix_id: "soundmix_0123456789abcdef",
+        },
+      ],
+      error: null,
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://project-ref.supabase.co/rest/v1/sound_mixes?on_conflict=user_id%2Clocal_mix_id&select=id%2Clocal_mix_id",
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          Prefer: "resolution=merge-duplicates,return=representation",
+        }),
+        method: "POST",
+      }),
+    );
+  });
+
   it("rejects Wind-Down run sync with a non-idempotent conflict target", async () => {
     const fetchMock = jest.fn();
     global.fetch = fetchMock as typeof fetch;

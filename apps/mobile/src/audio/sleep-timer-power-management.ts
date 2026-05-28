@@ -1,3 +1,5 @@
+import { activateKeepAwakeAsync, deactivateKeepAwake } from "expo-keep-awake";
+
 export type SleepTimerAppState = "active" | "background" | "locked";
 
 export type SleepTimerStopReason = "manual-stop" | "timer-ended" | "interrupted";
@@ -14,8 +16,13 @@ export type SleepTimerPowerLock = {
   readonly release: () => Promise<void> | void;
 };
 
+type ExpoKeepAwakePowerLockAdapter = {
+  readonly activateKeepAwakeAsync: (tag?: string) => Promise<void>;
+  readonly deactivateKeepAwake: (tag?: string) => Promise<void>;
+};
+
 export type SleepTimerPowerControllerOptions = {
-  readonly powerLock?: SleepTimerPowerLock;
+  readonly powerLock?: SleepTimerPowerLock | null;
 };
 
 export type BeginSleepTimerPlaybackInput = {
@@ -37,9 +44,31 @@ export type SleepTimerPowerController = {
   readonly getSnapshot: () => SleepTimerPowerSnapshot;
 };
 
-export function createSleepTimerPowerController(
-  options: SleepTimerPowerControllerOptions = {},
-): SleepTimerPowerController {
+export const sleepTimerPowerLockTag = "nidoru-sleep-timer-playback";
+
+const defaultKeepAwakeAdapter = {
+  activateKeepAwakeAsync,
+  deactivateKeepAwake,
+} as const satisfies ExpoKeepAwakePowerLockAdapter;
+
+export function createExpoKeepAwakePowerLock({
+  adapter = defaultKeepAwakeAdapter,
+  tag = sleepTimerPowerLockTag,
+}: {
+  readonly adapter?: ExpoKeepAwakePowerLockAdapter;
+  readonly tag?: string;
+} = {}): SleepTimerPowerLock {
+  return {
+    acquire: () => adapter.activateKeepAwakeAsync(tag),
+    release: () => adapter.deactivateKeepAwake(tag),
+  };
+}
+
+const defaultPowerLock = createExpoKeepAwakePowerLock();
+
+export function createSleepTimerPowerController({
+  powerLock = defaultPowerLock,
+}: SleepTimerPowerControllerOptions = {}): SleepTimerPowerController {
   let snapshot: SleepTimerPowerSnapshot = {
     appState: "active",
     powerLockHeld: false,
@@ -48,13 +77,20 @@ export function createSleepTimerPowerController(
 
   return {
     async beginTimerPlayback(input) {
-      if (options.powerLock && !snapshot.powerLockHeld) {
-        await options.powerLock.acquire();
+      let powerLockHeld = snapshot.powerLockHeld;
+
+      if (powerLock && !snapshot.powerLockHeld) {
+        try {
+          await powerLock.acquire();
+          powerLockHeld = true;
+        } catch {
+          powerLockHeld = false;
+        }
       }
 
       snapshot = {
         appState: input.appState,
-        powerLockHeld: options.powerLock !== undefined,
+        powerLockHeld,
         status: "playing",
       };
 
@@ -62,8 +98,12 @@ export function createSleepTimerPowerController(
     },
 
     async endTimerPlayback(input) {
-      if (options.powerLock && snapshot.powerLockHeld) {
-        await options.powerLock.release();
+      if (powerLock && snapshot.powerLockHeld) {
+        try {
+          await powerLock.release();
+        } catch {
+          // Power release failures must not block audio cleanup or route unmount.
+        }
       }
 
       snapshot = {

@@ -854,6 +854,163 @@ Deno.test("supports Wind-Down local persistence and strict recovery constraints"
   }
 });
 
+Deno.test("supports Sound Mixer saved mixes with local max-3 constraints", async () => {
+  const { database, cleanup } = await createDatabase();
+
+  try {
+    await runSqliteMigrations(database);
+    await database.execAsync(`
+      PRAGMA foreign_keys = ON;
+
+      INSERT INTO local_install_identity (local_install_id, created_at, last_seen_at)
+      VALUES ('install_0123456789abcdef', '2026-05-28T12:00:00.000Z', '2026-05-28T12:00:00.000Z');
+
+      INSERT INTO sound_mixer_saved_mixes (
+        mix_id,
+        local_install_id,
+        name,
+        timer_preference,
+        created_at,
+        updated_at
+      )
+      VALUES
+        (
+          'soundmix_0123456789abcdef',
+          'install_0123456789abcdef',
+          'Rain Hearth',
+          '30',
+          '2026-05-28T12:00:00.000Z',
+          '2026-05-28T12:00:00.000Z'
+        ),
+        (
+          'soundmix_1123456789abcdef',
+          'install_0123456789abcdef',
+          'Forest Fan',
+          '45',
+          '2026-05-28T12:01:00.000Z',
+          '2026-05-28T12:01:00.000Z'
+        ),
+        (
+          'soundmix_2123456789abcdef',
+          'install_0123456789abcdef',
+          'Ocean Noise',
+          '60',
+          '2026-05-28T12:02:00.000Z',
+          '2026-05-28T12:02:00.000Z'
+        );
+
+      INSERT INTO sound_mixer_saved_mix_layers (
+        mix_id,
+        layer_position,
+        sound_id,
+        volume
+      )
+      VALUES
+        ('soundmix_0123456789abcdef', 0, 'light-rain', 72),
+        ('soundmix_0123456789abcdef', 1, 'brown-noise', 58),
+        ('soundmix_0123456789abcdef', 2, 'fireplace-crackling', 34);
+    `);
+
+    const savedMixRows = await database.getAllAsync<{ layer_count: number; mix_count: number }>(`
+      SELECT
+        COUNT(DISTINCT sound_mixer_saved_mixes.mix_id) AS mix_count,
+        COUNT(sound_mixer_saved_mix_layers.sound_id) AS layer_count
+      FROM sound_mixer_saved_mixes
+      LEFT JOIN sound_mixer_saved_mix_layers
+        ON sound_mixer_saved_mix_layers.mix_id = sound_mixer_saved_mixes.mix_id
+      WHERE sound_mixer_saved_mixes.local_install_id = 'install_0123456789abcdef';
+    `);
+
+    assertEquals(savedMixRows, [{ mix_count: 3, layer_count: 3 }]);
+
+    await assertRejects(
+      () =>
+        database.execAsync(`
+          INSERT INTO local_install_identity (local_install_id, created_at, last_seen_at)
+          VALUES ('install_invalidtimer1', '2026-05-28T12:04:00.000Z', '2026-05-28T12:04:00.000Z');
+
+          INSERT INTO sound_mixer_saved_mixes (
+            mix_id,
+            local_install_id,
+            name,
+            timer_preference,
+            created_at,
+            updated_at
+          )
+          VALUES (
+            'soundmix_3123456789abcdef',
+            'install_0123456789abcdef',
+            'River Rain',
+            '20',
+            '2026-05-28T12:03:00.000Z',
+            '2026-05-28T12:03:00.000Z'
+          );
+        `),
+      /up to 3 saved mixes/,
+    );
+    await assertRejects(
+      () =>
+        database.execAsync(`
+          INSERT INTO sound_mixer_saved_mix_layers (
+            mix_id,
+            layer_position,
+            sound_id,
+            volume
+          )
+          VALUES (
+            'soundmix_0123456789abcdef',
+            3,
+            'ocean-waves',
+            70
+          );
+        `),
+      /at most 3 active layers|CHECK constraint failed/,
+    );
+    await assertRejects(
+      () =>
+        database.execAsync(`
+          INSERT INTO sound_mixer_saved_mixes (
+            mix_id,
+            local_install_id,
+            name,
+            timer_preference,
+            created_at,
+            updated_at
+          )
+          VALUES (
+            'soundmix_invalidtimer1',
+            'install_invalidtimer1',
+            'Invalid Timer',
+            '25',
+            '2026-05-28T12:04:00.000Z',
+            '2026-05-28T12:04:00.000Z'
+          );
+        `),
+      /CHECK constraint failed/,
+    );
+    await assertRejects(
+      () =>
+        database.execAsync(`
+          INSERT INTO sound_mixer_saved_mix_layers (
+            mix_id,
+            layer_position,
+            sound_id,
+            volume
+          )
+          VALUES (
+            'soundmix_1123456789abcdef',
+            0,
+            'unlicensed-drone',
+            70
+          );
+        `),
+      /CHECK constraint failed/,
+    );
+  } finally {
+    await cleanup();
+  }
+});
+
 Deno.test("does not reapply migrations that already ran", async () => {
   const { database, cleanup } = await createDatabase();
 

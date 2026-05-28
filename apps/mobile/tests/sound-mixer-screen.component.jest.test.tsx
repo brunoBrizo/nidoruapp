@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, jest } from "@jest/globals";
-import { act, fireEvent, render, screen } from "@testing-library/react-native";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react-native";
 import * as Haptics from "expo-haptics";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -525,6 +525,105 @@ describe("SoundMixerAnchorScreen", () => {
     );
     expect(screen.getByRole("button", { name: "Close Save Mix sheet" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Cancel Save Mix" })).toBeTruthy();
+  });
+
+  it("saves a named mix through the local persistence handler and updates the row", async () => {
+    jest.useFakeTimers();
+    jest.setSystemTime(Date.parse("2026-05-28T12:00:00.000Z"));
+
+    const onSaveMix = jest.fn<() => Promise<void>>(() => Promise.resolve());
+
+    render(
+      <SoundMixerScreen
+        initialSavedMixRecords={[]}
+        localInstallId="install_0123456789abcdef"
+        onSaveMix={onSaveMix}
+        uiVariant="empty-mixer"
+      />,
+    );
+
+    fireEvent.press(screen.getByRole("button", { name: "Heavy Rain sound" }));
+    fireEvent.press(screen.getByRole("button", { name: "Save Mix" }));
+    fireEvent.changeText(screen.getByTestId("sound-mixer-save-mix-name-input"), "  Storm Fan  ");
+    fireEvent.press(screen.getByRole("button", { name: "Save Mix" }));
+
+    await waitFor(() => {
+      expect(onSaveMix).toHaveBeenCalledWith(
+        expect.objectContaining({
+          createdAt: "2026-05-28T12:00:00.000Z",
+          layers: [{ soundId: "heavy-rain", volume: 70 }],
+          localInstallId: "install_0123456789abcdef",
+          mixId: expect.stringMatching(/^soundmix_[A-Za-z0-9_-]{8,64}$/),
+          name: "Storm Fan",
+          timerPreference: 30,
+          updatedAt: "2026-05-28T12:00:00.000Z",
+        }),
+      );
+    });
+    expect(screen.queryByText("Save mix")).toBeNull();
+    expect(screen.getByRole("button", { name: "Storm Fan saved mix" })).toBeTruthy();
+  });
+
+  it("replaces an existing saved mix instead of creating a fourth persisted record", async () => {
+    jest.useFakeTimers();
+    jest.setSystemTime(Date.parse("2026-05-28T12:10:00.000Z"));
+
+    const onSaveMix = jest.fn<() => Promise<void>>(() => Promise.resolve());
+
+    render(
+      <SoundMixerScreen
+        initialSavedMixRecords={[
+          {
+            createdAt: "2026-05-28T12:00:00.000Z",
+            layers: [{ soundId: "light-rain", volume: 72 }],
+            localInstallId: "install_0123456789abcdef",
+            mixId: "soundmix_rainhearth0001",
+            name: "Rain Hearth",
+            timerPreference: 30,
+            updatedAt: "2026-05-28T12:00:00.000Z",
+          },
+          {
+            createdAt: "2026-05-28T12:01:00.000Z",
+            layers: [{ soundId: "forest", volume: 70 }],
+            localInstallId: "install_0123456789abcdef",
+            mixId: "soundmix_forestfan0001",
+            name: "Forest Fan",
+            timerPreference: 45,
+            updatedAt: "2026-05-28T12:01:00.000Z",
+          },
+          {
+            createdAt: "2026-05-28T12:02:00.000Z",
+            layers: [{ soundId: "ocean-waves", volume: 70 }],
+            localInstallId: "install_0123456789abcdef",
+            mixId: "soundmix_oceannoise0001",
+            name: "Ocean Noise",
+            timerPreference: 60,
+            updatedAt: "2026-05-28T12:02:00.000Z",
+          },
+        ]}
+        localInstallId="install_0123456789abcdef"
+        onSaveMix={onSaveMix}
+        uiVariant="full-save-mix-sheet"
+      />,
+    );
+
+    fireEvent.changeText(screen.getByTestId("sound-mixer-save-mix-name-input"), "Storm Hearth");
+    fireEvent.press(screen.getByRole("button", { name: "Replace existing mix" }));
+
+    await waitFor(() => {
+      expect(onSaveMix).toHaveBeenCalledWith(
+        expect.objectContaining({
+          createdAt: "2026-05-28T12:00:00.000Z",
+          localInstallId: "install_0123456789abcdef",
+          mixId: "soundmix_rainhearth0001",
+          name: "Storm Hearth",
+          updatedAt: "2026-05-28T12:10:00.000Z",
+        }),
+      );
+    });
+    expect(screen.queryByText("Save mix")).toBeNull();
+    expect(screen.getByTestId("sound-mixer-saved-mix-soundmix_rainhearth0001")).toBeTruthy();
+    expect(screen.getByText("Storm Hearth")).toBeTruthy();
   });
 
   it("opens the dark playback base and wakes the temporary controls", () => {

@@ -15,6 +15,7 @@ import {
   type SoundMixerSavedMix as DomainSoundMixerSavedMix,
   type SoundMixerSnapshot,
 } from "@nidoru/domain";
+import { soundMixerSavedMixRecordSchema, type SoundMixerSavedMixRecord } from "@nidoru/validation";
 import * as Haptics from "expo-haptics";
 import {
   Asterisk,
@@ -48,6 +49,7 @@ import { StatusBar } from "expo-status-bar";
 
 import { useReduceMotionPreference } from "../motion/use-reduce-motion-enabled";
 import { Animated, Pressable, ScrollView, Text, TextInput, View, cn } from "../tw";
+import { createSoundMixerSavedMixId } from "./sound-mixer-local-persistence";
 
 type MixerIconProps = {
   readonly color?: string;
@@ -59,13 +61,16 @@ type MixerIconProps = {
 type MixerIcon = ElementType<MixerIconProps>;
 
 type SavedMix = {
+  readonly createdAt?: string;
   readonly layers: readonly SoundMixerActiveLayer[];
   readonly id: string;
   readonly label: string;
   readonly icons: readonly MixerIcon[];
+  readonly localInstallId?: string;
   readonly name: string;
   readonly timerLabel?: string;
   readonly timerPreference: DomainSoundMixerSavedMix["timerPreference"];
+  readonly updatedAt?: string;
 };
 
 type SoundCard = {
@@ -281,16 +286,86 @@ function getSavedMixesForVariant(variant: SoundMixerUIVariant): readonly SavedMi
     : savedMixes;
 }
 
+function getSavedMixesFromRecords(
+  records: readonly SoundMixerSavedMixRecord[] | undefined,
+): readonly SavedMix[] | undefined {
+  return records?.map(createSavedMixFromRecord);
+}
+
+function getInitialSavedMixes({
+  records,
+  variant,
+}: {
+  readonly records: readonly SoundMixerSavedMixRecord[] | undefined;
+  readonly variant: SoundMixerUIVariant;
+}): readonly SavedMix[] {
+  return getSavedMixesFromRecords(records) ?? getSavedMixesForVariant(variant);
+}
+
+function createSavedMixFromRecord(record: SoundMixerSavedMixRecord): SavedMix {
+  return {
+    createdAt: record.createdAt,
+    icons: getSavedMixIcons(record.layers),
+    id: record.mixId,
+    label: record.name,
+    layers: record.layers,
+    localInstallId: record.localInstallId,
+    name: record.name,
+    timerLabel: formatSoundMixerTimerPreference(record.timerPreference),
+    timerPreference: record.timerPreference,
+    updatedAt: record.updatedAt,
+  };
+}
+
+function getSavedMixIcons(layers: readonly SoundMixerActiveLayer[]): readonly MixerIcon[] {
+  const icons = layers.map((layer) => getSoundIcon(layer.soundId)).slice(0, 2);
+
+  return icons.length === 0 ? [MoonStar] : icons;
+}
+
+function getSoundIcon(soundId: LaunchSoundId): MixerIcon {
+  for (const category of soundCategories) {
+    const sound = category.sounds.find((candidate) => candidate.id === soundId);
+
+    if (sound) {
+      return sound.Icon;
+    }
+  }
+
+  return MoonStar;
+}
+
+function getDomainSavedMixes(mixes: readonly SavedMix[]): readonly DomainSoundMixerSavedMix[] {
+  return mixes.map((mix) => ({
+    layers: mix.layers,
+    name: mix.name,
+    timerPreference: mix.timerPreference,
+  }));
+}
+
+function upsertSavedMix(mixes: readonly SavedMix[], nextMix: SavedMix): readonly SavedMix[] {
+  const existingMixIndex = mixes.findIndex((mix) => mix.id === nextMix.id);
+
+  if (existingMixIndex === -1) {
+    return mixes.length >= soundMixerLimits.maxSavedMixes ? mixes : [...mixes, nextMix];
+  }
+
+  return mixes.map((mix, index) => (index === existingMixIndex ? nextMix : mix));
+}
+
 function getInitialEditingSoundId(variant: SoundMixerUIVariant): LaunchSoundId | undefined {
   return variant === "volume-editing" ? "light-rain" : undefined;
 }
 
-function createInitialSoundMixerController(variant: SoundMixerUIVariant): SoundMixerController {
+function createInitialSoundMixerController(
+  variant: SoundMixerUIVariant,
+  savedMixCatalog = getSavedMixesForVariant(variant),
+): SoundMixerController {
   const activeLayers = getInitialActiveLayersForVariant(variant);
 
   return createSoundMixerController({
     activeLayers,
-    savedMixes: getSavedMixesForVariant(variant),
+    savedMixes: getDomainSavedMixes(savedMixCatalog),
     state: activeLayers.length === 0 ? "idle-dark" : "playing",
   });
 }
@@ -444,12 +519,18 @@ function getSoundMixerVolumeDetent(volume: number) {
 
 export function SoundMixerScreen({
   disableHaptics = false,
+  initialSavedMixRecords,
   initialPlaybackMode = "mixer",
+  localInstallId,
+  onSaveMix,
   reduceMotionOverride,
   uiVariant = "default",
 }: {
   readonly disableHaptics?: boolean;
+  readonly initialSavedMixRecords?: readonly SoundMixerSavedMixRecord[];
   readonly initialPlaybackMode?: PlaybackMode;
+  readonly localInstallId?: string;
+  readonly onSaveMix?: (record: SoundMixerSavedMixRecord) => Promise<void> | void;
   readonly reduceMotionOverride?: boolean;
   readonly uiVariant?: SoundMixerUIVariant;
 } = {}) {
@@ -461,8 +542,16 @@ export function SoundMixerScreen({
   const activeStripMotionConfig = getSoundMixerActiveStripMotionConfig(reduceMotionEnabled);
   const idleDimmingMotionConfig = getSoundMixerIdleDimmingMotionConfig(reduceMotionEnabled);
   const appStateRef = useRef(AppState.currentState);
-  const savedMixCatalog = getSavedMixesForVariant(uiVariant);
-  const [controller, setController] = useState(() => createInitialSoundMixerController(uiVariant));
+  const initialSavedMixRecordsRef = useRef(initialSavedMixRecords);
+  const [savedMixCatalog, setSavedMixCatalog] = useState(() =>
+    getInitialSavedMixes({ records: initialSavedMixRecords, variant: uiVariant }),
+  );
+  const [controller, setController] = useState(() =>
+    createInitialSoundMixerController(
+      uiVariant,
+      getInitialSavedMixes({ records: initialSavedMixRecords, variant: uiVariant }),
+    ),
+  );
   const [editingSoundId, setEditingSoundId] = useState<LaunchSoundId | undefined>(() =>
     getInitialEditingSoundId(uiVariant),
   );
@@ -531,8 +620,36 @@ export function SoundMixerScreen({
   }, [isFullSaveMixSheet]);
 
   useEffect(() => {
-    const nextController = createInitialSoundMixerController(uiVariant);
+    initialSavedMixRecordsRef.current = initialSavedMixRecords;
+  }, [initialSavedMixRecords]);
 
+  useEffect(() => {
+    if (initialSavedMixRecords === undefined) {
+      return;
+    }
+
+    const nextSavedMixCatalog = getInitialSavedMixes({
+      records: initialSavedMixRecords,
+      variant: uiVariant,
+    });
+
+    setSavedMixCatalog(nextSavedMixCatalog);
+    setController((currentController) =>
+      createSoundMixerController({
+        ...currentController,
+        savedMixes: getDomainSavedMixes(nextSavedMixCatalog),
+      }),
+    );
+  }, [initialSavedMixRecords, uiVariant]);
+
+  useEffect(() => {
+    const nextSavedMixCatalog = getInitialSavedMixes({
+      records: initialSavedMixRecordsRef.current,
+      variant: uiVariant,
+    });
+    const nextController = createInitialSoundMixerController(uiVariant, nextSavedMixCatalog);
+
+    setSavedMixCatalog(nextSavedMixCatalog);
     setController(nextController);
     setEditingSoundId(getInitialEditingSoundId(uiVariant));
     setMixTitle("Rain Hearth");
@@ -702,6 +819,47 @@ export function SoundMixerScreen({
     [markMixerInteraction, syncPlaybackStartForController, triggerSelectionHaptic],
   );
 
+  const handleSaveMixSubmit = useCallback(
+    async ({ name, replaceMixId }: { readonly name: string; readonly replaceMixId?: string }) => {
+      if (controller.activeLayers.length === 0) {
+        throw new Error("Sound mixer saved mixes require at least one active layer.");
+      }
+
+      const existingMix =
+        replaceMixId === undefined
+          ? undefined
+          : savedMixCatalog.find((savedMix) => savedMix.id === replaceMixId);
+      const nowIso = new Date().toISOString();
+      const savedMixRecord = soundMixerSavedMixRecordSchema.parse({
+        createdAt: existingMix?.createdAt ?? nowIso,
+        layers: controller.activeLayers,
+        localInstallId: localInstallId ?? "install_soundmixerlocal",
+        mixId:
+          existingMix?.id.startsWith("soundmix_") === true
+            ? existingMix.id
+            : createSoundMixerSavedMixId(),
+        name,
+        timerPreference: controller.timerPreference,
+        updatedAt: nowIso,
+      });
+      const nextSavedMix = createSavedMixFromRecord(savedMixRecord);
+      const nextSavedMixCatalog = upsertSavedMix(savedMixCatalog, nextSavedMix);
+
+      await onSaveMix?.(savedMixRecord);
+
+      setSavedMixCatalog(nextSavedMixCatalog);
+      setController((currentController) =>
+        createSoundMixerController({
+          ...currentController,
+          savedMixes: getDomainSavedMixes(nextSavedMixCatalog),
+        }),
+      );
+      setMixTitle(savedMixRecord.name);
+      setIsSaveMixSheetOpen(false);
+    },
+    [controller, localInstallId, onSaveMix, savedMixCatalog],
+  );
+
   if (playbackMode !== "mixer") {
     return (
       <Modal
@@ -816,7 +974,9 @@ export function SoundMixerScreen({
                     </Text>
                   </Text>
                   <Text className="mt-0.5 font-nidoru-primary-regular text-xs font-light leading-4 tracking-wide text-[#8A8FA8]">
-                    {hasActiveSounds ? `${timerStatus.primaryLabel} ` : "Starts when a sound plays."}
+                    {hasActiveSounds
+                      ? `${timerStatus.primaryLabel} `
+                      : "Starts when a sound plays."}
                     {hasActiveSounds ? (
                       <Text className="font-nidoru-data-regular tabular-nums">
                         {timerStatus.primaryValue}
@@ -989,11 +1149,17 @@ export function SoundMixerScreen({
       {isSaveMixSheetOpen ? (
         <SaveMixSheet
           activeSounds={mixerState.activeSounds}
+          initialName={mixTitle}
           savedMixes={mixerState.savedMixes}
           onDismiss={() => {
             setIsSaveMixSheetOpen(false);
           }}
-          variant={isFullSaveMixSheet ? "full" : "default"}
+          onSubmit={handleSaveMixSubmit}
+          variant={
+            isFullSaveMixSheet || mixerState.savedMixes.length >= soundMixerLimits.maxSavedMixes
+              ? "full"
+              : "default"
+          }
         />
       ) : null}
     </View>
@@ -1512,16 +1678,41 @@ function SavedMixesSection({
 
 function SaveMixSheet({
   activeSounds,
+  initialName,
   savedMixes,
   onDismiss,
+  onSubmit,
   variant,
 }: {
   readonly activeSounds: readonly SoundCard[];
+  readonly initialName: string;
   readonly savedMixes: readonly SavedMix[];
   readonly onDismiss: () => void;
+  readonly onSubmit: (input: {
+    readonly name: string;
+    readonly replaceMixId?: string;
+  }) => Promise<void>;
   readonly variant: "default" | "full";
 }) {
   const isFull = variant === "full";
+  const [mixName, setMixName] = useState(initialName);
+  const [selectedReplacementMixId, setSelectedReplacementMixId] = useState(() => savedMixes[0]?.id);
+  const [saveError, setSaveError] = useState<string | undefined>();
+
+  const handleSubmit = useCallback(async () => {
+    setSaveError(undefined);
+
+    try {
+      await onSubmit({
+        name: mixName,
+        ...(isFull && selectedReplacementMixId !== undefined
+          ? { replaceMixId: selectedReplacementMixId }
+          : {}),
+      });
+    } catch {
+      setSaveError("Check the mix name and try again.");
+    }
+  }, [isFull, mixName, onSubmit, selectedReplacementMixId]);
 
   return (
     <Modal
@@ -1597,30 +1788,48 @@ function SaveMixSheet({
               accessibilityLabel="Mix name"
               accessibilityLabelledBy="sound-mixer-save-mix-name-label"
               className="mb-2 h-12 rounded-[14px] border border-[#2D3359] bg-[#0D0F1A] px-4 font-nidoru-primary-semibold text-[15px] leading-5 text-[#EEF0FF]"
-              defaultValue="Rain Hearth"
+              onChangeText={setMixName}
               placeholder="Enter mix name"
               placeholderTextColor="#6A7095"
               returnKeyType="done"
               selectionColor={colors.active}
               testID="sound-mixer-save-mix-name-input"
+              value={mixName}
             />
             <View className="flex-row items-center justify-between px-1">
               <Text className="font-nidoru-primary-regular text-xs font-light leading-4 text-[#8A8FA8]">
                 You can save up to 3 mixes.
               </Text>
               <Text className="font-nidoru-data-regular text-xs font-medium leading-4 text-[#A89CE0] tabular-nums">
-                {isFull ? "3 of 3 saved" : "2 of 3 saved"}
+                {`${Math.min(savedMixes.length, soundMixerLimits.maxSavedMixes)} of 3 saved`}
               </Text>
             </View>
+            {saveError ? (
+              <Text
+                accessibilityLiveRegion="polite"
+                className="mt-2 px-1 font-nidoru-primary-regular text-xs leading-4 text-[#F6A3A3]"
+              >
+                {saveError}
+              </Text>
+            ) : null}
           </View>
 
-          {isFull ? <ReplacementMixSelector savedMixes={savedMixes} /> : null}
+          {isFull ? (
+            <ReplacementMixSelector
+              onSelectMix={setSelectedReplacementMixId}
+              savedMixes={savedMixes}
+              selectedMixId={selectedReplacementMixId}
+            />
+          ) : null}
 
           <View className="gap-2">
             <Pressable
               accessibilityLabel={isFull ? "Replace existing mix" : "Save Mix"}
               accessibilityRole="button"
               className="h-12 items-center justify-center rounded-[14px] bg-[#7C6FCD] shadow-[0_0_15px_rgba(124,111,205,0.25)] active:scale-[0.98]"
+              onPress={() => {
+                void handleSubmit();
+              }}
               testID="sound-mixer-save-mix-submit"
             >
               <Text className="font-nidoru-primary-semibold text-[15px] leading-5 tracking-wide text-white">
@@ -1672,7 +1881,15 @@ function SaveMixLayerRow({ sound }: { readonly sound: SoundCard }) {
   );
 }
 
-function ReplacementMixSelector({ savedMixes }: { readonly savedMixes: readonly SavedMix[] }) {
+function ReplacementMixSelector({
+  onSelectMix,
+  savedMixes,
+  selectedMixId,
+}: {
+  readonly onSelectMix: (mixId: string) => void;
+  readonly savedMixes: readonly SavedMix[];
+  readonly selectedMixId: string | undefined;
+}) {
   return (
     <View className="mb-5 gap-2" testID="sound-mixer-replace-mix-selector">
       <View className="flex-row items-center justify-between px-1">
@@ -1684,29 +1901,34 @@ function ReplacementMixSelector({ savedMixes }: { readonly savedMixes: readonly 
         </Text>
       </View>
       <View className="gap-2 rounded-[16px] border border-[#1E2236]/60 bg-[#0D0F1A] p-2">
-        {savedMixes.map((mix, index) => (
-          <Pressable
-            accessibilityLabel={`Replace ${mix.label} saved mix`}
-            accessibilityRole="button"
-            accessibilityState={{ selected: index === 0 }}
-            className={cn(
-              "min-h-10 flex-row items-center justify-between rounded-[12px] border px-3 py-2 active:scale-[0.98]",
-              index === 0
-                ? "border-[#7C6FCD]/50 bg-[#1C2040]"
-                : "border-transparent bg-transparent",
-            )}
-            key={mix.id}
-            testID={`sound-mixer-replace-mix-${mix.id}`}
-          >
-            <SavedMixIconStack icons={mix.icons} size="sm" />
-            <Text className="ml-2 flex-1 font-nidoru-primary-regular text-[13px] leading-[18px] tracking-wide text-[#EEF0FF]">
-              {mix.label}
-            </Text>
-            <Text className="font-nidoru-data-regular text-xs leading-4 text-[#A89CE0] tabular-nums">
-              {mix.timerLabel}
-            </Text>
-          </Pressable>
-        ))}
+        {savedMixes.map((mix, index) => {
+          const selected = selectedMixId === undefined ? index === 0 : mix.id === selectedMixId;
+
+          return (
+            <Pressable
+              accessibilityLabel={`Replace ${mix.label} saved mix`}
+              accessibilityRole="button"
+              accessibilityState={{ selected }}
+              className={cn(
+                "min-h-10 flex-row items-center justify-between rounded-[12px] border px-3 py-2 active:scale-[0.98]",
+                selected ? "border-[#7C6FCD]/50 bg-[#1C2040]" : "border-transparent bg-transparent",
+              )}
+              key={mix.id}
+              onPress={() => {
+                onSelectMix(mix.id);
+              }}
+              testID={`sound-mixer-replace-mix-${mix.id}`}
+            >
+              <SavedMixIconStack icons={mix.icons} size="sm" />
+              <Text className="ml-2 flex-1 font-nidoru-primary-regular text-[13px] leading-[18px] tracking-wide text-[#EEF0FF]">
+                {mix.label}
+              </Text>
+              <Text className="font-nidoru-data-regular text-xs leading-4 text-[#A89CE0] tabular-nums">
+                {mix.timerLabel}
+              </Text>
+            </Pressable>
+          );
+        })}
       </View>
     </View>
   );

@@ -631,6 +631,75 @@ export const sqliteMigrations = [
         ON local_event_queue (status, next_attempt_at, created_at);
     `,
   },
+  {
+    id: "0007_sound_mixer_saved_mix_persistence",
+    sql: `
+      CREATE TABLE sound_mixer_saved_mixes (
+        mix_id TEXT PRIMARY KEY NOT NULL,
+        local_install_id TEXT NOT NULL REFERENCES local_install_identity(local_install_id) ON DELETE CASCADE,
+        name TEXT NOT NULL CHECK (length(trim(name)) BETWEEN 1 AND 40),
+        timer_preference TEXT NOT NULL CHECK (timer_preference IN ('20', '30', '45', '60', 'infinity')),
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        CHECK (substr(mix_id, 1, 9) = 'soundmix_'),
+        CHECK (length(mix_id) BETWEEN 17 AND 73),
+        CHECK (updated_at >= created_at)
+      );
+
+      CREATE TABLE sound_mixer_saved_mix_layers (
+        mix_id TEXT NOT NULL REFERENCES sound_mixer_saved_mixes(mix_id) ON DELETE CASCADE,
+        layer_position INTEGER NOT NULL CHECK (layer_position BETWEEN 0 AND 2),
+        sound_id TEXT NOT NULL CHECK (
+          sound_id IN (
+            'light-rain',
+            'heavy-rain',
+            'rain-on-window',
+            'thunderstorm',
+            'ocean-waves',
+            'forest',
+            'river-stream',
+            'wind',
+            'white-noise',
+            'brown-noise',
+            'pink-noise',
+            'fireplace-crackling',
+            'cafe-ambience',
+            'fan',
+            '432hz-tone',
+            'delta-wave-binaural'
+          )
+        ),
+        volume REAL NOT NULL CHECK (volume >= 0 AND volume <= 100),
+        PRIMARY KEY (mix_id, sound_id),
+        UNIQUE (mix_id, layer_position)
+      );
+
+      CREATE INDEX sound_mixer_saved_mixes_install_updated_idx
+        ON sound_mixer_saved_mixes (local_install_id, updated_at);
+
+      CREATE TRIGGER sound_mixer_saved_mixes_max_3_insert
+      BEFORE INSERT ON sound_mixer_saved_mixes
+      WHEN (
+        SELECT COUNT(*)
+        FROM sound_mixer_saved_mixes
+        WHERE local_install_id = NEW.local_install_id
+      ) >= 3
+      BEGIN
+        SELECT RAISE(ABORT, 'Sound mixer supports up to 3 saved mixes.');
+      END;
+
+      CREATE TRIGGER sound_mixer_saved_mix_layers_max_3_insert
+      BEFORE INSERT ON sound_mixer_saved_mix_layers
+      WHEN (
+        SELECT COUNT(*)
+        FROM sound_mixer_saved_mix_layers
+        WHERE mix_id = NEW.mix_id
+      ) >= 3
+      BEGIN
+        SELECT RAISE(ABORT, 'Sound mixer supports at most 3 active layers.');
+      END;
+    `,
+  },
 ] as const satisfies readonly SQLiteMigration[];
 
 export async function runSqliteMigrations(

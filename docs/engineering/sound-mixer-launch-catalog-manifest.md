@@ -5,7 +5,7 @@ ClickUp task: `06.IMP.00 Resolve launch sound catalog, licensing, and bundled as
 
 ## Source Of Truth
 
-The launch Sound Mixer catalog is **15 sounds** after reducing launch scope. The accepted Sound Mixer UI contract, the handoff HTML, and `packages/domain/src/index.ts` all include two Tones entries, so no named launch sound is dropped from the remaining catalog.
+The launch Sound Mixer catalog is **14 sounds** after reducing launch scope. The accepted Sound Mixer UI contract, the handoff HTML, and `packages/domain/src/index.ts` all include two Tones entries, so no named launch sound is dropped from the remaining catalog.
 
 Implementation source:
 
@@ -34,7 +34,6 @@ Every launch loop target must be AAC-LC `.m4a`, at least 240 seconds, loopable w
 | `pink-noise` | Pink Noise | Noise | 70% on activation | `apps/mobile/assets/audio/sleep/pink-noise.m4a` | Blocked: file missing | Yes | Blocked: no licensed source committed | Blocked |
 | `fireplace-crackling` | Fireplace Crackling | Environment | 70% on activation | `apps/mobile/assets/audio/sleep/fireplace-crackling.m4a` | Blocked: file missing | Yes | Blocked: no licensed source committed | Blocked |
 | `cafe-ambience` | Cafe Ambience | Environment | 70% on activation | `apps/mobile/assets/audio/sleep/cafe-ambience.m4a` | Blocked: file missing | Yes | Blocked: no licensed source committed | Blocked |
-| `fan` | Fan | Environment | 70% on activation | `apps/mobile/assets/audio/sleep/fan.m4a` | Blocked: file missing | Yes | Blocked: no licensed source committed | Blocked |
 | `432hz-tone` | 432Hz Tone | Tones | 70% on activation | `apps/mobile/assets/audio/sleep/432hz-tone.m4a` | Blocked: file missing | Yes | Blocked: no licensed source committed | Blocked |
 | `delta-wave-binaural` | Delta Wave Binaural | Tones | 70% on activation | `apps/mobile/assets/audio/sleep/delta-wave-binaural.m4a` | Blocked: file missing | Yes | Blocked: no licensed source committed | Blocked |
 

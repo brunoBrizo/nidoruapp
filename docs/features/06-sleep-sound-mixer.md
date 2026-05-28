@@ -15,12 +15,12 @@ The sleep sound mixer lets users layer curated ambient sounds with independent v
 
 ## MVP Scope
 
-- Launch library: 15 curated sounds from the accepted Sound Mixer UI contract.
+- Launch library: 14 curated sounds from the accepted Sound Mixer UI contract.
 - Categories:
   - Rain: Light Rain, Heavy Rain, Rain on Window, Thunderstorm.
   - Nature: Ocean Waves, Forest, River Stream, Wind.
   - Noise: Brown Noise, Pink Noise.
-  - Environment: Fireplace Crackling, Cafe Ambience, Fan.
+  - Environment: Fireplace Crackling, Cafe Ambience.
   - Tones: 432Hz Tone, Delta Wave Binaural as experimental/preference audio, not premium proof points.
 - Each sound is minimum 4 minutes, seamlessly looped with no audible click.
 - Two-column sound-card grid.
@@ -46,8 +46,8 @@ The sleep sound mixer lets users layer curated ambient sounds with independent v
 ## Acceptance Criteria
 
 - Cached or bundled audio starts in less than 500 ms.
-- All 15 bundled sounds play offline.
-- All 15 bundled sounds loop without audible clicks.
+- All 14 bundled sounds play offline.
+- All 14 bundled sounds loop without audible clicks.
 - Three-layer sound mix works with independent volume.
 - Sleep timer begins a 2-minute fade before the end.
 - Sleep timer releases keep-awake or power-management locks when playback ends.
@@ -113,6 +113,6 @@ The sleep sound mixer lets users layer curated ambient sounds with independent v
 - [ ] Add saved mixes with max 3.
 - [ ] Persist mixes locally.
 - [ ] Sync saved mixes after auth exists.
-- [ ] Verify all 15 bundled sounds offline.
+- [ ] Verify all 14 bundled sounds offline.
 - [ ] Verify locked-screen/background playback.
 - [ ] Verify timer-ended playback lets the device dim and lock naturally.

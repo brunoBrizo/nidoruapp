@@ -282,7 +282,7 @@ assertCondition(
       createdAt: "2026-05-18T02:00:00.000Z",
       localInstallId,
       mixId: "soundmix_1123456789abcdef",
-      name: "Forest Fan",
+      name: "Forest Stream",
       updatedAt: "2026-05-18T02:00:00.000Z",
     },
     {

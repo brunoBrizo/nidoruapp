@@ -282,7 +282,6 @@ export const launchSoundIds = [
   "pink-noise",
   "fireplace-crackling",
   "cafe-ambience",
-  "fan",
   "432hz-tone",
   "delta-wave-binaural",
 ] as const;
@@ -421,12 +420,6 @@ export const launchSoundCatalog = [
     categoryLabel: "Environment",
     displayName: "Cafe Ambience",
     id: "cafe-ambience",
-  }),
-  createBlockedLaunchSoundCatalogItem({
-    categoryId: "environment",
-    categoryLabel: "Environment",
-    displayName: "Fan",
-    id: "fan",
   }),
   createBlockedLaunchSoundCatalogItem({
     categoryId: "tones",

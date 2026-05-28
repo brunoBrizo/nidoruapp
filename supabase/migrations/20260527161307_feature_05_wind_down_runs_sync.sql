@@ -40,7 +40,6 @@ create table public.wind_down_runs (
         'pink-noise',
         'fireplace-crackling',
         'cafe-ambience',
-        'fan',
         '432hz-tone',
         'delta-wave-binaural'
       )

@@ -126,7 +126,6 @@ assertEquals(launchSoundIds, [
   "pink-noise",
   "fireplace-crackling",
   "cafe-ambience",
-  "fan",
   "432hz-tone",
   "delta-wave-binaural",
 ]);
@@ -150,7 +149,6 @@ assertEquals(
     "Pink Noise",
     "Fireplace Crackling",
     "Cafe Ambience",
-    "Fan",
     "432Hz Tone",
     "Delta Wave Binaural",
   ],
@@ -282,7 +280,7 @@ assertThrows(
         savedMixes: [
           { layers: [{ soundId: "light-rain", volume: 70 }], name: "Rain", timerPreference: 20 },
           { layers: [{ soundId: "forest", volume: 70 }], name: "Forest", timerPreference: 30 },
-          { layers: [{ soundId: "fan", volume: 70 }], name: "Fan", timerPreference: 45 },
+          { layers: [{ soundId: "river-stream", volume: 70 }], name: "River", timerPreference: 45 },
         ],
       }),
       { name: "Ocean" },

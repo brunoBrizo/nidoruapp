@@ -67,14 +67,14 @@ describe("SleepTabScreen", () => {
     expect(screen.getByText("55%")).toBeTruthy();
     expect(screen.getByText("35%")).toBeTruthy();
     expect(screen.getByText("Brown noise")).toBeTruthy();
-    expect(screen.getByText("Fireplace")).toBeTruthy();
+    expect(screen.getAllByText("Fireplace")).toHaveLength(2);
 
     expect(screen.getByRole("link", { name: "Rain quick sound" })).toHaveProp(
       "accessibilityHint",
       "Opens the Sound Mixer anchor.",
     );
     expect(screen.getByRole("link", { name: "Ocean quick sound" })).toBeTruthy();
-    expect(screen.getByRole("link", { name: "Fan quick sound" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Fireplace quick sound" })).toBeTruthy();
 
     expect(screen.getByRole("link", { name: "Sleep Stories" })).toHaveProp(
       "accessibilityHint",

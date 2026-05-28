@@ -372,7 +372,6 @@ export const sqliteMigrations = [
             'pink-noise',
             'fireplace-crackling',
             'cafe-ambience',
-            'fan',
             '432hz-tone',
             'delta-wave-binaural'
           )
@@ -662,7 +661,6 @@ export const sqliteMigrations = [
             'pink-noise',
             'fireplace-crackling',
             'cafe-ambience',
-            'fan',
             '432hz-tone',
             'delta-wave-binaural'
           )

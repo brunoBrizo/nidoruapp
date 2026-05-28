@@ -42,14 +42,14 @@ The accepted sources may name preference audio such as `Brown Noise`, `Pink Nois
 
 ## Catalog Count Resolution
 
-The launch library source of truth is 15 curated sounds. The named category list, accepted Sound Mixer designs, and `packages/domain/src/index.ts` include 15 names:
+The launch library source of truth is 14 curated sounds. The named category list, accepted Sound Mixer designs, and `packages/domain/src/index.ts` include 14 names:
 
 | Category | Names in the source contract |
 | --- | --- |
 | Rain | Light Rain, Heavy Rain, Rain on Window, Thunderstorm |
 | Nature | Ocean Waves, Forest, River Stream, Wind |
 | Noise | Brown Noise, Pink Noise |
-| Environment | Fireplace Crackling, Cafe Ambience, Fan |
+| Environment | Fireplace Crackling, Cafe Ambience |
 | Tones | 432Hz Tone, Delta Wave Binaural |
 
 The implementation manifest is `docs/engineering/sound-mixer-launch-catalog-manifest.md`. Playback, offline, analytics, or sync work must not treat any launch sound as shippable until the matching licensed AAC-LC `.m4a` loop is committed and verified there.

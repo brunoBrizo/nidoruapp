@@ -18,7 +18,6 @@ import {
 import { soundMixerSavedMixRecordSchema, type SoundMixerSavedMixRecord } from "@nidoru/validation";
 import * as Haptics from "expo-haptics";
 import {
-  Asterisk,
   ChartNoAxesColumn,
   ChevronLeft,
   Cloud,
@@ -153,14 +152,14 @@ const savedMixes: readonly SavedMix[] = [
     timerPreference: 30,
   },
   {
-    id: "forest-fan",
-    label: "Forest Fan",
-    icons: [Leaf, Asterisk],
+    id: "forest-stream",
+    label: "Forest Stream",
+    icons: [Leaf, Droplet],
     layers: [
       { soundId: "forest", volume: 70 },
-      { soundId: "fan", volume: 52 },
+      { soundId: "river-stream", volume: 52 },
     ],
-    name: "Forest Fan",
+    name: "Forest Stream",
     timerLabel: "45 min",
     timerPreference: 45,
   },
@@ -217,7 +216,6 @@ const soundCategories: readonly SoundCategory[] = [
     sounds: [
       { id: "fireplace-crackling", label: "Fireplace Crackling", Icon: Flame },
       { id: "cafe-ambience", label: "Cafe Ambience", Icon: Coffee },
-      { id: "fan", label: "Fan", Icon: Asterisk },
     ],
   },
   {

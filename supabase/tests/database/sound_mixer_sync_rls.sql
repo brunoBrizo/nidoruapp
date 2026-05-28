@@ -55,11 +55,11 @@ values
     true
   ),
   (
-    'fan',
+    'cafe-ambience',
     'environment',
     0.700,
     'aac-lc-m4a',
-    'apps/mobile/assets/audio/sleep/fan.m4a',
+    'apps/mobile/assets/audio/sleep/cafe-ambience.m4a',
     240,
     'blocked_missing_licensed_audio',
     false
@@ -81,9 +81,9 @@ values
     null
   ),
   (
-    'fan',
+    'cafe-ambience',
     'en',
-    'Fan',
+    'Cafe Ambience',
     'Environment',
     null
   );
@@ -119,11 +119,11 @@ values
     'soundmix_otherbbbbbbb',
     'install_otherbbbbbbb',
     '22222222-2222-4222-8222-222222222222',
-    'Forest Fan',
+    'Forest Stream',
     '45',
     'forest',
     64,
-    'fan',
+    'river-stream',
     50,
     '2026-05-28T13:00:00Z',
     '2026-05-28T13:05:00Z'

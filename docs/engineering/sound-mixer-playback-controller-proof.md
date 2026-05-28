@@ -29,4 +29,4 @@ The launch Sound Mixer loop files are still not committed under `apps/mobile/ass
 - `loopReviewStatus = blocked_missing_audio`
 - `shipStatus = blocked_missing_licensed_audio`
 
-Because those licensed AAC-LC `.m4a` files are absent, this work can prove the playback controller behavior with injected local asset sources, but it cannot honestly prove that all 15 launch sounds play offline or loop cleanly on a physical locked device.
+Because those licensed AAC-LC `.m4a` files are absent, this work can prove the playback controller behavior with injected local asset sources, but it cannot honestly prove that all 14 launch sounds play offline or loop cleanly on a physical locked device.

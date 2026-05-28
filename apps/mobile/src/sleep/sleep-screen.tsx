@@ -12,7 +12,6 @@ import {
   SolarPlayLinearIcon,
   SolarSoundwaveLinearIcon,
   SolarWaterdropsLinearIcon,
-  SolarWindLinearIcon,
   type SleepIconComponent,
 } from "./sleep-icons";
 
@@ -42,7 +41,7 @@ const mixerLayers = [
 const quickSounds = [
   { label: "Rain", Icon: SolarCloudRainLinearIcon },
   { label: "Ocean", Icon: SolarWaterdropsLinearIcon },
-  { label: "Fan", Icon: SolarWindLinearIcon },
+  { label: "Fireplace", Icon: SolarFireLinearIcon },
 ] as const satisfies readonly QuickSound[];
 
 const layerFillClassByVolume = {

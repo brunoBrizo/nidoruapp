@@ -885,7 +885,7 @@ Deno.test("supports Sound Mixer saved mixes with local max-3 constraints", async
         (
           'soundmix_1123456789abcdef',
           'install_0123456789abcdef',
-          'Forest Fan',
+          'Forest Stream',
           '45',
           '2026-05-28T12:01:00.000Z',
           '2026-05-28T12:01:00.000Z'

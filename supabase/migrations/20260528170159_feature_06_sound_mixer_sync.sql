@@ -16,7 +16,6 @@ create table public.sound_assets (
         'pink-noise',
         'fireplace-crackling',
         'cafe-ambience',
-        'fan',
         '432hz-tone',
         'delta-wave-binaural'
       )
@@ -84,7 +83,6 @@ create table public.sound_mixes (
         'pink-noise',
         'fireplace-crackling',
         'cafe-ambience',
-        'fan',
         '432hz-tone',
         'delta-wave-binaural'
       )
@@ -107,7 +105,6 @@ create table public.sound_mixes (
         'pink-noise',
         'fireplace-crackling',
         'cafe-ambience',
-        'fan',
         '432hz-tone',
         'delta-wave-binaural'
       )
@@ -130,7 +127,6 @@ create table public.sound_mixes (
         'pink-noise',
         'fireplace-crackling',
         'cafe-ambience',
-        'fan',
         '432hz-tone',
         'delta-wave-binaural'
       )

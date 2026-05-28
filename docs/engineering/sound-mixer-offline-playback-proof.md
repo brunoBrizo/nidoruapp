@@ -5,7 +5,7 @@ ClickUp task: `06.IMP.10 Prove all bundled sounds offline, loop quality, and sta
 
 ## Result
 
-This ticket cannot be completed in the current checkout because the launch Sound Mixer audio files are not committed. The catalog and playback controller are covered by focused automated tests, but native offline startup and loop quality cannot be honestly proven until the 15 licensed launch loops exist under `apps/mobile/assets/audio/sleep/`.
+This ticket cannot be completed in the current checkout because the launch Sound Mixer audio files are not committed. The catalog and playback controller are covered by focused automated tests, but native offline startup and loop quality cannot be honestly proven until the 14 licensed launch loops exist under `apps/mobile/assets/audio/sleep/`.
 
 Current file inventory:
 
@@ -44,7 +44,6 @@ apps/mobile/assets/audio/breath/soft-whoosh-inhale.m4a
 | Pink Noise | `apps/mobile/assets/audio/sleep/pink-noise.m4a` | Blocked: file missing, no network fallback allowed | Not measured: no local asset exists to start | Blocked: no audio to review |
 | Fireplace Crackling | `apps/mobile/assets/audio/sleep/fireplace-crackling.m4a` | Blocked: file missing, no network fallback allowed | Not measured: no local asset exists to start | Blocked: no audio to review |
 | Cafe Ambience | `apps/mobile/assets/audio/sleep/cafe-ambience.m4a` | Blocked: file missing, no network fallback allowed | Not measured: no local asset exists to start | Blocked: no audio to review |
-| Fan | `apps/mobile/assets/audio/sleep/fan.m4a` | Blocked: file missing, no network fallback allowed | Not measured: no local asset exists to start | Blocked: no audio to review |
 | 432Hz Tone | `apps/mobile/assets/audio/sleep/432hz-tone.m4a` | Blocked: file missing, no network fallback allowed | Not measured: no local asset exists to start | Blocked: no audio to review |
 | Delta Wave Binaural | `apps/mobile/assets/audio/sleep/delta-wave-binaural.m4a` | Blocked: file missing, no network fallback allowed | Not measured: no local asset exists to start | Blocked: no audio to review |
 

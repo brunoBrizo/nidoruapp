@@ -89,7 +89,7 @@ describe("SoundMixerAnchorScreen", () => {
 
     expect(screen.getByText("SAVED MIXES")).toBeTruthy();
     expect(screen.getByRole("button", { name: "Rain Hearth saved mix" })).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Forest Fan saved mix" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Forest Stream saved mix" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Create new saved mix" })).toBeTruthy();
 
     expect(screen.getByText(/Timer/)).toBeTruthy();
@@ -114,7 +114,6 @@ describe("SoundMixerAnchorScreen", () => {
       "Pink Noise",
       "Fireplace Crackling",
       "Cafe Ambience",
-      "Fan",
       "432Hz Tone",
       "Delta Wave Binaural",
     ]) {
@@ -386,7 +385,7 @@ describe("SoundMixerAnchorScreen", () => {
     expect(screen.getByTestId("sound-mixer-saved-mixes-empty-section")).toBeTruthy();
     expect(screen.getByText("No saved mixes yet.")).toBeTruthy();
     expect(screen.queryByRole("button", { name: "Rain Hearth saved mix" })).toBeNull();
-    expect(screen.queryByRole("button", { name: "Forest Fan saved mix" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Forest Stream saved mix" })).toBeNull();
     expect(screen.getByRole("button", { name: "Create new saved mix" })).toBeTruthy();
     expect(screen.getByText("2 active layers")).toBeTruthy();
     expect(
@@ -408,7 +407,7 @@ describe("SoundMixerAnchorScreen", () => {
     expect(screen.getByTestId("sound-mixer-saved-mixes-full-panel")).toBeTruthy();
     expect(screen.getByText("3 of 3 saved")).toBeTruthy();
     expect(screen.getByTestId("sound-mixer-saved-mix-full-rain-hearth")).toBeTruthy();
-    expect(screen.getByTestId("sound-mixer-saved-mix-full-forest-fan")).toBeTruthy();
+    expect(screen.getByTestId("sound-mixer-saved-mix-full-forest-stream")).toBeTruthy();
     expect(screen.getByTestId("sound-mixer-saved-mix-full-ocean-noise")).toBeTruthy();
     expect(screen.getByText("Ocean Noise")).toBeTruthy();
     expect(screen.getByRole("button", { name: "Saved mixes full" })).toHaveProp(
@@ -431,7 +430,7 @@ describe("SoundMixerAnchorScreen", () => {
       "accessibilityState",
       { selected: true },
     );
-    expect(screen.getByRole("button", { name: "Replace Forest Fan saved mix" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Replace Forest Stream saved mix" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Replace Ocean Noise saved mix" })).toBeTruthy();
     expect(screen.getByTestId("sound-mixer-replace-mix-selector")).toBeTruthy();
   });
@@ -558,7 +557,7 @@ describe("SoundMixerAnchorScreen", () => {
 
     fireEvent.press(screen.getByRole("button", { name: "Heavy Rain sound" }));
     fireEvent.press(screen.getByRole("button", { name: "Save Mix" }));
-    fireEvent.changeText(screen.getByTestId("sound-mixer-save-mix-name-input"), "  Storm Fan  ");
+    fireEvent.changeText(screen.getByTestId("sound-mixer-save-mix-name-input"), "  Storm Hearth  ");
     fireEvent.press(screen.getByRole("button", { name: "Save Mix" }));
 
     await waitFor(() => {
@@ -568,14 +567,14 @@ describe("SoundMixerAnchorScreen", () => {
           layers: [{ soundId: "heavy-rain", volume: 70 }],
           localInstallId: "install_0123456789abcdef",
           mixId: expect.stringMatching(/^soundmix_[A-Za-z0-9_-]{8,64}$/),
-          name: "Storm Fan",
+          name: "Storm Hearth",
           timerPreference: 30,
           updatedAt: "2026-05-28T12:00:00.000Z",
         }),
       );
     });
     expect(screen.queryByText("Save mix")).toBeNull();
-    expect(screen.getByRole("button", { name: "Storm Fan saved mix" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Storm Hearth saved mix" })).toBeTruthy();
     expect(mockCaptureAnalyticsEventDeferred).toHaveBeenCalledWith("sound_mix_saved", {
       active_layer_count: 1,
       source_surface: "sound_mixer",
@@ -585,7 +584,7 @@ describe("SoundMixerAnchorScreen", () => {
     });
     expect(callOrder).toEqual(["local-save", "analytics"]);
     expect(JSON.stringify(mockCaptureAnalyticsEventDeferred.mock.calls)).not.toMatch(
-      /Storm Fan|install_|soundmix_|Bruno/i,
+      /Storm Hearth|install_|soundmix_|Bruno/i,
     );
   });
 
@@ -606,14 +605,14 @@ describe("SoundMixerAnchorScreen", () => {
 
     fireEvent.press(screen.getByRole("button", { name: "Heavy Rain sound" }));
     fireEvent.press(screen.getByRole("button", { name: "Save Mix" }));
-    fireEvent.changeText(screen.getByTestId("sound-mixer-save-mix-name-input"), "Storm Fan");
+    fireEvent.changeText(screen.getByTestId("sound-mixer-save-mix-name-input"), "Storm Hearth");
     fireEvent.press(screen.getByRole("button", { name: "Save Mix" }));
 
     await waitFor(() => {
       expect(onSaveMix).toHaveBeenCalledTimes(1);
     });
     expect(screen.queryByText("Save mix")).toBeNull();
-    expect(screen.getByRole("button", { name: "Storm Fan saved mix" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Storm Hearth saved mix" })).toBeTruthy();
   });
 
   it("replaces an existing saved mix instead of creating a fourth persisted record", async () => {
@@ -638,8 +637,8 @@ describe("SoundMixerAnchorScreen", () => {
             createdAt: "2026-05-28T12:01:00.000Z",
             layers: [{ soundId: "forest", volume: 70 }],
             localInstallId: "install_0123456789abcdef",
-            mixId: "soundmix_forestfan0001",
-            name: "Forest Fan",
+            mixId: "soundmix_foreststream0001",
+            name: "Forest Stream",
             timerPreference: 45,
             updatedAt: "2026-05-28T12:01:00.000Z",
           },

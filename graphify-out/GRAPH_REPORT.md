@@ -1,11 +1,11 @@
 # Graph Report - sleep-app  (2026-05-28)
 
 ## Corpus Check
-- 171 files · ~501,495 words
+- 171 files · ~500,583 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 607 nodes · 695 edges · 22 communities detected
+- 606 nodes · 694 edges · 22 communities detected
 - Extraction: 88% EXTRACTED · 12% INFERRED · 0% AMBIGUOUS · INFERRED: 84 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
@@ -52,20 +52,20 @@
   packages/domain/src/index.ts → apps/mobile/src/sleep/sound-mixer-screen.tsx
 - `createSoundMixerController()` --calls--> `createInitialSoundMixerController()`  [INFERRED]
   packages/domain/src/index.ts → apps/mobile/src/sleep/sound-mixer-screen.tsx
-- `getOnboardingPlanForGoal()` --calls--> `completeOnboardingPersonalizationLocally()`  [INFERRED]
-  packages/domain/src/index.ts → apps/mobile/src/onboarding/local-first-onboarding.ts
 - `canPromptForNotificationPermission()` --calls--> `evaluateGate()`  [INFERRED]
   packages/domain/src/index.ts → apps/mobile/src/notifications/notification-permission-gate-controller.tsx
+- `getNextEveningReminderDate()` --calls--> `reconcileEveningReminderSchedule()`  [INFERRED]
+  packages/domain/src/index.ts → apps/mobile/src/notifications/notification-permission-service.ts
 
 ## Communities
 
 ### Community 0 - "Community 0"
 Cohesion: 0.08
-Nodes (38): activateSoundMixerLayer(), assertLaunchSoundId(), assertSoundMixerStateLabel(), assertSoundMixerTimerPreference(), clampEveningReminderMinuteOfDay(), clampSoundMixerVolume(), createLocalDateAtMinuteOfDay(), createPersonalizedOnboardingPlan() (+30 more)
+Nodes (30): shouldStartFirstLaunchOnboarding(), canPromptForNotificationPermission(), getOnboardingPlanForGoal(), completeFirstSessionLocally(), completeOnboardingPersonalizationLocally(), createDefaultRandomSegment(), createLocalEventId(), createLocalReflectionId() (+22 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.08
-Nodes (29): shouldStartFirstLaunchOnboarding(), canPromptForNotificationPermission(), completeFirstSessionLocally(), completeOnboardingPersonalizationLocally(), createDefaultRandomSegment(), createLocalEventId(), createLocalReflectionId(), getLocalCalendarDayDifference() (+21 more)
+Cohesion: 0.09
+Nodes (35): activateSoundMixerLayer(), assertLaunchSoundId(), assertSoundMixerStateLabel(), assertSoundMixerTimerPreference(), clampEveningReminderMinuteOfDay(), clampSoundMixerVolume(), createLocalDateAtMinuteOfDay(), createPersonalizedOnboardingPlan() (+27 more)
 
 ### Community 2 - "Community 2"
 Cohesion: 0.1
@@ -76,12 +76,12 @@ Cohesion: 0.09
 Nodes (13): captureAudioFailedDeferred(), captureAnalyticsEventDeferred(), captureSyncFailureDeferred(), captureRescueMeSoundHandoffAudioFailedDeferred(), captureSoundMixSavedDeferred(), createSoundMixerLayerAnalyticsProperties(), createSoundMixerSoundAnalyticsProperties(), getSoundMixerTimerOptionFromDurationSeconds() (+5 more)
 
 ### Community 4 - "Community 4"
-Cohesion: 0.1
-Nodes (15): createLocalHomeState(), getLocalMinuteOfDay(), getPrimaryActionIdForMinute(), selectHomePrimaryAction(), getHomeContentEntranceMotionConfig(), HomeEntrancePolish(), HomeScreen(), markRescueMeTapIfNeeded() (+7 more)
+Cohesion: 0.09
+Nodes (17): calculateSoundMixerVolumeFromPoint(), createInitialSoundMixerController(), createSavedMixFromRecord(), formatSoundMixerTimerDuration(), formatSoundMixerTimerPreference(), getDomainSavedMixes(), getInitialActiveLayersForVariant(), getInitialSavedMixes() (+9 more)
 
 ### Community 5 - "Community 5"
 Cohesion: 0.1
-Nodes (15): createInitialSoundMixerController(), createSavedMixFromRecord(), formatSoundMixerTimerDuration(), formatSoundMixerTimerPreference(), getDomainSavedMixes(), getInitialActiveLayersForVariant(), getInitialSavedMixes(), getSavedMixesForVariant() (+7 more)
+Nodes (15): createLocalHomeState(), getLocalMinuteOfDay(), getPrimaryActionIdForMinute(), selectHomePrimaryAction(), getHomeContentEntranceMotionConfig(), HomeEntrancePolish(), HomeScreen(), markRescueMeTapIfNeeded() (+7 more)
 
 ### Community 6 - "Community 6"
 Cohesion: 0.11
@@ -162,9 +162,9 @@ Nodes (2): OnboardingRouteScreen(), parseOnboardingStage()
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `getOrCreateLocalInstallIdentity()` connect `Community 1` to `Community 6`?**
+- **Why does `getOrCreateLocalInstallIdentity()` connect `Community 0` to `Community 6`?**
   _High betweenness centrality (0.071) - this node is a cross-community bridge._
-- **Why does `tickAmbientTimer()` connect `Community 5` to `Community 9`?**
+- **Why does `tickAmbientTimer()` connect `Community 4` to `Community 9`?**
   _High betweenness centrality (0.066) - this node is a cross-community bridge._
 - **Are the 7 inferred relationships involving `getBreathSessionSnapshot()` (e.g. with `pauseSession()` and `resumeSession()`) actually correct?**
   _`getBreathSessionSnapshot()` has 7 INFERRED edges - model-reasoned connections that need verification._
@@ -175,4 +175,4 @@ _Questions this graph is uniquely positioned to answer:_
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.08 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
-  _Cohesion score 0.08 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.09 - nodes in this community are weakly interconnected._

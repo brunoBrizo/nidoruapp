@@ -106,14 +106,14 @@ describe("launch catalog", () => {
   });
 
   it("keeps the Sound Mixer launch catalog aligned with the bundled asset manifest", () => {
-    expect(launchSoundIds).toHaveLength(14);
-    expect(launchSoundCatalog).toHaveLength(14);
-    expect(soundMixerBundledAssetManifest).toHaveLength(14);
+    expect(launchSoundIds).toHaveLength(12);
+    expect(launchSoundCatalog).toHaveLength(12);
+    expect(soundMixerBundledAssetManifest).toHaveLength(12);
     expect(soundMixerBundledAssetManifest.map((sound) => sound.soundId)).toEqual([
       ...launchSoundIds,
     ]);
     expect(new Set(soundMixerBundledAssetManifest.map((sound) => sound.targetAssetPath)).size).toBe(
-      14,
+      12,
     );
 
     for (const sound of soundMixerBundledAssetManifest) {
@@ -126,8 +126,6 @@ describe("launch catalog", () => {
 
   it("registers the committed static Sound Mixer playback assets", () => {
     expect(soundMixerPlaybackAssetIds).toEqual([...committedSleepAssetIds]);
-    expect(soundMixerPlaybackAssetIds).not.toContain("432hz-tone");
-    expect(soundMixerPlaybackAssetIds).not.toContain("delta-wave-binaural");
   });
 
   it("keeps licensed-but-unreviewed Sound Mixer loops blocked until final proof", () => {
@@ -142,17 +140,13 @@ describe("launch catalog", () => {
       const metadata =
         committedSleepAssetMetadata[sound.soundId as keyof typeof committedSleepAssetMetadata];
 
-      if (metadata) {
-        expect(sound.durationSeconds).toBe(metadata.durationSeconds);
-        expect(sound.licenseStatus).toBe("licensed");
-        expect(sound.licenseSource).toBe(metadata.licenseSource);
-        expect(sound.loopReviewStatus).toBe("blocked_loop_review_pending");
-      } else {
-        expect(sound.durationSeconds).toBeNull();
-        expect(sound.licenseStatus).toBe("blocked_missing_license");
-        expect(sound.licenseSource).toMatch(/^BLOCKED:/);
-        expect(sound.loopReviewStatus).toBe("blocked_missing_audio");
+      if (!metadata) {
+        throw new Error(`Missing committed asset metadata for ${sound.soundId}`);
       }
+      expect(sound.durationSeconds).toBe(metadata.durationSeconds);
+      expect(sound.licenseStatus).toBe("licensed");
+      expect(sound.licenseSource).toBe(metadata.licenseSource);
+      expect(sound.loopReviewStatus).toBe("blocked_loop_review_pending");
 
       expect(sound.shipStatus).toBe("blocked_missing_licensed_audio");
     }

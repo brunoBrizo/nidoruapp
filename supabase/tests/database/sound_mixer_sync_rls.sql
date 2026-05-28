@@ -307,7 +307,7 @@ select throws_ok(
       '11111111-1111-4111-8111-111111111111',
       'Bad Asset',
       '20',
-      'private-r2-key',
+      '432hz-tone',
       70,
       '2026-05-28T14:00:00Z',
       '2026-05-28T14:05:00Z'
@@ -315,7 +315,7 @@ select throws_ok(
   $$,
   '23514',
   null,
-  'sound mix payload rejects non-allowlisted sound identifiers'
+  'sound mix payload rejects removed sound identifiers'
 );
 
 select lives_ok(

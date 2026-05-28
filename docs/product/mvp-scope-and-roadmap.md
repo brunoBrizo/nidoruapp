@@ -74,9 +74,9 @@ Why it matters:
 
 Required behavior:
 
-- 14 launch sounds from the accepted Sound Mixer catalog.
+- 12 launch sounds from the accepted Sound Mixer catalog.
 - Include rain, ocean, brown noise, pink noise, forest, fireplace, and cafe ambience.
-- Treat 432 Hz, delta-wave binaural, and colored-noise tracks as preference/masking audio, not clinically proven sleep enhancers or premium proof points.
+- Treat colored-noise tracks as preference/masking audio, not clinically proven sleep enhancers or premium proof points.
 - Users can mix 2-3 layers.
 - Each layer has separate volume.
 - Sleep timer supports 20, 30, 45, and 60 minutes.

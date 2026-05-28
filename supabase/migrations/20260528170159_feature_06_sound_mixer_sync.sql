@@ -15,13 +15,11 @@ create table public.sound_assets (
         'brown-noise',
         'pink-noise',
         'fireplace-crackling',
-        'cafe-ambience',
-        '432hz-tone',
-        'delta-wave-binaural'
+        'cafe-ambience'
       )
     ),
   category_id text not null
-    check (category_id in ('rain', 'nature', 'noise', 'environment', 'tones')),
+    check (category_id in ('rain', 'nature', 'noise', 'environment')),
   default_volume numeric(4, 3) not null
     check (default_volume >= 0 and default_volume <= 1),
   audio_format text not null
@@ -82,9 +80,7 @@ create table public.sound_mixes (
         'brown-noise',
         'pink-noise',
         'fireplace-crackling',
-        'cafe-ambience',
-        '432hz-tone',
-        'delta-wave-binaural'
+        'cafe-ambience'
       )
     ),
   layer_0_volume numeric(5, 2)
@@ -104,9 +100,7 @@ create table public.sound_mixes (
         'brown-noise',
         'pink-noise',
         'fireplace-crackling',
-        'cafe-ambience',
-        '432hz-tone',
-        'delta-wave-binaural'
+        'cafe-ambience'
       )
     ),
   layer_1_volume numeric(5, 2)
@@ -126,9 +120,7 @@ create table public.sound_mixes (
         'brown-noise',
         'pink-noise',
         'fireplace-crackling',
-        'cafe-ambience',
-        '432hz-tone',
-        'delta-wave-binaural'
+        'cafe-ambience'
       )
     ),
   layer_2_volume numeric(5, 2)

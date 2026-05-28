@@ -71,7 +71,7 @@ Only after this feels good should the team add account creation, subscriptions, 
 | Store review risk | Background audio and subscriptions can cause review issues | Create an app-store compliance checklist before beta |
 | Clinical language | Wellness claims can create trust and legal risk | Review app copy before public launch |
 | Technique evidence drift | Breathwork, sleep, and sound research changes over time | Refresh the Sleep and Breathwork Technique Audit before launch copy, clinical-sounding features, or paid acquisition |
-| Sound-frequency claims | 432 Hz, binaural, delta, and colored-noise evidence is weaker than user-preference/masking value | Treat these as preference audio unless a future evidence review supports stronger claims |
+| Sound-frequency claims | Colored-noise evidence is weaker than user-preference/masking value | Treat these as preference audio unless a future evidence review supports stronger claims |
 
 ## Product Risks
 
@@ -94,7 +94,7 @@ Before writing production code, decide:
 2. Initial visual direction.
 3. Whether to start with local-first prototype or backend-connected MVP.
 4. Whether account creation exists at all in the first beta.
-5. Licensed source files for the 16 accepted launch Sound Mixer sounds.
+5. Licensed source files for the accepted launch Sound Mixer sounds.
 6. Initial subscription products and whether lifetime is available at launch.
 7. Minimum analytics schema.
 

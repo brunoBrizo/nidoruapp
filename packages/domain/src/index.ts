@@ -282,11 +282,9 @@ export const launchSoundIds = [
   "pink-noise",
   "fireplace-crackling",
   "cafe-ambience",
-  "432hz-tone",
-  "delta-wave-binaural",
 ] as const;
 
-export const launchSoundCategoryIds = ["rain", "nature", "noise", "environment", "tones"] as const;
+export const launchSoundCategoryIds = ["rain", "nature", "noise", "environment"] as const;
 
 export type LaunchSoundId = (typeof launchSoundIds)[number];
 export type LaunchSoundCategoryId = (typeof launchSoundCategoryIds)[number];
@@ -309,9 +307,6 @@ export type LaunchSoundCatalogItem = {
   readonly shipStatus: "blocked_missing_licensed_audio" | "bundled_verified";
   readonly evidenceSafeNote?: string;
 };
-
-const missingLaunchAudioLicenseSource =
-  "BLOCKED: no licensed launch sleep loop source is committed for this asset.";
 
 const launchSoundLicenseSources = {
   "brown-noise":
@@ -336,42 +331,8 @@ const launchSoundLicenseSources = {
     "Relaxing River Sound by IceVFX -- https://freesound.org/s/722875/ -- License: Creative Commons 0",
   thunderstorm:
     "LONG THUNDER ROLLS AND HEAVY RAIN.wav by Alex_hears_things -- https://freesound.org/s/376810/ -- License: Creative Commons 0",
-  wind:
-    "Pink Lakes Wind Atmos #2 by kangaroovindaloo -- https://freesound.org/s/266656/ -- License: Creative Commons 0",
+  wind: "Pink Lakes Wind Atmos #2 by kangaroovindaloo -- https://freesound.org/s/266656/ -- License: Creative Commons 0",
 } as const satisfies Partial<Record<LaunchSoundId, string>>;
-
-function createBlockedLaunchSoundCatalogItem({
-  categoryId,
-  categoryLabel,
-  displayName,
-  evidenceSafeNote,
-  id,
-}: {
-  readonly categoryId: LaunchSoundCategoryId;
-  readonly categoryLabel: string;
-  readonly displayName: string;
-  readonly evidenceSafeNote?: string;
-  readonly id: LaunchSoundId;
-}): LaunchSoundCatalogItem {
-  return {
-    audioFormat: "aac-lc-m4a",
-    bundledAssetPath: `apps/mobile/assets/audio/sleep/${id}.m4a`,
-    categoryId,
-    categoryLabel,
-    defaultVolume: 0.7,
-    defaultVolumeBehavior: "activate_at_70_percent",
-    displayName,
-    durationSeconds: null,
-    ...(evidenceSafeNote === undefined ? {} : { evidenceSafeNote }),
-    id,
-    licenseSource: missingLaunchAudioLicenseSource,
-    licenseStatus: "blocked_missing_license",
-    loop: true,
-    loopReviewStatus: "blocked_missing_audio",
-    minimumDurationSeconds: 240,
-    shipStatus: "blocked_missing_licensed_audio",
-  };
-}
 
 function createLicensedLaunchSoundCatalogItem({
   categoryId,
@@ -494,22 +455,6 @@ export const launchSoundCatalog = [
     displayName: "Cafe Ambience",
     durationSeconds: 266.433,
     id: "cafe-ambience",
-  }),
-  createBlockedLaunchSoundCatalogItem({
-    categoryId: "tones",
-    categoryLabel: "Tones",
-    displayName: "432Hz Tone",
-    evidenceSafeNote:
-      "Experimental preference audio only; no clinical sleep efficacy claim or premium proof point.",
-    id: "432hz-tone",
-  }),
-  createBlockedLaunchSoundCatalogItem({
-    categoryId: "tones",
-    categoryLabel: "Tones",
-    displayName: "Delta Wave Binaural",
-    evidenceSafeNote:
-      "Experimental preference audio only; no clinical sleep efficacy claim or premium proof point.",
-    id: "delta-wave-binaural",
   }),
 ] as const satisfies readonly LaunchSoundCatalogItem[];
 

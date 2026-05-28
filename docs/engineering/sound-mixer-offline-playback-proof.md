@@ -5,7 +5,7 @@ ClickUp task: `06.IMP.10 Prove all bundled sounds offline, loop quality, and sta
 
 ## Result
 
-This ticket cannot be completed in the current checkout because only 12 of the 14 launch Sound Mixer audio files are committed, the two Tones files are still missing, and manual loop review plus physical locked-device startup proof are still outstanding.
+This ticket cannot be completed in the current checkout because manual loop review plus physical locked-device startup proof are still outstanding.
 
 The 12 committed files are normalized to the expected catalog slugs, carry CC0 source records, statically import into the Expo asset graph, and wire through the Sound Mixer route into the native playback controller.
 
@@ -32,12 +32,7 @@ apps/mobile/assets/audio/sleep/thunderstorm.m4a
 apps/mobile/assets/audio/sleep/wind.m4a
 ```
 
-Missing launch target files:
-
-```text
-apps/mobile/assets/audio/sleep/432hz-tone.m4a
-apps/mobile/assets/audio/sleep/delta-wave-binaural.m4a
-```
+Missing launch target files: none.
 
 Bundle weight:
 
@@ -61,9 +56,6 @@ Bundle weight:
 | Pink Noise | `apps/mobile/assets/audio/sleep/pink-noise.m4a` | Wired to bundled static asset, no network fallback | Automated route/controller proof only; device startup not measured | Blocked: manual audible loop review pending |
 | Fireplace Crackling | `apps/mobile/assets/audio/sleep/fireplace-crackling.m4a` | Wired to bundled static asset, no network fallback | Automated route/controller proof only; device startup not measured | Blocked: manual audible loop review pending |
 | Cafe Ambience | `apps/mobile/assets/audio/sleep/cafe-ambience.m4a` | Wired to bundled static asset, no network fallback | Automated route/controller proof only; device startup not measured | Blocked: manual audible loop review pending |
-| 432Hz Tone | `apps/mobile/assets/audio/sleep/432hz-tone.m4a` | Blocked: file missing, no network fallback allowed | Not measured: no local asset exists to start | Blocked: no audio to review |
-| Delta Wave Binaural | `apps/mobile/assets/audio/sleep/delta-wave-binaural.m4a` | Blocked: file missing, no network fallback allowed | Not measured: no local asset exists to start | Blocked: no audio to review |
-
 ## Three-Layer Mix Proof
 
 `apps/mobile/tests/sound-mixer-playback-controller.unit.jest.test.ts` verifies the playback controller with injected bundled-local asset sources:
@@ -72,7 +64,7 @@ Bundle weight:
 - creates one `expo-audio` player per layer,
 - sets `loop = true` on every layer,
 - keeps independent volumes,
-- keeps missing launch assets blocked without network fallback,
+- fails closed if a catalog sound is missing from the injected asset map,
 - avoids leaking local paths or URLs into audio failure telemetry.
 
 `apps/mobile/tests/sound-mixer-screen.component.jest.test.tsx` verifies that the screen starts the default three active layers when a native playback controller is provided. `SoundMixerRouteScreen` now provides the static asset-backed controller in app runtime.
@@ -121,12 +113,12 @@ Result: passed on iPhone 17 simulator. The development build launched and loaded
 
 Blocked or failed:
 
-Native network-disabled playback proof on a physical locked device was not completed in this pass. With two missing Tones files and no manual loop review, final startup latency or all-sound loop-quality numbers would still be incomplete.
+Native network-disabled playback proof on a physical locked device was not completed in this pass. With no manual loop review, final startup latency or all-sound loop-quality numbers are still incomplete.
 
 ## Closeout Decision
 
 Move ClickUp task `86e1k5hm1` to `Needs Review`, not `complete`.
 
-Exact next step: add the two missing licensed AAC-LC `.m4a` files, attach license records for those Tones sounds, complete manual loop review, update the catalog entries from blocked to verified, then rerun native network-disabled startup and locked-device loop review for each sound.
+Exact next step: complete manual loop review for the 12 committed AAC-LC `.m4a` files, update the catalog entries from blocked to verified, then rerun native network-disabled startup and locked-device loop review for each sound.
 
 No audio assets, lockfiles, dependency inventories, or scan results were uploaded to external services for this proof.

@@ -5,9 +5,9 @@ ClickUp task: `06.IMP.00 Resolve launch sound catalog, licensing, and bundled as
 
 ## Source Of Truth
 
-The launch Sound Mixer catalog is **14 sounds** after reducing launch scope. The accepted Sound Mixer UI contract, the handoff HTML, and `packages/domain/src/index.ts` all include two Tones entries, so no named launch sound is dropped from the remaining catalog.
+The launch Sound Mixer catalog is **12 sounds** after removing the unsuitable audio options from the app.
 
-Current asset state: **12 of 14** target sleep loops are committed under `apps/mobile/assets/audio/sleep/`. The missing target assets are `432hz-tone.m4a` and `delta-wave-binaural.m4a`.
+Current asset state: **12 of 12** target sleep loops are committed under `apps/mobile/assets/audio/sleep/`.
 
 Implementation source:
 
@@ -36,13 +36,9 @@ Every launch loop target must be AAC-LC `.m4a`, at least 240 seconds, loopable w
 | `pink-noise` | Pink Noise | Noise | 70% on activation | `apps/mobile/assets/audio/sleep/pink-noise.m4a` | 243.213s verified | Blocked: manual review pending | pink_noise_ref_-14dB.wav by lartti -- https://freesound.org/s/517215/ -- License: Creative Commons 0 | Blocked |
 | `fireplace-crackling` | Fireplace Crackling | Environment | 70% on activation | `apps/mobile/assets/audio/sleep/fireplace-crackling.m4a` | 714.000s verified | Blocked: manual review pending | Aachen_Burning Fireplace Crackling Fire Sounds.wav by visionear -- https://freesound.org/s/501417/ -- License: Creative Commons 0 | Blocked |
 | `cafe-ambience` | Cafe Ambience | Environment | 70% on activation | `apps/mobile/assets/audio/sleep/cafe-ambience.m4a` | 266.433s verified | Blocked: manual review pending | NYC-diner-2-ambience-ambiance-by-EDLUNDART.wav by edlundart -- https://freesound.org/s/515719/ -- License: Creative Commons 0 | Blocked |
-| `432hz-tone` | 432Hz Tone | Tones | 70% on activation | `apps/mobile/assets/audio/sleep/432hz-tone.m4a` | Blocked: file missing | Blocked: no audio to review | Blocked: no licensed source committed | Blocked |
-| `delta-wave-binaural` | Delta Wave Binaural | Tones | 70% on activation | `apps/mobile/assets/audio/sleep/delta-wave-binaural.m4a` | Blocked: file missing | Blocked: no audio to review | Blocked: no licensed source committed | Blocked |
-
 ## Evidence-Safe Notes
 
 - Brown Noise and Pink Noise are preference and masking audio only. Do not make clinical sleep efficacy claims.
-- 432Hz Tone and Delta Wave Binaural are experimental preference audio only. Do not present them as clinical sleep aids or premium proof points.
 - No network-required, AI-generated, placeholder, or unlicensed audio is shippable for the launch catalog.
 
 ## File Inventory
@@ -68,10 +64,7 @@ Result on 2026-05-28:
 - `apps/mobile/assets/audio/sleep/thunderstorm.m4a`
 - `apps/mobile/assets/audio/sleep/wind.m4a`
 
-Missing target files:
-
-- `apps/mobile/assets/audio/sleep/432hz-tone.m4a`
-- `apps/mobile/assets/audio/sleep/delta-wave-binaural.m4a`
+Missing target files: none.
 
 Current total sleep-loop bundle weight:
 
@@ -97,7 +90,7 @@ Result:
 Before moving playback implementation tickets beyond Needs Review, each catalog entry must have:
 
 - A committed source/license record proving bundled app distribution rights.
-- A real `apps/mobile/assets/audio/sleep/<sound-id>.m4a` file for all 14 launch sounds.
+- A real `apps/mobile/assets/audio/sleep/<sound-id>.m4a` file for all 12 launch sounds.
 - AAC-LC encoding confirmation.
 - Duration confirmation of at least 240 seconds.
 - Manual loop review with no audible click at the loop point.

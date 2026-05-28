@@ -126,10 +126,8 @@ assertEquals(launchSoundIds, [
   "pink-noise",
   "fireplace-crackling",
   "cafe-ambience",
-  "432hz-tone",
-  "delta-wave-binaural",
 ]);
-assertEquals(launchSoundCategoryIds, ["rain", "nature", "noise", "environment", "tones"]);
+assertEquals(launchSoundCategoryIds, ["rain", "nature", "noise", "environment"]);
 assertEquals(
   launchSoundCatalog.map((sound) => sound.id),
   [...launchSoundIds],
@@ -149,8 +147,6 @@ assertEquals(
     "Pink Noise",
     "Fireplace Crackling",
     "Cafe Ambience",
-    "432Hz Tone",
-    "Delta Wave Binaural",
   ],
 );
 assertCondition(
@@ -172,40 +168,26 @@ assertCondition(
   "launch sleep loops must stay blocked until full ship proof passes",
 );
 assertCondition(
-  launchSoundCatalog
-    .filter((sound) => sound.id !== "432hz-tone" && sound.id !== "delta-wave-binaural")
-    .every(
-      (sound) =>
-        sound.durationSeconds !== null &&
-        sound.licenseStatus === "licensed" &&
-        sound.licenseSource.includes("License: Creative Commons 0") &&
-        sound.loopReviewStatus === "blocked_loop_review_pending",
-    ),
+  launchSoundCatalog.every(
+    (sound) =>
+      sound.durationSeconds !== null &&
+      sound.licenseStatus === "licensed" &&
+      sound.licenseSource.includes("License: Creative Commons 0") &&
+      sound.loopReviewStatus === "blocked_loop_review_pending",
+  ),
   "committed launch sleep loops must keep CC0 license records but stay blocked for loop review",
 );
 assertCondition(
   launchSoundCatalog
-    .filter((sound) => sound.id === "432hz-tone" || sound.id === "delta-wave-binaural")
-    .every(
-      (sound) =>
-        sound.durationSeconds === null &&
-        sound.licenseStatus === "blocked_missing_license" &&
-        sound.licenseSource.startsWith("BLOCKED:") &&
-        sound.loopReviewStatus === "blocked_missing_audio",
-    ),
-  "missing launch tone loops must stay blocked until audio and license records are committed",
+    .filter((sound) => sound.categoryId === "noise")
+    .every((sound) => sound.evidenceSafeNote?.includes("no clinical sleep efficacy claim")),
+  "colored noise needs explicit evidence-safe notes",
 );
 assertNoAuditRiskPublicCopy(
   launchSoundCatalog.flatMap((sound) => [
     sound.displayName,
     ...(sound.evidenceSafeNote === undefined ? [] : [sound.evidenceSafeNote]),
   ]),
-);
-assertCondition(
-  launchSoundCatalog
-    .filter((sound) => sound.categoryId === "tones" || sound.categoryId === "noise")
-    .every((sound) => sound.evidenceSafeNote?.includes("no clinical sleep efficacy claim")),
-  "tones and colored noise need explicit evidence-safe notes",
 );
 assertEquals(soundMixerTimerOptions, [20, 30, 45, 60, "infinity"]);
 assertEquals(soundMixerStateLabels, [

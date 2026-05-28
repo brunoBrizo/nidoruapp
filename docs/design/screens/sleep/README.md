@@ -36,13 +36,13 @@ This contract does not implement app UI. It records the accepted source files an
 
 ## Evidence-Safe Copy Rules
 
-Sound Mixer copy must frame audio as masking, preference, ambiance, and routine support. It must not claim that pink noise, brown noise, 432 Hz tones, binaural tracks, or delta-wave tracks clinically improve sleep, treat insomnia, reduce anxiety, or produce guaranteed sleep outcomes.
+Sound Mixer copy must frame audio as masking, preference, ambiance, and routine support. It must not claim that pink noise or brown noise clinically improve sleep, treat insomnia, reduce anxiety, or produce guaranteed sleep outcomes.
 
-The accepted sources may name preference audio such as `Brown Noise`, `Pink Noise`, `432Hz Tone`, and `Delta Wave Binaural`, but implementation and public copy must keep those labels descriptive and non-clinical.
+The accepted sources may name preference audio such as `Brown Noise` and `Pink Noise`, but implementation and public copy must keep those labels descriptive and non-clinical.
 
 ## Catalog Count Resolution
 
-The launch library source of truth is 14 curated sounds. The named category list, accepted Sound Mixer designs, and `packages/domain/src/index.ts` include 14 names:
+The launch library source of truth is 12 curated sounds. The named category list, accepted Sound Mixer designs, and `packages/domain/src/index.ts` include 12 names:
 
 | Category | Names in the source contract |
 | --- | --- |
@@ -50,7 +50,6 @@ The launch library source of truth is 14 curated sounds. The named category list
 | Nature | Ocean Waves, Forest, River Stream, Wind |
 | Noise | Brown Noise, Pink Noise |
 | Environment | Fireplace Crackling, Cafe Ambience |
-| Tones | 432Hz Tone, Delta Wave Binaural |
 
 The implementation manifest is `docs/engineering/sound-mixer-launch-catalog-manifest.md`. Playback, offline, analytics, or sync work must not treat any launch sound as shippable until the matching licensed AAC-LC `.m4a` loop is committed and verified there.
 

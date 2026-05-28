@@ -371,9 +371,7 @@ export const sqliteMigrations = [
             'brown-noise',
             'pink-noise',
             'fireplace-crackling',
-            'cafe-ambience',
-            '432hz-tone',
-            'delta-wave-binaural'
+            'cafe-ambience'
           )
         ),
         status TEXT NOT NULL CHECK (
@@ -660,9 +658,7 @@ export const sqliteMigrations = [
             'brown-noise',
             'pink-noise',
             'fireplace-crackling',
-            'cafe-ambience',
-            '432hz-tone',
-            'delta-wave-binaural'
+            'cafe-ambience'
           )
         ),
         volume REAL NOT NULL CHECK (volume >= 0 AND volume <= 100),

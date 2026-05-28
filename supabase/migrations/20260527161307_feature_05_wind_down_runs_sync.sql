@@ -39,9 +39,7 @@ create table public.wind_down_runs (
         'brown-noise',
         'pink-noise',
         'fireplace-crackling',
-        'cafe-ambience',
-        '432hz-tone',
-        'delta-wave-binaural'
+        'cafe-ambience'
       )
     ),
   started_at timestamptz not null,

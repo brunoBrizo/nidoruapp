@@ -157,7 +157,7 @@ describe("SoundMixerAnchorScreen", () => {
     expect(screen.getByText(/Fade starts in/)).toBeTruthy();
     expect(screen.getByText("28 min")).toBeTruthy();
 
-    for (const category of ["RAIN", "NATURE", "NOISE", "ENVIRONMENT", "TONES"]) {
+    for (const category of ["RAIN", "NATURE", "NOISE", "ENVIRONMENT"]) {
       expect(screen.getByText(category)).toBeTruthy();
     }
 
@@ -174,11 +174,12 @@ describe("SoundMixerAnchorScreen", () => {
       "Pink Noise",
       "Fireplace Crackling",
       "Cafe Ambience",
-      "432Hz Tone",
-      "Delta Wave Binaural",
     ]) {
       expect(screen.getByText(sound)).toBeTruthy();
     }
+
+    expect(screen.queryByText("432Hz Tone")).toBeNull();
+    expect(screen.queryByText("Delta Wave Binaural")).toBeNull();
 
     expect(screen.getByText("72%")).toBeTruthy();
     expect(screen.getByText("58%")).toBeTruthy();

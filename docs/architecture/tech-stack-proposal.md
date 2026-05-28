@@ -193,7 +193,7 @@ Audio files:
 
 - Source masters are stored outside the app as archival WAV files.
 - App-bundled loops use AAC-LC `.m4a`, normalized and cut for seamless looping.
-- The launch bundle includes all 14 base sounds from the accepted Sound Mixer catalog.
+- The launch bundle includes all 12 base sounds from the accepted Sound Mixer catalog.
 - Remote story and premium audio objects live in Cloudflare R2.
 
 Screen-off guidance:
@@ -411,7 +411,7 @@ Supabase stores metadata only.
 
 Bundled media:
 
-- All 14 launch base sounds are included in the app install.
+- All 12 launch base sounds are included in the app install.
 - Bundled sounds must be loop-tested before release.
 - The app never streams the default sleep sound needed for first value.
 

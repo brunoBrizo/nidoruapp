@@ -1024,7 +1024,25 @@ Deno.test("supports Sound Mixer saved mixes with local max-3 constraints", async
           VALUES (
             'soundmix_1123456789abcdef',
             0,
-            'unlicensed-drone',
+            '432hz-tone',
+            70
+          );
+        `),
+      /CHECK constraint failed/,
+    );
+    await assertRejects(
+      () =>
+        database.execAsync(`
+          INSERT INTO sound_mixer_saved_mix_layers (
+            mix_id,
+            layer_position,
+            sound_id,
+            volume
+          )
+          VALUES (
+            'soundmix_1123456789abcdef',
+            0,
+            'delta-wave-binaural',
             70
           );
         `),

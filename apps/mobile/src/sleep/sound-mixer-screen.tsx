@@ -30,7 +30,6 @@ import {
   Flame,
   Headphones,
   Leaf,
-  Magnet,
   MoonStar,
   MoreHorizontal,
   Pause,
@@ -219,14 +218,6 @@ const soundCategories: readonly SoundCategory[] = [
     sounds: [
       { id: "fireplace-crackling", label: "Fireplace Crackling", Icon: Flame },
       { id: "cafe-ambience", label: "Cafe Ambience", Icon: Coffee },
-    ],
-  },
-  {
-    id: "tones",
-    label: "Tones",
-    sounds: [
-      { id: "432hz-tone", label: "432Hz Tone", Icon: Magnet },
-      { id: "delta-wave-binaural", label: "Delta Wave Binaural", Icon: Headphones },
     ],
   },
 ] as const;
@@ -555,9 +546,7 @@ export function SoundMixerScreen({
   const playbackControllerRef = useRef<SoundMixerPlaybackController | null>(null);
   const nativePlaybackMixTitleRef = useRef<string | undefined>(undefined);
   const nativePlaybackStartedRef = useRef(false);
-  const nativePlaybackTimerPreferenceRef = useRef<SoundMixerTimerPreference | undefined>(
-    undefined,
-  );
+  const nativePlaybackTimerPreferenceRef = useRef<SoundMixerTimerPreference | undefined>(undefined);
   const hasMountedVariantRef = useRef(false);
   const initialSavedMixRecordsRef = useRef(initialSavedMixRecords);
   const [savedMixCatalog, setSavedMixCatalog] = useState(() =>

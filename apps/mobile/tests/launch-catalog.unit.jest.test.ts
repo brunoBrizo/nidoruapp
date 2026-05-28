@@ -25,14 +25,14 @@ describe("launch catalog", () => {
   });
 
   it("keeps the Sound Mixer launch catalog aligned with the bundled asset manifest", () => {
-    expect(launchSoundIds).toHaveLength(16);
-    expect(launchSoundCatalog).toHaveLength(16);
-    expect(soundMixerBundledAssetManifest).toHaveLength(16);
+    expect(launchSoundIds).toHaveLength(15);
+    expect(launchSoundCatalog).toHaveLength(15);
+    expect(soundMixerBundledAssetManifest).toHaveLength(15);
     expect(soundMixerBundledAssetManifest.map((sound) => sound.soundId)).toEqual([
       ...launchSoundIds,
     ]);
     expect(new Set(soundMixerBundledAssetManifest.map((sound) => sound.targetAssetPath)).size).toBe(
-      16,
+      15,
     );
 
     for (const sound of soundMixerBundledAssetManifest) {

@@ -36,19 +36,19 @@ This contract does not implement app UI. It records the accepted source files an
 
 ## Evidence-Safe Copy Rules
 
-Sound Mixer copy must frame audio as masking, preference, ambiance, and routine support. It must not claim that white noise, pink noise, brown noise, 432 Hz tones, binaural tracks, or delta-wave tracks clinically improve sleep, treat insomnia, reduce anxiety, or produce guaranteed sleep outcomes.
+Sound Mixer copy must frame audio as masking, preference, ambiance, and routine support. It must not claim that pink noise, brown noise, 432 Hz tones, binaural tracks, or delta-wave tracks clinically improve sleep, treat insomnia, reduce anxiety, or produce guaranteed sleep outcomes.
 
-The accepted sources may name preference audio such as `White Noise`, `Brown Noise`, `Pink Noise`, `432Hz Tone`, and `Delta Wave Binaural`, but implementation and public copy must keep those labels descriptive and non-clinical.
+The accepted sources may name preference audio such as `Brown Noise`, `Pink Noise`, `432Hz Tone`, and `Delta Wave Binaural`, but implementation and public copy must keep those labels descriptive and non-clinical.
 
 ## Catalog Count Resolution
 
-The launch library source of truth is 16 curated sounds. The named category list, accepted Sound Mixer designs, and `packages/domain/src/index.ts` include 16 names:
+The launch library source of truth is 15 curated sounds. The named category list, accepted Sound Mixer designs, and `packages/domain/src/index.ts` include 15 names:
 
 | Category | Names in the source contract |
 | --- | --- |
 | Rain | Light Rain, Heavy Rain, Rain on Window, Thunderstorm |
 | Nature | Ocean Waves, Forest, River Stream, Wind |
-| Noise | White Noise, Brown Noise, Pink Noise |
+| Noise | Brown Noise, Pink Noise |
 | Environment | Fireplace Crackling, Cafe Ambience, Fan |
 | Tones | 432Hz Tone, Delta Wave Binaural |
 

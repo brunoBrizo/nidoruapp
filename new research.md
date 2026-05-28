@@ -273,7 +273,7 @@ Local device data storage; fully functional offline without requiring an account
 
 Keep-Awake Sleep Timer: Maintains background audio playback and haptics while allowing the phone's screen to safely dim and lock, resolving battery drain issues.
 
-Multi-Channel Sound Mixer: Allows users to build custom soundscapes by layering up to four ambient loops (e.g., rainfall, white noise, and binaural beats) with separate volume controls.
+Multi-Channel Sound Mixer: Allows users to build custom soundscapes by layering up to four ambient loops (e.g., rainfall, brown noise, and binaural beats) with separate volume controls.
 
 Progress Analytics: Tracks long-term correlations between breathing metrics, BOLT scores, and sleep data.
 

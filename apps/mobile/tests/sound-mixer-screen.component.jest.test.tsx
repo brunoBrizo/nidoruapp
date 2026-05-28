@@ -110,7 +110,6 @@ describe("SoundMixerAnchorScreen", () => {
       "Forest",
       "River Stream",
       "Wind",
-      "White Noise",
       "Brown Noise",
       "Pink Noise",
       "Fireplace Crackling",

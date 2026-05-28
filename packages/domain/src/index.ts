@@ -278,7 +278,6 @@ export const launchSoundIds = [
   "forest",
   "river-stream",
   "wind",
-  "white-noise",
   "brown-noise",
   "pink-noise",
   "fireplace-crackling",
@@ -396,13 +395,6 @@ export const launchSoundCatalog = [
     categoryLabel: "Nature",
     displayName: "Wind",
     id: "wind",
-  }),
-  createBlockedLaunchSoundCatalogItem({
-    categoryId: "noise",
-    categoryLabel: "Noise",
-    displayName: "White Noise",
-    evidenceSafeNote: "Preference and masking audio only; no clinical sleep efficacy claim.",
-    id: "white-noise",
   }),
   createBlockedLaunchSoundCatalogItem({
     categoryId: "noise",

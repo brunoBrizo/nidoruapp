@@ -193,8 +193,8 @@ Use this metadata as the current App Store working set:
 | --- | --- |
 | Title | Nidoru |
 | Subtitle | Sleep Sounds & Breathwork |
-| Keyword intent | breathing exercises, deep breathing, box breathing, sleep sounds, white noise, brown noise, relax, calm sounds, sleep timer, bedtime routine |
-| First App Store keyword field | breathing exercises,deep breathing,box breathing,sleep sounds,white noise,calm sounds,sleep timer |
+| Keyword intent | breathing exercises, deep breathing, box breathing, sleep sounds, brown noise, pink noise, relax, calm sounds, sleep timer, bedtime routine |
+| First App Store keyword field | breathing exercises,deep breathing,box breathing,sleep sounds,brown noise,calm sounds,sleep timer |
 
 The full keyword intent is longer than Apple's 100-byte keyword field. The first submission keyword field preserves the strongest non-brand search phrases and fits within the 100-byte limit.
 

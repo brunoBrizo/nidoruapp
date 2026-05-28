@@ -35,7 +35,6 @@ import {
   MoreHorizontal,
   Pause,
   PlusCircle,
-  Radio,
   Timer,
   Waves,
   Wind,
@@ -208,7 +207,6 @@ const soundCategories: readonly SoundCategory[] = [
     id: "noise",
     label: "Noise",
     sounds: [
-      { id: "white-noise", label: "White Noise", Icon: Radio },
       { id: "brown-noise", label: "Brown Noise", Icon: ChartNoAxesColumn },
       { id: "pink-noise", label: "Pink Noise", Icon: Disc3 },
     ],

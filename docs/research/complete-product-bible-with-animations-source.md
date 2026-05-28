@@ -248,13 +248,13 @@ A 5-minute audio guide slowly drawing attention from toes to head, releasing ten
 
 **Why it matters more than it sounds:** Sound mixing is the single feature that generates the most "WHAT APP IS THIS?" comments on TikTok. When a creator screen records their mix setup — rain at 80%, brown noise at 60%, fireplace at 40%, adjusting sliders in real time — the result is visually captivating and immediately communicates value. This is the #1 viral feature in the product.[^19]
 
-**The full sound library (16 curated sounds at launch):**
+**The full sound library (15 curated sounds at launch):**
 
 | Category | Sounds |
 |----------|--------|
 | Rain | Light Rain, Heavy Rain, Rain on Window, Thunderstorm |
 | Nature | Ocean Waves, Forest, River Stream, Wind |
-| Noise | White Noise, Brown Noise, Pink Noise |
+| Noise | Brown Noise, Pink Noise |
 | Environment | Fireplace Crackling, Cafe Ambience, Fan |
 | Tones | 432Hz Tone, Delta Wave Binaural (experimental/preference audio, not a premium proof point) |
 
@@ -279,7 +279,7 @@ At the bottom, a persistent mixer strip:
 - At 2 minutes before fade: volume begins a slow linear fade from current to 0%
 - Fade duration: 2 minutes (not sudden cut) — users who are light sleepers hate sudden audio stops
 
-**Offline behavior:** All 16 base sounds are bundled in the app install after licensing and loop QA clear. Zero network required. This is the most important technical decision for the sound mixer. Competitors require network playback — causing buffer pauses that wake users up. This is mentioned directly in user complaints about Calm.[^20]
+**Offline behavior:** All 15 base sounds are bundled in the app install after licensing and loop QA clear. Zero network required. This is the most important technical decision for the sound mixer. Competitors require network playback — causing buffer pauses that wake users up. This is mentioned directly in user complaints about Calm.[^20]
 
 **What competitors get wrong:**
 - Calm's sound mixer UI is visually decent but doesn't allow fine-grained volume per sound in the same way
@@ -470,7 +470,7 @@ This is the "moment of magic" — the first time the user feels the app notices 
 |---|---|---|
 | Bedtime correlation | Wind-down start time + sleep rating | "Your highest-rated nights often start with wind-down before 10:45 PM" |
 | Streak effect | Session streak length + sleep rating | "After 3+ consecutive nights using the app, your check-ins have trended higher" |
-| Sound preference | Most used sounds + sleep rating | "Rain sounds appear on more of your higher-rated nights than white noise" |
+| Sound preference | Most used sounds + sleep rating | "Rain sounds appear on more of your higher-rated nights than fan sounds" |
 | Breathing technique impact | Technique used + sleep rating | "Your recent 4-7-8 nights have been rated higher than your recent box-breathing nights" |
 | Weekend pattern | Day of week + sleep rating | "Your worst sleep is Sunday to Monday. Try starting wind-down 30 min earlier on Sundays" |
 | Session duration effect | Breathing session duration + sleep rating | "Longer breathing sessions (5+ min) correlate with your best sleep nights" |

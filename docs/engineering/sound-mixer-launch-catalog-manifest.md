@@ -5,7 +5,7 @@ ClickUp task: `06.IMP.00 Resolve launch sound catalog, licensing, and bundled as
 
 ## Source Of Truth
 
-The launch Sound Mixer catalog is **16 sounds**, not 15. The accepted Sound Mixer UI contract, the handoff HTML, and `packages/domain/src/index.ts` all include two Tones entries, so no named launch sound is dropped.
+The launch Sound Mixer catalog is **15 sounds** after reducing launch scope. The accepted Sound Mixer UI contract, the handoff HTML, and `packages/domain/src/index.ts` all include two Tones entries, so no named launch sound is dropped from the remaining catalog.
 
 Implementation source:
 
@@ -30,7 +30,6 @@ Every launch loop target must be AAC-LC `.m4a`, at least 240 seconds, loopable w
 | `forest` | Forest | Nature | 70% on activation | `apps/mobile/assets/audio/sleep/forest.m4a` | Blocked: file missing | Yes | Blocked: no licensed source committed | Blocked |
 | `river-stream` | River Stream | Nature | 70% on activation | `apps/mobile/assets/audio/sleep/river-stream.m4a` | Blocked: file missing | Yes | Blocked: no licensed source committed | Blocked |
 | `wind` | Wind | Nature | 70% on activation | `apps/mobile/assets/audio/sleep/wind.m4a` | Blocked: file missing | Yes | Blocked: no licensed source committed | Blocked |
-| `white-noise` | White Noise | Noise | 70% on activation | `apps/mobile/assets/audio/sleep/white-noise.m4a` | Blocked: file missing | Yes | Blocked: no licensed source committed | Blocked |
 | `brown-noise` | Brown Noise | Noise | 70% on activation | `apps/mobile/assets/audio/sleep/brown-noise.m4a` | Blocked: file missing | Yes | Blocked: no licensed source committed | Blocked |
 | `pink-noise` | Pink Noise | Noise | 70% on activation | `apps/mobile/assets/audio/sleep/pink-noise.m4a` | Blocked: file missing | Yes | Blocked: no licensed source committed | Blocked |
 | `fireplace-crackling` | Fireplace Crackling | Environment | 70% on activation | `apps/mobile/assets/audio/sleep/fireplace-crackling.m4a` | Blocked: file missing | Yes | Blocked: no licensed source committed | Blocked |
@@ -41,7 +40,7 @@ Every launch loop target must be AAC-LC `.m4a`, at least 240 seconds, loopable w
 
 ## Evidence-Safe Notes
 
-- White Noise, Brown Noise, and Pink Noise are preference and masking audio only. Do not make clinical sleep efficacy claims.
+- Brown Noise and Pink Noise are preference and masking audio only. Do not make clinical sleep efficacy claims.
 - 432Hz Tone and Delta Wave Binaural are experimental preference audio only. Do not present them as clinical sleep aids or premium proof points.
 - No network-required, AI-generated, placeholder, or unlicensed audio is shippable for the launch catalog.
 

@@ -5,7 +5,7 @@ ClickUp task: `06.IMP.10 Prove all bundled sounds offline, loop quality, and sta
 
 ## Result
 
-This ticket cannot be completed in the current checkout because the launch Sound Mixer audio files are not committed. The catalog and playback controller are covered by focused automated tests, but native offline startup and loop quality cannot be honestly proven until the 16 licensed launch loops exist under `apps/mobile/assets/audio/sleep/`.
+This ticket cannot be completed in the current checkout because the launch Sound Mixer audio files are not committed. The catalog and playback controller are covered by focused automated tests, but native offline startup and loop quality cannot be honestly proven until the 15 licensed launch loops exist under `apps/mobile/assets/audio/sleep/`.
 
 Current file inventory:
 
@@ -40,7 +40,6 @@ apps/mobile/assets/audio/breath/soft-whoosh-inhale.m4a
 | Forest | `apps/mobile/assets/audio/sleep/forest.m4a` | Blocked: file missing, no network fallback allowed | Not measured: no local asset exists to start | Blocked: no audio to review |
 | River Stream | `apps/mobile/assets/audio/sleep/river-stream.m4a` | Blocked: file missing, no network fallback allowed | Not measured: no local asset exists to start | Blocked: no audio to review |
 | Wind | `apps/mobile/assets/audio/sleep/wind.m4a` | Blocked: file missing, no network fallback allowed | Not measured: no local asset exists to start | Blocked: no audio to review |
-| White Noise | `apps/mobile/assets/audio/sleep/white-noise.m4a` | Blocked: file missing, no network fallback allowed | Not measured: no local asset exists to start | Blocked: no audio to review |
 | Brown Noise | `apps/mobile/assets/audio/sleep/brown-noise.m4a` | Blocked: file missing, no network fallback allowed | Not measured: no local asset exists to start | Blocked: no audio to review |
 | Pink Noise | `apps/mobile/assets/audio/sleep/pink-noise.m4a` | Blocked: file missing, no network fallback allowed | Not measured: no local asset exists to start | Blocked: no audio to review |
 | Fireplace Crackling | `apps/mobile/assets/audio/sleep/fireplace-crackling.m4a` | Blocked: file missing, no network fallback allowed | Not measured: no local asset exists to start | Blocked: no audio to review |

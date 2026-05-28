@@ -36,7 +36,6 @@ create table public.wind_down_runs (
         'forest',
         'river-stream',
         'wind',
-        'white-noise',
         'brown-noise',
         'pink-noise',
         'fireplace-crackling',

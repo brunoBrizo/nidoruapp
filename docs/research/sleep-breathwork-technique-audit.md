@@ -11,7 +11,7 @@ Scope: Current documentation and implementation for sleep, wind-down, Rescue Me,
 - Breathwork for stress and mood has broader support than breathwork for objectively improving sleep. A 2023 meta-analysis of randomized controlled trials found breathwork associated with lower self-reported stress versus controls, but the effect base is heterogeneous.
 - Coherent or resonant breathing around the 5-6 breaths/min family remains a reasonable daily practice pattern. Use the exact app cadence consistently: 5.5s inhale and 5.5s exhale.
 - Cyclic sighing / physiological sigh has promising acute-arousal and mood evidence from a 2023 randomized trial, but it is not yet a proven sleep or panic-treatment protocol. Keep it post-MVP or present it as an optional short reset with careful safety copy.
-- Continuous white/pink/brown noise is defensible as masking and user preference. Systematic reviews do not support strong sleep-improvement claims. Avoid implying special clinical efficacy for 432 Hz tones, binaural/delta tracks, or colored noise.
+- Continuous pink/brown noise is defensible as masking and user preference. Systematic reviews do not support strong sleep-improvement claims. Avoid implying special clinical efficacy for 432 Hz tones, binaural/delta tracks, or colored noise.
 
 ## Current implementation check
 
@@ -23,7 +23,7 @@ Scope: Current documentation and implementation for sleep, wind-down, Rescue Me,
 | Diaphragmatic Breathing | 4s inhale / 6s exhale, stress reset | Good low-risk stress relaxation option; less direct as a sleep treatment | Keep. Consider offering it as an easier alternative when users dislike breath holds |
 | Physiological Sigh | Domain marks it post-MVP and not in current library | Promising for short acute arousal reduction, but not enough to replace established MVP flows | Keep post-MVP. If introduced, use "short reset" copy and validate safety/comfort first |
 | Body scan / body relaxation | Wind-Down docs and UI include a body relax step | Strong fit for bedtime wind-down, especially when thoughts feel busy | Expand before adding more breath techniques. Prefer progressive muscle relaxation or simple body scan copy over diagnostic insomnia language |
-| Ambient sound / colored noise | Sleep Sound Mixer includes nature, white/pink/brown noise, 432 Hz tone, and delta-wave binaural | Good for masking and preference; weak evidence for broad sleep claims | Keep as preference tools. Do not sell tones or binaural tracks as scientifically proven sleep enhancers |
+| Ambient sound / colored noise | Sleep Sound Mixer includes nature, pink/brown noise, 432 Hz tone, and delta-wave binaural | Good for masking and preference; weak evidence for broad sleep claims | Keep as preference tools. Do not sell tones or binaural tracks as scientifically proven sleep enhancers |
 | Sleep stories | Post-MVP low-stimulation narrative content | Reasonable cognitive-distraction and routine-support pattern | Keep post-MVP with low-stimulation UX and no treatment claims |
 
 ## Documentation updates from this audit

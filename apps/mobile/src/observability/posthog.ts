@@ -35,6 +35,7 @@ export type AnalyticsEventName = (typeof approvedAnalyticsEventNames)[number];
 
 type AnalyticsEventProperties = Readonly<
   Partial<{
+    active_layer_count: number;
     app_environment: ReturnType<typeof getAppEnvironment>;
     attempt_count: number;
     audio_asset_id:
@@ -47,9 +48,11 @@ type AnalyticsEventProperties = Readonly<
       | "audio_mode_configuration"
       | "cue_playback_failed"
       | "interruption_handling_failed"
+      | "layer_playback_failed"
       | "lock_screen_metadata_failed"
+      | "missing_bundled_asset"
       | "route_change_handling_failed";
-    audio_mode: "gentle-bell" | "nature-ambient" | "none" | "soft-whoosh";
+    audio_mode: "gentle-bell" | "nature-ambient" | "none" | "soft-whoosh" | "sound-mixer";
     breath_phase: "exhale" | "hold" | "inhale" | "second-inhale";
     proof: boolean;
     reason_class:
@@ -69,6 +72,7 @@ type AnalyticsEventProperties = Readonly<
     release: string;
     source: "observability_proof";
     sync_stage: "post_value_sync" | "analytics_event_flush";
+    timer_duration_seconds: 1200 | 1800 | 2700 | 3600;
   }>
 >;
 
@@ -90,10 +94,12 @@ const allowedStringAnalyticsProperties = {
     "audio_mode_configuration",
     "cue_playback_failed",
     "interruption_handling_failed",
+    "layer_playback_failed",
     "lock_screen_metadata_failed",
+    "missing_bundled_asset",
     "route_change_handling_failed",
   ]),
-  audio_mode: new Set(["gentle-bell", "nature-ambient", "none", "soft-whoosh"]),
+  audio_mode: new Set(["gentle-bell", "nature-ambient", "none", "soft-whoosh", "sound-mixer"]),
   breath_phase: new Set(["exhale", "hold", "inhale", "second-inhale"]),
   reason_class: new Set([
     "offline",
@@ -116,6 +122,7 @@ const allowedStringAnalyticsProperties = {
 } as const;
 
 const safeReleasePattern = /^[A-Za-z0-9._/@:+-]{1,120}$/;
+const safeTimerDurationSeconds = new Set([1200, 1800, 2700, 3600]);
 
 const posthogOptions: PostHogOptions = {
   before_send: (event) => {
@@ -171,6 +178,24 @@ export function createPrivacySafeAnalyticsProperties(
 
   if (typeof properties.proof === "boolean") {
     safeProperties.proof = properties.proof;
+  }
+
+  const activeLayerCount = properties.active_layer_count;
+  if (
+    typeof activeLayerCount === "number" &&
+    Number.isInteger(activeLayerCount) &&
+    activeLayerCount >= 0 &&
+    activeLayerCount <= 3
+  ) {
+    safeProperties.active_layer_count = activeLayerCount;
+  }
+
+  const timerDurationSeconds = properties.timer_duration_seconds;
+  if (
+    typeof timerDurationSeconds === "number" &&
+    safeTimerDurationSeconds.has(timerDurationSeconds)
+  ) {
+    safeProperties.timer_duration_seconds = timerDurationSeconds;
   }
 
   const release = properties.release;

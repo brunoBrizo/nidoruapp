@@ -149,6 +149,30 @@ describe("privacy-safe observability", () => {
     );
   });
 
+  it("allows only coarse Sound Mixer playback telemetry", () => {
+    const properties = createPrivacySafeAnalyticsProperties({
+      active_layer_count: 3,
+      audio_asset_id: "apps/mobile/assets/audio/sleep/light-rain.m4a",
+      audio_failure_class: "missing_bundled_asset",
+      audio_mode: "sound-mixer",
+      exact_mix_name: "Rain beside Bruno's window",
+      sound_id: "light-rain",
+      sound_ids: ["light-rain", "brown-noise"],
+      timer_duration_seconds: 1_800,
+      volume_by_sound_id: { "light-rain": 72 },
+    });
+
+    expect(properties).toEqual({
+      active_layer_count: 3,
+      audio_failure_class: "missing_bundled_asset",
+      audio_mode: "sound-mixer",
+      timer_duration_seconds: 1_800,
+    });
+    expect(JSON.stringify(properties)).not.toMatch(
+      /light-rain|brown-noise|Rain beside|Bruno|apps\/mobile|\.m4a/i,
+    );
+  });
+
   it("redacts sync failure observability to reason classes and non-sensitive counters", () => {
     const context = createPrivacySafeSyncFailureContext({
       attemptCount: 3,

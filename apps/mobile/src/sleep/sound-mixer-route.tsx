@@ -1,6 +1,8 @@
 import type { SoundMixerSavedMixRecord } from "@nidoru/validation";
 import { useCallback, useEffect, useState } from "react";
 
+import { createSoundMixerPlaybackController } from "../audio/sound-mixer-playback-controller";
+import { soundMixerPlaybackAssetSources } from "../audio/sound-mixer-playback-assets";
 import { getOrCreateLocalInstallIdentity } from "../onboarding/local-first-onboarding";
 import type { LocalFirstOnboardingDatabase } from "../onboarding/local-first-onboarding";
 import { openMigratedLocalDatabase } from "../storage/local-database";
@@ -19,6 +21,10 @@ type SoundMixerRouteState = {
 
 export function SoundMixerRouteScreen({ uiVariant }: { readonly uiVariant: SoundMixerUIVariant }) {
   const [routeState, setRouteState] = useState<SoundMixerRouteState>();
+  const createPlaybackController = useCallback(
+    () => createSoundMixerPlaybackController({ assetSources: soundMixerPlaybackAssetSources }),
+    [],
+  );
 
   useEffect(() => {
     let isMounted = true;
@@ -90,6 +96,7 @@ export function SoundMixerRouteScreen({ uiVariant }: { readonly uiVariant: Sound
           }
         : {})}
       uiVariant={uiVariant}
+      createPlaybackController={createPlaybackController}
     />
   );
 }

@@ -7,6 +7,24 @@ import {
   shippableSoundMixerBundledAssets,
   soundMixerBundledAssetManifest,
 } from "../src/audio/sound-mixer-asset-manifest";
+import { soundMixerPlaybackAssetIds } from "../src/audio/sound-mixer-playback-assets";
+
+const committedSleepAssetIds = [
+  "light-rain",
+  "heavy-rain",
+  "rain-on-window",
+  "thunderstorm",
+  "ocean-waves",
+  "forest",
+  "river-stream",
+  "wind",
+  "brown-noise",
+  "pink-noise",
+  "fireplace-crackling",
+  "cafe-ambience",
+] as const;
+
+const committedSleepAssetIdSet = new Set<string>(committedSleepAssetIds);
 
 describe("launch catalog", () => {
   it("keeps the first sleep technique and launch sounds available", () => {
@@ -43,13 +61,21 @@ describe("launch catalog", () => {
     }
   });
 
-  it("does not treat missing or unlicensed Sound Mixer loops as shippable", () => {
+  it("registers the committed static Sound Mixer playback assets", () => {
+    expect(soundMixerPlaybackAssetIds).toEqual([...committedSleepAssetIds]);
+    expect(soundMixerPlaybackAssetIds).not.toContain("432hz-tone");
+    expect(soundMixerPlaybackAssetIds).not.toContain("delta-wave-binaural");
+  });
+
+  it("does not treat incomplete or unlicensed Sound Mixer loops as shippable", () => {
     const repoRoot = resolve(__dirname, "../../..");
 
     expect(shippableSoundMixerBundledAssets).toHaveLength(0);
 
     for (const sound of soundMixerBundledAssetManifest) {
-      expect(existsSync(resolve(repoRoot, sound.targetAssetPath))).toBe(false);
+      expect(existsSync(resolve(repoRoot, sound.targetAssetPath))).toBe(
+        committedSleepAssetIdSet.has(sound.soundId),
+      );
       expect(sound.durationSeconds).toBeNull();
       expect(sound.licenseStatus).toBe("blocked_missing_license");
       expect(sound.licenseSource).toMatch(/^BLOCKED:/);

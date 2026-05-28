@@ -14,6 +14,7 @@ import {
   type SoundMixerController,
   type SoundMixerSavedMix as DomainSoundMixerSavedMix,
   type SoundMixerSnapshot,
+  type SoundMixerTimerPreference,
 } from "@nidoru/domain";
 import { soundMixerSavedMixRecordSchema, type SoundMixerSavedMixRecord } from "@nidoru/validation";
 import * as Haptics from "expo-haptics";
@@ -39,12 +40,14 @@ import {
   Wind,
 } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useRef, useState, type ElementType } from "react";
-import { AppState, Modal } from "react-native";
+import { AppState, Modal, type AppStateStatus } from "react-native";
 import { FadeIn, FadeInUp, FadeOut, FadeOutUp, LinearTransition } from "react-native-reanimated";
 import Svg, { Circle, Line, Rect } from "react-native-svg";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 
+import type { SoundMixerPlaybackController } from "../audio/sound-mixer-playback-controller";
+import type { SleepTimerAppState } from "../audio/sleep-timer-power-management";
 import { useReduceMotionPreference } from "../motion/use-reduce-motion-enabled";
 import { captureSoundMixSavedDeferred } from "../observability/sound-mixer-observability";
 import { Animated, Pressable, ScrollView, Text, TextInput, View, cn } from "../tw";
@@ -464,6 +467,14 @@ function getSoundMixerTimerStatus(snapshot: SoundMixerSnapshot) {
   };
 }
 
+function getSoundMixerTimerDurationSeconds(preference: SoundMixerTimerPreference) {
+  return preference === "infinity" ? null : preference * 60;
+}
+
+function getSleepTimerAppState(appState: AppStateStatus): SleepTimerAppState {
+  return appState === "active" ? "active" : "background";
+}
+
 export function getSoundMixerActiveStripMotionConfig(reduceMotionEnabled: boolean) {
   return reduceMotionEnabled
     ? {
@@ -515,6 +526,7 @@ function getSoundMixerVolumeDetent(volume: number) {
 }
 
 export function SoundMixerScreen({
+  createPlaybackController,
   disableHaptics = false,
   initialSavedMixRecords,
   initialPlaybackMode = "mixer",
@@ -523,6 +535,7 @@ export function SoundMixerScreen({
   reduceMotionOverride,
   uiVariant = "default",
 }: {
+  readonly createPlaybackController?: () => SoundMixerPlaybackController;
   readonly disableHaptics?: boolean;
   readonly initialSavedMixRecords?: readonly SoundMixerSavedMixRecord[];
   readonly initialPlaybackMode?: PlaybackMode;
@@ -539,6 +552,13 @@ export function SoundMixerScreen({
   const activeStripMotionConfig = getSoundMixerActiveStripMotionConfig(reduceMotionEnabled);
   const idleDimmingMotionConfig = getSoundMixerIdleDimmingMotionConfig(reduceMotionEnabled);
   const appStateRef = useRef(AppState.currentState);
+  const playbackControllerRef = useRef<SoundMixerPlaybackController | null>(null);
+  const nativePlaybackMixTitleRef = useRef<string | undefined>(undefined);
+  const nativePlaybackStartedRef = useRef(false);
+  const nativePlaybackTimerPreferenceRef = useRef<SoundMixerTimerPreference | undefined>(
+    undefined,
+  );
+  const hasMountedVariantRef = useRef(false);
   const initialSavedMixRecordsRef = useRef(initialSavedMixRecords);
   const [savedMixCatalog, setSavedMixCatalog] = useState(() =>
     getInitialSavedMixes({ records: initialSavedMixRecords, variant: uiVariant }),
@@ -603,8 +623,43 @@ export function SoundMixerScreen({
   }, []);
 
   useEffect(() => {
+    if (!createPlaybackController) {
+      playbackControllerRef.current = null;
+      nativePlaybackMixTitleRef.current = undefined;
+      nativePlaybackStartedRef.current = false;
+      nativePlaybackTimerPreferenceRef.current = undefined;
+      return undefined;
+    }
+
+    const playbackController = createPlaybackController();
+    playbackControllerRef.current = playbackController;
+
+    return () => {
+      if (playbackControllerRef.current === playbackController) {
+        playbackControllerRef.current = null;
+      }
+
+      nativePlaybackStartedRef.current = false;
+      nativePlaybackMixTitleRef.current = undefined;
+      nativePlaybackTimerPreferenceRef.current = undefined;
+      playbackController.release();
+    };
+  }, [createPlaybackController]);
+
+  useEffect(() => {
     const subscription = AppState.addEventListener("change", (nextAppState) => {
       appStateRef.current = nextAppState;
+
+      const playbackController = playbackControllerRef.current;
+
+      if (playbackController) {
+        void playbackController
+          .handleAppStateChange({
+            appState: getSleepTimerAppState(nextAppState),
+            nowMs: Date.now(),
+          })
+          .catch(() => undefined);
+      }
     });
 
     return () => {
@@ -640,6 +695,11 @@ export function SoundMixerScreen({
   }, [initialSavedMixRecords, uiVariant]);
 
   useEffect(() => {
+    if (!hasMountedVariantRef.current) {
+      hasMountedVariantRef.current = true;
+      return;
+    }
+
     const nextSavedMixCatalog = getInitialSavedMixes({
       records: initialSavedMixRecordsRef.current,
       variant: uiVariant,
@@ -654,6 +714,102 @@ export function SoundMixerScreen({
     setObservedAtMs(Date.now());
     setPlaybackStartedAtMs(nextController.activeLayers.length > 0 ? Date.now() : undefined);
   }, [uiVariant]);
+
+  useEffect(() => {
+    const playbackController = playbackControllerRef.current;
+
+    if (!playbackController) {
+      return undefined;
+    }
+
+    const activePlaybackController = playbackController;
+    let isCancelled = false;
+
+    async function syncNativePlayback() {
+      const nowMs = Date.now();
+      const appState = getSleepTimerAppState(appStateRef.current);
+
+      if (!hasActiveSounds || playbackStartedAtMs === undefined) {
+        if (nativePlaybackStartedRef.current) {
+          await activePlaybackController.stop({
+            appState,
+            nowMs,
+            reason: "manual-stop",
+          });
+          nativePlaybackStartedRef.current = false;
+          nativePlaybackMixTitleRef.current = undefined;
+          nativePlaybackTimerPreferenceRef.current = undefined;
+        }
+
+        return;
+      }
+
+      if (
+        !nativePlaybackStartedRef.current ||
+        nativePlaybackMixTitleRef.current !== mixTitle ||
+        nativePlaybackTimerPreferenceRef.current !== controller.timerPreference
+      ) {
+        if (nativePlaybackStartedRef.current) {
+          await activePlaybackController.stop({
+            appState,
+            nowMs,
+            reason: "manual-stop",
+          });
+          nativePlaybackStartedRef.current = false;
+        }
+
+        const snapshot = await activePlaybackController.start({
+          activeLayers: controller.activeLayers,
+          appState,
+          fadeOutDurationSeconds: soundMixerLimits.fadeOutDurationSeconds,
+          mixTitle,
+          nowMs: playbackStartedAtMs,
+          timerDurationSeconds: getSoundMixerTimerDurationSeconds(controller.timerPreference),
+        });
+
+        if (!isCancelled) {
+          nativePlaybackStartedRef.current =
+            snapshot.status === "playing" || snapshot.status === "fading";
+          nativePlaybackMixTitleRef.current = nativePlaybackStartedRef.current
+            ? mixTitle
+            : undefined;
+          nativePlaybackTimerPreferenceRef.current = nativePlaybackStartedRef.current
+            ? controller.timerPreference
+            : undefined;
+        }
+
+        return;
+      }
+
+      const syncSnapshot = await activePlaybackController.syncActiveLayers({
+        activeLayers: controller.activeLayers,
+        nowMs,
+      });
+
+      if (!isCancelled) {
+        nativePlaybackStartedRef.current =
+          syncSnapshot.status === "playing" || syncSnapshot.status === "fading";
+      }
+
+      await activePlaybackController.handleTimerTick({
+        appState,
+        nowMs,
+      });
+    }
+
+    void syncNativePlayback().catch(() => undefined);
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [
+    controller.activeLayers,
+    controller.timerPreference,
+    createPlaybackController,
+    hasActiveSounds,
+    mixTitle,
+    playbackStartedAtMs,
+  ]);
 
   useEffect(() => {
     if (
@@ -677,7 +833,19 @@ export function SoundMixerScreen({
     }
 
     const timeout = setTimeout(() => {
-      setObservedAtMs(Date.now());
+      const nowMs = Date.now();
+      const playbackController = playbackControllerRef.current;
+
+      setObservedAtMs(nowMs);
+
+      if (playbackController) {
+        void playbackController
+          .handleTimerTick({
+            appState: getSleepTimerAppState(appStateRef.current),
+            nowMs,
+          })
+          .catch(() => undefined);
+      }
     }, soundMixerTimerTickMs);
 
     return () => clearTimeout(timeout);

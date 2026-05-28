@@ -4,17 +4,63 @@ import * as Haptics from "expo-haptics";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-import { captureAnalyticsEventDeferred } from "../src/observability/deferred-capture";
-import SoundMixerAnchorScreen from "../src/app/(tabs)/sleep/sounds";
-import { SoundMixerScreen } from "../src/sleep/sound-mixer-screen";
-
 const mockRouterBack = jest.fn();
 const mockUseLocalSearchParams = jest.fn<() => Record<string, string | string[] | undefined>>(
   () => ({}),
 );
+const mockSoundMixerAudioPlayer = {
+  clearLockScreenControls: jest.fn(),
+  loop: false,
+  pause: jest.fn(),
+  play: jest.fn(),
+  remove: jest.fn(),
+  seekTo: jest.fn(() => Promise.resolve()),
+  setActiveForLockScreen: jest.fn(),
+  volume: 1,
+};
+const mockCreateAudioPlayer = jest.fn(() => mockSoundMixerAudioPlayer);
+const mockSetAudioModeAsync = jest.fn(() => Promise.resolve());
+const mockSetIsAudioActiveAsync = jest.fn(() => Promise.resolve());
 
 jest.mock("expo-haptics", () => ({
   selectionAsync: jest.fn(() => Promise.resolve()),
+}));
+
+jest.mock("expo-audio", () => ({
+  createAudioPlayer: mockCreateAudioPlayer,
+  setAudioModeAsync: mockSetAudioModeAsync,
+  setIsAudioActiveAsync: mockSetIsAudioActiveAsync,
+}));
+
+jest.mock("../src/audio/sound-mixer-playback-assets", () => ({
+  soundMixerPlaybackAssetIds: [
+    "light-rain",
+    "heavy-rain",
+    "rain-on-window",
+    "thunderstorm",
+    "ocean-waves",
+    "forest",
+    "river-stream",
+    "wind",
+    "brown-noise",
+    "pink-noise",
+    "fireplace-crackling",
+    "cafe-ambience",
+  ],
+  soundMixerPlaybackAssetSources: {
+    "light-rain": 101,
+    "heavy-rain": 102,
+    "rain-on-window": 103,
+    thunderstorm: 104,
+    "ocean-waves": 105,
+    forest: 106,
+    "river-stream": 107,
+    wind: 108,
+    "brown-noise": 109,
+    "pink-noise": 110,
+    "fireplace-crackling": 111,
+    "cafe-ambience": 112,
+  },
 }));
 
 jest.mock("../src/motion/use-reduce-motion-enabled", () => ({
@@ -60,6 +106,10 @@ jest.mock("react-native-css", () => {
   };
 });
 
+import { captureAnalyticsEventDeferred } from "../src/observability/deferred-capture";
+import SoundMixerAnchorScreen from "../src/app/(tabs)/sleep/sounds";
+import { SoundMixerScreen } from "../src/sleep/sound-mixer-screen";
+
 const hapticsSelectionAsync = Haptics.selectionAsync as jest.MockedFunction<
   typeof Haptics.selectionAsync
 >;
@@ -69,6 +119,16 @@ const mockCaptureAnalyticsEventDeferred = captureAnalyticsEventDeferred as jest.
 
 describe("SoundMixerAnchorScreen", () => {
   beforeEach(() => {
+    mockCreateAudioPlayer.mockClear();
+    mockSetAudioModeAsync.mockClear();
+    mockSetIsAudioActiveAsync.mockClear();
+    mockSoundMixerAudioPlayer.clearLockScreenControls.mockClear();
+    mockSoundMixerAudioPlayer.pause.mockClear();
+    mockSoundMixerAudioPlayer.play.mockClear();
+    mockSoundMixerAudioPlayer.remove.mockClear();
+    mockSoundMixerAudioPlayer.seekTo.mockClear();
+    mockSoundMixerAudioPlayer.setActiveForLockScreen.mockClear();
+    mockSoundMixerAudioPlayer.volume = 1;
     hapticsSelectionAsync.mockClear();
     mockCaptureAnalyticsEventDeferred.mockReset();
     mockRouterBack.mockClear();
@@ -139,6 +199,46 @@ describe("SoundMixerAnchorScreen", () => {
     expect(screen.getByRole("header", { name: "Save mix" })).toBeTruthy();
     expect(screen.getByText("3 of 3 saved")).toBeTruthy();
     expect(screen.getByRole("button", { name: "Replace existing mix" })).toBeTruthy();
+  });
+
+  it("starts the default bundled playback layers when native playback is provided", async () => {
+    const playbackSnapshot = {
+      activeLayerCount: 3,
+      fadeProgress: 0,
+      playingLayerCount: 3,
+      remainingSeconds: 1_800,
+      status: "playing" as const,
+      timerDurationSeconds: 1_800,
+      volumesBySoundId: {},
+    };
+    const playbackController = {
+      getSnapshot: jest.fn(() => playbackSnapshot),
+      handleAppStateChange: jest.fn(() => Promise.resolve(playbackSnapshot)),
+      handleAudioInterruption: jest.fn(() => Promise.resolve(playbackSnapshot)),
+      handleAudioOutputChange: jest.fn(() => Promise.resolve(playbackSnapshot)),
+      handleTimerTick: jest.fn(() => Promise.resolve(playbackSnapshot)),
+      release: jest.fn(),
+      start: jest.fn(() => Promise.resolve(playbackSnapshot)),
+      stop: jest.fn(() => Promise.resolve({ ...playbackSnapshot, status: "stopped" as const })),
+      syncActiveLayers: jest.fn(() => Promise.resolve(playbackSnapshot)),
+    };
+
+    render(<SoundMixerScreen createPlaybackController={() => playbackController} />);
+
+    await waitFor(() => {
+      expect(playbackController.start).toHaveBeenCalledTimes(1);
+    });
+
+    expect(playbackController.start).toHaveBeenCalledWith(
+      expect.objectContaining({
+        activeLayers: [
+          { soundId: "light-rain", volume: 72 },
+          { soundId: "brown-noise", volume: 58 },
+          { soundId: "fireplace-crackling", volume: 34 },
+        ],
+        timerDurationSeconds: 1_800,
+      }),
+    );
   });
 
   it("falls back to the default mixer when the proof variant param is unknown", () => {
@@ -882,7 +982,7 @@ describe("SoundMixerAnchorScreen", () => {
     expect(screen.getByTestId("sound-mixer-main-content")).toHaveProp("pointerEvents", "auto");
   });
 
-  it("routes the back affordance without adding playback, account, or network behavior", () => {
+  it("routes the back affordance without adding account or network behavior", () => {
     render(<SoundMixerAnchorScreen />);
 
     fireEvent.press(screen.getByRole("button", { name: "Back to Sleep" }));

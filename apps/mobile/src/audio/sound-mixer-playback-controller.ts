@@ -36,13 +36,28 @@ export type SoundMixerPlaybackStatus =
   | "idle"
   | "playing"
   | "fading"
+  | "interrupted"
   | "blocked"
   | "stopped"
   | "completed";
 
+export type SoundMixerPlaybackLifecycleOutcome =
+  | "continued"
+  | "faded"
+  | "resumed"
+  | "stopped";
+
+export type SoundMixerPlaybackLifecycleReason =
+  | "app-backgrounded"
+  | "audio-output-change"
+  | "lock-screen"
+  | "system-interruption";
+
 export type SoundMixerPlaybackSnapshot = {
   readonly activeLayerCount: number;
   readonly fadeProgress: number;
+  readonly lastLifecycleOutcome?: SoundMixerPlaybackLifecycleOutcome;
+  readonly lastLifecycleReason?: SoundMixerPlaybackLifecycleReason;
   readonly playingLayerCount: number;
   readonly remainingSeconds: number | null;
   readonly status: SoundMixerPlaybackStatus;
@@ -81,10 +96,19 @@ export type SoundMixerPlaybackControllerOptions = {
 
 export type SoundMixerPlaybackController = {
   readonly getSnapshot: (nowMs?: number) => SoundMixerPlaybackSnapshot;
+  readonly handleAppStateChange: (input: {
+    readonly appState: SleepTimerAppState;
+    readonly nowMs: number;
+  }) => Promise<SoundMixerPlaybackSnapshot>;
   readonly handleAudioInterruption: (input: {
     readonly appState: SleepTimerAppState;
     readonly nowMs: number;
+    readonly shouldResume?: boolean;
     readonly type: "began" | "ended";
+  }) => Promise<SoundMixerPlaybackSnapshot>;
+  readonly handleAudioOutputChange: (input: {
+    readonly appState: SleepTimerAppState;
+    readonly nowMs: number;
   }) => Promise<SoundMixerPlaybackSnapshot>;
   readonly handleTimerTick: (input: {
     readonly appState: SleepTimerAppState;
@@ -120,6 +144,8 @@ export function createSoundMixerPlaybackController({
   let activeLayers: readonly SoundMixerActiveLayer[] = [];
   let audioModeConfigured = false;
   let fadeOutDurationSeconds: number = soundMixerLimits.fadeOutDurationSeconds;
+  let lastLifecycleOutcome: SoundMixerPlaybackLifecycleOutcome | undefined;
+  let lastLifecycleReason: SoundMixerPlaybackLifecycleReason | undefined;
   let mixTitle = "Sleep mix";
   let playbackStartedAtMs: number | undefined;
   let status: SoundMixerPlaybackStatus = "idle";
@@ -164,6 +190,28 @@ export function createSoundMixerPlaybackController({
 
     await powerController.endTimerPlayback({ appState, reason });
     timerPlaybackActive = false;
+  }
+
+  function setLifecycleOutcome({
+    outcome,
+    reason,
+  }: {
+    readonly outcome: SoundMixerPlaybackLifecycleOutcome;
+    readonly reason: SoundMixerPlaybackLifecycleReason;
+  }) {
+    lastLifecycleOutcome = outcome;
+    lastLifecycleReason = reason;
+  }
+
+  function clearLifecycleOutcome() {
+    lastLifecycleOutcome = undefined;
+    lastLifecycleReason = undefined;
+  }
+
+  function getLifecycleReasonForAppState(
+    appState: SleepTimerAppState,
+  ): SoundMixerPlaybackLifecycleReason {
+    return appState === "locked" ? "lock-screen" : "app-backgrounded";
   }
 
   function getAssetSource(soundId: LaunchSoundId) {
@@ -312,9 +360,157 @@ export function createSoundMixerPlaybackController({
     return getSnapshot(nowMs);
   }
 
+  async function pauseForInterruption({
+    appState,
+    nowMs,
+  }: {
+    readonly appState: SleepTimerAppState;
+    readonly nowMs: number;
+  }) {
+    if (playersBySoundId.size === 0) {
+      status = "stopped";
+      stopReason = "interrupted";
+      setLifecycleOutcome({
+        outcome: "stopped",
+        reason: "system-interruption",
+      });
+      return getSnapshot(nowMs);
+    }
+
+    for (const [soundId, player] of playersBySoundId) {
+      try {
+        player.pause();
+      } catch {
+        captureAudioFailed({ failureClass: "interruption_handling_failed", soundId });
+      }
+    }
+
+    try {
+      await adapter.setIsAudioActiveAsync(false);
+    } catch {
+      captureAudioFailed({ failureClass: "interruption_handling_failed" });
+    }
+
+    await endPowerPlayback(appState, "interrupted");
+    status = "interrupted";
+    stopReason = "interrupted";
+    setLifecycleOutcome({
+      outcome: "stopped",
+      reason: "system-interruption",
+    });
+    return getSnapshot(nowMs);
+  }
+
+  async function resumeAfterInterruption({
+    appState,
+    nowMs,
+  }: {
+    readonly appState: SleepTimerAppState;
+    readonly nowMs: number;
+  }) {
+    if (activeLayers.length === 0) {
+      status = "idle";
+      stopReason = undefined;
+      return getSnapshot(nowMs);
+    }
+
+    const remainingSeconds = getRemainingSeconds(nowMs);
+
+    if (timerDurationSeconds !== null && remainingSeconds === 0) {
+      setLifecycleOutcome({
+        outcome: "faded",
+        reason: "system-interruption",
+      });
+      return stopInternal({
+        appState,
+        nowMs,
+        reason: "timer-ended",
+        terminalStatus: "completed",
+      });
+    }
+
+    const configured = await configureAudio();
+
+    if (!configured) {
+      status = "blocked";
+      return getSnapshot(nowMs);
+    }
+
+    try {
+      await adapter.setIsAudioActiveAsync(true);
+    } catch {
+      captureAudioFailed({ failureClass: "interruption_handling_failed" });
+      status = "blocked";
+      return getSnapshot(nowMs);
+    }
+
+    const resumedLayers: SoundMixerActiveLayer[] = [];
+
+    for (const layer of activeLayers) {
+      if (await ensurePlayerForLayer(layer, false)) {
+        resumedLayers.push(layer);
+      }
+    }
+
+    if (resumedLayers.length === 0) {
+      status = "blocked";
+      await adapter.setIsAudioActiveAsync(false).catch(() => undefined);
+      return getSnapshot(nowMs);
+    }
+
+    status =
+      remainingSeconds !== null && remainingSeconds <= fadeOutDurationSeconds
+        ? "fading"
+        : "playing";
+    stopReason = undefined;
+    setLifecycleOutcome({
+      outcome: "resumed",
+      reason: "system-interruption",
+    });
+    applyCurrentVolumes(nowMs);
+    await beginPowerPlayback(appState);
+    return getSnapshot(nowMs);
+  }
+
+  async function handleTimerTickInternal(input: {
+    readonly appState: SleepTimerAppState;
+    readonly nowMs: number;
+  }) {
+    if (status !== "playing" && status !== "fading") {
+      return getSnapshot(input.nowMs);
+    }
+
+    const remainingSeconds = getRemainingSeconds(input.nowMs);
+
+    if (remainingSeconds === 0) {
+      if (input.appState !== "active") {
+        setLifecycleOutcome({
+          outcome: "faded",
+          reason: getLifecycleReasonForAppState(input.appState),
+        });
+      }
+
+      return stopInternal({
+        appState: input.appState,
+        nowMs: input.nowMs,
+        reason: "timer-ended",
+        terminalStatus: "completed",
+      });
+    }
+
+    status =
+      remainingSeconds !== null && remainingSeconds <= fadeOutDurationSeconds
+        ? "fading"
+        : "playing";
+    applyCurrentVolumes(input.nowMs);
+    return getSnapshot(input.nowMs);
+  }
+
   function getSnapshot(nowMs = playbackStartedAtMs ?? 0): SoundMixerPlaybackSnapshot {
     const remainingSeconds = getRemainingSeconds(nowMs);
     const volumesBySoundId: Partial<Record<LaunchSoundId, number>> = {};
+    const playingLayerCount =
+      status === "playing" || status === "fading" ? playersBySoundId.size : 0;
 
     for (const layer of activeLayers) {
       volumesBySoundId[layer.soundId] = getCurrentLayerVolume(layer, nowMs);
@@ -323,7 +519,10 @@ export function createSoundMixerPlaybackController({
     return {
       activeLayerCount: activeLayers.length,
       fadeProgress: 1 - getFadeFactor(nowMs),
-      playingLayerCount: playersBySoundId.size,
+      ...(lastLifecycleOutcome === undefined || lastLifecycleReason === undefined
+        ? {}
+        : { lastLifecycleOutcome, lastLifecycleReason }),
+      playingLayerCount,
       remainingSeconds,
       status,
       ...(stopReason === undefined ? {} : { stopReason }),
@@ -347,18 +546,69 @@ export function createSoundMixerPlaybackController({
   return {
     getSnapshot,
 
-    async handleAudioInterruption(input) {
+    async handleAppStateChange(input) {
+      if (status !== "playing" && status !== "fading") {
+        return getSnapshot(input.nowMs);
+      }
+
       try {
-        if (input.type === "began" && playersBySoundId.size > 0) {
-          return await stopInternal({
-            appState: input.appState,
-            nowMs: input.nowMs,
-            reason: "interrupted",
-            terminalStatus: "stopped",
+        if (input.appState === "active") {
+          await adapter.setIsAudioActiveAsync(true);
+        } else {
+          setLifecycleOutcome({
+            outcome: "continued",
+            reason: getLifecycleReasonForAppState(input.appState),
           });
         }
+      } catch {
+        captureAudioFailed({ failureClass: "interruption_handling_failed" });
+      }
 
+      return handleTimerTickInternal(input);
+    },
+
+    async handleAudioInterruption(input) {
+      try {
+        if (input.type === "began") {
+          return await pauseForInterruption(input);
+        }
+
+        if (input.shouldResume) {
+          return await resumeAfterInterruption(input);
+        }
+
+        setLifecycleOutcome({
+          outcome: "stopped",
+          reason: "system-interruption",
+        });
+        return await stopInternal({
+          appState: input.appState,
+          nowMs: input.nowMs,
+          reason: "interrupted",
+          terminalStatus: "stopped",
+        });
+      } catch {
+        captureAudioFailed({ failureClass: "interruption_handling_failed" });
         return getSnapshot(input.nowMs);
+      }
+    },
+
+    async handleAudioOutputChange(input) {
+      try {
+        if (status !== "playing" && status !== "fading" && status !== "interrupted") {
+          return getSnapshot(input.nowMs);
+        }
+
+        setLifecycleOutcome({
+          outcome: "stopped",
+          reason: "audio-output-change",
+        });
+        return await stopInternal({
+          appState: input.appState,
+          nowMs: input.nowMs,
+          reason: "interrupted",
+          terminalStatus: "stopped",
+        });
       } catch {
         captureAudioFailed({ failureClass: "interruption_handling_failed" });
         return getSnapshot(input.nowMs);
@@ -366,27 +616,7 @@ export function createSoundMixerPlaybackController({
     },
 
     async handleTimerTick(input) {
-      if (status !== "playing" && status !== "fading") {
-        return getSnapshot(input.nowMs);
-      }
-
-      const remainingSeconds = getRemainingSeconds(input.nowMs);
-
-      if (remainingSeconds === 0) {
-        return stopInternal({
-          appState: input.appState,
-          nowMs: input.nowMs,
-          reason: "timer-ended",
-          terminalStatus: "completed",
-        });
-      }
-
-      status =
-        remainingSeconds !== null && remainingSeconds <= fadeOutDurationSeconds
-          ? "fading"
-          : "playing";
-      applyCurrentVolumes(input.nowMs);
-      return getSnapshot(input.nowMs);
+      return handleTimerTickInternal(input);
     },
 
     release() {
@@ -418,6 +648,7 @@ export function createSoundMixerPlaybackController({
       mixTitle = input.mixTitle ?? "Sleep mix";
       playbackStartedAtMs = input.nowMs;
       stopReason = undefined;
+      clearLifecycleOutcome();
       timerDurationSeconds = input.timerDurationSeconds;
 
       const playableLayers = activeLayers.filter(

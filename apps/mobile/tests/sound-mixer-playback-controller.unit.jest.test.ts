@@ -19,12 +19,14 @@ import {
   createSoundMixerPlaybackController,
   type SoundMixerPlaybackFailureContext,
 } from "../src/audio/sound-mixer-playback-controller";
+import type { SleepTimerAppState } from "../src/audio/sleep-timer-power-management";
 
 type MockAudioPlayer = {
   clearLockScreenControls: jest.Mock;
   loop: boolean;
   pause: jest.Mock;
   play: jest.Mock;
+  playing: boolean;
   remove: jest.Mock;
   seekTo: jest.Mock;
   setActiveForLockScreen: jest.Mock;
@@ -48,16 +50,23 @@ const mockCaptureAnalyticsEventDeferred = captureAnalyticsEventDeferred as jest.
 >;
 
 function createMockPlayer(): MockAudioPlayer {
-  return {
+  const player = {
     clearLockScreenControls: jest.fn(),
     loop: false,
-    pause: jest.fn(),
-    play: jest.fn(),
+    pause: jest.fn(() => {
+      player.playing = false;
+    }),
+    play: jest.fn(() => {
+      player.playing = true;
+    }),
+    playing: false,
     remove: jest.fn(),
     seekTo: jest.fn(() => Promise.resolve()),
     setActiveForLockScreen: jest.fn(),
     volume: 1,
   };
+
+  return player;
 }
 
 function createMockPowerController() {
@@ -69,13 +78,14 @@ function createMockPowerController() {
         status: "playing" as const,
       }),
     ),
-    endTimerPlayback: jest.fn((input: { readonly appState: "active"; readonly reason: string }) =>
-      Promise.resolve({
-        appState: input.appState,
-        powerLockHeld: false,
-        status: "ended" as const,
-        stopReason: input.reason,
-      }),
+    endTimerPlayback: jest.fn(
+      (input: { readonly appState: SleepTimerAppState; readonly reason: string }) =>
+        Promise.resolve({
+          appState: input.appState,
+          powerLockHeld: false,
+          status: "ended" as const,
+          stopReason: input.reason,
+        }),
     ),
     getSnapshot: jest.fn(() => ({
       appState: "active" as const,
@@ -318,5 +328,190 @@ describe("Sound Mixer playback controller", () => {
       reason: "timer-ended",
     });
     expect(mockSetIsAudioActiveAsync).toHaveBeenCalledWith(false);
+  });
+
+  it("keeps background and locked playback active while applying timer fade by wall clock", async () => {
+    const playersBySource = new Map<number, MockAudioPlayer>();
+    const powerController = createMockPowerController();
+    mockCreateAudioPlayer.mockImplementation((source: number) => {
+      const player = createMockPlayer();
+      playersBySource.set(source, player);
+      return player;
+    });
+    const controller = createSoundMixerPlaybackController({
+      adapter: mockAudioAdapter,
+      assetSources,
+      powerController,
+    });
+
+    await controller.start({
+      activeLayers: [
+        { soundId: "light-rain", volume: 72 },
+        { soundId: "brown-noise", volume: 58 },
+      ],
+      appState: "active",
+      nowMs: 0,
+      timerDurationSeconds: 1_800,
+    });
+
+    mockSetIsAudioActiveAsync.mockClear();
+
+    const lockedFade = await controller.handleAppStateChange({
+      appState: "locked",
+      nowMs: 1_740_000,
+    });
+
+    expect(lockedFade).toEqual(
+      expect.objectContaining({
+        fadeProgress: 0.5,
+        lastLifecycleOutcome: "continued",
+        lastLifecycleReason: "lock-screen",
+        remainingSeconds: 60,
+        status: "fading",
+      }),
+    );
+    expect(playersBySource.get(201)?.volume).toBeCloseTo(0.36, 2);
+    expect(playersBySource.get(202)?.volume).toBeCloseTo(0.29, 2);
+    expect(mockSetIsAudioActiveAsync).not.toHaveBeenCalledWith(false);
+    expect(powerController.endTimerPlayback).not.toHaveBeenCalled();
+
+    const ended = await controller.handleTimerTick({
+      appState: "background",
+      nowMs: 1_800_000,
+    });
+
+    expect(ended).toEqual(
+      expect.objectContaining({
+        lastLifecycleOutcome: "faded",
+        lastLifecycleReason: "app-backgrounded",
+        playingLayerCount: 0,
+        status: "completed",
+        stopReason: "timer-ended",
+      }),
+    );
+    expect(powerController.endTimerPlayback).toHaveBeenCalledWith({
+      appState: "background",
+      reason: "timer-ended",
+    });
+    expect(mockSetIsAudioActiveAsync).toHaveBeenCalledWith(false);
+  });
+
+  it("classifies a system interruption as stopped, then resumes without recreating players", async () => {
+    const playersBySource = new Map<number, MockAudioPlayer>();
+    const powerController = createMockPowerController();
+    mockCreateAudioPlayer.mockImplementation((source: number) => {
+      const player = createMockPlayer();
+      playersBySource.set(source, player);
+      return player;
+    });
+    const controller = createSoundMixerPlaybackController({
+      adapter: mockAudioAdapter,
+      assetSources,
+      powerController,
+    });
+
+    await controller.start({
+      activeLayers: [
+        { soundId: "light-rain", volume: 72 },
+        { soundId: "brown-noise", volume: 58 },
+      ],
+      appState: "active",
+      nowMs: 0,
+      timerDurationSeconds: 1_800,
+    });
+
+    const interrupted = await controller.handleAudioInterruption({
+      appState: "background",
+      nowMs: 15_000,
+      type: "began",
+    });
+
+    expect(interrupted).toEqual(
+      expect.objectContaining({
+        lastLifecycleOutcome: "stopped",
+        lastLifecycleReason: "system-interruption",
+        playingLayerCount: 0,
+        status: "interrupted",
+        stopReason: "interrupted",
+      }),
+    );
+    expect(playersBySource.get(201)?.pause).toHaveBeenCalledTimes(1);
+    expect(playersBySource.get(202)?.pause).toHaveBeenCalledTimes(1);
+    expect(mockSetIsAudioActiveAsync).toHaveBeenCalledWith(false);
+    expect(powerController.endTimerPlayback).toHaveBeenCalledWith({
+      appState: "background",
+      reason: "interrupted",
+    });
+
+    const resumed = await controller.handleAudioInterruption({
+      appState: "active",
+      nowMs: 16_000,
+      shouldResume: true,
+      type: "ended",
+    });
+
+    expect(resumed).toEqual(
+      expect.objectContaining({
+        lastLifecycleOutcome: "resumed",
+        lastLifecycleReason: "system-interruption",
+        status: "playing",
+      }),
+    );
+    expect(mockCreateAudioPlayer).toHaveBeenCalledTimes(2);
+    expect(playersBySource.get(201)?.play).toHaveBeenCalledTimes(2);
+    expect(playersBySource.get(202)?.play).toHaveBeenCalledTimes(2);
+    expect(powerController.beginTimerPlayback).toHaveBeenCalledTimes(2);
+    expect(mockSetIsAudioActiveAsync).toHaveBeenLastCalledWith(true);
+  });
+
+  it("stops and cleans up lock-screen controls when the audio output changes", async () => {
+    const playersBySource = new Map<number, MockAudioPlayer>();
+    const powerController = createMockPowerController();
+    mockCreateAudioPlayer.mockImplementation((source: number) => {
+      const player = createMockPlayer();
+      playersBySource.set(source, player);
+      return player;
+    });
+    const controller = createSoundMixerPlaybackController({
+      adapter: mockAudioAdapter,
+      assetSources,
+      powerController,
+    });
+
+    await controller.start({
+      activeLayers: [
+        { soundId: "light-rain", volume: 72 },
+        { soundId: "brown-noise", volume: 58 },
+      ],
+      appState: "active",
+      nowMs: 0,
+      timerDurationSeconds: 1_800,
+    });
+
+    const stopped = await controller.handleAudioOutputChange({
+      appState: "active",
+      nowMs: 30_000,
+    });
+
+    expect(stopped).toEqual(
+      expect.objectContaining({
+        lastLifecycleOutcome: "stopped",
+        lastLifecycleReason: "audio-output-change",
+        playingLayerCount: 0,
+        status: "stopped",
+        stopReason: "interrupted",
+      }),
+    );
+    expect(playersBySource.get(201)?.clearLockScreenControls).toHaveBeenCalledTimes(1);
+    expect(playersBySource.get(202)?.clearLockScreenControls).toHaveBeenCalledTimes(1);
+    expect(playersBySource.get(201)?.remove).toHaveBeenCalledTimes(1);
+    expect(playersBySource.get(202)?.remove).toHaveBeenCalledTimes(1);
+    expect(powerController.endTimerPlayback).toHaveBeenCalledWith({
+      appState: "active",
+      reason: "interrupted",
+    });
+    expect(JSON.stringify(mockCaptureAnalyticsEventDeferred.mock.calls)).not.toMatch(
+      /private|Containers|\.m4a|https?:\/\/|bluetooth|headphone/i,
+    );
   });
 });

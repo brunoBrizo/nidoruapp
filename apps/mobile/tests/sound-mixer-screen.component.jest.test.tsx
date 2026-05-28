@@ -802,6 +802,16 @@ describe("SoundMixerAnchorScreen", () => {
     expect(screen.getByRole("button", { name: "Pause sound" })).toBeTruthy();
   });
 
+  it("returns from the audio interruption state to the mixer when the user keeps audio stopped", () => {
+    render(<SoundMixerScreen initialPlaybackMode="interrupted" />);
+
+    fireEvent.press(screen.getByRole("button", { name: "Keep stopped" }));
+
+    expect(screen.queryByTestId("sound-mixer-dark-playback-interrupted")).toBeNull();
+    expect(screen.getByTestId("sound-mixer-screen")).toBeTruthy();
+    expect(screen.getByText("Layer sounds for tonight.")).toBeTruthy();
+  });
+
   it("matches the Save Mix sheet layout classes and touch-target requirements", () => {
     render(<SoundMixerAnchorScreen />);
 

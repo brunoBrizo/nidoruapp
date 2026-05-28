@@ -1,5 +1,9 @@
-import { SoundMixerScreen } from "../../../sleep/sound-mixer-screen";
+import { useLocalSearchParams } from "expo-router";
+
+import { SoundMixerScreen, parseSoundMixerUIVariant } from "../../../sleep/sound-mixer-screen";
 
 export default function SoundMixerAnchorScreen() {
-  return <SoundMixerScreen />;
+  const params = useLocalSearchParams<{ uiVariant?: string | string[] }>();
+
+  return <SoundMixerScreen uiVariant={parseSoundMixerUIVariant(params.uiVariant)} />;
 }

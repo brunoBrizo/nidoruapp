@@ -21,7 +21,7 @@ import {
   Waves,
   Wind,
 } from "lucide-react-native";
-import { useState, type ElementType } from "react";
+import { useEffect, useState, type ElementType } from "react";
 import { Modal } from "react-native";
 import Svg, { Circle, Line, Rect } from "react-native-svg";
 import { useRouter } from "expo-router";
@@ -66,6 +66,27 @@ export type SoundMixerUIVariant =
   | "empty-saved-mixes"
   | "full-saved-mixes"
   | "full-save-mix-sheet";
+
+export const soundMixerUIVariants = [
+  "default",
+  "volume-editing",
+  "empty-mixer",
+  "empty-saved-mixes",
+  "full-saved-mixes",
+  "full-save-mix-sheet",
+] as const satisfies readonly SoundMixerUIVariant[];
+
+const soundMixerUIVariantSet = new Set<string>(soundMixerUIVariants);
+
+export function parseSoundMixerUIVariant(
+  value: string | readonly string[] | undefined,
+): SoundMixerUIVariant {
+  const requestedVariant = Array.isArray(value) ? value[0] : value;
+
+  return requestedVariant && soundMixerUIVariantSet.has(requestedVariant)
+    ? (requestedVariant as SoundMixerUIVariant)
+    : "default";
+}
 
 type MixerState = {
   readonly activeSounds: readonly SoundCard[];
@@ -227,6 +248,10 @@ export function SoundMixerScreen({
   const [playbackMode, setPlaybackMode] = useState<PlaybackMode>(initialPlaybackMode);
   const activeLayerLabel = formatActiveLayerCount(mixerState.activeSounds.length);
   const hasActiveSounds = mixerState.activeSounds.length > 0;
+
+  useEffect(() => {
+    setIsSaveMixSheetOpen(isFullSaveMixSheet);
+  }, [isFullSaveMixSheet]);
 
   if (playbackMode !== "mixer") {
     return (
@@ -1102,6 +1127,7 @@ function ReplacementMixSelector({ savedMixes }: { readonly savedMixes: readonly 
           <Pressable
             accessibilityLabel={`Replace ${mix.label} saved mix`}
             accessibilityRole="button"
+            accessibilityState={{ selected: index === 0 }}
             className={cn(
               "min-h-10 flex-row items-center justify-between rounded-[12px] border px-3 py-2 active:scale-[0.98]",
               index === 0

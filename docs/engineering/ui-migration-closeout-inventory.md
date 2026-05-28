@@ -18,7 +18,7 @@ ClickUp task: `06.UI.15 Final UI migration cleanup, dead-code removal, and pixel
 | `docs/design/screens/home/home.html`, `home-1.png`, `home-2.png` | `apps/mobile/src/home/home-screen.tsx`, `apps/mobile/src/app/(tabs)/index.tsx` | Migrated Tailwind surface. The ClickUp task names `home.png`, but the repo currently contains `home-1.png` and `home-2.png`, not `home.png`. |
 | Home-derived global tab menu in `home.html` | `apps/mobile/src/navigation/app-tab-bar.tsx`, `apps/mobile/src/design-system/global-tab-bar.tsx`, `apps/mobile/src/app/(tabs)/_layout.tsx` | Migrated shared shell. Home, Sleep, Breathe, Progress, and Profile all route through the same `AppTabBar` / `GlobalTabBarSurface` implementation. |
 | `docs/design/screens/sleep/sleep.html`, `sleep.png` | `apps/mobile/src/sleep/sleep-screen.tsx`, `apps/mobile/src/app/(tabs)/sleep.tsx` | Migrated Tailwind surface using the Home-derived shared tab shell. |
-| `docs/design/screens/sleep/README.md`, `sound-mixer-main.html`, `sound-mixer-main.png`, `sound-mixer-save-mix.html`, `sound-mixer-save-mix.png`, `sound-mixer-dark.html`, `sound-mixer-dark.png` | `apps/mobile/src/app/(tabs)/sleep/sounds.tsx` | Accepted Feature 06 Sound Mixer source contract is frozen; route implementation remains pending. |
+| `docs/design/screens/sleep/README.md`, `sound-mixer-main.html`, `sound-mixer-main.png`, `sound-mixer-save-mix.html`, `sound-mixer-save-mix.png`, `sound-mixer-dark.html`, `sound-mixer-dark.png` | `apps/mobile/src/app/(tabs)/sleep/sounds.tsx` | Sound Mixer route implementation and 06.UI.05 simulator proof are captured in `docs/engineering/sound-mixer-ui-closeout-proof.md`. |
 | `docs/design/screens/breath/breathe.html`, `breathe.png` | `apps/mobile/src/app/(tabs)/breathe.tsx` | Migrated Tailwind surface using the Home-derived shared tab shell. |
 | `docs/design/screens/progress/progress.html`, `progress.png` | `apps/mobile/src/progress/progress-screen.tsx`, `apps/mobile/src/app/(tabs)/progress.tsx` | Migrated Tailwind surface using the Home-derived shared tab shell. |
 | `docs/design/screens/profile/profile.html`, `profile.png` | `apps/mobile/src/profile/profile-screen.tsx`, `apps/mobile/src/app/(tabs)/profile.tsx` | Migrated Tailwind surface using the Home-derived shared tab shell. |
@@ -73,7 +73,7 @@ No accepted main tab handoff is routed through `TabPlaceholderScreen`.
 
 This task should remain `Needs Review` until the following are resolved:
 
-- ClickUp prerequisites were not all complete at audit time: `06.UI.05` was `to do`, and `06.UI.00`, `06.UI.03`, `06.UI.04`, `06.UI.12`, `06.UI.13`, and `06.UI.14` were still `needs review`.
+- ClickUp prerequisites were not all complete at audit time: `06.UI.00`, `06.UI.03`, `06.UI.04`, `06.UI.12`, `06.UI.13`, and `06.UI.14` were still `needs review`; `06.UI.05` now has local simulator closeout proof.
 - Partial simulator screenshots were captured for the five tabbed screens and stored under `docs/engineering/ui-migration-closeout-screenshots/`. They prove the same Home-derived tab shell is used on Home, Sleep, Breathe, Progress, and Profile.
 - The required full simulator screenshot set has not been captured in this pass for onboarding, personalized plan, first session, notification gate, paywall, Rescue Me, Wind-Down, and 06.UI.14-classified surfaces.
 - The task references `docs/design/screens/home/home.png`, but the current repo does not contain that file; it contains `home-1.png`, `home-2.png`, and `home.html`.

@@ -7,6 +7,9 @@ import SoundMixerAnchorScreen from "../src/app/(tabs)/sleep/sounds";
 import { SoundMixerScreen } from "../src/sleep/sound-mixer-screen";
 
 const mockRouterBack = jest.fn();
+const mockUseLocalSearchParams = jest.fn<() => Record<string, string | string[] | undefined>>(
+  () => ({}),
+);
 
 jest.mock("expo-router", () => {
   const React = jest.requireActual<typeof import("react")>("react");
@@ -25,6 +28,7 @@ jest.mock("expo-router", () => {
 
   return {
     Link,
+    useLocalSearchParams: () => mockUseLocalSearchParams(),
     useRouter: () => ({ back: mockRouterBack }),
   };
 });
@@ -42,6 +46,8 @@ jest.mock("react-native-css", () => {
 describe("SoundMixerAnchorScreen", () => {
   beforeEach(() => {
     mockRouterBack.mockClear();
+    mockUseLocalSearchParams.mockReset();
+    mockUseLocalSearchParams.mockReturnValue({});
   });
 
   it("renders the accepted Sound Mixer main handoff content", () => {
@@ -95,6 +101,29 @@ describe("SoundMixerAnchorScreen", () => {
       "accessibilityHint",
       "Opens the Save Mix sheet.",
     );
+  });
+
+  it("renders route-addressed proof variants through the validated uiVariant param", () => {
+    mockUseLocalSearchParams.mockReturnValue({ uiVariant: ["full-save-mix-sheet"] });
+
+    render(<SoundMixerAnchorScreen />);
+
+    expect(screen.getByRole("header", { name: "Save mix" })).toBeTruthy();
+    expect(screen.getByText("3 of 3 saved")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Replace existing mix" })).toBeTruthy();
+  });
+
+  it("falls back to the default mixer when the proof variant param is unknown", () => {
+    mockUseLocalSearchParams.mockReturnValue({ uiVariant: "unknown-proof-state" });
+
+    render(<SoundMixerAnchorScreen />);
+
+    expect(
+      screen.getByRole("button", { name: "Light Rain active sound at 72% volume" }),
+    ).toBeTruthy();
+    expect(screen.getByText("72%")).toBeTruthy();
+    expect(screen.queryByText("84%")).toBeNull();
+    expect(screen.queryByTestId("sound-mixer-volume-ring-light-rain-knob")).toBeNull();
   });
 
   it("keeps active sounds and fixed controls accessible", () => {
@@ -224,10 +253,35 @@ describe("SoundMixerAnchorScreen", () => {
     expect(screen.getByText("Replace saved mix")).toBeTruthy();
     expect(screen.getByText("Capacity reached")).toBeTruthy();
     expect(screen.getByRole("button", { name: "Replace existing mix" })).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Replace Rain Hearth saved mix" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Replace Rain Hearth saved mix" })).toHaveProp(
+      "accessibilityState",
+      { selected: true },
+    );
     expect(screen.getByRole("button", { name: "Replace Forest Fan saved mix" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Replace Ocean Noise saved mix" })).toBeTruthy();
     expect(screen.getByTestId("sound-mixer-replace-mix-selector")).toBeTruthy();
+  });
+
+  it("opens the full-capacity Save Mix sheet when the proof variant changes after mount", () => {
+    const { rerender } = render(<SoundMixerScreen />);
+
+    expect(screen.queryByRole("header", { name: "Save mix" })).toBeNull();
+
+    rerender(<SoundMixerScreen uiVariant="full-save-mix-sheet" />);
+
+    expect(screen.getByRole("header", { name: "Save mix" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Replace existing mix" })).toBeTruthy();
+  });
+
+  it("closes the full-capacity Save Mix sheet when leaving the proof variant", () => {
+    const { rerender } = render(<SoundMixerScreen uiVariant="full-save-mix-sheet" />);
+
+    expect(screen.getByRole("header", { name: "Save mix" })).toBeTruthy();
+
+    rerender(<SoundMixerScreen uiVariant="default" />);
+
+    expect(screen.queryByRole("header", { name: "Save mix" })).toBeNull();
+    expect(screen.getByTestId("sound-mixer-main-content")).toHaveProp("pointerEvents", "auto");
   });
 
   it("matches the handoff layout classes for the main screen and active strip", () => {
@@ -449,6 +503,9 @@ describe("SoundMixerAnchorScreen", () => {
       /improves sleep|treats anxiety|heals insomnia|proven frequency/i,
     );
     expect(combinedSource).not.toMatch(/expo-audio|supabase|sqlite|fetch\(/i);
+    expect(combinedSource).not.toMatch(
+      /setInterval|requestAnimationFrame|Animated\.loop|withRepeat|useSharedValue/i,
+    );
 
     render(<SoundMixerAnchorScreen />);
     fireEvent.press(screen.getByRole("button", { name: "Save Mix" }));

@@ -1,4 +1,19 @@
 import {
+  activateSoundMixerLayer,
+  clampSoundMixerVolume,
+  createSoundMixerController,
+  deactivateSoundMixerLayer,
+  launchSoundCatalog,
+  setSoundMixerLayerVolume,
+  soundMixerLimits,
+  type LaunchSoundCategoryId,
+  type LaunchSoundId,
+  type SoundMixerActiveLayer,
+  type SoundMixerController,
+  type SoundMixerSavedMix as DomainSoundMixerSavedMix,
+} from "@nidoru/domain";
+import * as Haptics from "expo-haptics";
+import {
   Asterisk,
   ChartNoAxesColumn,
   ChevronLeft,
@@ -21,13 +36,15 @@ import {
   Waves,
   Wind,
 } from "lucide-react-native";
-import { useEffect, useState, type ElementType } from "react";
-import { Modal } from "react-native";
+import { useCallback, useEffect, useMemo, useRef, useState, type ElementType } from "react";
+import { AppState, Modal } from "react-native";
+import { FadeInUp, FadeOutUp, LinearTransition } from "react-native-reanimated";
 import Svg, { Circle, Line, Rect } from "react-native-svg";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 
-import { Pressable, ScrollView, Text, TextInput, View, cn } from "../tw";
+import { useReduceMotionPreference } from "../motion/use-reduce-motion-enabled";
+import { Animated, Pressable, ScrollView, Text, TextInput, View, cn } from "../tw";
 
 type MixerIconProps = {
   readonly color?: string;
@@ -39,21 +56,24 @@ type MixerIconProps = {
 type MixerIcon = ElementType<MixerIconProps>;
 
 type SavedMix = {
+  readonly layers: readonly SoundMixerActiveLayer[];
   readonly id: string;
   readonly label: string;
   readonly icons: readonly MixerIcon[];
+  readonly name: string;
   readonly timerLabel?: string;
+  readonly timerPreference: DomainSoundMixerSavedMix["timerPreference"];
 };
 
 type SoundCard = {
-  readonly id: string;
+  readonly id: LaunchSoundId;
   readonly label: string;
   readonly Icon: MixerIcon;
   readonly volume?: number;
 };
 
 type SoundCategory = {
-  readonly id: string;
+  readonly id: LaunchSoundCategoryId;
   readonly label: string;
   readonly sounds: readonly SoundCard[];
 };
@@ -105,9 +125,35 @@ const colors = {
   text: "#EEF0FF",
 } as const;
 
+const soundMixerVolumeRingHitAreaSize = 96;
+const soundMixerVolumeDragThreshold = 6;
+const soundMixerVolumeStep = 10;
+
 const savedMixes: readonly SavedMix[] = [
-  { id: "rain-hearth", label: "Rain Hearth", icons: [CloudRain, Flame], timerLabel: "30 min" },
-  { id: "forest-fan", label: "Forest Fan", icons: [Leaf, Asterisk], timerLabel: "45 min" },
+  {
+    id: "rain-hearth",
+    label: "Rain Hearth",
+    icons: [CloudRain, Flame],
+    layers: [
+      { soundId: "light-rain", volume: 72 },
+      { soundId: "fireplace-crackling", volume: 34 },
+    ],
+    name: "Rain Hearth",
+    timerLabel: "30 min",
+    timerPreference: 30,
+  },
+  {
+    id: "forest-fan",
+    label: "Forest Fan",
+    icons: [Leaf, Asterisk],
+    layers: [
+      { soundId: "forest", volume: 70 },
+      { soundId: "fan", volume: 52 },
+    ],
+    name: "Forest Fan",
+    timerLabel: "45 min",
+    timerPreference: 45,
+  },
 ] as const;
 
 const fullSavedMixes: readonly SavedMix[] = [
@@ -116,7 +162,13 @@ const fullSavedMixes: readonly SavedMix[] = [
     id: "ocean-noise",
     label: "Ocean Noise",
     icons: [Waves, ChartNoAxesColumn],
+    layers: [
+      { soundId: "ocean-waves", volume: 70 },
+      { soundId: "brown-noise", volume: 58 },
+    ],
+    name: "Ocean Noise",
     timerLabel: "60 min",
+    timerPreference: 60,
   },
 ] as const;
 
@@ -125,7 +177,7 @@ const soundCategories: readonly SoundCategory[] = [
     id: "rain",
     label: "Rain",
     sounds: [
-      { id: "light-rain", label: "Light Rain", Icon: CloudRain, volume: 72 },
+      { id: "light-rain", label: "Light Rain", Icon: CloudRain },
       { id: "heavy-rain", label: "Heavy Rain", Icon: Cloud },
       { id: "rain-on-window", label: "Rain on Window", Icon: AppWindowIcon },
       { id: "thunderstorm", label: "Thunderstorm", Icon: CloudLightning },
@@ -146,7 +198,7 @@ const soundCategories: readonly SoundCategory[] = [
     label: "Noise",
     sounds: [
       { id: "white-noise", label: "White Noise", Icon: Radio },
-      { id: "brown-noise", label: "Brown Noise", Icon: ChartNoAxesColumn, volume: 58 },
+      { id: "brown-noise", label: "Brown Noise", Icon: ChartNoAxesColumn },
       { id: "pink-noise", label: "Pink Noise", Icon: Disc3 },
     ],
   },
@@ -154,7 +206,7 @@ const soundCategories: readonly SoundCategory[] = [
     id: "environment",
     label: "Environment",
     sounds: [
-      { id: "fireplace-crackling", label: "Fireplace Crackling", Icon: Flame, volume: 34 },
+      { id: "fireplace-crackling", label: "Fireplace Crackling", Icon: Flame },
       { id: "cafe-ambience", label: "Cafe Ambience", Icon: Coffee },
       { id: "fan", label: "Fan", Icon: Asterisk },
     ],
@@ -169,14 +221,15 @@ const soundCategories: readonly SoundCategory[] = [
   },
 ] as const;
 
-const activeSounds = soundCategories
-  .flatMap((category) => category.sounds)
-  .filter((sound) => sound.volume !== undefined);
-
 const timerOptions = ["20", "30", "45", "60", "∞"] as const;
 
-function getMixerState(variant: SoundMixerUIVariant): MixerState {
-  const volumesByVariant: Record<SoundMixerUIVariant, Readonly<Partial<Record<string, number>>>> = {
+function getInitialActiveLayersForVariant(
+  variant: SoundMixerUIVariant,
+): readonly SoundMixerActiveLayer[] {
+  const volumesByVariant: Record<
+    SoundMixerUIVariant,
+    Readonly<Partial<Record<LaunchSoundId, number>>>
+  > = {
     default: {
       "brown-noise": 58,
       "fireplace-crackling": 34,
@@ -203,11 +256,59 @@ function getMixerState(variant: SoundMixerUIVariant): MixerState {
       "light-rain": 84,
     },
   };
+
+  return launchSoundCatalog
+    .map((sound): SoundMixerActiveLayer | null => {
+      const volume = volumesByVariant[variant][sound.id];
+
+      return volume === undefined ? null : { soundId: sound.id, volume };
+    })
+    .filter((layer): layer is SoundMixerActiveLayer => layer !== null);
+}
+
+function getSavedMixesForVariant(variant: SoundMixerUIVariant): readonly SavedMix[] {
+  if (variant === "empty-saved-mixes") {
+    return [];
+  }
+
+  return variant === "full-saved-mixes" || variant === "full-save-mix-sheet"
+    ? fullSavedMixes
+    : savedMixes;
+}
+
+function getInitialEditingSoundId(variant: SoundMixerUIVariant): LaunchSoundId | undefined {
+  return variant === "volume-editing" ? "light-rain" : undefined;
+}
+
+function createInitialSoundMixerController(variant: SoundMixerUIVariant): SoundMixerController {
+  const activeLayers = getInitialActiveLayersForVariant(variant);
+
+  return createSoundMixerController({
+    activeLayers,
+    savedMixes: getSavedMixesForVariant(variant),
+    state: activeLayers.length === 0 ? "idle-dark" : "playing",
+  });
+}
+
+function getMixerState({
+  controller,
+  editingSoundId,
+  savedMixes,
+  variant,
+}: {
+  readonly controller: SoundMixerController;
+  readonly editingSoundId?: LaunchSoundId;
+  readonly savedMixes: readonly SavedMix[];
+  readonly variant: SoundMixerUIVariant;
+}): MixerState {
+  const volumesBySoundId = new Map(
+    controller.activeLayers.map((layer) => [layer.soundId, layer.volume] as const),
+  );
   const soundCategoriesForVariant: readonly SoundCategory[] = soundCategories.map((category) => ({
     id: category.id,
     label: category.label,
     sounds: category.sounds.map((sound): SoundCard => {
-      const volume = volumesByVariant[variant][sound.id];
+      const volume = volumesBySoundId.get(sound.id);
       const baseSound = { Icon: sound.Icon, id: sound.id, label: sound.label };
 
       return volume === undefined ? baseSound : { ...baseSound, volume };
@@ -219,39 +320,234 @@ function getMixerState(variant: SoundMixerUIVariant): MixerState {
       .flatMap((category) => category.sounds)
       .filter((sound) => sound.volume !== undefined),
     isSavedMixesExpanded: variant === "full-saved-mixes",
-    savedMixes:
-      variant === "full-saved-mixes" || variant === "full-save-mix-sheet"
-        ? fullSavedMixes
-        : savedMixes,
-    showEmptySavedMixes: variant === "empty-saved-mixes",
+    savedMixes,
+    showEmptySavedMixes: savedMixes.length === 0,
     soundCategories: soundCategoriesForVariant,
   };
 
-  return variant === "volume-editing" ? { ...state, editingSoundId: "light-rain" } : state;
+  return editingSoundId === undefined ? state : { ...state, editingSoundId };
 }
 
 function formatActiveLayerCount(count: number) {
   return `${count} active ${count === 1 ? "layer" : "layers"}`;
 }
 
+export function getSoundMixerActiveStripMotionConfig(reduceMotionEnabled: boolean) {
+  return reduceMotionEnabled
+    ? {
+        enabled: false,
+        enterDurationMs: 0,
+        enterTranslateY: 0,
+        exitDurationMs: 0,
+        exitTranslateY: 0,
+      }
+    : {
+        enabled: true,
+        enterDurationMs: 200,
+        enterTranslateY: 12,
+        exitDurationMs: 150,
+        exitTranslateY: -8,
+      };
+}
+
+export function calculateSoundMixerVolumeFromPoint({
+  size = soundMixerVolumeRingHitAreaSize,
+  x,
+  y,
+}: {
+  readonly size?: number;
+  readonly x: number;
+  readonly y: number;
+}) {
+  const center = size / 2;
+  const angleFromTop = Math.atan2(y - center, x - center) + Math.PI / 2;
+  const normalizedAngle = (angleFromTop + Math.PI * 2) % (Math.PI * 2);
+
+  return clampSoundMixerVolume(Math.round((normalizedAngle / (Math.PI * 2)) * 100));
+}
+
+function getSoundMixerVolumeDetent(volume: number) {
+  return Math.floor(clampSoundMixerVolume(volume) / soundMixerVolumeStep);
+}
+
 export function SoundMixerScreen({
+  disableHaptics = false,
   initialPlaybackMode = "mixer",
+  reduceMotionOverride,
   uiVariant = "default",
 }: {
+  readonly disableHaptics?: boolean;
   readonly initialPlaybackMode?: PlaybackMode;
+  readonly reduceMotionOverride?: boolean;
   readonly uiVariant?: SoundMixerUIVariant;
 } = {}) {
   const router = useRouter();
-  const mixerState = getMixerState(uiVariant);
+  const reduceMotionPreference = useReduceMotionPreference();
+  const reduceMotionEnabled =
+    reduceMotionOverride ??
+    (!reduceMotionPreference.isResolved || reduceMotionPreference.reduceMotionEnabled);
+  const activeStripMotionConfig = getSoundMixerActiveStripMotionConfig(reduceMotionEnabled);
+  const appStateRef = useRef(AppState.currentState);
+  const savedMixCatalog = getSavedMixesForVariant(uiVariant);
+  const [controller, setController] = useState(() => createInitialSoundMixerController(uiVariant));
+  const [editingSoundId, setEditingSoundId] = useState<LaunchSoundId | undefined>(() =>
+    getInitialEditingSoundId(uiVariant),
+  );
+  const [maxLayerSoundId, setMaxLayerSoundId] = useState<LaunchSoundId | undefined>();
   const isFullSaveMixSheet = uiVariant === "full-save-mix-sheet";
   const [isSaveMixSheetOpen, setIsSaveMixSheetOpen] = useState(isFullSaveMixSheet);
   const [playbackMode, setPlaybackMode] = useState<PlaybackMode>(initialPlaybackMode);
+  const mixerState = useMemo(
+    () =>
+      getMixerState({
+        controller,
+        savedMixes: savedMixCatalog,
+        variant: uiVariant,
+        ...(editingSoundId === undefined ? {} : { editingSoundId }),
+      }),
+    [controller, editingSoundId, savedMixCatalog, uiVariant],
+  );
   const activeLayerLabel = formatActiveLayerCount(mixerState.activeSounds.length);
   const hasActiveSounds = mixerState.activeSounds.length > 0;
+  const showMaxLayerNotice = maxLayerSoundId !== undefined;
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (nextAppState) => {
+      appStateRef.current = nextAppState;
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
 
   useEffect(() => {
     setIsSaveMixSheetOpen(isFullSaveMixSheet);
   }, [isFullSaveMixSheet]);
+
+  useEffect(() => {
+    setController(createInitialSoundMixerController(uiVariant));
+    setEditingSoundId(getInitialEditingSoundId(uiVariant));
+    setMaxLayerSoundId(undefined);
+  }, [uiVariant]);
+
+  const triggerSelectionHaptic = useCallback(() => {
+    if (
+      disableHaptics ||
+      appStateRef.current === "background" ||
+      appStateRef.current === "inactive"
+    ) {
+      return;
+    }
+
+    void Haptics.selectionAsync().catch(() => undefined);
+  }, [disableHaptics]);
+
+  const triggerVolumeDetentHaptic = useCallback(
+    (previousVolume: number, nextVolume: number) => {
+      if (getSoundMixerVolumeDetent(previousVolume) !== getSoundMixerVolumeDetent(nextVolume)) {
+        triggerSelectionHaptic();
+      }
+    },
+    [triggerSelectionHaptic],
+  );
+
+  const updateLayerVolume = useCallback(
+    (soundId: LaunchSoundId, volume: number) => {
+      setController((currentController) => {
+        const previousVolume = currentController.activeLayers.find(
+          (layer) => layer.soundId === soundId,
+        )?.volume;
+
+        if (previousVolume === undefined) {
+          return currentController;
+        }
+
+        const nextVolume = clampSoundMixerVolume(volume);
+
+        if (previousVolume === nextVolume) {
+          return currentController;
+        }
+
+        triggerVolumeDetentHaptic(previousVolume, nextVolume);
+        return setSoundMixerLayerVolume(currentController, soundId, nextVolume);
+      });
+      setEditingSoundId(soundId);
+      setMaxLayerSoundId(undefined);
+    },
+    [triggerVolumeDetentHaptic],
+  );
+
+  const adjustLayerVolume = useCallback(
+    (soundId: LaunchSoundId, delta: number) => {
+      setController((currentController) => {
+        const previousVolume = currentController.activeLayers.find(
+          (layer) => layer.soundId === soundId,
+        )?.volume;
+
+        if (previousVolume === undefined) {
+          return currentController;
+        }
+
+        const nextVolume = clampSoundMixerVolume(previousVolume + delta);
+
+        if (previousVolume === nextVolume) {
+          return currentController;
+        }
+
+        triggerVolumeDetentHaptic(previousVolume, nextVolume);
+        return setSoundMixerLayerVolume(currentController, soundId, nextVolume);
+      });
+      setEditingSoundId(soundId);
+      setMaxLayerSoundId(undefined);
+    },
+    [triggerVolumeDetentHaptic],
+  );
+
+  const handleSoundCardPress = useCallback(
+    (sound: SoundCard) => {
+      setController((currentController) => {
+        const isActive = currentController.activeLayers.some((layer) => layer.soundId === sound.id);
+
+        if (isActive) {
+          setEditingSoundId((currentEditingSoundId) =>
+            currentEditingSoundId === sound.id ? undefined : currentEditingSoundId,
+          );
+          setMaxLayerSoundId(undefined);
+          triggerSelectionHaptic();
+          return deactivateSoundMixerLayer(currentController, sound.id);
+        }
+
+        if (currentController.activeLayers.length >= soundMixerLimits.maxActiveLayers) {
+          setMaxLayerSoundId(sound.id);
+          return currentController;
+        }
+
+        setEditingSoundId(undefined);
+        setMaxLayerSoundId(undefined);
+        triggerSelectionHaptic();
+        return activateSoundMixerLayer(currentController, sound.id);
+      });
+    },
+    [triggerSelectionHaptic],
+  );
+
+  const handleSavedMixPress = useCallback(
+    (mix: SavedMix) => {
+      setController((currentController) =>
+        createSoundMixerController({
+          ...currentController,
+          activeLayers: mix.layers,
+          state: mix.layers.length === 0 ? "idle-dark" : "playing",
+          timerPreference: mix.timerPreference,
+        }),
+      );
+      setEditingSoundId(undefined);
+      setMaxLayerSoundId(undefined);
+      triggerSelectionHaptic();
+    },
+    [triggerSelectionHaptic],
+  );
 
   if (playbackMode !== "mixer") {
     return (
@@ -263,6 +559,7 @@ export function SoundMixerScreen({
         visible
       >
         <SoundMixerPlaybackScreen
+          activeSounds={mixerState.activeSounds}
           mode={playbackMode}
           onReturnToMixer={() => {
             setPlaybackMode("mixer");
@@ -342,7 +639,7 @@ export function SoundMixerScreen({
             </Text>
           </View>
 
-          <SavedMixesSection state={mixerState} />
+          <SavedMixesSection onSavedMixPress={handleSavedMixPress} state={mixerState} />
 
           <View className="mt-4 px-nidoru-screen">
             <View
@@ -392,6 +689,19 @@ export function SoundMixerScreen({
                     <SoundCardButton
                       isEditing={mixerState.editingSoundId === sound.id}
                       key={sound.id}
+                      onPress={() => {
+                        handleSoundCardPress(sound);
+                      }}
+                      onVolumeAdjust={(delta) => {
+                        adjustLayerVolume(sound.id, delta);
+                      }}
+                      onVolumeChange={(volume) => {
+                        updateLayerVolume(sound.id, volume);
+                      }}
+                      onVolumeEditingStart={() => {
+                        setEditingSoundId(sound.id);
+                        setMaxLayerSoundId(undefined);
+                      }}
                       sound={sound}
                     />
                   ))}
@@ -427,10 +737,26 @@ export function SoundMixerScreen({
             </View>
             <View className="flex-row gap-1.5" testID="sound-mixer-active-icons">
               {mixerState.activeSounds.map((sound) => (
-                <ActiveMiniIcon key={sound.id} sound={sound} />
+                <ActiveMiniIcon
+                  key={sound.id}
+                  motionConfig={activeStripMotionConfig}
+                  sound={sound}
+                />
               ))}
             </View>
           </Pressable>
+
+          {showMaxLayerNotice ? (
+            <View
+              accessibilityLiveRegion="polite"
+              className="-mt-1 rounded-[12px] border border-[#2D3359]/60 bg-[#0D0F1A] px-3 py-2"
+              testID="sound-mixer-max-layer-notice"
+            >
+              <Text className="font-nidoru-primary-regular text-xs leading-4 tracking-wide text-[#A89CE0]">
+                3 layers max. Remove one to add another.
+              </Text>
+            </View>
+          ) : null}
 
           <View className="h-11 flex-row gap-3">
             <View
@@ -511,12 +837,14 @@ export function SoundMixerScreen({
 }
 
 function SoundMixerPlaybackScreen({
+  activeSounds,
   mode,
   onReturnToMixer,
   onResumeSound,
   onShowIdle,
   onWake,
 }: {
+  readonly activeSounds: readonly SoundCard[];
   readonly mode: Exclude<PlaybackMode, "mixer">;
   readonly onReturnToMixer: () => void;
   readonly onResumeSound: () => void;
@@ -524,12 +852,13 @@ function SoundMixerPlaybackScreen({
   readonly onWake: () => void;
 }) {
   if (mode === "idle") {
-    return <SoundMixerIdlePlaybackScreen onWake={onWake} />;
+    return <SoundMixerIdlePlaybackScreen activeSounds={activeSounds} onWake={onWake} />;
   }
 
   if (mode === "interrupted") {
     return (
       <SoundMixerInterruptedPlaybackScreen
+        activeSounds={activeSounds}
         onKeepStopped={onReturnToMixer}
         onResumeSound={onResumeSound}
       />
@@ -650,9 +979,11 @@ function SoundMixerPlaybackScreen({
 }
 
 function SoundMixerInterruptedPlaybackScreen({
+  activeSounds,
   onKeepStopped,
   onResumeSound,
 }: {
+  readonly activeSounds: readonly SoundCard[];
   readonly onKeepStopped: () => void;
   readonly onResumeSound: () => void;
 }) {
@@ -756,7 +1087,13 @@ function SoundMixerInterruptedPlaybackScreen({
   );
 }
 
-function SoundMixerIdlePlaybackScreen({ onWake }: { readonly onWake: () => void }) {
+function SoundMixerIdlePlaybackScreen({
+  activeSounds,
+  onWake,
+}: {
+  readonly activeSounds: readonly SoundCard[];
+  readonly onWake: () => void;
+}) {
   return (
     <Pressable
       accessibilityLabel="Tap to show controls"
@@ -874,7 +1211,13 @@ function getPlaybackLayerLabel(sound: SoundCard) {
   return sound.label;
 }
 
-function SavedMixesSection({ state }: { readonly state: MixerState }) {
+function SavedMixesSection({
+  onSavedMixPress,
+  state,
+}: {
+  readonly onSavedMixPress?: (mix: SavedMix) => void;
+  readonly state: MixerState;
+}) {
   if (state.isSavedMixesExpanded) {
     return (
       <View className="mt-1 px-nidoru-screen" testID="sound-mixer-saved-mixes-full-section">
@@ -892,7 +1235,13 @@ function SavedMixesSection({ state }: { readonly state: MixerState }) {
         >
           <View className="flex-row flex-wrap gap-2">
             {state.savedMixes.map((mix) => (
-              <SavedMixManagementChip key={mix.id} mix={mix} />
+              <SavedMixManagementChip
+                key={mix.id}
+                mix={mix}
+                onPress={() => {
+                  onSavedMixPress?.(mix);
+                }}
+              />
             ))}
             <Pressable
               accessibilityLabel="Saved mixes full"
@@ -941,7 +1290,13 @@ function SavedMixesSection({ state }: { readonly state: MixerState }) {
         testID="sound-mixer-saved-mixes-row"
       >
         {state.savedMixes.map((mix) => (
-          <SavedMixChip key={mix.id} mix={mix} />
+          <SavedMixChip
+            key={mix.id}
+            mix={mix}
+            onPress={() => {
+              onSavedMixPress?.(mix);
+            }}
+          />
         ))}
         <NewMixChip />
       </ScrollView>
@@ -1151,12 +1506,13 @@ function ReplacementMixSelector({ savedMixes }: { readonly savedMixes: readonly 
   );
 }
 
-function SavedMixChip({ mix }: { readonly mix: SavedMix }) {
+function SavedMixChip({ mix, onPress }: { readonly mix: SavedMix; readonly onPress?: () => void }) {
   return (
     <Pressable
       accessibilityLabel={`${mix.label} saved mix`}
       accessibilityRole="button"
       className="h-10 shrink-0 flex-row items-center gap-2 rounded-[14px] border border-[#1E2236]/60 bg-[#14172B] px-3.5 active:scale-[0.96]"
+      onPress={onPress}
       testID={`sound-mixer-saved-mix-${mix.id}`}
     >
       <SavedMixIconStack icons={mix.icons} size="sm" />
@@ -1167,12 +1523,19 @@ function SavedMixChip({ mix }: { readonly mix: SavedMix }) {
   );
 }
 
-function SavedMixManagementChip({ mix }: { readonly mix: SavedMix }) {
+function SavedMixManagementChip({
+  mix,
+  onPress,
+}: {
+  readonly mix: SavedMix;
+  readonly onPress?: () => void;
+}) {
   return (
     <Pressable
       accessibilityLabel={`${mix.label} saved mix, ${mix.timerLabel}`}
       accessibilityRole="button"
       className="h-10 shrink-0 flex-row items-center gap-2 rounded-[14px] border border-[#1E2236]/60 bg-[#0D0F1A] pl-3 pr-2 active:scale-[0.96]"
+      onPress={onPress}
       testID={`sound-mixer-saved-mix-full-${mix.id}`}
     >
       <SavedMixIconStack icons={mix.icons} size="sm" />
@@ -1232,13 +1595,23 @@ function SavedMixIconStack({
 
 function SoundCardButton({
   isEditing,
+  onPress,
+  onVolumeAdjust,
+  onVolumeChange,
+  onVolumeEditingStart,
   sound,
 }: {
   readonly isEditing: boolean;
+  readonly onPress: () => void;
+  readonly onVolumeAdjust: (delta: number) => void;
+  readonly onVolumeChange: (volume: number) => void;
+  readonly onVolumeEditingStart: () => void;
   readonly sound: SoundCard;
 }) {
   const isActive = sound.volume !== undefined;
   const Icon = sound.Icon;
+  const dragStartPointRef = useRef<{ readonly x: number; readonly y: number } | null>(null);
+  const hasDraggedVolumeRef = useRef(false);
   const accessibilityLabel = isEditing
     ? `${sound.label} active sound being edited at ${sound.volume}% volume`
     : isActive
@@ -1258,6 +1631,7 @@ function SoundCardButton({
             ? "overflow-hidden border-[#7C6FCD]/40 bg-[#1C2040] shadow-[0_0_25px_rgba(124,111,205,0.15)]"
             : "border-[#1E2236]/60 bg-[#14172B]",
       )}
+      onPress={onPress}
       testID={`sound-mixer-sound-${sound.id}`}
     >
       {isActive ? (
@@ -1267,25 +1641,91 @@ function SoundCardButton({
       <View
         className={cn(
           "relative mb-2.5 items-center justify-center",
-          isActive ? "h-[72px] w-[72px]" : "h-16 w-16",
+          isActive ? "h-24 w-24" : "h-16 w-16",
         )}
       >
         {isActive ? (
-          <ProgressRing
-            progress={(sound.volume ?? 0) / 100}
-            size={72}
-            strokeColor={colors.active}
-            strokeWidth={2.5}
-            trackColor={colors.active}
-            trackOpacity={isEditing ? 0.28 : 0.2}
-            {...(isEditing
-              ? {
-                  showDetents: true,
-                  showKnob: true,
-                  testIDPrefix: `sound-mixer-volume-ring-${sound.id}`,
-                }
-              : {})}
-          />
+          <View
+            accessibilityActions={[
+              { label: "Increase volume", name: "increment" },
+              { label: "Decrease volume", name: "decrement" },
+            ]}
+            accessibilityLabel={`Adjust ${sound.label} volume`}
+            accessibilityRole="adjustable"
+            accessibilityValue={{
+              max: soundMixerLimits.maxVolume,
+              min: soundMixerLimits.minVolume,
+              now: sound.volume ?? 0,
+              text: `${sound.volume ?? 0}%`,
+            }}
+            accessible
+            className="h-24 w-24 items-center justify-center rounded-full"
+            onAccessibilityAction={(event) => {
+              if (event.nativeEvent.actionName === "increment") {
+                onVolumeAdjust(soundMixerVolumeStep);
+              }
+
+              if (event.nativeEvent.actionName === "decrement") {
+                onVolumeAdjust(-soundMixerVolumeStep);
+              }
+            }}
+            onResponderGrant={(event) => {
+              dragStartPointRef.current = {
+                x: event.nativeEvent.locationX,
+                y: event.nativeEvent.locationY,
+              };
+              hasDraggedVolumeRef.current = false;
+              onVolumeEditingStart();
+            }}
+            onResponderMove={(event) => {
+              const startPoint = dragStartPointRef.current;
+
+              if (!startPoint) {
+                return;
+              }
+
+              const currentPoint = {
+                x: event.nativeEvent.locationX,
+                y: event.nativeEvent.locationY,
+              };
+
+              if (
+                !hasDraggedVolumeRef.current &&
+                getDistanceBetweenPoints(startPoint, currentPoint) < soundMixerVolumeDragThreshold
+              ) {
+                return;
+              }
+
+              hasDraggedVolumeRef.current = true;
+              onVolumeChange(calculateSoundMixerVolumeFromPoint(currentPoint));
+            }}
+            onResponderRelease={() => {
+              if (!hasDraggedVolumeRef.current) {
+                onPress();
+              }
+
+              dragStartPointRef.current = null;
+              hasDraggedVolumeRef.current = false;
+            }}
+            onStartShouldSetResponder={() => true}
+            testID={`sound-mixer-volume-ring-${sound.id}-hit-area`}
+          >
+            <ProgressRing
+              progress={(sound.volume ?? 0) / 100}
+              size={72}
+              strokeColor={colors.active}
+              strokeWidth={2.5}
+              trackColor={colors.active}
+              trackOpacity={isEditing ? 0.28 : 0.2}
+              {...(isEditing
+                ? {
+                    showDetents: true,
+                    showKnob: true,
+                    testIDPrefix: `sound-mixer-volume-ring-${sound.id}`,
+                  }
+                : {})}
+            />
+          </View>
         ) : (
           <ProgressRing
             progress={0}
@@ -1327,20 +1767,41 @@ function SoundCardButton({
   );
 }
 
-function ActiveMiniIcon({ sound }: { readonly sound: SoundCard }) {
+function ActiveMiniIcon({
+  motionConfig,
+  sound,
+}: {
+  readonly motionConfig: ReturnType<typeof getSoundMixerActiveStripMotionConfig>;
+  readonly sound: SoundCard;
+}) {
   const Icon = sound.Icon;
+  const motionProps = motionConfig.enabled
+    ? {
+        entering: FadeInUp.duration(motionConfig.enterDurationMs),
+        exiting: FadeOutUp.duration(motionConfig.exitDurationMs),
+        layout: LinearTransition.duration(motionConfig.enterDurationMs),
+      }
+    : {};
 
   return (
-    <View
+    <Animated.View
       accessibilityLabel={`${sound.label} active layer`}
       accessibilityRole="image"
       accessible
       className="h-9 w-9 items-center justify-center rounded-full border border-[#2D3359] bg-[#1C2040]"
       testID={`sound-mixer-active-layer-${sound.id}`}
+      {...motionProps}
     >
       <Icon color={colors.activeSoft} size={16} strokeWidth={1.5} />
-    </View>
+    </Animated.View>
   );
+}
+
+function getDistanceBetweenPoints(
+  first: { readonly x: number; readonly y: number },
+  second: { readonly x: number; readonly y: number },
+) {
+  return Math.hypot(second.x - first.x, second.y - first.y);
 }
 
 function ProgressRing({

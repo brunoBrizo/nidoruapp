@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 import { fireEvent, render, screen } from "@testing-library/react-native";
+import * as Haptics from "expo-haptics";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
@@ -10,6 +11,17 @@ const mockRouterBack = jest.fn();
 const mockUseLocalSearchParams = jest.fn<() => Record<string, string | string[] | undefined>>(
   () => ({}),
 );
+
+jest.mock("expo-haptics", () => ({
+  selectionAsync: jest.fn(() => Promise.resolve()),
+}));
+
+jest.mock("../src/motion/use-reduce-motion-enabled", () => ({
+  useReduceMotionPreference: () => ({
+    isResolved: true,
+    reduceMotionEnabled: false,
+  }),
+}));
 
 jest.mock("expo-router", () => {
   const React = jest.requireActual<typeof import("react")>("react");
@@ -43,8 +55,13 @@ jest.mock("react-native-css", () => {
   };
 });
 
+const hapticsSelectionAsync = Haptics.selectionAsync as jest.MockedFunction<
+  typeof Haptics.selectionAsync
+>;
+
 describe("SoundMixerAnchorScreen", () => {
   beforeEach(() => {
+    hapticsSelectionAsync.mockClear();
     mockRouterBack.mockClear();
     mockUseLocalSearchParams.mockReset();
     mockUseLocalSearchParams.mockReturnValue({});
@@ -160,6 +177,60 @@ describe("SoundMixerAnchorScreen", () => {
     expect(screen.getByRole("button", { name: "∞ minute timer" })).toBeTruthy();
   });
 
+  it("activates inactive sounds at the default volume and deactivates active cards", () => {
+    render(<SoundMixerScreen uiVariant="empty-mixer" />);
+
+    fireEvent.press(screen.getByRole("button", { name: "Heavy Rain sound" }));
+
+    expect(
+      screen.getByRole("button", { name: "Heavy Rain active sound at 70% volume" }),
+    ).toBeTruthy();
+    expect(screen.getByText("70%")).toBeTruthy();
+    expect(screen.getByText("1 active layer")).toBeTruthy();
+    expect(screen.getByTestId("sound-mixer-active-layer-heavy-rain")).toBeTruthy();
+
+    fireEvent.press(screen.getByRole("button", { name: "Heavy Rain active sound at 70% volume" }));
+
+    expect(screen.getByRole("button", { name: "Heavy Rain sound" })).toBeTruthy();
+    expect(screen.queryByTestId("sound-mixer-active-layer-heavy-rain")).toBeNull();
+    expect(screen.getByText("Choose up to 3 layers")).toBeTruthy();
+  });
+
+  it("restores saved-mix layer volumes instead of reactivating every sound at the default volume", () => {
+    render(<SoundMixerAnchorScreen />);
+
+    fireEvent.press(screen.getByRole("button", { name: "Rain Hearth saved mix" }));
+
+    expect(
+      screen.getByRole("button", { name: "Light Rain active sound at 72% volume" }),
+    ).toBeTruthy();
+    expect(
+      screen.getByRole("button", { name: "Fireplace Crackling active sound at 34% volume" }),
+    ).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Brown Noise sound" })).toBeTruthy();
+    expect(screen.getByText("2 active layers")).toBeTruthy();
+    expect(screen.queryByTestId("sound-mixer-active-layer-brown-noise")).toBeNull();
+  });
+
+  it("shows a quiet max-3 state without dropping an existing active layer", () => {
+    render(<SoundMixerAnchorScreen />);
+
+    fireEvent.press(screen.getByRole("button", { name: "Ocean Waves sound" }));
+
+    expect(screen.getByTestId("sound-mixer-max-layer-notice")).toBeTruthy();
+    expect(screen.getByText("3 layers max. Remove one to add another.")).toBeTruthy();
+    expect(
+      screen.getByRole("button", { name: "Light Rain active sound at 72% volume" }),
+    ).toBeTruthy();
+    expect(
+      screen.getByRole("button", { name: "Brown Noise active sound at 58% volume" }),
+    ).toBeTruthy();
+    expect(
+      screen.getByRole("button", { name: "Fireplace Crackling active sound at 34% volume" }),
+    ).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Ocean Waves sound" })).toBeTruthy();
+  });
+
   it("renders the circular volume editing variant with visible detents and live volume", () => {
     render(<SoundMixerScreen uiVariant="volume-editing" />);
 
@@ -181,6 +252,97 @@ describe("SoundMixerAnchorScreen", () => {
     expect(screen.getByTestId("sound-mixer-sound-light-rain").props.className).toEqual(
       expect.stringContaining("border-[#A89CE0]/70"),
     );
+    expect(screen.getByLabelText("Adjust Light Rain volume")).toHaveProp(
+      "accessibilityRole",
+      "adjustable",
+    );
+    expect(screen.getByLabelText("Adjust Light Rain volume")).toHaveProp("accessibilityActions", [
+      { label: "Increase volume", name: "increment" },
+      { label: "Decrease volume", name: "decrement" },
+    ]);
+  });
+
+  it("drags the generous circular ring hit area with live clamped volume feedback", () => {
+    render(<SoundMixerScreen uiVariant="volume-editing" />);
+
+    const ringHitArea = screen.getByTestId("sound-mixer-volume-ring-light-rain-hit-area");
+
+    fireEvent(ringHitArea, "responderGrant", {
+      nativeEvent: { locationX: 48, locationY: 0, pageX: 48, pageY: 0 },
+    });
+    fireEvent(ringHitArea, "responderMove", {
+      nativeEvent: { locationX: 96, locationY: 48, pageX: 96, pageY: 48 },
+    });
+    fireEvent(ringHitArea, "responderRelease", {
+      nativeEvent: { locationX: 96, locationY: 48, pageX: 96, pageY: 48 },
+    });
+
+    expect(
+      screen.getByRole("button", { name: "Light Rain active sound being edited at 25% volume" }),
+    ).toBeTruthy();
+    expect(screen.getByText("25%")).toBeTruthy();
+    expect(hapticsSelectionAsync).toHaveBeenCalled();
+  });
+
+  it("offers an adjustable accessibility path that clamps volume and gates haptic detents", () => {
+    render(<SoundMixerScreen uiVariant="empty-mixer" />);
+
+    fireEvent.press(screen.getByRole("button", { name: "Heavy Rain sound" }));
+
+    const volumeControl = screen.getByLabelText("Adjust Heavy Rain volume");
+
+    for (let index = 0; index < 5; index += 1) {
+      fireEvent(volumeControl, "accessibilityAction", {
+        nativeEvent: { actionName: "increment" },
+      });
+    }
+
+    expect(
+      screen.getByRole("button", { name: "Heavy Rain active sound being edited at 100% volume" }),
+    ).toBeTruthy();
+    expect(hapticsSelectionAsync).toHaveBeenCalled();
+
+    hapticsSelectionAsync.mockClear();
+
+    for (let index = 0; index < 12; index += 1) {
+      fireEvent(volumeControl, "accessibilityAction", {
+        nativeEvent: { actionName: "decrement" },
+      });
+    }
+
+    expect(
+      screen.getByRole("button", { name: "Heavy Rain active sound being edited at 0% volume" }),
+    ).toBeTruthy();
+    expect(hapticsSelectionAsync).toHaveBeenCalled();
+  });
+
+  it("does not claim haptic detents when haptics are disabled", () => {
+    render(<SoundMixerScreen disableHaptics uiVariant="volume-editing" />);
+
+    fireEvent(screen.getByLabelText("Adjust Light Rain volume"), "accessibilityAction", {
+      nativeEvent: { actionName: "increment" },
+    });
+
+    expect(
+      screen.getByRole("button", { name: "Light Rain active sound being edited at 94% volume" }),
+    ).toBeTruthy();
+    expect(hapticsSelectionAsync).not.toHaveBeenCalled();
+  });
+
+  it("uses active-strip motion props only when reduced motion is off", () => {
+    const { rerender } = render(<SoundMixerScreen reduceMotionOverride />);
+
+    expect(
+      screen.getByTestId("sound-mixer-active-layer-light-rain").props.entering,
+    ).toBeUndefined();
+    expect(screen.getByTestId("sound-mixer-active-layer-light-rain").props.exiting).toBeUndefined();
+    expect(screen.getByTestId("sound-mixer-active-layer-light-rain").props.layout).toBeUndefined();
+
+    rerender(<SoundMixerScreen reduceMotionOverride={false} />);
+
+    expect(screen.getByTestId("sound-mixer-active-layer-light-rain").props.entering).toBeTruthy();
+    expect(screen.getByTestId("sound-mixer-active-layer-light-rain").props.exiting).toBeTruthy();
+    expect(screen.getByTestId("sound-mixer-active-layer-light-rain").props.layout).toBeTruthy();
   });
 
   it("renders the empty mixer state without active layers or save affordance", () => {

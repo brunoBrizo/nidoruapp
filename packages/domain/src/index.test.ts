@@ -10,12 +10,16 @@ import {
   canShowAccountPrompt,
   canShowPaywall,
   canStartDeferredAnonymousAuth,
+  activateSoundMixerLayer,
+  clampSoundMixerVolume,
   createPersonalizedOnboardingPlan,
+  createSoundMixerController,
   eveningReminderNotificationContent,
   eveningReminderWindow,
   firstBreathDemo,
   getNoHoldFallbackTechniqueId,
   getNextEveningReminderDate,
+  getSoundMixerSnapshot,
   getOnboardingPlanForGoal,
   hasOpenedInReminderSuppressionWindow,
   initialInsightRuleTypes,
@@ -31,7 +35,11 @@ import {
   onboardingQuestionIds,
   postMvpBreathTechniqueIds,
   sleepBaselineOptions,
+  saveSoundMixerMix,
   streakRules,
+  soundMixerStateLabels,
+  soundMixerTimerOptions,
+  startSoundMixerPlayback,
   parseWindDownContextGoalInput,
   resolveWindDownRoutine,
   windDownContextGoalOptions,
@@ -51,6 +59,24 @@ function assertCondition(condition: boolean, message: string): void {
   if (!condition) {
     throw new Error(message);
   }
+}
+
+function assertThrows(action: () => unknown, expectedMessage: RegExp): void {
+  try {
+    action();
+  } catch (error) {
+    if (!(error instanceof Error)) {
+      throw new Error("Expected thrown value to be an Error.");
+    }
+
+    assertCondition(
+      expectedMessage.test(error.message),
+      `Expected error matching ${expectedMessage}, received ${error.message}`,
+    );
+    return;
+  }
+
+  throw new Error(`Expected error matching ${expectedMessage}.`);
 }
 
 function assertNoAuditRiskPublicCopy(values: readonly string[]): void {
@@ -164,6 +190,131 @@ assertCondition(
     .filter((sound) => sound.categoryId === "tones" || sound.categoryId === "noise")
     .every((sound) => sound.evidenceSafeNote?.includes("no clinical sleep efficacy claim")),
   "tones and colored noise need explicit evidence-safe notes",
+);
+assertEquals(soundMixerTimerOptions, [20, 30, 45, 60, "infinity"]);
+assertEquals(soundMixerStateLabels, [
+  "playing",
+  "idle-dark",
+  "fade-pending",
+  "fading-out",
+  "interrupted",
+  "ended",
+]);
+assertEquals(clampSoundMixerVolume(-10), 0);
+assertEquals(clampSoundMixerVolume(72), 72);
+assertEquals(clampSoundMixerVolume(110), 100);
+
+const emptySoundMixer = createSoundMixerController();
+
+assertEquals(emptySoundMixer.activeLayers, []);
+assertEquals(emptySoundMixer.savedMixes, []);
+assertEquals(emptySoundMixer.state, "idle-dark");
+assertEquals(emptySoundMixer.timerPreference, 30);
+
+const threeLayerSoundMixer = activateSoundMixerLayer(
+  activateSoundMixerLayer(activateSoundMixerLayer(emptySoundMixer, "light-rain"), "brown-noise", {
+    volume: 58,
+  }),
+  "fireplace-crackling",
+  {
+    lastMix: {
+      layers: [{ soundId: "fireplace-crackling", volume: 34 }],
+      name: "Rain Hearth",
+      timerPreference: 30,
+    },
+  },
+);
+
+assertEquals(threeLayerSoundMixer.activeLayers, [
+  { soundId: "light-rain", volume: 70 },
+  { soundId: "brown-noise", volume: 58 },
+  { soundId: "fireplace-crackling", volume: 34 },
+]);
+assertThrows(
+  () => activateSoundMixerLayer(threeLayerSoundMixer, "ocean-waves"),
+  /at most 3 active layers/,
+);
+assertThrows(
+  () => activateSoundMixerLayer(emptySoundMixer, "rainstorm" as never),
+  /Unknown sound mixer sound/,
+);
+assertThrows(
+  () =>
+    createSoundMixerController({
+      activeLayers: [
+        { soundId: "light-rain", volume: 70 },
+        { soundId: "light-rain", volume: 40 },
+      ],
+    }),
+  /Duplicate sound mixer layer/,
+);
+assertThrows(
+  () =>
+    createSoundMixerController({
+      activeLayers: [{ soundId: "light-rain", volume: 101 }],
+    }),
+  /volume must be between 0 and 100/,
+);
+assertThrows(
+  () => createSoundMixerController({ timerPreference: 25 as never }),
+  /Unsupported sound mixer timer/,
+);
+
+const savedMixController = saveSoundMixerMix(threeLayerSoundMixer, {
+  name: "  Rain Hearth  ",
+});
+
+assertEquals(savedMixController.savedMixes, [
+  {
+    layers: threeLayerSoundMixer.activeLayers,
+    name: "Rain Hearth",
+    timerPreference: 30,
+  },
+]);
+assertThrows(() => saveSoundMixerMix(threeLayerSoundMixer, { name: "   " }), /non-empty/);
+assertThrows(
+  () => saveSoundMixerMix(threeLayerSoundMixer, { name: "a".repeat(41) }),
+  /at most 40 characters/,
+);
+assertThrows(
+  () =>
+    saveSoundMixerMix(
+      createSoundMixerController({
+        activeLayers: [{ soundId: "light-rain", volume: 70 }],
+        savedMixes: [
+          { layers: [{ soundId: "light-rain", volume: 70 }], name: "Rain", timerPreference: 20 },
+          { layers: [{ soundId: "forest", volume: 70 }], name: "Forest", timerPreference: 30 },
+          { layers: [{ soundId: "fan", volume: 70 }], name: "Fan", timerPreference: 45 },
+        ],
+      }),
+      { name: "Ocean" },
+    ),
+  /up to 3 saved mixes/,
+);
+
+const timedSoundMixer = startSoundMixerPlayback(
+  createSoundMixerController({
+    activeLayers: [{ soundId: "light-rain", volume: 70 }],
+    timerPreference: 20,
+  }),
+  1_000,
+);
+
+assertEquals(getSoundMixerSnapshot(timedSoundMixer, 17 * 60 * 1000 + 999).state, "fade-pending");
+assertEquals(getSoundMixerSnapshot(timedSoundMixer, 18 * 60 * 1000 + 1_000).state, "fading-out");
+assertEquals(getSoundMixerSnapshot(timedSoundMixer, 20 * 60 * 1000 + 1_000).state, "ended");
+assertEquals(
+  getSoundMixerSnapshot(
+    startSoundMixerPlayback(
+      createSoundMixerController({
+        activeLayers: [{ soundId: "light-rain", volume: 70 }],
+        timerPreference: "infinity",
+      }),
+      1_000,
+    ),
+    60 * 60 * 1000,
+  ).state,
+  "playing",
 );
 assertEquals(
   mvpBreathTechniqueIds.map((techniqueId) => {

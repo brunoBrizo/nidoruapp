@@ -454,6 +454,442 @@ export const launchSoundCatalog = [
   }),
 ] as const satisfies readonly LaunchSoundCatalogItem[];
 
+export const soundMixerFiniteTimerOptions = [20, 30, 45, 60] as const;
+export const soundMixerTimerOptions = [...soundMixerFiniteTimerOptions, "infinity"] as const;
+export const soundMixerStateLabels = [
+  "playing",
+  "idle-dark",
+  "fade-pending",
+  "fading-out",
+  "interrupted",
+  "ended",
+] as const;
+
+export type SoundMixerTimerPreference = (typeof soundMixerTimerOptions)[number];
+export type SoundMixerStateLabel = (typeof soundMixerStateLabels)[number];
+
+export const soundMixerLimits = {
+  defaultActivationVolume: 70,
+  fadeOutDurationSeconds: 120,
+  maxActiveLayers: 3,
+  maxSavedMixes: 3,
+  maxSavedMixNameLength: 40,
+  maxVolume: 100,
+  minVolume: 0,
+} as const;
+
+export type SoundMixerActiveLayer = {
+  readonly soundId: LaunchSoundId;
+  readonly volume: number;
+};
+
+export type SoundMixerSavedMix = {
+  readonly layers: readonly SoundMixerActiveLayer[];
+  readonly name: string;
+  readonly timerPreference: SoundMixerTimerPreference;
+};
+
+export type SoundMixerController = {
+  readonly activeLayers: readonly SoundMixerActiveLayer[];
+  readonly playbackStartedAtMs?: number;
+  readonly savedMixes: readonly SoundMixerSavedMix[];
+  readonly state: SoundMixerStateLabel;
+  readonly timerPreference: SoundMixerTimerPreference;
+};
+
+export type SoundMixerSnapshot = {
+  readonly activeLayers: readonly SoundMixerActiveLayer[];
+  readonly elapsedMs: number;
+  readonly fadeProgress: number;
+  readonly observedAtMs: number;
+  readonly remainingMs: number | null;
+  readonly shouldReleasePowerLock: boolean;
+  readonly state: SoundMixerStateLabel;
+  readonly timerDurationMs: number | null;
+  readonly timerPreference: SoundMixerTimerPreference;
+};
+
+const launchSoundIdSet = new Set<string>(launchSoundIds);
+const soundMixerTimerOptionSet = new Set<SoundMixerTimerPreference>(soundMixerTimerOptions);
+const soundMixerStateLabelSet = new Set<SoundMixerStateLabel>(soundMixerStateLabels);
+
+export function isLaunchSoundId(value: unknown): value is LaunchSoundId {
+  return typeof value === "string" && launchSoundIdSet.has(value);
+}
+
+export function clampSoundMixerVolume(volume: number) {
+  if (!Number.isFinite(volume)) {
+    throw new Error("Sound mixer volume must be finite.");
+  }
+
+  return Math.min(soundMixerLimits.maxVolume, Math.max(soundMixerLimits.minVolume, volume));
+}
+
+export function createSoundMixerController({
+  activeLayers = [],
+  playbackStartedAtMs,
+  savedMixes = [],
+  state,
+  timerPreference = 30,
+}: Partial<SoundMixerController> = {}): SoundMixerController {
+  const normalizedActiveLayers = normalizeSoundMixerActiveLayers(activeLayers);
+  const normalizedSavedMixes = normalizeSoundMixerSavedMixes(savedMixes);
+  const normalizedState = state ?? (normalizedActiveLayers.length === 0 ? "idle-dark" : "playing");
+
+  assertSoundMixerTimerPreference(timerPreference);
+  assertSoundMixerStateLabel(normalizedState);
+
+  if (playbackStartedAtMs !== undefined && !Number.isFinite(playbackStartedAtMs)) {
+    throw new Error("Sound mixer playback start time must be finite.");
+  }
+
+  return {
+    activeLayers: normalizedActiveLayers,
+    ...(playbackStartedAtMs === undefined ? {} : { playbackStartedAtMs }),
+    savedMixes: normalizedSavedMixes,
+    state: normalizedState,
+    timerPreference,
+  };
+}
+
+export function activateSoundMixerLayer(
+  controller: SoundMixerController,
+  soundId: LaunchSoundId,
+  {
+    lastMix,
+    volume,
+  }: {
+    readonly lastMix?: SoundMixerSavedMix;
+    readonly volume?: number;
+  } = {},
+): SoundMixerController {
+  assertLaunchSoundId(soundId);
+
+  if (controller.activeLayers.some((layer) => layer.soundId === soundId)) {
+    return controller;
+  }
+
+  if (controller.activeLayers.length >= soundMixerLimits.maxActiveLayers) {
+    throw new Error("Sound mixer supports at most 3 active layers.");
+  }
+
+  const normalizedVolume =
+    volume === undefined
+      ? (getLastMixVolume(lastMix, soundId) ?? getDefaultSoundMixerActivationVolume(soundId))
+      : clampSoundMixerVolume(volume);
+
+  return createSoundMixerController({
+    ...controller,
+    activeLayers: [...controller.activeLayers, { soundId, volume: normalizedVolume }],
+    state: controller.state === "idle-dark" ? "playing" : controller.state,
+  });
+}
+
+export function setSoundMixerLayerVolume(
+  controller: SoundMixerController,
+  soundId: LaunchSoundId,
+  volume: number,
+): SoundMixerController {
+  assertLaunchSoundId(soundId);
+
+  if (!controller.activeLayers.some((layer) => layer.soundId === soundId)) {
+    throw new Error(`Sound mixer layer is not active: ${soundId}`);
+  }
+
+  return createSoundMixerController({
+    ...controller,
+    activeLayers: controller.activeLayers.map((layer) =>
+      layer.soundId === soundId ? { ...layer, volume: clampSoundMixerVolume(volume) } : layer,
+    ),
+  });
+}
+
+export function deactivateSoundMixerLayer(
+  controller: SoundMixerController,
+  soundId: LaunchSoundId,
+): SoundMixerController {
+  assertLaunchSoundId(soundId);
+
+  const activeLayers = controller.activeLayers.filter((layer) => layer.soundId !== soundId);
+
+  if (activeLayers.length === 0) {
+    const { playbackStartedAtMs, ...idleController } = controller;
+
+    void playbackStartedAtMs;
+
+    return createSoundMixerController({
+      ...idleController,
+      activeLayers,
+      state: "idle-dark",
+    });
+  }
+
+  return createSoundMixerController({
+    ...controller,
+    activeLayers,
+  });
+}
+
+export function saveSoundMixerMix(
+  controller: SoundMixerController,
+  { name }: { readonly name: string },
+): SoundMixerController {
+  if (controller.savedMixes.length >= soundMixerLimits.maxSavedMixes) {
+    throw new Error("Sound mixer supports up to 3 saved mixes.");
+  }
+
+  const savedMix = normalizeSoundMixerSavedMix({
+    layers: controller.activeLayers,
+    name,
+    timerPreference: controller.timerPreference,
+  });
+
+  return createSoundMixerController({
+    ...controller,
+    savedMixes: [...controller.savedMixes, savedMix],
+  });
+}
+
+export function startSoundMixerPlayback(
+  controller: SoundMixerController,
+  startedAtMs: number,
+): SoundMixerController {
+  if (!Number.isFinite(startedAtMs)) {
+    throw new Error("Sound mixer playback start time must be finite.");
+  }
+
+  if (controller.activeLayers.length === 0) {
+    const { playbackStartedAtMs, ...idleController } = controller;
+
+    void playbackStartedAtMs;
+
+    return createSoundMixerController({
+      ...idleController,
+      state: "idle-dark",
+    });
+  }
+
+  return createSoundMixerController({
+    ...controller,
+    playbackStartedAtMs: startedAtMs,
+    state: controller.timerPreference === "infinity" ? "playing" : "fade-pending",
+  });
+}
+
+export function interruptSoundMixerPlayback(
+  controller: SoundMixerController,
+): SoundMixerController {
+  return createSoundMixerController({
+    ...controller,
+    state: "interrupted",
+  });
+}
+
+export function endSoundMixerPlayback(controller: SoundMixerController): SoundMixerController {
+  return createSoundMixerController({
+    ...controller,
+    state: "ended",
+  });
+}
+
+export function getSoundMixerSnapshot(
+  controller: SoundMixerController,
+  observedAtMs: number,
+): SoundMixerSnapshot {
+  if (!Number.isFinite(observedAtMs)) {
+    throw new Error("Sound mixer snapshot time must be finite.");
+  }
+
+  if (controller.activeLayers.length === 0 || controller.playbackStartedAtMs === undefined) {
+    return createSoundMixerSnapshot(controller, observedAtMs, {
+      elapsedMs: 0,
+      fadeProgress: 0,
+      remainingMs: null,
+      shouldReleasePowerLock: controller.state === "ended",
+      state: controller.activeLayers.length === 0 ? "idle-dark" : controller.state,
+      timerDurationMs: getSoundMixerTimerDurationMs(controller.timerPreference),
+    });
+  }
+
+  if (
+    controller.state === "interrupted" ||
+    controller.state === "ended" ||
+    controller.timerPreference === "infinity"
+  ) {
+    const state = controller.timerPreference === "infinity" ? controller.state : controller.state;
+
+    return createSoundMixerSnapshot(controller, observedAtMs, {
+      elapsedMs: Math.max(0, observedAtMs - controller.playbackStartedAtMs),
+      fadeProgress: state === "ended" ? 1 : 0,
+      remainingMs: null,
+      shouldReleasePowerLock: state === "ended",
+      state,
+      timerDurationMs: null,
+    });
+  }
+
+  const timerDurationMs = controller.timerPreference * 60 * 1000;
+  const fadeOutDurationMs = soundMixerLimits.fadeOutDurationSeconds * 1000;
+  const elapsedMs = Math.min(
+    timerDurationMs,
+    Math.max(0, observedAtMs - controller.playbackStartedAtMs),
+  );
+  const fadeStartsAtMs = Math.max(0, timerDurationMs - fadeOutDurationMs);
+  const state: SoundMixerStateLabel =
+    elapsedMs >= timerDurationMs
+      ? "ended"
+      : elapsedMs >= fadeStartsAtMs
+        ? "fading-out"
+        : "fade-pending";
+  const fadeProgress =
+    state === "ended"
+      ? 1
+      : state === "fading-out"
+        ? Math.min(1, (elapsedMs - fadeStartsAtMs) / fadeOutDurationMs)
+        : 0;
+
+  return createSoundMixerSnapshot(controller, observedAtMs, {
+    elapsedMs,
+    fadeProgress,
+    remainingMs: timerDurationMs - elapsedMs,
+    shouldReleasePowerLock: state === "ended",
+    state,
+    timerDurationMs,
+  });
+}
+
+function assertLaunchSoundId(soundId: LaunchSoundId): void {
+  if (!isLaunchSoundId(soundId)) {
+    throw new Error(`Unknown sound mixer sound: ${String(soundId)}`);
+  }
+}
+
+function assertSoundMixerTimerPreference(timerPreference: SoundMixerTimerPreference): void {
+  if (!soundMixerTimerOptionSet.has(timerPreference)) {
+    throw new Error(`Unsupported sound mixer timer: ${String(timerPreference)}`);
+  }
+}
+
+function assertSoundMixerStateLabel(state: SoundMixerStateLabel): void {
+  if (!soundMixerStateLabelSet.has(state)) {
+    throw new Error(`Unsupported sound mixer state: ${String(state)}`);
+  }
+}
+
+function assertSoundMixerLayerVolume(volume: number): void {
+  if (
+    !Number.isFinite(volume) ||
+    volume < soundMixerLimits.minVolume ||
+    volume > soundMixerLimits.maxVolume
+  ) {
+    throw new Error("Sound mixer layer volume must be between 0 and 100.");
+  }
+}
+
+function normalizeSoundMixerActiveLayers(
+  layers: readonly SoundMixerActiveLayer[],
+): readonly SoundMixerActiveLayer[] {
+  if (layers.length > soundMixerLimits.maxActiveLayers) {
+    throw new Error("Sound mixer supports at most 3 active layers.");
+  }
+
+  const seenSoundIds = new Set<LaunchSoundId>();
+
+  return layers.map((layer) => {
+    assertLaunchSoundId(layer.soundId);
+    assertSoundMixerLayerVolume(layer.volume);
+
+    if (seenSoundIds.has(layer.soundId)) {
+      throw new Error(`Duplicate sound mixer layer: ${layer.soundId}`);
+    }
+
+    seenSoundIds.add(layer.soundId);
+
+    return {
+      soundId: layer.soundId,
+      volume: layer.volume,
+    };
+  });
+}
+
+function normalizeSoundMixerSavedMixes(
+  savedMixes: readonly SoundMixerSavedMix[],
+): readonly SoundMixerSavedMix[] {
+  if (savedMixes.length > soundMixerLimits.maxSavedMixes) {
+    throw new Error("Sound mixer supports up to 3 saved mixes.");
+  }
+
+  return savedMixes.map(normalizeSoundMixerSavedMix);
+}
+
+function normalizeSoundMixerSavedMix(savedMix: SoundMixerSavedMix): SoundMixerSavedMix {
+  assertSoundMixerTimerPreference(savedMix.timerPreference);
+
+  return {
+    layers: normalizeSoundMixerActiveLayers(savedMix.layers),
+    name: normalizeSoundMixerSavedMixName(savedMix.name),
+    timerPreference: savedMix.timerPreference,
+  };
+}
+
+function normalizeSoundMixerSavedMixName(name: string): string {
+  const trimmedName = name.trim();
+
+  if (trimmedName.length === 0) {
+    throw new Error("Sound mixer saved mix name must be non-empty after trim.");
+  }
+
+  if (trimmedName.length > soundMixerLimits.maxSavedMixNameLength) {
+    throw new Error("Sound mixer saved mix name must be at most 40 characters.");
+  }
+
+  if (
+    !Array.from(trimmedName).every((character) => {
+      const characterCode = character.charCodeAt(0);
+
+      return characterCode > 31 && characterCode !== 127;
+    })
+  ) {
+    throw new Error("Sound mixer saved mix name cannot contain control characters.");
+  }
+
+  return trimmedName;
+}
+
+function getDefaultSoundMixerActivationVolume(soundId: LaunchSoundId): number {
+  const catalogItem = launchSoundCatalog.find((sound) => sound.id === soundId);
+
+  return clampSoundMixerVolume(
+    Math.round((catalogItem?.defaultVolume ?? 0.7) * soundMixerLimits.maxVolume),
+  );
+}
+
+function getLastMixVolume(
+  lastMix: SoundMixerSavedMix | undefined,
+  soundId: LaunchSoundId,
+): number | undefined {
+  const matchingLayer = lastMix?.layers.find((layer) => layer.soundId === soundId);
+
+  return matchingLayer === undefined ? undefined : clampSoundMixerVolume(matchingLayer.volume);
+}
+
+function getSoundMixerTimerDurationMs(timerPreference: SoundMixerTimerPreference): number | null {
+  return timerPreference === "infinity" ? null : timerPreference * 60 * 1000;
+}
+
+function createSoundMixerSnapshot(
+  controller: SoundMixerController,
+  observedAtMs: number,
+  snapshot: Omit<SoundMixerSnapshot, "activeLayers" | "observedAtMs" | "timerPreference">,
+): SoundMixerSnapshot {
+  return {
+    activeLayers: controller.activeLayers,
+    observedAtMs,
+    timerPreference: controller.timerPreference,
+    ...snapshot,
+  };
+}
+
 export const streakRules = {
   completionIncludes: ["breathwork", "wind-down"] as const,
   missedDayPausesStreak: true,

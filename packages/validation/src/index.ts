@@ -8,6 +8,8 @@ import {
   mvpBreathTechniqueIds,
   onboardingGoalOptions,
   onboardingPlanIds,
+  soundMixerLimits,
+  soundMixerStateLabels,
   windDownContextGoals,
   windDownRoutineIds,
   type NotificationPermissionState,
@@ -20,6 +22,14 @@ export const isoDateTimeSchema = z.string().datetime({ offset: true });
 export const breathTechniqueIdSchema = z.enum(breathTechniqueIds);
 export const mvpBreathTechniqueIdSchema = z.enum(mvpBreathTechniqueIds);
 export const launchSoundIdSchema = z.enum(launchSoundIds);
+export const soundMixerStateLabelSchema = z.enum(soundMixerStateLabels);
+export const soundMixerTimerPreferenceSchema = z.union([
+  z.literal(20),
+  z.literal(30),
+  z.literal(45),
+  z.literal(60),
+  z.literal("infinity"),
+]);
 export const breathSessionPhaseNameSchema = z.enum(breathPhaseNames);
 export const breathPhaseDurationMsSchema = z.number().int().positive().max(60_000);
 export const audioCueModeIdSchema = z.enum(breathAudioCueModeIds);
@@ -539,10 +549,70 @@ export const notificationGateEligibilitySchema = z.object({
   systemPermissionState: systemNotificationPermissionStateSchema,
 });
 
-export const soundMixLayerSchema = z.object({
+export const soundMixerVolumeSchema = z
+  .number()
+  .min(soundMixerLimits.minVolume)
+  .max(soundMixerLimits.maxVolume);
+
+export const soundMixerActiveLayerSchema = z.object({
   soundId: launchSoundIdSchema,
-  volume: z.number().min(0).max(1),
+  volume: soundMixerVolumeSchema,
 });
+
+export const soundMixerActiveLayersSchema = z
+  .array(soundMixerActiveLayerSchema)
+  .max(soundMixerLimits.maxActiveLayers)
+  .superRefine((layers, context) => {
+    const seenSoundIds = new Set<string>();
+
+    for (const [index, layer] of layers.entries()) {
+      if (seenSoundIds.has(layer.soundId)) {
+        context.addIssue({
+          code: "custom",
+          message: "Duplicate sound mixer layer",
+          path: [index, "soundId"],
+        });
+      }
+
+      seenSoundIds.add(layer.soundId);
+    }
+  });
+
+export const soundMixerSavedMixNameSchema = z
+  .string()
+  .trim()
+  .min(1)
+  .max(soundMixerLimits.maxSavedMixNameLength)
+  .refine(
+    (value) =>
+      Array.from(value).every((character) => {
+        const characterCode = character.charCodeAt(0);
+
+        return characterCode > 31 && characterCode !== 127;
+      }),
+    {
+      message: "Sound mixer saved mix name cannot contain control characters",
+    },
+  );
+
+export const soundMixerSavedMixSchema = z.object({
+  layers: soundMixerActiveLayersSchema,
+  name: soundMixerSavedMixNameSchema,
+  timerPreference: soundMixerTimerPreferenceSchema,
+});
+
+export const soundMixerSavedMixRecordSchema = soundMixerSavedMixSchema.extend({
+  createdAt: isoDateTimeSchema,
+  localInstallId: localInstallIdSchema,
+  mixId: localRecordIdSchema("soundmix"),
+  updatedAt: isoDateTimeSchema,
+});
+
+export const soundMixerSavedMixRecordsSchema = z
+  .array(soundMixerSavedMixRecordSchema)
+  .max(soundMixerLimits.maxSavedMixes);
+
+export const soundMixLayerSchema = soundMixerActiveLayerSchema;
 
 export const morningCheckInSchema = z.object({
   localInstallId: localInstallIdSchema,
@@ -566,10 +636,11 @@ export type WindDownRunStart = z.infer<typeof windDownRunStartSchema>;
 export type WindDownStepProgress = z.infer<typeof windDownStepProgressSchema>;
 export type WindDownCompletion = z.infer<typeof windDownCompletionSchema>;
 export type WindDownStop = z.infer<typeof windDownStopSchema>;
-export type RememberedWindDownContextChoice = z.infer<
-  typeof rememberedWindDownContextChoiceSchema
->;
+export type RememberedWindDownContextChoice = z.infer<typeof rememberedWindDownContextChoiceSchema>;
 export type PostSessionReflection = z.infer<typeof postSessionReflectionSchema>;
 export type NotificationGateEligibility = z.infer<typeof notificationGateEligibilitySchema>;
+export type SoundMixerActiveLayer = z.infer<typeof soundMixerActiveLayerSchema>;
+export type SoundMixerSavedMix = z.infer<typeof soundMixerSavedMixSchema>;
+export type SoundMixerSavedMixRecord = z.infer<typeof soundMixerSavedMixRecordSchema>;
 export type SoundMixLayer = z.infer<typeof soundMixLayerSchema>;
 export type MorningCheckIn = z.infer<typeof morningCheckInSchema>;

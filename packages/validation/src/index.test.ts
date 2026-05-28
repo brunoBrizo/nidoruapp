@@ -14,6 +14,11 @@ import {
   onboardingPlanIdSchema,
   onboardingResponseSchema,
   postSessionReflectionSchema,
+  soundMixerActiveLayerSchema,
+  soundMixerSavedMixRecordsSchema,
+  soundMixerSavedMixSchema,
+  soundMixerStateLabelSchema,
+  soundMixerTimerPreferenceSchema,
 } from "@nidoru/validation";
 
 function assertCondition(condition: boolean, message: string): void {
@@ -73,6 +78,15 @@ const morningCheckIn = morningCheckInSchema.parse({
   sleepRating: 4,
   moodTag: "rested",
 });
+const soundMixerSavedMix = soundMixerSavedMixSchema.parse({
+  name: "  Rain Hearth  ",
+  layers: [
+    { soundId: "light-rain", volume: 70 },
+    { soundId: "brown-noise", volume: 58 },
+    { soundId: "fireplace-crackling", volume: 34 },
+  ],
+  timerPreference: 30,
+});
 
 void localInstallIdentity;
 void onboardingResponse;
@@ -80,6 +94,7 @@ void firstSessionRecord;
 void postSessionReflection;
 void notificationGateEligibility;
 void morningCheckIn;
+void soundMixerSavedMix;
 
 assertCondition(
   breathTechniqueIdSchema.safeParse("physiological-sigh").success,
@@ -195,4 +210,94 @@ assertCondition(
     daysSinceFirstActiveDay: -1,
   }).success,
   "Notification gate inputs must reject impossible active-day counts.",
+);
+assertCondition(
+  soundMixerTimerPreferenceSchema.safeParse("infinity").success,
+  "Sound mixer timer must allow infinity for product UI flows.",
+);
+assertCondition(
+  !soundMixerTimerPreferenceSchema.safeParse(25).success,
+  "Sound mixer timer must reject unsupported minute values.",
+);
+assertCondition(
+  soundMixerStateLabelSchema.safeParse("fading-out").success,
+  "Sound mixer state labels must validate for UI persistence.",
+);
+assertCondition(
+  !soundMixerStateLabelSchema.safeParse("buffering").success,
+  "Sound mixer state labels must reject unplanned states.",
+);
+assertCondition(
+  soundMixerActiveLayerSchema.safeParse({ soundId: "light-rain", volume: 0 }).success,
+  "Sound mixer layers must allow muted active sounds.",
+);
+assertCondition(
+  soundMixerActiveLayerSchema.safeParse({ soundId: "light-rain", volume: 100 }).success,
+  "Sound mixer layers must allow full volume.",
+);
+assertCondition(
+  !soundMixerActiveLayerSchema.safeParse({ soundId: "unknown-sound", volume: 70 }).success,
+  "Sound mixer layers must reject unknown catalog IDs.",
+);
+assertCondition(
+  !soundMixerActiveLayerSchema.safeParse({ soundId: "light-rain", volume: 101 }).success,
+  "Sound mixer layers must reject over-range volume for persisted payloads.",
+);
+assertCondition(
+  soundMixerSavedMix.name === "Rain Hearth",
+  "Sound mixer saved mix names must be trimmed before storage.",
+);
+assertCondition(
+  !soundMixerSavedMixSchema.safeParse({ ...soundMixerSavedMix, name: "   " }).success,
+  "Sound mixer saved mix names must be non-empty after trim.",
+);
+assertCondition(
+  !soundMixerSavedMixSchema.safeParse({ ...soundMixerSavedMix, name: "a".repeat(41) }).success,
+  "Sound mixer saved mix names must stay length-limited.",
+);
+assertCondition(
+  !soundMixerSavedMixSchema.safeParse({
+    ...soundMixerSavedMix,
+    layers: [
+      { soundId: "light-rain", volume: 70 },
+      { soundId: "light-rain", volume: 40 },
+    ],
+  }).success,
+  "Sound mixer saved mixes must reject duplicate active layers.",
+);
+assertCondition(
+  !soundMixerSavedMixRecordsSchema.safeParse([
+    {
+      ...soundMixerSavedMix,
+      createdAt: "2026-05-18T02:00:00.000Z",
+      localInstallId,
+      mixId: "soundmix_0123456789abcdef",
+      updatedAt: "2026-05-18T02:00:00.000Z",
+    },
+    {
+      ...soundMixerSavedMix,
+      createdAt: "2026-05-18T02:00:00.000Z",
+      localInstallId,
+      mixId: "soundmix_1123456789abcdef",
+      name: "Forest Fan",
+      updatedAt: "2026-05-18T02:00:00.000Z",
+    },
+    {
+      ...soundMixerSavedMix,
+      createdAt: "2026-05-18T02:00:00.000Z",
+      localInstallId,
+      mixId: "soundmix_2123456789abcdef",
+      name: "Ocean Noise",
+      updatedAt: "2026-05-18T02:00:00.000Z",
+    },
+    {
+      ...soundMixerSavedMix,
+      createdAt: "2026-05-18T02:00:00.000Z",
+      localInstallId,
+      mixId: "soundmix_3123456789abcdef",
+      name: "River Rain",
+      updatedAt: "2026-05-18T02:00:00.000Z",
+    },
+  ]).success,
+  "Sound mixer saved mix persistence must reject more than 3 saved mixes.",
 );

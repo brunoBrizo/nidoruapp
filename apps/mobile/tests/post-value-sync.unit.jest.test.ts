@@ -429,7 +429,7 @@ describe("post-value local record sync", () => {
       return Promise.resolve([] as never);
     });
     const client = createClient();
-    const soundMixUpsert = jest.fn((values) =>
+    const soundMixUpsert = jest.fn(() =>
       Promise.resolve({
         data: [
           {

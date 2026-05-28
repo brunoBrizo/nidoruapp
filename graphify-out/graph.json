@@ -27,7 +27,7 @@
       "source_file": "supabase/functions/tests/foundation-health.test.ts",
       "source_location": "L1",
       "id": "supabase_functions_tests_foundation_health_test_ts",
-      "community": 4,
+      "community": 5,
       "norm_label": "foundation-health.test.ts"
     },
     {
@@ -36,7 +36,7 @@
       "source_file": "supabase/functions/tests/foundation-health.test.ts",
       "source_location": "L3",
       "id": "foundation_health_test_assertequals",
-      "community": 4,
+      "community": 5,
       "norm_label": "assertequals()"
     },
     {
@@ -45,7 +45,7 @@
       "source_file": "supabase/functions/foundation-health/index.ts",
       "source_location": "L1",
       "id": "supabase_functions_foundation_health_index_ts",
-      "community": 4,
+      "community": 5,
       "norm_label": "index.ts"
     },
     {
@@ -54,7 +54,7 @@
       "source_file": "supabase/functions/foundation-health/index.ts",
       "source_location": "L7",
       "id": "index_fetch",
-      "community": 4,
+      "community": 5,
       "norm_label": "fetch()"
     },
     {
@@ -151,7 +151,7 @@
       "label": "assertCondition()",
       "file_type": "code",
       "source_file": "packages/validation/src/index.test.ts",
-      "source_location": "L24",
+      "source_location": "L27",
       "id": "index_test_assertcondition",
       "community": 18,
       "norm_label": "assertcondition()"
@@ -592,7 +592,7 @@
       "label": "localRecordIdSchema()",
       "file_type": "code",
       "source_file": "packages/validation/src/index.ts",
-      "source_location": "L54",
+      "source_location": "L56",
       "id": "index_localrecordidschema",
       "community": 23,
       "norm_label": "localrecordidschema()"
@@ -601,7 +601,7 @@
       "label": "refineBreathSessionProgress()",
       "file_type": "code",
       "source_file": "packages/validation/src/index.ts",
-      "source_location": "L259",
+      "source_location": "L261",
       "id": "index_refinebreathsessionprogress",
       "community": 23,
       "norm_label": "refinebreathsessionprogress()"
@@ -610,7 +610,7 @@
       "label": "refineWindDownRunTerminalState()",
       "file_type": "code",
       "source_file": "packages/validation/src/index.ts",
-      "source_location": "L363",
+      "source_location": "L365",
       "id": "index_refinewinddownrunterminalstate",
       "community": 23,
       "norm_label": "refinewinddownrunterminalstate()"
@@ -927,7 +927,7 @@
       "source_file": "apps/mobile/tests/post-value-sync.unit.jest.test.ts",
       "source_location": "L1",
       "id": "apps_mobile_tests_post_value_sync_unit_jest_test_ts",
-      "community": 4,
+      "community": 5,
       "norm_label": "post-value-sync.unit.jest.test.ts"
     },
     {
@@ -936,7 +936,7 @@
       "source_file": "apps/mobile/tests/post-value-sync.unit.jest.test.ts",
       "source_location": "L12",
       "id": "post_value_sync_unit_jest_test_createdatabase",
-      "community": 4,
+      "community": 5,
       "norm_label": "createdatabase()"
     },
     {
@@ -945,7 +945,7 @@
       "source_file": "apps/mobile/tests/post-value-sync.unit.jest.test.ts",
       "source_location": "L80",
       "id": "post_value_sync_unit_jest_test_createclient",
-      "community": 4,
+      "community": 5,
       "norm_label": "createclient()"
     },
     {
@@ -954,7 +954,7 @@
       "source_file": "apps/mobile/tests/post-value-sync.unit.jest.test.ts",
       "source_location": "L97",
       "id": "post_value_sync_unit_jest_test_createcompletedrescuemesyncrow",
-      "community": 4,
+      "community": 5,
       "norm_label": "createcompletedrescuemesyncrow()"
     },
     {
@@ -963,7 +963,7 @@
       "source_file": "apps/mobile/tests/post-value-sync.unit.jest.test.ts",
       "source_location": "L117",
       "id": "post_value_sync_unit_jest_test_createcompletedwinddownsyncrow",
-      "community": 4,
+      "community": 5,
       "norm_label": "createcompletedwinddownsyncrow()"
     },
     {
@@ -972,7 +972,7 @@
       "source_file": "apps/mobile/tests/post-value-sync.unit.jest.test.ts",
       "source_location": "L143",
       "id": "post_value_sync_unit_jest_test_createstoppedwinddownsyncrow",
-      "community": 4,
+      "community": 5,
       "norm_label": "createstoppedwinddownsyncrow()"
     },
     {
@@ -1746,7 +1746,7 @@
       "source_file": "apps/mobile/src/home/home-screen.tsx",
       "source_location": "L1",
       "id": "apps_mobile_src_home_home_screen_tsx",
-      "community": 3,
+      "community": 4,
       "norm_label": "home-screen.tsx"
     },
     {
@@ -1755,7 +1755,7 @@
       "source_file": "apps/mobile/src/home/home-screen.tsx",
       "source_location": "L44",
       "id": "home_screen_gethomecontententrancemotionconfig",
-      "community": 3,
+      "community": 4,
       "norm_label": "gethomecontententrancemotionconfig()"
     },
     {
@@ -1764,7 +1764,7 @@
       "source_file": "apps/mobile/src/home/home-screen.tsx",
       "source_location": "L154",
       "id": "home_screen_homeentrancepolish",
-      "community": 3,
+      "community": 4,
       "norm_label": "homeentrancepolish()"
     },
     {
@@ -1773,7 +1773,7 @@
       "source_file": "apps/mobile/src/home/home-screen.tsx",
       "source_location": "L199",
       "id": "home_screen_formathometimestamp",
-      "community": 3,
+      "community": 4,
       "norm_label": "formathometimestamp()"
     },
     {
@@ -1782,7 +1782,7 @@
       "source_file": "apps/mobile/src/home/home-screen.tsx",
       "source_location": "L210",
       "id": "home_screen_markrescuemetapifneeded",
-      "community": 3,
+      "community": 4,
       "norm_label": "markrescuemetapifneeded()"
     },
     {
@@ -1791,7 +1791,7 @@
       "source_file": "apps/mobile/src/home/home-screen.tsx",
       "source_location": "L216",
       "id": "home_screen_markwinddowntapifneeded",
-      "community": 3,
+      "community": 4,
       "norm_label": "markwinddowntapifneeded()"
     },
     {
@@ -1800,7 +1800,7 @@
       "source_file": "apps/mobile/src/home/home-screen.tsx",
       "source_location": "L222",
       "id": "home_screen_homescreen",
-      "community": 3,
+      "community": 4,
       "norm_label": "homescreen()"
     },
     {
@@ -1809,7 +1809,7 @@
       "source_file": "apps/mobile/src/home/home-screen.tsx",
       "source_location": "L414",
       "id": "home_screen_primarycardbackdrop",
-      "community": 3,
+      "community": 4,
       "norm_label": "primarycardbackdrop()"
     },
     {
@@ -1818,7 +1818,7 @@
       "source_file": "apps/mobile/src/home/home-screen.tsx",
       "source_location": "L474",
       "id": "home_screen_homeambientbackdrop",
-      "community": 3,
+      "community": 4,
       "norm_label": "homeambientbackdrop()"
     },
     {
@@ -1827,7 +1827,7 @@
       "source_file": "apps/mobile/src/home/home-screen.tsx",
       "source_location": "L1027",
       "id": "home_screen_isstory",
-      "community": 3,
+      "community": 4,
       "norm_label": "isstory()"
     },
     {
@@ -1836,7 +1836,7 @@
       "source_file": "apps/mobile/src/home/home-actions.ts",
       "source_location": "L1",
       "id": "apps_mobile_src_home_home_actions_ts",
-      "community": 3,
+      "community": 4,
       "norm_label": "home-actions.ts"
     },
     {
@@ -1845,7 +1845,7 @@
       "source_file": "apps/mobile/src/home/home-actions.ts",
       "source_location": "L230",
       "id": "home_actions_getlocalminuteofday",
-      "community": 3,
+      "community": 4,
       "norm_label": "getlocalminuteofday()"
     },
     {
@@ -1854,7 +1854,7 @@
       "source_file": "apps/mobile/src/home/home-actions.ts",
       "source_location": "L232",
       "id": "home_actions_getprimaryactionidforminute",
-      "community": 3,
+      "community": 4,
       "norm_label": "getprimaryactionidforminute()"
     },
     {
@@ -1863,7 +1863,7 @@
       "source_file": "apps/mobile/src/home/home-actions.ts",
       "source_location": "L252",
       "id": "home_actions_selecthomeprimaryaction",
-      "community": 3,
+      "community": 4,
       "norm_label": "selecthomeprimaryaction()"
     },
     {
@@ -1872,7 +1872,7 @@
       "source_file": "apps/mobile/src/home/home-actions.ts",
       "source_location": "L255",
       "id": "home_actions_createlocalhomestate",
-      "community": 3,
+      "community": 4,
       "norm_label": "createlocalhomestate()"
     },
     {
@@ -1881,7 +1881,7 @@
       "source_file": "apps/mobile/src/home/home-state.ts",
       "source_location": "L1",
       "id": "apps_mobile_src_home_home_state_ts",
-      "community": 3,
+      "community": 4,
       "norm_label": "home-state.ts"
     },
     {
@@ -1890,7 +1890,7 @@
       "source_file": "apps/mobile/src/home/home-state.ts",
       "source_location": "L95",
       "id": "home_state_createhomeoverview",
-      "community": 3,
+      "community": 4,
       "norm_label": "createhomeoverview()"
     },
     {
@@ -2061,7 +2061,7 @@
       "source_file": "apps/mobile/src/app/(tabs)/_layout.tsx",
       "source_location": "L1",
       "id": "apps_mobile_src_app_tabs_layout_tsx",
-      "community": 21,
+      "community": 22,
       "norm_label": "_layout.tsx"
     },
     {
@@ -2070,7 +2070,7 @@
       "source_file": "apps/mobile/src/app/(tabs)/_layout.tsx",
       "source_location": "L7",
       "id": "layout_tablayout",
-      "community": 21,
+      "community": 22,
       "norm_label": "tablayout()"
     },
     {
@@ -2241,185 +2241,185 @@
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
       "source_location": "L1",
       "id": "apps_mobile_src_sleep_sound_mixer_screen_tsx",
-      "community": 5,
+      "community": 6,
       "norm_label": "sound-mixer-screen.tsx"
     },
     {
       "label": "parseSoundMixerUIVariant()",
       "file_type": "code",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L109",
+      "source_location": "L110",
       "id": "sound_mixer_screen_parsesoundmixeruivariant",
-      "community": 5,
+      "community": 6,
       "norm_label": "parsesoundmixeruivariant()"
     },
     {
       "label": "getInitialActiveLayersForVariant()",
       "file_type": "code",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L236",
+      "source_location": "L237",
       "id": "sound_mixer_screen_getinitialactivelayersforvariant",
-      "community": 5,
+      "community": 6,
       "norm_label": "getinitialactivelayersforvariant()"
     },
     {
       "label": "getSavedMixesForVariant()",
       "file_type": "code",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L279",
+      "source_location": "L280",
       "id": "sound_mixer_screen_getsavedmixesforvariant",
-      "community": 5,
+      "community": 6,
       "norm_label": "getsavedmixesforvariant()"
     },
     {
       "label": "getSavedMixesFromRecords()",
       "file_type": "code",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L289",
+      "source_location": "L290",
       "id": "sound_mixer_screen_getsavedmixesfromrecords",
-      "community": 5,
+      "community": 6,
       "norm_label": "getsavedmixesfromrecords()"
     },
     {
       "label": "getInitialSavedMixes()",
       "file_type": "code",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L295",
+      "source_location": "L296",
       "id": "sound_mixer_screen_getinitialsavedmixes",
-      "community": 5,
+      "community": 6,
       "norm_label": "getinitialsavedmixes()"
     },
     {
       "label": "createSavedMixFromRecord()",
       "file_type": "code",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L305",
+      "source_location": "L306",
       "id": "sound_mixer_screen_createsavedmixfromrecord",
-      "community": 5,
+      "community": 6,
       "norm_label": "createsavedmixfromrecord()"
     },
     {
       "label": "getSavedMixIcons()",
       "file_type": "code",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L320",
+      "source_location": "L321",
       "id": "sound_mixer_screen_getsavedmixicons",
-      "community": 5,
+      "community": 6,
       "norm_label": "getsavedmixicons()"
     },
     {
       "label": "getSoundIcon()",
       "file_type": "code",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L326",
+      "source_location": "L327",
       "id": "sound_mixer_screen_getsoundicon",
-      "community": 5,
+      "community": 6,
       "norm_label": "getsoundicon()"
     },
     {
       "label": "getDomainSavedMixes()",
       "file_type": "code",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L338",
+      "source_location": "L339",
       "id": "sound_mixer_screen_getdomainsavedmixes",
-      "community": 5,
+      "community": 6,
       "norm_label": "getdomainsavedmixes()"
     },
     {
       "label": "upsertSavedMix()",
       "file_type": "code",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L346",
+      "source_location": "L347",
       "id": "sound_mixer_screen_upsertsavedmix",
-      "community": 5,
+      "community": 6,
       "norm_label": "upsertsavedmix()"
     },
     {
       "label": "getInitialEditingSoundId()",
       "file_type": "code",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L356",
+      "source_location": "L357",
       "id": "sound_mixer_screen_getinitialeditingsoundid",
-      "community": 5,
+      "community": 6,
       "norm_label": "getinitialeditingsoundid()"
     },
     {
       "label": "createInitialSoundMixerController()",
       "file_type": "code",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L360",
+      "source_location": "L361",
       "id": "sound_mixer_screen_createinitialsoundmixercontroller",
-      "community": 5,
+      "community": 6,
       "norm_label": "createinitialsoundmixercontroller()"
     },
     {
       "label": "getMixerState()",
       "file_type": "code",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L373",
+      "source_location": "L374",
       "id": "sound_mixer_screen_getmixerstate",
-      "community": 5,
+      "community": 6,
       "norm_label": "getmixerstate()"
     },
     {
       "label": "formatActiveLayerCount()",
       "file_type": "code",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L411",
+      "source_location": "L412",
       "id": "sound_mixer_screen_formatactivelayercount",
-      "community": 5,
+      "community": 6,
       "norm_label": "formatactivelayercount()"
     },
     {
       "label": "formatSoundMixerTimerPreference()",
       "file_type": "code",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L415",
+      "source_location": "L416",
       "id": "sound_mixer_screen_formatsoundmixertimerpreference",
-      "community": 5,
+      "community": 6,
       "norm_label": "formatsoundmixertimerpreference()"
     },
     {
       "label": "formatSoundMixerTimerDuration()",
       "file_type": "code",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L419",
+      "source_location": "L420",
       "id": "sound_mixer_screen_formatsoundmixertimerduration",
-      "community": 5,
+      "community": 6,
       "norm_label": "formatsoundmixertimerduration()"
     },
     {
       "label": "getSoundMixerTimerStatus()",
       "file_type": "code",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L429",
+      "source_location": "L430",
       "id": "sound_mixer_screen_getsoundmixertimerstatus",
-      "community": 5,
+      "community": 6,
       "norm_label": "getsoundmixertimerstatus()"
     },
     {
       "label": "getSoundMixerActiveStripMotionConfig()",
       "file_type": "code",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L470",
+      "source_location": "L471",
       "id": "sound_mixer_screen_getsoundmixeractivestripmotionconfig",
-      "community": 5,
+      "community": 6,
       "norm_label": "getsoundmixeractivestripmotionconfig()"
     },
     {
       "label": "getSoundMixerIdleDimmingMotionConfig()",
       "file_type": "code",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L488",
+      "source_location": "L489",
       "id": "sound_mixer_screen_getsoundmixeridledimmingmotionconfig",
-      "community": 5,
+      "community": 6,
       "norm_label": "getsoundmixeridledimmingmotionconfig()"
     },
     {
       "label": "calculateSoundMixerVolumeFromPoint()",
       "file_type": "code",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L500",
+      "source_location": "L501",
       "id": "sound_mixer_screen_calculatesoundmixervolumefrompoint",
       "community": 0,
       "norm_label": "calculatesoundmixervolumefrompoint()"
@@ -2428,7 +2428,7 @@
       "label": "getSoundMixerVolumeDetent()",
       "file_type": "code",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L516",
+      "source_location": "L517",
       "id": "sound_mixer_screen_getsoundmixervolumedetent",
       "community": 0,
       "norm_label": "getsoundmixervolumedetent()"
@@ -2437,27 +2437,27 @@
       "label": "cn()",
       "file_type": "code",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L1128",
+      "source_location": "L1132",
       "id": "sound_mixer_screen_cn",
-      "community": 5,
+      "community": 6,
       "norm_label": "cn()"
     },
     {
       "label": "onVolumeAdjust()",
       "file_type": "code",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L2093",
+      "source_location": "L2097",
       "id": "sound_mixer_screen_onvolumeadjust",
-      "community": 5,
+      "community": 6,
       "norm_label": "onvolumeadjust()"
     },
     {
       "label": "if()",
       "file_type": "code",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L2131",
+      "source_location": "L2135",
       "id": "sound_mixer_screen_if",
-      "community": 5,
+      "community": 6,
       "norm_label": "if()"
     },
     {
@@ -2493,7 +2493,7 @@
       "source_file": "apps/mobile/src/sleep/sound-mixer-local-persistence.ts",
       "source_location": "L1",
       "id": "apps_mobile_src_sleep_sound_mixer_local_persistence_ts",
-      "community": 22,
+      "community": 21,
       "norm_label": "sound-mixer-local-persistence.ts"
     },
     {
@@ -2502,7 +2502,7 @@
       "source_file": "apps/mobile/src/sleep/sound-mixer-local-persistence.ts",
       "source_location": "L49",
       "id": "sound_mixer_local_persistence_loadsoundmixersavedmixeslocally",
-      "community": 22,
+      "community": 21,
       "norm_label": "loadsoundmixersavedmixeslocally()"
     },
     {
@@ -2511,7 +2511,7 @@
       "source_file": "apps/mobile/src/sleep/sound-mixer-local-persistence.ts",
       "source_location": "L110",
       "id": "sound_mixer_local_persistence_savesoundmixermixlocally",
-      "community": 22,
+      "community": 21,
       "norm_label": "savesoundmixermixlocally()"
     },
     {
@@ -2520,7 +2520,7 @@
       "source_file": "apps/mobile/src/sleep/sound-mixer-local-persistence.ts",
       "source_location": "L202",
       "id": "sound_mixer_local_persistence_createsoundmixersavedmixid",
-      "community": 22,
+      "community": 21,
       "norm_label": "createsoundmixersavedmixid()"
     },
     {
@@ -2529,7 +2529,7 @@
       "source_file": "apps/mobile/src/sleep/sound-mixer-local-persistence.ts",
       "source_location": "L216",
       "id": "sound_mixer_local_persistence_parsesoundmixertimerpreference",
-      "community": 22,
+      "community": 21,
       "norm_label": "parsesoundmixertimerpreference()"
     },
     {
@@ -2745,7 +2745,7 @@
       "source_file": "apps/mobile/src/rescue/rescue-me-launch-performance.ts",
       "source_location": "L1",
       "id": "apps_mobile_src_rescue_rescue_me_launch_performance_ts",
-      "community": 3,
+      "community": 4,
       "norm_label": "rescue-me-launch-performance.ts"
     },
     {
@@ -2754,7 +2754,7 @@
       "source_file": "apps/mobile/src/rescue/rescue-me-launch-performance.ts",
       "source_location": "L17",
       "id": "rescue_me_launch_performance_markrescuemehometap",
-      "community": 3,
+      "community": 4,
       "norm_label": "markrescuemehometap()"
     },
     {
@@ -2763,7 +2763,7 @@
       "source_file": "apps/mobile/src/rescue/rescue-me-launch-performance.ts",
       "source_location": "L21",
       "id": "rescue_me_launch_performance_recordrescuemeorbvisible",
-      "community": 3,
+      "community": 4,
       "norm_label": "recordrescuemeorbvisible()"
     },
     {
@@ -2772,7 +2772,7 @@
       "source_file": "apps/mobile/src/rescue/rescue-me-launch-performance.ts",
       "source_location": "L44",
       "id": "rescue_me_launch_performance_resetrescuemelaunchperformanceproof",
-      "community": 3,
+      "community": 4,
       "norm_label": "resetrescuemelaunchperformanceproof()"
     },
     {
@@ -2781,7 +2781,7 @@
       "source_file": "apps/mobile/src/rescue/rescue-me-launch-performance.ts",
       "source_location": "L48",
       "id": "rescue_me_launch_performance_getmonotonicnowms",
-      "community": 3,
+      "community": 4,
       "norm_label": "getmonotonicnowms()"
     },
     {
@@ -2871,7 +2871,7 @@
       "source_file": "apps/mobile/src/navigation/app-tab-bar.tsx",
       "source_location": "L1",
       "id": "apps_mobile_src_navigation_app_tab_bar_tsx",
-      "community": 11,
+      "community": 10,
       "norm_label": "app-tab-bar.tsx"
     },
     {
@@ -2880,7 +2880,7 @@
       "source_file": "apps/mobile/src/navigation/app-tab-bar.tsx",
       "source_location": "L51",
       "id": "app_tab_bar_gettabindicatormotionconfig",
-      "community": 11,
+      "community": 10,
       "norm_label": "gettabindicatormotionconfig()"
     },
     {
@@ -2889,7 +2889,7 @@
       "source_file": "apps/mobile/src/navigation/app-tab-bar.tsx",
       "source_location": "L83",
       "id": "app_tab_bar_isdefaultprevented",
-      "community": 11,
+      "community": 10,
       "norm_label": "isdefaultprevented()"
     },
     {
@@ -2898,7 +2898,7 @@
       "source_file": "apps/mobile/src/navigation/app-tab-bar.tsx",
       "source_location": "L89",
       "id": "app_tab_bar_apptabbar",
-      "community": 11,
+      "community": 10,
       "norm_label": "apptabbar()"
     },
     {
@@ -2907,7 +2907,7 @@
       "source_file": "apps/mobile/src/navigation/onboarding-route-contract.ts",
       "source_location": "L1",
       "id": "apps_mobile_src_navigation_onboarding_route_contract_ts",
-      "community": 21,
+      "community": 22,
       "norm_label": "onboarding-route-contract.ts"
     },
     {
@@ -2916,7 +2916,7 @@
       "source_file": "apps/mobile/src/navigation/onboarding-route-contract.ts",
       "source_location": "L1",
       "id": "onboarding_route_contract_allowsincompleteonboardingforroute",
-      "community": 21,
+      "community": 22,
       "norm_label": "allowsincompleteonboardingforroute()"
     },
     {
@@ -2925,7 +2925,7 @@
       "source_file": "apps/mobile/src/navigation/onboarding-route-contract.ts",
       "source_location": "L12",
       "id": "onboarding_route_contract_parsefirstlaunch",
-      "community": 21,
+      "community": 22,
       "norm_label": "parsefirstlaunch()"
     },
     {
@@ -2979,7 +2979,7 @@
       "source_file": "apps/mobile/src/motion/use-reduce-motion-enabled.ts",
       "source_location": "L1",
       "id": "apps_mobile_src_motion_use_reduce_motion_enabled_ts",
-      "community": 11,
+      "community": 10,
       "norm_label": "use-reduce-motion-enabled.ts"
     },
     {
@@ -2988,7 +2988,7 @@
       "source_file": "apps/mobile/src/motion/use-reduce-motion-enabled.ts",
       "source_location": "L9",
       "id": "use_reduce_motion_enabled_usereducemotionpreference",
-      "community": 11,
+      "community": 10,
       "norm_label": "usereducemotionpreference()"
     },
     {
@@ -2997,7 +2997,7 @@
       "source_file": "apps/mobile/src/motion/use-reduce-motion-enabled.ts",
       "source_location": "L52",
       "id": "use_reduce_motion_enabled_usereducemotionenabled",
-      "community": 11,
+      "community": 10,
       "norm_label": "usereducemotionenabled()"
     },
     {
@@ -3013,7 +3013,7 @@
       "label": "createPrivacySafeSyncFailureContext()",
       "file_type": "code",
       "source_file": "apps/mobile/src/observability/sync-observability.ts",
-      "source_location": "L50",
+      "source_location": "L51",
       "id": "sync_observability_createprivacysafesyncfailurecontext",
       "community": 76,
       "norm_label": "createprivacysafesyncfailurecontext()"
@@ -3139,7 +3139,7 @@
       "label": "isPostHogConfigured()",
       "file_type": "code",
       "source_file": "apps/mobile/src/observability/posthog.ts",
-      "source_location": "L151",
+      "source_location": "L171",
       "id": "posthog_isposthogconfigured",
       "community": 7,
       "norm_label": "isposthogconfigured()"
@@ -3148,7 +3148,7 @@
       "label": "isApprovedAnalyticsEventName()",
       "file_type": "code",
       "source_file": "apps/mobile/src/observability/posthog.ts",
-      "source_location": "L155",
+      "source_location": "L175",
       "id": "posthog_isapprovedanalyticseventname",
       "community": 7,
       "norm_label": "isapprovedanalyticseventname()"
@@ -3157,7 +3157,7 @@
       "label": "createPrivacySafeAnalyticsProperties()",
       "file_type": "code",
       "source_file": "apps/mobile/src/observability/posthog.ts",
-      "source_location": "L161",
+      "source_location": "L181",
       "id": "posthog_createprivacysafeanalyticsproperties",
       "community": 7,
       "norm_label": "createprivacysafeanalyticsproperties()"
@@ -3166,7 +3166,7 @@
       "label": "isPrivacySafeRelease()",
       "file_type": "code",
       "source_file": "apps/mobile/src/observability/posthog.ts",
-      "source_location": "L209",
+      "source_location": "L252",
       "id": "posthog_isprivacysaferelease",
       "community": 7,
       "norm_label": "isprivacysaferelease()"
@@ -3175,16 +3175,25 @@
       "label": "containsSensitiveToken()",
       "file_type": "code",
       "source_file": "apps/mobile/src/observability/posthog.ts",
-      "source_location": "L213",
+      "source_location": "L256",
       "id": "posthog_containssensitivetoken",
       "community": 7,
       "norm_label": "containssensitivetoken()"
     },
     {
+      "label": "filterAllowedStringArray()",
+      "file_type": "code",
+      "source_file": "apps/mobile/src/observability/posthog.ts",
+      "source_location": "L260",
+      "id": "posthog_filterallowedstringarray",
+      "community": 7,
+      "norm_label": "filterallowedstringarray()"
+    },
+    {
       "label": "captureExplicitEvent()",
       "file_type": "code",
       "source_file": "apps/mobile/src/observability/posthog.ts",
-      "source_location": "L217",
+      "source_location": "L276",
       "id": "posthog_captureexplicitevent",
       "community": 7,
       "norm_label": "captureexplicitevent()"
@@ -3193,7 +3202,7 @@
       "label": "captureAnalyticsEvent()",
       "file_type": "code",
       "source_file": "apps/mobile/src/observability/posthog.ts",
-      "source_location": "L245",
+      "source_location": "L304",
       "id": "posthog_captureanalyticsevent",
       "community": 7,
       "norm_label": "captureanalyticsevent()"
@@ -3202,7 +3211,7 @@
       "label": "capturePostHogProofEvent()",
       "file_type": "code",
       "source_file": "apps/mobile/src/observability/posthog.ts",
-      "source_location": "L252",
+      "source_location": "L311",
       "id": "posthog_captureposthogproofevent",
       "community": 7,
       "norm_label": "captureposthogproofevent()"
@@ -3213,7 +3222,7 @@
       "source_file": "apps/mobile/src/observability/deferred-capture.ts",
       "source_location": "L1",
       "id": "apps_mobile_src_observability_deferred_capture_ts",
-      "community": 6,
+      "community": 3,
       "norm_label": "deferred-capture.ts"
     },
     {
@@ -3222,7 +3231,7 @@
       "source_file": "apps/mobile/src/observability/deferred-capture.ts",
       "source_location": "L4",
       "id": "deferred_capture_captureanalyticseventdeferred",
-      "community": 6,
+      "community": 3,
       "norm_label": "captureanalyticseventdeferred()"
     },
     {
@@ -3231,8 +3240,62 @@
       "source_file": "apps/mobile/src/observability/deferred-capture.ts",
       "source_location": "L15",
       "id": "deferred_capture_capturesyncfailuredeferred",
-      "community": 6,
+      "community": 3,
       "norm_label": "capturesyncfailuredeferred()"
+    },
+    {
+      "label": "sound-mixer-observability.ts",
+      "file_type": "code",
+      "source_file": "apps/mobile/src/observability/sound-mixer-observability.ts",
+      "source_location": "L1",
+      "id": "apps_mobile_src_observability_sound_mixer_observability_ts",
+      "community": 3,
+      "norm_label": "sound-mixer-observability.ts"
+    },
+    {
+      "label": "createSoundMixerLayerAnalyticsProperties()",
+      "file_type": "code",
+      "source_file": "apps/mobile/src/observability/sound-mixer-observability.ts",
+      "source_location": "L18",
+      "id": "sound_mixer_observability_createsoundmixerlayeranalyticsproperties",
+      "community": 3,
+      "norm_label": "createsoundmixerlayeranalyticsproperties()"
+    },
+    {
+      "label": "createSoundMixerSoundAnalyticsProperties()",
+      "file_type": "code",
+      "source_file": "apps/mobile/src/observability/sound-mixer-observability.ts",
+      "source_location": "L46",
+      "id": "sound_mixer_observability_createsoundmixersoundanalyticsproperties",
+      "community": 3,
+      "norm_label": "createsoundmixersoundanalyticsproperties()"
+    },
+    {
+      "label": "captureSoundMixSavedDeferred()",
+      "file_type": "code",
+      "source_file": "apps/mobile/src/observability/sound-mixer-observability.ts",
+      "source_location": "L56",
+      "id": "sound_mixer_observability_capturesoundmixsaveddeferred",
+      "community": 3,
+      "norm_label": "capturesoundmixsaveddeferred()"
+    },
+    {
+      "label": "getSoundMixerTimerOptionFromDurationSeconds()",
+      "file_type": "code",
+      "source_file": "apps/mobile/src/observability/sound-mixer-observability.ts",
+      "source_location": "L70",
+      "id": "sound_mixer_observability_getsoundmixertimeroptionfromdurationseconds",
+      "community": 3,
+      "norm_label": "getsoundmixertimeroptionfromdurationseconds()"
+    },
+    {
+      "label": "isSoundMixerFiniteTimerPreference()",
+      "file_type": "code",
+      "source_file": "apps/mobile/src/observability/sound-mixer-observability.ts",
+      "source_location": "L86",
+      "id": "sound_mixer_observability_issoundmixerfinitetimerpreference",
+      "community": 3,
+      "norm_label": "issoundmixerfinitetimerpreference()"
     },
     {
       "label": "local-install-identity.ts",
@@ -3240,7 +3303,7 @@
       "source_file": "apps/mobile/src/storage/local-install-identity.ts",
       "source_location": "L1",
       "id": "apps_mobile_src_storage_local_install_identity_ts",
-      "community": 10,
+      "community": 11,
       "norm_label": "local-install-identity.ts"
     },
     {
@@ -3249,7 +3312,7 @@
       "source_file": "apps/mobile/src/storage/local-install-identity.ts",
       "source_location": "L22",
       "id": "local_install_identity_createlocalinstallid",
-      "community": 10,
+      "community": 11,
       "norm_label": "createlocalinstallid()"
     },
     {
@@ -3258,7 +3321,7 @@
       "source_file": "apps/mobile/src/storage/local-install-identity.ts",
       "source_location": "L34",
       "id": "local_install_identity_getorcreatelocalinstallidentity",
-      "community": 10,
+      "community": 11,
       "norm_label": "getorcreatelocalinstallidentity()"
     },
     {
@@ -3267,7 +3330,7 @@
       "source_file": "apps/mobile/src/storage/local-install-identity.ts",
       "source_location": "L61",
       "id": "local_install_identity_createdefaultrandomsegment",
-      "community": 10,
+      "community": 11,
       "norm_label": "createdefaultrandomsegment()"
     },
     {
@@ -3357,7 +3420,7 @@
       "source_file": "apps/mobile/src/audio/rescue-me-sound-handoff-audio.ts",
       "source_location": "L1",
       "id": "apps_mobile_src_audio_rescue_me_sound_handoff_audio_ts",
-      "community": 6,
+      "community": 3,
       "norm_label": "rescue-me-sound-handoff-audio.ts"
     },
     {
@@ -3366,7 +3429,7 @@
       "source_file": "apps/mobile/src/audio/rescue-me-sound-handoff-audio.ts",
       "source_location": "L30",
       "id": "rescue_me_sound_handoff_audio_createrescuemesoundhandoffaudiocontroller",
-      "community": 6,
+      "community": 3,
       "norm_label": "createrescuemesoundhandoffaudiocontroller()"
     },
     {
@@ -3375,7 +3438,7 @@
       "source_file": "apps/mobile/src/audio/rescue-me-sound-handoff-audio.ts",
       "source_location": "L182",
       "id": "rescue_me_sound_handoff_audio_capturerescuemesoundhandoffaudiofaileddeferred",
-      "community": 6,
+      "community": 3,
       "norm_label": "capturerescuemesoundhandoffaudiofaileddeferred()"
     },
     {
@@ -3384,7 +3447,7 @@
       "source_file": "apps/mobile/src/audio/wind-down-ambient-audio.ts",
       "source_location": "L1",
       "id": "apps_mobile_src_audio_wind_down_ambient_audio_ts",
-      "community": 6,
+      "community": 3,
       "norm_label": "wind-down-ambient-audio.ts"
     },
     {
@@ -3393,7 +3456,7 @@
       "source_file": "apps/mobile/src/audio/wind-down-ambient-audio.ts",
       "source_location": "L109",
       "id": "wind_down_ambient_audio_createwinddownambientaudiocontroller",
-      "community": 6,
+      "community": 3,
       "norm_label": "createwinddownambientaudiocontroller()"
     },
     {
@@ -3402,7 +3465,7 @@
       "source_file": "apps/mobile/src/audio/wind-down-ambient-audio.ts",
       "source_location": "L434",
       "id": "wind_down_ambient_audio_capturewinddownambientaudiofaileddeferred",
-      "community": 6,
+      "community": 3,
       "norm_label": "capturewinddownambientaudiofaileddeferred()"
     },
     {
@@ -3411,7 +3474,7 @@
       "source_file": "apps/mobile/src/audio/wind-down-ambient-audio.ts",
       "source_location": "L449",
       "id": "wind_down_ambient_audio_capturewinddownambientaudiostarteddeferred",
-      "community": 6,
+      "community": 3,
       "norm_label": "capturewinddownambientaudiostarteddeferred()"
     },
     {
@@ -3420,7 +3483,7 @@
       "source_file": "apps/mobile/src/audio/wind-down-ambient-audio.ts",
       "source_location": "L466",
       "id": "wind_down_ambient_audio_clamp",
-      "community": 6,
+      "community": 3,
       "norm_label": "clamp()"
     },
     {
@@ -3429,7 +3492,7 @@
       "source_file": "apps/mobile/src/audio/active-session-audio-controller.ts",
       "source_location": "L1",
       "id": "apps_mobile_src_audio_active_session_audio_controller_ts",
-      "community": 6,
+      "community": 3,
       "norm_label": "active-session-audio-controller.ts"
     },
     {
@@ -3438,7 +3501,7 @@
       "source_file": "apps/mobile/src/audio/active-session-audio-controller.ts",
       "source_location": "L85",
       "id": "active_session_audio_controller_createactivesessionaudiocontroller",
-      "community": 6,
+      "community": 3,
       "norm_label": "createactivesessionaudiocontroller()"
     },
     {
@@ -3447,7 +3510,7 @@
       "source_file": "apps/mobile/src/audio/active-session-audio-controller.ts",
       "source_location": "L389",
       "id": "active_session_audio_controller_getcueassetid",
-      "community": 6,
+      "community": 3,
       "norm_label": "getcueassetid()"
     },
     {
@@ -3456,7 +3519,7 @@
       "source_file": "apps/mobile/src/audio/active-session-audio-controller.ts",
       "source_location": "L410",
       "id": "active_session_audio_controller_getassetsource",
-      "community": 6,
+      "community": 3,
       "norm_label": "getassetsource()"
     },
     {
@@ -3465,7 +3528,7 @@
       "source_file": "apps/mobile/src/audio/active-session-audio-controller.ts",
       "source_location": "L426",
       "id": "active_session_audio_controller_getmodelockscreentitle",
-      "community": 6,
+      "community": 3,
       "norm_label": "getmodelockscreentitle()"
     },
     {
@@ -3474,7 +3537,7 @@
       "source_file": "apps/mobile/src/audio/active-session-audio-controller.ts",
       "source_location": "L439",
       "id": "active_session_audio_controller_captureaudiofaileddeferred",
-      "community": 6,
+      "community": 3,
       "norm_label": "captureaudiofaileddeferred()"
     },
     {
@@ -3510,52 +3573,52 @@
       "source_file": "apps/mobile/src/audio/sound-mixer-playback-controller.ts",
       "source_location": "L1",
       "id": "apps_mobile_src_audio_sound_mixer_playback_controller_ts",
-      "community": 6,
+      "community": 3,
       "norm_label": "sound-mixer-playback-controller.ts"
     },
     {
       "label": "createSoundMixerPlaybackController()",
       "file_type": "code",
       "source_file": "apps/mobile/src/audio/sound-mixer-playback-controller.ts",
-      "source_location": "L108",
+      "source_location": "L112",
       "id": "sound_mixer_playback_controller_createsoundmixerplaybackcontroller",
-      "community": 6,
+      "community": 3,
       "norm_label": "createsoundmixerplaybackcontroller()"
     },
     {
       "label": "normalizeActiveLayers()",
       "file_type": "code",
       "source_file": "apps/mobile/src/audio/sound-mixer-playback-controller.ts",
-      "source_location": "L517",
+      "source_location": "L521",
       "id": "sound_mixer_playback_controller_normalizeactivelayers",
-      "community": 6,
+      "community": 3,
       "norm_label": "normalizeactivelayers()"
     },
     {
       "label": "captureSoundMixerAudioFailedDeferred()",
       "file_type": "code",
       "source_file": "apps/mobile/src/audio/sound-mixer-playback-controller.ts",
-      "source_location": "L540",
+      "source_location": "L544",
       "id": "sound_mixer_playback_controller_capturesoundmixeraudiofaileddeferred",
-      "community": 6,
+      "community": 3,
       "norm_label": "capturesoundmixeraudiofaileddeferred()"
     },
     {
       "label": "captureSoundMixerAudioStartedDeferred()",
       "file_type": "code",
       "source_file": "apps/mobile/src/audio/sound-mixer-playback-controller.ts",
-      "source_location": "L551",
+      "source_location": "L559",
       "id": "sound_mixer_playback_controller_capturesoundmixeraudiostarteddeferred",
-      "community": 6,
+      "community": 3,
       "norm_label": "capturesoundmixeraudiostarteddeferred()"
     },
     {
       "label": "clamp()",
       "file_type": "code",
       "source_file": "apps/mobile/src/audio/sound-mixer-playback-controller.ts",
-      "source_location": "L569",
+      "source_location": "L579",
       "id": "sound_mixer_playback_controller_clamp",
-      "community": 6,
+      "community": 3,
       "norm_label": "clamp()"
     },
     {
@@ -3906,7 +3969,7 @@
       "source_file": "apps/mobile/src/paywall/post-value-supabase-auth.ts",
       "source_location": "L1",
       "id": "apps_mobile_src_paywall_post_value_supabase_auth_ts",
-      "community": 4,
+      "community": 5,
       "norm_label": "post-value-supabase-auth.ts"
     },
     {
@@ -3915,7 +3978,7 @@
       "source_file": "apps/mobile/src/paywall/post-value-supabase-auth.ts",
       "source_location": "L41",
       "id": "post_value_supabase_auth_createpostvaluesupabaseauthenticator",
-      "community": 4,
+      "community": 5,
       "norm_label": "createpostvaluesupabaseauthenticator()"
     },
     {
@@ -3924,7 +3987,7 @@
       "source_file": "apps/mobile/src/paywall/post-value-supabase-auth.ts",
       "source_location": "L59",
       "id": "post_value_supabase_auth_createpostvaluesupabaseclient",
-      "community": 4,
+      "community": 5,
       "norm_label": "createpostvaluesupabaseclient()"
     },
     {
@@ -3933,7 +3996,7 @@
       "source_file": "apps/mobile/src/paywall/post-value-supabase-auth.ts",
       "source_location": "L101",
       "id": "post_value_supabase_auth_isconfiguredpublicvalue",
-      "community": 4,
+      "community": 5,
       "norm_label": "isconfiguredpublicvalue()"
     },
     {
@@ -3942,7 +4005,7 @@
       "source_file": "apps/mobile/src/paywall/post-value-supabase-auth.ts",
       "source_location": "L105",
       "id": "post_value_supabase_auth_getorcreateanonymoususerid",
-      "community": 4,
+      "community": 5,
       "norm_label": "getorcreateanonymoususerid()"
     },
     {
@@ -3951,7 +4014,7 @@
       "source_file": "apps/mobile/src/paywall/post-value-supabase-auth.ts",
       "source_location": "L121",
       "id": "post_value_supabase_auth_startproviderlink",
-      "community": 4,
+      "community": 5,
       "norm_label": "startproviderlink()"
     },
     {
@@ -3960,7 +4023,7 @@
       "source_file": "apps/mobile/src/paywall/post-value-supabase-auth.ts",
       "source_location": "L142",
       "id": "post_value_supabase_auth_parsesupabaseurl",
-      "community": 4,
+      "community": 5,
       "norm_label": "parsesupabaseurl()"
     },
     {
@@ -3969,7 +4032,7 @@
       "source_file": "apps/mobile/src/paywall/post-value-supabase-auth.ts",
       "source_location": "L150",
       "id": "post_value_supabase_auth_createsupabaseserviceurl",
-      "community": 4,
+      "community": 5,
       "norm_label": "createsupabaseserviceurl()"
     },
     {
@@ -3978,7 +4041,7 @@
       "source_file": "apps/mobile/src/paywall/post-value-supabase-auth.ts",
       "source_location": "L154",
       "id": "post_value_supabase_auth_createsupabasestoragekey",
-      "community": 4,
+      "community": 5,
       "norm_label": "createsupabasestoragekey()"
     },
     {
@@ -3987,7 +4050,7 @@
       "source_file": "apps/mobile/src/paywall/post-value-supabase-auth.ts",
       "source_location": "L158",
       "id": "post_value_supabase_auth_createsupabaseheaders",
-      "community": 4,
+      "community": 5,
       "norm_label": "createsupabaseheaders()"
     },
     {
@@ -3996,7 +4059,7 @@
       "source_file": "apps/mobile/src/paywall/post-value-supabase-auth.ts",
       "source_location": "L166",
       "id": "post_value_supabase_auth_upsertpostvaluerecords",
-      "community": 4,
+      "community": 5,
       "norm_label": "upsertpostvaluerecords()"
     },
     {
@@ -4005,7 +4068,7 @@
       "source_file": "apps/mobile/src/paywall/post-value-supabase-auth.ts",
       "source_location": "L227",
       "id": "post_value_supabase_auth_isallowedpostvaluesynctarget",
-      "community": 4,
+      "community": 5,
       "norm_label": "isallowedpostvaluesynctarget()"
     },
     {
@@ -4014,7 +4077,7 @@
       "source_file": "apps/mobile/src/paywall/post-value-supabase-auth.ts",
       "source_location": "L234",
       "id": "post_value_supabase_auth_createpostvaluesynchttperror",
-      "community": 4,
+      "community": 5,
       "norm_label": "createpostvaluesynchttperror()"
     },
     {
@@ -4023,7 +4086,7 @@
       "source_file": "apps/mobile/src/paywall/post-value-account-paywall-route.tsx",
       "source_location": "L1",
       "id": "apps_mobile_src_paywall_post_value_account_paywall_route_tsx",
-      "community": 4,
+      "community": 5,
       "norm_label": "post-value-account-paywall-route.tsx"
     },
     {
@@ -4032,7 +4095,7 @@
       "source_file": "apps/mobile/src/paywall/post-value-account-paywall-route.tsx",
       "source_location": "L42",
       "id": "post_value_account_paywall_route_loadroutestate",
-      "community": 4,
+      "community": 5,
       "norm_label": "loadroutestate()"
     },
     {
@@ -4176,7 +4239,7 @@
       "source_file": "apps/mobile/src/notifications/notification-permission-gate-screen.tsx",
       "source_location": "L1",
       "id": "apps_mobile_src_notifications_notification_permission_gate_screen_tsx",
-      "community": 11,
+      "community": 10,
       "norm_label": "notification-permission-gate-screen.tsx"
     },
     {
@@ -4185,7 +4248,7 @@
       "source_file": "apps/mobile/src/notifications/notification-permission-gate-screen.tsx",
       "source_location": "L32",
       "id": "notification_permission_gate_screen_notificationpermissiongatescreen",
-      "community": 11,
+      "community": 10,
       "norm_label": "notificationpermissiongatescreen()"
     },
     {
@@ -4194,7 +4257,7 @@
       "source_file": "apps/mobile/src/notifications/notification-permission-gate-screen.tsx",
       "source_location": "L201",
       "id": "notification_permission_gate_screen_splitheadline",
-      "community": 11,
+      "community": 10,
       "norm_label": "splitheadline()"
     },
     {
@@ -4203,7 +4266,7 @@
       "source_file": "apps/mobile/src/notifications/notification-permission-gate-screen.tsx",
       "source_location": "L217",
       "id": "notification_permission_gate_screen_notificationgateambientfade",
-      "community": 11,
+      "community": 10,
       "norm_label": "notificationgateambientfade()"
     },
     {
@@ -4212,7 +4275,7 @@
       "source_file": "apps/mobile/src/notifications/notification-permission-gate-screen.tsx",
       "source_location": "L243",
       "id": "notification_permission_gate_screen_notificationgateactionfade",
-      "community": 11,
+      "community": 10,
       "norm_label": "notificationgateactionfade()"
     },
     {
@@ -4356,7 +4419,7 @@
       "source_file": "apps/mobile/src/onboarding/local-first-onboarding.ts",
       "source_location": "L239",
       "id": "local_first_onboarding_hascompletedonboardingpersonalization",
-      "community": 10,
+      "community": 11,
       "norm_label": "hascompletedonboardingpersonalization()"
     },
     {
@@ -4581,7 +4644,7 @@
       "source_file": "apps/mobile/src/onboarding/onboarding-splash-screen.tsx",
       "source_location": "L1",
       "id": "apps_mobile_src_onboarding_onboarding_splash_screen_tsx",
-      "community": 11,
+      "community": 10,
       "norm_label": "onboarding-splash-screen.tsx"
     },
     {
@@ -4590,7 +4653,7 @@
       "source_file": "apps/mobile/src/onboarding/onboarding-splash-screen.tsx",
       "source_location": "L20",
       "id": "onboarding_splash_screen_getonboardingsplashorbpulseconfig",
-      "community": 11,
+      "community": 10,
       "norm_label": "getonboardingsplashorbpulseconfig()"
     },
     {
@@ -4599,7 +4662,7 @@
       "source_file": "apps/mobile/src/onboarding/onboarding-splash-screen.tsx",
       "source_location": "L34",
       "id": "onboarding_splash_screen_onboardingsplashscreen",
-      "community": 11,
+      "community": 10,
       "norm_label": "onboardingsplashscreen()"
     },
     {
@@ -4608,7 +4671,7 @@
       "source_file": "apps/mobile/src/onboarding/first-launch-onboarding-gate.tsx",
       "source_location": "L1",
       "id": "apps_mobile_src_onboarding_first_launch_onboarding_gate_tsx",
-      "community": 10,
+      "community": 11,
       "norm_label": "first-launch-onboarding-gate.tsx"
     },
     {
@@ -4617,7 +4680,7 @@
       "source_file": "apps/mobile/src/onboarding/first-launch-onboarding-gate.tsx",
       "source_location": "L21",
       "id": "first_launch_onboarding_gate_firstlaunchonboardinggate",
-      "community": 10,
+      "community": 11,
       "norm_label": "firstlaunchonboardinggate()"
     },
     {
@@ -4626,7 +4689,7 @@
       "source_file": "apps/mobile/src/onboarding/first-launch-onboarding-gate.tsx",
       "source_location": "L42",
       "id": "first_launch_onboarding_gate_firstlaunchonboardinggatebase",
-      "community": 10,
+      "community": 11,
       "norm_label": "firstlaunchonboardinggatebase()"
     },
     {
@@ -4635,7 +4698,7 @@
       "source_file": "apps/mobile/src/onboarding/first-launch-onboarding-gate.tsx",
       "source_location": "L103",
       "id": "first_launch_onboarding_gate_shouldstartfirstlaunchonboarding",
-      "community": 10,
+      "community": 11,
       "norm_label": "shouldstartfirstlaunchonboarding()"
     },
     {
@@ -4662,7 +4725,7 @@
       "source_file": "apps/mobile/src/onboarding/onboarding-flow-screen.tsx",
       "source_location": "L1",
       "id": "apps_mobile_src_onboarding_onboarding_flow_screen_tsx",
-      "community": 10,
+      "community": 11,
       "norm_label": "onboarding-flow-screen.tsx"
     },
     {
@@ -4671,7 +4734,7 @@
       "source_file": "apps/mobile/src/onboarding/onboarding-flow-screen.tsx",
       "source_location": "L220",
       "id": "onboarding_flow_screen_onboardingflowscreen",
-      "community": 10,
+      "community": 11,
       "norm_label": "onboardingflowscreen()"
     },
     {
@@ -4680,7 +4743,7 @@
       "source_file": "apps/mobile/src/onboarding/onboarding-flow-screen.tsx",
       "source_location": "L596",
       "id": "onboarding_flow_screen_submiterror",
-      "community": 10,
+      "community": 11,
       "norm_label": "submiterror()"
     },
     {
@@ -4689,7 +4752,7 @@
       "source_file": "apps/mobile/src/onboarding/onboarding-flow-screen.tsx",
       "source_location": "L853",
       "id": "onboarding_flow_screen_cn",
-      "community": 10,
+      "community": 11,
       "norm_label": "cn()"
     },
     {
@@ -4698,7 +4761,7 @@
       "source_file": "apps/mobile/src/onboarding/onboarding-flow-screen.tsx",
       "source_location": "L1356",
       "id": "onboarding_flow_screen_onboardingcontinuebutton",
-      "community": 10,
+      "community": 11,
       "norm_label": "onboardingcontinuebutton()"
     },
     {
@@ -4707,7 +4770,7 @@
       "source_file": "apps/mobile/src/onboarding/onboarding-flow-screen.tsx",
       "source_location": "L1408",
       "id": "onboarding_flow_screen_padtimenumber",
-      "community": 10,
+      "community": 11,
       "norm_label": "padtimenumber()"
     },
     {
@@ -4878,7 +4941,7 @@
       "source_file": "apps/mobile/src/wind-down/wind-down-performance-proof.ts",
       "source_location": "L1",
       "id": "apps_mobile_src_wind_down_wind_down_performance_proof_ts",
-      "community": 3,
+      "community": 4,
       "norm_label": "wind-down-performance-proof.ts"
     },
     {
@@ -4887,7 +4950,7 @@
       "source_file": "apps/mobile/src/wind-down/wind-down-performance-proof.ts",
       "source_location": "L14",
       "id": "wind_down_performance_proof_markwinddownperformancestart",
-      "community": 3,
+      "community": 4,
       "norm_label": "markwinddownperformancestart()"
     },
     {
@@ -4896,7 +4959,7 @@
       "source_file": "apps/mobile/src/wind-down/wind-down-performance-proof.ts",
       "source_location": "L25",
       "id": "wind_down_performance_proof_recordwinddownperformancemeasure",
-      "community": 3,
+      "community": 4,
       "norm_label": "recordwinddownperformancemeasure()"
     },
     {
@@ -4905,7 +4968,7 @@
       "source_file": "apps/mobile/src/wind-down/wind-down-performance-proof.ts",
       "source_location": "L46",
       "id": "wind_down_performance_proof_iswinddownperformanceproofenabled",
-      "community": 3,
+      "community": 4,
       "norm_label": "iswinddownperformanceproofenabled()"
     },
     {
@@ -4914,7 +4977,7 @@
       "source_file": "apps/mobile/src/wind-down/wind-down-performance-proof.ts",
       "source_location": "L50",
       "id": "wind_down_performance_proof_getnowms",
-      "community": 3,
+      "community": 4,
       "norm_label": "getnowms()"
     },
     {
@@ -5487,7 +5550,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "packages/validation/src/index.test.ts",
-      "source_location": "L24",
+      "source_location": "L27",
       "weight": 1.0,
       "_src": "packages_validation_src_index_test_ts",
       "_tgt": "index_test_assertcondition",
@@ -6531,7 +6594,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "packages/validation/src/index.ts",
-      "source_location": "L54",
+      "source_location": "L56",
       "weight": 1.0,
       "_src": "packages_validation_src_index_ts",
       "_tgt": "index_localrecordidschema",
@@ -6543,7 +6606,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "packages/validation/src/index.ts",
-      "source_location": "L259",
+      "source_location": "L261",
       "weight": 1.0,
       "_src": "packages_validation_src_index_ts",
       "_tgt": "index_refinebreathsessionprogress",
@@ -6555,7 +6618,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "packages/validation/src/index.ts",
-      "source_location": "L363",
+      "source_location": "L365",
       "weight": 1.0,
       "_src": "packages_validation_src_index_ts",
       "_tgt": "index_refinewinddownrunterminalstate",
@@ -7959,7 +8022,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L109",
+      "source_location": "L110",
       "weight": 1.0,
       "_src": "apps_mobile_src_sleep_sound_mixer_screen_tsx",
       "_tgt": "sound_mixer_screen_parsesoundmixeruivariant",
@@ -7971,7 +8034,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L236",
+      "source_location": "L237",
       "weight": 1.0,
       "_src": "apps_mobile_src_sleep_sound_mixer_screen_tsx",
       "_tgt": "sound_mixer_screen_getinitialactivelayersforvariant",
@@ -7983,7 +8046,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L279",
+      "source_location": "L280",
       "weight": 1.0,
       "_src": "apps_mobile_src_sleep_sound_mixer_screen_tsx",
       "_tgt": "sound_mixer_screen_getsavedmixesforvariant",
@@ -7995,7 +8058,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L289",
+      "source_location": "L290",
       "weight": 1.0,
       "_src": "apps_mobile_src_sleep_sound_mixer_screen_tsx",
       "_tgt": "sound_mixer_screen_getsavedmixesfromrecords",
@@ -8007,7 +8070,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L295",
+      "source_location": "L296",
       "weight": 1.0,
       "_src": "apps_mobile_src_sleep_sound_mixer_screen_tsx",
       "_tgt": "sound_mixer_screen_getinitialsavedmixes",
@@ -8019,7 +8082,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L305",
+      "source_location": "L306",
       "weight": 1.0,
       "_src": "apps_mobile_src_sleep_sound_mixer_screen_tsx",
       "_tgt": "sound_mixer_screen_createsavedmixfromrecord",
@@ -8031,7 +8094,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L320",
+      "source_location": "L321",
       "weight": 1.0,
       "_src": "apps_mobile_src_sleep_sound_mixer_screen_tsx",
       "_tgt": "sound_mixer_screen_getsavedmixicons",
@@ -8043,7 +8106,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L326",
+      "source_location": "L327",
       "weight": 1.0,
       "_src": "apps_mobile_src_sleep_sound_mixer_screen_tsx",
       "_tgt": "sound_mixer_screen_getsoundicon",
@@ -8055,7 +8118,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L338",
+      "source_location": "L339",
       "weight": 1.0,
       "_src": "apps_mobile_src_sleep_sound_mixer_screen_tsx",
       "_tgt": "sound_mixer_screen_getdomainsavedmixes",
@@ -8067,7 +8130,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L346",
+      "source_location": "L347",
       "weight": 1.0,
       "_src": "apps_mobile_src_sleep_sound_mixer_screen_tsx",
       "_tgt": "sound_mixer_screen_upsertsavedmix",
@@ -8079,7 +8142,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L356",
+      "source_location": "L357",
       "weight": 1.0,
       "_src": "apps_mobile_src_sleep_sound_mixer_screen_tsx",
       "_tgt": "sound_mixer_screen_getinitialeditingsoundid",
@@ -8091,7 +8154,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L360",
+      "source_location": "L361",
       "weight": 1.0,
       "_src": "apps_mobile_src_sleep_sound_mixer_screen_tsx",
       "_tgt": "sound_mixer_screen_createinitialsoundmixercontroller",
@@ -8103,7 +8166,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L373",
+      "source_location": "L374",
       "weight": 1.0,
       "_src": "apps_mobile_src_sleep_sound_mixer_screen_tsx",
       "_tgt": "sound_mixer_screen_getmixerstate",
@@ -8115,7 +8178,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L411",
+      "source_location": "L412",
       "weight": 1.0,
       "_src": "apps_mobile_src_sleep_sound_mixer_screen_tsx",
       "_tgt": "sound_mixer_screen_formatactivelayercount",
@@ -8127,7 +8190,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L415",
+      "source_location": "L416",
       "weight": 1.0,
       "_src": "apps_mobile_src_sleep_sound_mixer_screen_tsx",
       "_tgt": "sound_mixer_screen_formatsoundmixertimerpreference",
@@ -8139,7 +8202,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L419",
+      "source_location": "L420",
       "weight": 1.0,
       "_src": "apps_mobile_src_sleep_sound_mixer_screen_tsx",
       "_tgt": "sound_mixer_screen_formatsoundmixertimerduration",
@@ -8151,7 +8214,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L429",
+      "source_location": "L430",
       "weight": 1.0,
       "_src": "apps_mobile_src_sleep_sound_mixer_screen_tsx",
       "_tgt": "sound_mixer_screen_getsoundmixertimerstatus",
@@ -8163,7 +8226,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L470",
+      "source_location": "L471",
       "weight": 1.0,
       "_src": "apps_mobile_src_sleep_sound_mixer_screen_tsx",
       "_tgt": "sound_mixer_screen_getsoundmixeractivestripmotionconfig",
@@ -8175,7 +8238,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L488",
+      "source_location": "L489",
       "weight": 1.0,
       "_src": "apps_mobile_src_sleep_sound_mixer_screen_tsx",
       "_tgt": "sound_mixer_screen_getsoundmixeridledimmingmotionconfig",
@@ -8187,7 +8250,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L500",
+      "source_location": "L501",
       "weight": 1.0,
       "_src": "apps_mobile_src_sleep_sound_mixer_screen_tsx",
       "_tgt": "sound_mixer_screen_calculatesoundmixervolumefrompoint",
@@ -8199,7 +8262,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L516",
+      "source_location": "L517",
       "weight": 1.0,
       "_src": "apps_mobile_src_sleep_sound_mixer_screen_tsx",
       "_tgt": "sound_mixer_screen_getsoundmixervolumedetent",
@@ -8211,7 +8274,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L1128",
+      "source_location": "L1132",
       "weight": 1.0,
       "_src": "apps_mobile_src_sleep_sound_mixer_screen_tsx",
       "_tgt": "sound_mixer_screen_cn",
@@ -8223,7 +8286,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L2093",
+      "source_location": "L2097",
       "weight": 1.0,
       "_src": "apps_mobile_src_sleep_sound_mixer_screen_tsx",
       "_tgt": "sound_mixer_screen_onvolumeadjust",
@@ -8235,7 +8298,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L2131",
+      "source_location": "L2135",
       "weight": 1.0,
       "_src": "apps_mobile_src_sleep_sound_mixer_screen_tsx",
       "_tgt": "sound_mixer_screen_if",
@@ -8247,7 +8310,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L364",
+      "source_location": "L365",
       "weight": 1.0,
       "_src": "sound_mixer_screen_createinitialsoundmixercontroller",
       "_tgt": "sound_mixer_screen_getinitialactivelayersforvariant",
@@ -8259,7 +8322,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L302",
+      "source_location": "L303",
       "weight": 1.0,
       "_src": "sound_mixer_screen_getinitialsavedmixes",
       "_tgt": "sound_mixer_screen_getsavedmixesforvariant",
@@ -8271,7 +8334,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L302",
+      "source_location": "L303",
       "weight": 1.0,
       "_src": "sound_mixer_screen_getinitialsavedmixes",
       "_tgt": "sound_mixer_screen_getsavedmixesfromrecords",
@@ -8283,7 +8346,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L308",
+      "source_location": "L309",
       "weight": 1.0,
       "_src": "sound_mixer_screen_createsavedmixfromrecord",
       "_tgt": "sound_mixer_screen_getsavedmixicons",
@@ -8295,7 +8358,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L314",
+      "source_location": "L315",
       "weight": 1.0,
       "_src": "sound_mixer_screen_createsavedmixfromrecord",
       "_tgt": "sound_mixer_screen_formatsoundmixertimerpreference",
@@ -8307,7 +8370,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L368",
+      "source_location": "L369",
       "weight": 1.0,
       "_src": "sound_mixer_screen_createinitialsoundmixercontroller",
       "_tgt": "sound_mixer_screen_getdomainsavedmixes",
@@ -8319,7 +8382,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L444",
+      "source_location": "L445",
       "weight": 1.0,
       "_src": "sound_mixer_screen_getsoundmixertimerstatus",
       "_tgt": "sound_mixer_screen_formatsoundmixertimerpreference",
@@ -8331,7 +8394,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/sleep/sound-mixer-screen.tsx",
-      "source_location": "L451",
+      "source_location": "L452",
       "weight": 1.0,
       "_src": "sound_mixer_screen_getsoundmixertimerstatus",
       "_tgt": "sound_mixer_screen_formatsoundmixertimerduration",
@@ -9027,7 +9090,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/observability/sync-observability.ts",
-      "source_location": "L50",
+      "source_location": "L51",
       "weight": 1.0,
       "_src": "apps_mobile_src_observability_sync_observability_ts",
       "_tgt": "sync_observability_createprivacysafesyncfailurecontext",
@@ -9219,7 +9282,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/observability/posthog.ts",
-      "source_location": "L151",
+      "source_location": "L171",
       "weight": 1.0,
       "_src": "apps_mobile_src_observability_posthog_ts",
       "_tgt": "posthog_isposthogconfigured",
@@ -9231,7 +9294,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/observability/posthog.ts",
-      "source_location": "L155",
+      "source_location": "L175",
       "weight": 1.0,
       "_src": "apps_mobile_src_observability_posthog_ts",
       "_tgt": "posthog_isapprovedanalyticseventname",
@@ -9243,7 +9306,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/observability/posthog.ts",
-      "source_location": "L161",
+      "source_location": "L181",
       "weight": 1.0,
       "_src": "apps_mobile_src_observability_posthog_ts",
       "_tgt": "posthog_createprivacysafeanalyticsproperties",
@@ -9255,7 +9318,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/observability/posthog.ts",
-      "source_location": "L209",
+      "source_location": "L252",
       "weight": 1.0,
       "_src": "apps_mobile_src_observability_posthog_ts",
       "_tgt": "posthog_isprivacysaferelease",
@@ -9267,7 +9330,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/observability/posthog.ts",
-      "source_location": "L213",
+      "source_location": "L256",
       "weight": 1.0,
       "_src": "apps_mobile_src_observability_posthog_ts",
       "_tgt": "posthog_containssensitivetoken",
@@ -9279,7 +9342,19 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/observability/posthog.ts",
-      "source_location": "L217",
+      "source_location": "L260",
+      "weight": 1.0,
+      "_src": "apps_mobile_src_observability_posthog_ts",
+      "_tgt": "posthog_filterallowedstringarray",
+      "source": "apps_mobile_src_observability_posthog_ts",
+      "target": "posthog_filterallowedstringarray",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/mobile/src/observability/posthog.ts",
+      "source_location": "L276",
       "weight": 1.0,
       "_src": "apps_mobile_src_observability_posthog_ts",
       "_tgt": "posthog_captureexplicitevent",
@@ -9291,7 +9366,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/observability/posthog.ts",
-      "source_location": "L245",
+      "source_location": "L304",
       "weight": 1.0,
       "_src": "apps_mobile_src_observability_posthog_ts",
       "_tgt": "posthog_captureanalyticsevent",
@@ -9303,7 +9378,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/observability/posthog.ts",
-      "source_location": "L252",
+      "source_location": "L311",
       "weight": 1.0,
       "_src": "apps_mobile_src_observability_posthog_ts",
       "_tgt": "posthog_captureposthogproofevent",
@@ -9315,7 +9390,19 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/observability/posthog.ts",
-      "source_location": "L202",
+      "source_location": "L213",
+      "weight": 1.0,
+      "_src": "posthog_createprivacysafeanalyticsproperties",
+      "_tgt": "posthog_filterallowedstringarray",
+      "source": "posthog_createprivacysafeanalyticsproperties",
+      "target": "posthog_filterallowedstringarray",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/mobile/src/observability/posthog.ts",
+      "source_location": "L245",
       "weight": 1.0,
       "_src": "posthog_createprivacysafeanalyticsproperties",
       "_tgt": "posthog_isprivacysaferelease",
@@ -9327,7 +9414,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/observability/posthog.ts",
-      "source_location": "L229",
+      "source_location": "L288",
       "weight": 1.0,
       "_src": "posthog_captureexplicitevent",
       "_tgt": "posthog_createprivacysafeanalyticsproperties",
@@ -9339,7 +9426,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/observability/posthog.ts",
-      "source_location": "L210",
+      "source_location": "L253",
       "weight": 1.0,
       "_src": "posthog_isprivacysaferelease",
       "_tgt": "posthog_containssensitivetoken",
@@ -9351,7 +9438,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/observability/posthog.ts",
-      "source_location": "L233",
+      "source_location": "L292",
       "weight": 1.0,
       "_src": "posthog_captureexplicitevent",
       "_tgt": "posthog_isprivacysaferelease",
@@ -9363,7 +9450,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/observability/posthog.ts",
-      "source_location": "L249",
+      "source_location": "L308",
       "weight": 1.0,
       "_src": "posthog_captureanalyticsevent",
       "_tgt": "posthog_captureexplicitevent",
@@ -9375,7 +9462,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/observability/posthog.ts",
-      "source_location": "L260",
+      "source_location": "L319",
       "weight": 1.0,
       "_src": "posthog_captureposthogproofevent",
       "_tgt": "posthog_captureexplicitevent",
@@ -9430,6 +9517,18 @@
       "source": "deferred_capture_captureanalyticseventdeferred",
       "target": "deferred_capture_capturesyncfailuredeferred",
       "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "apps/mobile/src/observability/sound-mixer-observability.ts",
+      "source_location": "L57",
+      "weight": 1.0,
+      "_src": "deferred_capture_captureanalyticseventdeferred",
+      "_tgt": "sound_mixer_observability_capturesoundmixsaveddeferred",
+      "source": "deferred_capture_captureanalyticseventdeferred",
+      "target": "sound_mixer_observability_capturesoundmixsaveddeferred"
     },
     {
       "relation": "calls",
@@ -9514,6 +9613,126 @@
       "_tgt": "onboarding_flow_screen_submiterror",
       "source": "deferred_capture_captureanalyticseventdeferred",
       "target": "onboarding_flow_screen_submiterror"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/mobile/src/observability/sound-mixer-observability.ts",
+      "source_location": "L18",
+      "weight": 1.0,
+      "_src": "apps_mobile_src_observability_sound_mixer_observability_ts",
+      "_tgt": "sound_mixer_observability_createsoundmixerlayeranalyticsproperties",
+      "source": "apps_mobile_src_observability_sound_mixer_observability_ts",
+      "target": "sound_mixer_observability_createsoundmixerlayeranalyticsproperties",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/mobile/src/observability/sound-mixer-observability.ts",
+      "source_location": "L46",
+      "weight": 1.0,
+      "_src": "apps_mobile_src_observability_sound_mixer_observability_ts",
+      "_tgt": "sound_mixer_observability_createsoundmixersoundanalyticsproperties",
+      "source": "apps_mobile_src_observability_sound_mixer_observability_ts",
+      "target": "sound_mixer_observability_createsoundmixersoundanalyticsproperties",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/mobile/src/observability/sound-mixer-observability.ts",
+      "source_location": "L56",
+      "weight": 1.0,
+      "_src": "apps_mobile_src_observability_sound_mixer_observability_ts",
+      "_tgt": "sound_mixer_observability_capturesoundmixsaveddeferred",
+      "source": "apps_mobile_src_observability_sound_mixer_observability_ts",
+      "target": "sound_mixer_observability_capturesoundmixsaveddeferred",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/mobile/src/observability/sound-mixer-observability.ts",
+      "source_location": "L70",
+      "weight": 1.0,
+      "_src": "apps_mobile_src_observability_sound_mixer_observability_ts",
+      "_tgt": "sound_mixer_observability_getsoundmixertimeroptionfromdurationseconds",
+      "source": "apps_mobile_src_observability_sound_mixer_observability_ts",
+      "target": "sound_mixer_observability_getsoundmixertimeroptionfromdurationseconds",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/mobile/src/observability/sound-mixer-observability.ts",
+      "source_location": "L86",
+      "weight": 1.0,
+      "_src": "apps_mobile_src_observability_sound_mixer_observability_ts",
+      "_tgt": "sound_mixer_observability_issoundmixerfinitetimerpreference",
+      "source": "apps_mobile_src_observability_sound_mixer_observability_ts",
+      "target": "sound_mixer_observability_issoundmixerfinitetimerpreference",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/mobile/src/observability/sound-mixer-observability.ts",
+      "source_location": "L32",
+      "weight": 1.0,
+      "_src": "sound_mixer_observability_createsoundmixerlayeranalyticsproperties",
+      "_tgt": "sound_mixer_observability_getsoundmixertimeroptionfromdurationseconds",
+      "source": "sound_mixer_observability_createsoundmixerlayeranalyticsproperties",
+      "target": "sound_mixer_observability_getsoundmixertimeroptionfromdurationseconds",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/mobile/src/observability/sound-mixer-observability.ts",
+      "source_location": "L60",
+      "weight": 1.0,
+      "_src": "sound_mixer_observability_capturesoundmixsaveddeferred",
+      "_tgt": "sound_mixer_observability_createsoundmixerlayeranalyticsproperties",
+      "source": "sound_mixer_observability_createsoundmixerlayeranalyticsproperties",
+      "target": "sound_mixer_observability_capturesoundmixsaveddeferred",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "apps/mobile/src/audio/sound-mixer-playback-controller.ts",
+      "source_location": "L569",
+      "weight": 1.0,
+      "_src": "sound_mixer_observability_createsoundmixerlayeranalyticsproperties",
+      "_tgt": "sound_mixer_playback_controller_capturesoundmixeraudiostarteddeferred",
+      "source": "sound_mixer_observability_createsoundmixerlayeranalyticsproperties",
+      "target": "sound_mixer_playback_controller_capturesoundmixeraudiostarteddeferred"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "apps/mobile/src/audio/sound-mixer-playback-controller.ts",
+      "source_location": "L552",
+      "weight": 1.0,
+      "_src": "sound_mixer_observability_createsoundmixersoundanalyticsproperties",
+      "_tgt": "sound_mixer_playback_controller_capturesoundmixeraudiofaileddeferred",
+      "source": "sound_mixer_observability_createsoundmixersoundanalyticsproperties",
+      "target": "sound_mixer_playback_controller_capturesoundmixeraudiofaileddeferred"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/mobile/src/observability/sound-mixer-observability.ts",
+      "source_location": "L83",
+      "weight": 1.0,
+      "_src": "sound_mixer_observability_getsoundmixertimeroptionfromdurationseconds",
+      "_tgt": "sound_mixer_observability_issoundmixerfinitetimerpreference",
+      "source": "sound_mixer_observability_getsoundmixertimeroptionfromdurationseconds",
+      "target": "sound_mixer_observability_issoundmixerfinitetimerpreference",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -9927,7 +10146,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/audio/sound-mixer-playback-controller.ts",
-      "source_location": "L108",
+      "source_location": "L112",
       "weight": 1.0,
       "_src": "apps_mobile_src_audio_sound_mixer_playback_controller_ts",
       "_tgt": "sound_mixer_playback_controller_createsoundmixerplaybackcontroller",
@@ -9939,7 +10158,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/audio/sound-mixer-playback-controller.ts",
-      "source_location": "L517",
+      "source_location": "L521",
       "weight": 1.0,
       "_src": "apps_mobile_src_audio_sound_mixer_playback_controller_ts",
       "_tgt": "sound_mixer_playback_controller_normalizeactivelayers",
@@ -9951,7 +10170,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/audio/sound-mixer-playback-controller.ts",
-      "source_location": "L540",
+      "source_location": "L544",
       "weight": 1.0,
       "_src": "apps_mobile_src_audio_sound_mixer_playback_controller_ts",
       "_tgt": "sound_mixer_playback_controller_capturesoundmixeraudiofaileddeferred",
@@ -9963,7 +10182,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/audio/sound-mixer-playback-controller.ts",
-      "source_location": "L551",
+      "source_location": "L559",
       "weight": 1.0,
       "_src": "apps_mobile_src_audio_sound_mixer_playback_controller_ts",
       "_tgt": "sound_mixer_playback_controller_capturesoundmixeraudiostarteddeferred",
@@ -9975,7 +10194,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/mobile/src/audio/sound-mixer-playback-controller.ts",
-      "source_location": "L569",
+      "source_location": "L579",
       "weight": 1.0,
       "_src": "apps_mobile_src_audio_sound_mixer_playback_controller_ts",
       "_tgt": "sound_mixer_playback_controller_clamp",

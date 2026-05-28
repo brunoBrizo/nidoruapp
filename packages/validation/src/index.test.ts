@@ -15,8 +15,11 @@ import {
   onboardingResponseSchema,
   postSessionReflectionSchema,
   soundMixerActiveLayerSchema,
+  soundMixerAnalyticsEventNameSchema,
+  soundMixerAnalyticsPropertiesSchema,
   soundMixerSavedMixRecordsSchema,
   soundMixerSavedMixSchema,
+  soundMixerSyncRecordTypeSchema,
   soundMixerStateLabelSchema,
   soundMixerTimerPreferenceSchema,
 } from "@nidoru/validation";
@@ -300,4 +303,38 @@ assertCondition(
     },
   ]).success,
   "Sound mixer saved mix persistence must reject more than 3 saved mixes.",
+);
+const soundMixerAnalyticsProperties = soundMixerAnalyticsPropertiesSchema.parse({
+  active_layer_count: 3,
+  audio_failure_class: "missing_bundled_asset",
+  audio_mode: "sound-mixer",
+  record_type: "sound_mix",
+  source_surface: "sound_mixer",
+  sound_category_ids: ["rain", "noise", "environment"],
+  sound_ids: ["light-rain", "brown-noise", "fireplace-crackling"],
+  timer_duration_seconds: 1800,
+  timer_option: 30,
+});
+void soundMixerAnalyticsProperties;
+assertCondition(
+  soundMixerAnalyticsEventNameSchema.safeParse("sound_mix_saved").success,
+  "Feature 06 analytics must include the saved-mix event.",
+);
+assertCondition(
+  soundMixerSyncRecordTypeSchema.safeParse("sound_mix").success,
+  "Feature 06 sync observability must include saved-mix sync failure record type.",
+);
+assertCondition(
+  !soundMixerAnalyticsPropertiesSchema.safeParse({
+    source_surface: "sound_mixer",
+    sound_ids: ["/private/var/mobile/Containers/Data/light-rain.m4a"],
+  }).success,
+  "Sound mixer analytics must reject local file paths as sound IDs.",
+);
+assertCondition(
+  !soundMixerAnalyticsPropertiesSchema.safeParse({
+    source_surface: "sound_mixer",
+    mix_name: "Rain beside Bruno's window",
+  }).success,
+  "Sound mixer analytics must reject user-generated mix names.",
 );

@@ -48,6 +48,7 @@ import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 
 import { useReduceMotionPreference } from "../motion/use-reduce-motion-enabled";
+import { captureSoundMixSavedDeferred } from "../observability/sound-mixer-observability";
 import { Animated, Pressable, ScrollView, Text, TextInput, View, cn } from "../tw";
 import { createSoundMixerSavedMixId } from "./sound-mixer-local-persistence";
 
@@ -845,7 +846,10 @@ export function SoundMixerScreen({
       const nextSavedMix = createSavedMixFromRecord(savedMixRecord);
       const nextSavedMixCatalog = upsertSavedMix(savedMixCatalog, nextSavedMix);
 
-      await onSaveMix?.(savedMixRecord);
+      if (onSaveMix) {
+        await onSaveMix(savedMixRecord);
+        captureSoundMixSavedDeferred(savedMixRecord);
+      }
 
       setSavedMixCatalog(nextSavedMixCatalog);
       setController((currentController) =>

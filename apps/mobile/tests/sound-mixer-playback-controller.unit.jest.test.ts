@@ -170,6 +170,10 @@ describe("Sound Mixer playback controller", () => {
     expect(mockCaptureAnalyticsEventDeferred).toHaveBeenCalledWith("audio_started", {
       active_layer_count: 3,
       audio_mode: "sound-mixer",
+      source_surface: "sound_mixer",
+      sound_category_ids: ["rain", "noise", "environment"],
+      sound_ids: ["light-rain", "brown-noise", "fireplace-crackling"],
+      timer_option: 30,
       timer_duration_seconds: 1_800,
     });
 
@@ -219,6 +223,31 @@ describe("Sound Mixer playback controller", () => {
       soundId: "light-rain",
     } satisfies SoundMixerPlaybackFailureContext);
     expect(JSON.stringify(captureAudioFailed.mock.calls)).not.toMatch(
+      /private|Containers|\.m4a|https?:\/\//i,
+    );
+  });
+
+  it("emits deferred privacy-safe audio_failed metadata by default", async () => {
+    const controller = createSoundMixerPlaybackController({
+      adapter: mockAudioAdapter,
+      assetSources: {},
+    });
+
+    await controller.start({
+      activeLayers: [{ soundId: "light-rain", volume: 72 }],
+      appState: "active",
+      nowMs: 0,
+      timerDurationSeconds: 1_800,
+    });
+
+    expect(mockCaptureAnalyticsEventDeferred).toHaveBeenCalledWith("audio_failed", {
+      audio_failure_class: "missing_bundled_asset",
+      audio_mode: "sound-mixer",
+      source_surface: "sound_mixer",
+      sound_category_id: "rain",
+      sound_id: "light-rain",
+    });
+    expect(JSON.stringify(mockCaptureAnalyticsEventDeferred.mock.calls)).not.toMatch(
       /private|Containers|\.m4a|https?:\/\//i,
     );
   });

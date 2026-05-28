@@ -4,6 +4,7 @@ import * as Haptics from "expo-haptics";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
+import { captureAnalyticsEventDeferred } from "../src/observability/deferred-capture";
 import SoundMixerAnchorScreen from "../src/app/(tabs)/sleep/sounds";
 import { SoundMixerScreen } from "../src/sleep/sound-mixer-screen";
 
@@ -21,6 +22,10 @@ jest.mock("../src/motion/use-reduce-motion-enabled", () => ({
     isResolved: true,
     reduceMotionEnabled: false,
   }),
+}));
+
+jest.mock("../src/observability/deferred-capture", () => ({
+  captureAnalyticsEventDeferred: jest.fn(),
 }));
 
 jest.mock("expo-router", () => {
@@ -58,10 +63,14 @@ jest.mock("react-native-css", () => {
 const hapticsSelectionAsync = Haptics.selectionAsync as jest.MockedFunction<
   typeof Haptics.selectionAsync
 >;
+const mockCaptureAnalyticsEventDeferred = captureAnalyticsEventDeferred as jest.MockedFunction<
+  typeof captureAnalyticsEventDeferred
+>;
 
 describe("SoundMixerAnchorScreen", () => {
   beforeEach(() => {
     hapticsSelectionAsync.mockClear();
+    mockCaptureAnalyticsEventDeferred.mockReset();
     mockRouterBack.mockClear();
     mockUseLocalSearchParams.mockReset();
     mockUseLocalSearchParams.mockReturnValue({});
@@ -531,7 +540,13 @@ describe("SoundMixerAnchorScreen", () => {
     jest.useFakeTimers();
     jest.setSystemTime(Date.parse("2026-05-28T12:00:00.000Z"));
 
-    const onSaveMix = jest.fn<() => Promise<void>>(() => Promise.resolve());
+    const callOrder: string[] = [];
+    const onSaveMix = jest.fn<() => Promise<void>>(async () => {
+      callOrder.push("local-save");
+    });
+    mockCaptureAnalyticsEventDeferred.mockImplementation(() => {
+      callOrder.push("analytics");
+    });
 
     render(
       <SoundMixerScreen
@@ -559,6 +574,44 @@ describe("SoundMixerAnchorScreen", () => {
           updatedAt: "2026-05-28T12:00:00.000Z",
         }),
       );
+    });
+    expect(screen.queryByText("Save mix")).toBeNull();
+    expect(screen.getByRole("button", { name: "Storm Fan saved mix" })).toBeTruthy();
+    expect(mockCaptureAnalyticsEventDeferred).toHaveBeenCalledWith("sound_mix_saved", {
+      active_layer_count: 1,
+      source_surface: "sound_mixer",
+      sound_category_ids: ["rain"],
+      sound_ids: ["heavy-rain"],
+      timer_option: 30,
+    });
+    expect(callOrder).toEqual(["local-save", "analytics"]);
+    expect(JSON.stringify(mockCaptureAnalyticsEventDeferred.mock.calls)).not.toMatch(
+      /Storm Fan|install_|soundmix_|Bruno/i,
+    );
+  });
+
+  it("keeps the saved mix update non-blocking when telemetry capture fails", async () => {
+    const onSaveMix = jest.fn<() => Promise<void>>(() => Promise.resolve());
+    mockCaptureAnalyticsEventDeferred.mockImplementationOnce(() => {
+      throw new Error("posthog unavailable");
+    });
+
+    render(
+      <SoundMixerScreen
+        initialSavedMixRecords={[]}
+        localInstallId="install_0123456789abcdef"
+        onSaveMix={onSaveMix}
+        uiVariant="empty-mixer"
+      />,
+    );
+
+    fireEvent.press(screen.getByRole("button", { name: "Heavy Rain sound" }));
+    fireEvent.press(screen.getByRole("button", { name: "Save Mix" }));
+    fireEvent.changeText(screen.getByTestId("sound-mixer-save-mix-name-input"), "Storm Fan");
+    fireEvent.press(screen.getByRole("button", { name: "Save Mix" }));
+
+    await waitFor(() => {
+      expect(onSaveMix).toHaveBeenCalledTimes(1);
     });
     expect(screen.queryByText("Save mix")).toBeNull();
     expect(screen.getByRole("button", { name: "Storm Fan saved mix" })).toBeTruthy();

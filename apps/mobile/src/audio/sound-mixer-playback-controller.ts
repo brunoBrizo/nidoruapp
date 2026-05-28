@@ -10,6 +10,10 @@ import {
 
 import { captureAnalyticsEventDeferred } from "../observability/deferred-capture";
 import {
+  createSoundMixerLayerAnalyticsProperties,
+  createSoundMixerSoundAnalyticsProperties,
+} from "../observability/sound-mixer-observability";
+import {
   createSleepTimerPowerController,
   type SleepTimerAppState,
   type SleepTimerPowerController,
@@ -69,7 +73,7 @@ export type SoundMixerPlaybackControllerOptions = {
   readonly assetSources?: SoundMixerPlaybackAssetSources;
   readonly captureAudioFailed?: (context: SoundMixerPlaybackFailureContext) => void;
   readonly captureAudioStarted?: (context: {
-    readonly activeLayerCount: number;
+    readonly activeLayers: readonly SoundMixerActiveLayer[];
     readonly timerDurationSeconds: number | null;
   }) => void;
   readonly powerController?: SleepTimerPowerController;
@@ -440,15 +444,15 @@ export function createSoundMixerPlaybackController({
         return getSnapshot(input.nowMs);
       }
 
-      let startedLayerCount = 0;
+      const startedLayers: SoundMixerActiveLayer[] = [];
 
       for (const layer of activeLayers) {
         if (await ensurePlayerForLayer(layer, true)) {
-          startedLayerCount += 1;
+          startedLayers.push(layer);
         }
       }
 
-      if (startedLayerCount === 0) {
+      if (startedLayers.length === 0) {
         status = "blocked";
         await adapter.setIsAudioActiveAsync(false).catch(() => undefined);
         return getSnapshot(input.nowMs);
@@ -457,7 +461,7 @@ export function createSoundMixerPlaybackController({
       status = "playing";
       await beginPowerPlayback(input.appState);
       captureAudioStarted({
-        activeLayerCount: startedLayerCount,
+        activeLayers: startedLayers,
         timerDurationSeconds,
       });
       return getSnapshot(input.nowMs);
@@ -537,11 +541,15 @@ function normalizeActiveLayers(
   });
 }
 
-function captureSoundMixerAudioFailedDeferred({ failureClass }: SoundMixerPlaybackFailureContext) {
+function captureSoundMixerAudioFailedDeferred({
+  failureClass,
+  soundId,
+}: SoundMixerPlaybackFailureContext) {
   try {
     captureAnalyticsEventDeferred("audio_failed", {
       audio_failure_class: failureClass,
       audio_mode: "sound-mixer",
+      ...createSoundMixerSoundAnalyticsProperties(soundId),
     });
   } catch {
     // Audio observability must never block local playback.
@@ -549,17 +557,19 @@ function captureSoundMixerAudioFailedDeferred({ failureClass }: SoundMixerPlayba
 }
 
 function captureSoundMixerAudioStartedDeferred({
-  activeLayerCount,
+  activeLayers,
   timerDurationSeconds,
 }: {
-  readonly activeLayerCount: number;
+  readonly activeLayers: readonly SoundMixerActiveLayer[];
   readonly timerDurationSeconds: number | null;
 }) {
   try {
     captureAnalyticsEventDeferred("audio_started", {
-      active_layer_count: activeLayerCount,
       audio_mode: "sound-mixer",
-      ...(timerDurationSeconds === null ? {} : { timer_duration_seconds: timerDurationSeconds }),
+      ...createSoundMixerLayerAnalyticsProperties({
+        layers: activeLayers,
+        timerDurationSeconds,
+      }),
     });
   } catch {
     // Audio observability must never block local playback.

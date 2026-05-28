@@ -4,6 +4,7 @@ import {
   breathSessionDurationBounds,
   breathTechniqueIds,
   breathworkFamiliarityOptions,
+  launchSoundCategoryIds,
   launchSoundIds,
   mvpBreathTechniqueIds,
   onboardingGoalOptions,
@@ -22,6 +23,7 @@ export const isoDateTimeSchema = z.string().datetime({ offset: true });
 export const breathTechniqueIdSchema = z.enum(breathTechniqueIds);
 export const mvpBreathTechniqueIdSchema = z.enum(mvpBreathTechniqueIds);
 export const launchSoundIdSchema = z.enum(launchSoundIds);
+export const launchSoundCategoryIdSchema = z.enum(launchSoundCategoryIds);
 export const soundMixerStateLabelSchema = z.enum(soundMixerStateLabels);
 export const soundMixerTimerPreferenceSchema = z.union([
   z.literal(20),
@@ -614,6 +616,62 @@ export const soundMixerSavedMixRecordsSchema = z
 
 export const soundMixLayerSchema = soundMixerActiveLayerSchema;
 
+export const soundMixerAnalyticsEventNameSchema = z.enum([
+  "audio_started",
+  "audio_failed",
+  "sound_mix_saved",
+  "sync_failed",
+]);
+export const soundMixerAnalyticsAudioModeSchema = z.enum(["sound-mixer"]);
+export const soundMixerAnalyticsSourceSurfaceSchema = z.enum(["sound_mixer"]);
+export const soundMixerAnalyticsAudioFailureClassSchema = z.enum([
+  "audio_mode_configuration",
+  "interruption_handling_failed",
+  "layer_playback_failed",
+  "lock_screen_metadata_failed",
+  "missing_bundled_asset",
+]);
+export const soundMixerSyncRecordTypeSchema = z.enum(["sound_mix"]);
+export const soundMixerAnalyticsReasonClassSchema = z.enum([
+  "offline",
+  "auth_denied",
+  "server_error",
+  "rate_limited",
+  "validation_error",
+  "unknown",
+]);
+export const soundMixerAnalyticsSyncStageSchema = z.enum([
+  "post_value_sync",
+  "analytics_event_flush",
+]);
+export const soundMixerAnalyticsTimerDurationSecondsSchema = z.union([
+  z.literal(1200),
+  z.literal(1800),
+  z.literal(2700),
+  z.literal(3600),
+]);
+export const soundMixerAnalyticsPropertiesSchema = z
+  .object({
+    active_layer_count: z.number().int().min(0).max(soundMixerLimits.maxActiveLayers).optional(),
+    attempt_count: z.number().int().min(1).optional(),
+    audio_failure_class: soundMixerAnalyticsAudioFailureClassSchema.optional(),
+    audio_mode: soundMixerAnalyticsAudioModeSchema.optional(),
+    reason_class: soundMixerAnalyticsReasonClassSchema.optional(),
+    record_type: soundMixerSyncRecordTypeSchema.optional(),
+    source_surface: soundMixerAnalyticsSourceSurfaceSchema.optional(),
+    sound_category_id: launchSoundCategoryIdSchema.optional(),
+    sound_category_ids: z
+      .array(launchSoundCategoryIdSchema)
+      .max(soundMixerLimits.maxActiveLayers)
+      .optional(),
+    sound_id: launchSoundIdSchema.optional(),
+    sound_ids: z.array(launchSoundIdSchema).max(soundMixerLimits.maxActiveLayers).optional(),
+    sync_stage: soundMixerAnalyticsSyncStageSchema.optional(),
+    timer_duration_seconds: soundMixerAnalyticsTimerDurationSecondsSchema.optional(),
+    timer_option: soundMixerTimerPreferenceSchema.optional(),
+  })
+  .strict();
+
 export const morningCheckInSchema = z.object({
   localInstallId: localInstallIdSchema,
   checkedInAt: isoDateTimeSchema,
@@ -640,6 +698,7 @@ export type RememberedWindDownContextChoice = z.infer<typeof rememberedWindDownC
 export type PostSessionReflection = z.infer<typeof postSessionReflectionSchema>;
 export type NotificationGateEligibility = z.infer<typeof notificationGateEligibilitySchema>;
 export type SoundMixerActiveLayer = z.infer<typeof soundMixerActiveLayerSchema>;
+export type SoundMixerAnalyticsProperties = z.infer<typeof soundMixerAnalyticsPropertiesSchema>;
 export type SoundMixerSavedMix = z.infer<typeof soundMixerSavedMixSchema>;
 export type SoundMixerSavedMixRecord = z.infer<typeof soundMixerSavedMixRecordSchema>;
 export type SoundMixLayer = z.infer<typeof soundMixLayerSchema>;

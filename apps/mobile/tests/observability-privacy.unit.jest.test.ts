@@ -90,8 +90,14 @@ describe("privacy-safe observability", () => {
       reason_class: "anxiety",
       record_type: "goal_anxiety",
       release: "install_0123456789abcdef",
+      sound_category_id: "bedtime-story",
+      sound_category_ids: ["rain", "private-session"],
+      sound_id: "/private/session_0123456789abcdef/cue.m4a",
+      sound_ids: ["light-rain", "/private/session_0123456789abcdef/cue.m4a"],
       source: "rescue_me_anxiety_relief",
+      source_surface: "bedtime_journal",
       sync_stage: "raw_payload_flush",
+      timer_option: "sleep_diary",
     });
 
     expect(properties).toEqual({
@@ -149,15 +155,19 @@ describe("privacy-safe observability", () => {
     );
   });
 
-  it("allows only coarse Sound Mixer playback telemetry", () => {
+  it("allows only allowlisted Sound Mixer playback telemetry", () => {
     const properties = createPrivacySafeAnalyticsProperties({
       active_layer_count: 3,
       audio_asset_id: "apps/mobile/assets/audio/sleep/light-rain.m4a",
       audio_failure_class: "missing_bundled_asset",
       audio_mode: "sound-mixer",
       exact_mix_name: "Rain beside Bruno's window",
+      source_surface: "sound_mixer",
+      sound_category_id: "rain",
+      sound_category_ids: ["rain", "noise"],
       sound_id: "light-rain",
       sound_ids: ["light-rain", "brown-noise"],
+      timer_option: 30,
       timer_duration_seconds: 1_800,
       volume_by_sound_id: { "light-rain": 72 },
     });
@@ -166,10 +176,16 @@ describe("privacy-safe observability", () => {
       active_layer_count: 3,
       audio_failure_class: "missing_bundled_asset",
       audio_mode: "sound-mixer",
+      source_surface: "sound_mixer",
+      sound_category_id: "rain",
+      sound_category_ids: ["rain", "noise"],
+      sound_id: "light-rain",
+      sound_ids: ["light-rain", "brown-noise"],
+      timer_option: 30,
       timer_duration_seconds: 1_800,
     });
     expect(JSON.stringify(properties)).not.toMatch(
-      /light-rain|brown-noise|Rain beside|Bruno|apps\/mobile|\.m4a/i,
+      /Rain beside|Bruno|apps\/mobile|\.m4a/i,
     );
   });
 
@@ -180,14 +196,14 @@ describe("privacy-safe observability", () => {
         "HTTP 500 while syncing install_0123456789abcdef for user 123e4567-e89b-12d3-a456-426614174000 with token secret",
       ),
       reasonClass: "server_error",
-      recordType: "wind_down_run",
+      recordType: "sound_mix",
       syncStage: "post_value_sync",
     });
 
     expect(context.analyticsProperties).toEqual({
       attempt_count: 3,
       reason_class: "server_error",
-      record_type: "wind_down_run",
+      record_type: "sound_mix",
       sync_stage: "post_value_sync",
     });
     expect(context.sentryBreadcrumb).toEqual({
@@ -195,7 +211,7 @@ describe("privacy-safe observability", () => {
       data: {
         attempt_count: 3,
         reason_class: "server_error",
-        record_type: "wind_down_run",
+        record_type: "sound_mix",
         sync_stage: "post_value_sync",
       },
       level: "warning",

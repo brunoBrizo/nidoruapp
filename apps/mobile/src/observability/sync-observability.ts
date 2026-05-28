@@ -14,7 +14,8 @@ export type SyncFailureRecordType =
   | "first_session_record"
   | "post_session_reflection"
   | "local_event_queue"
-  | "wind_down_run";
+  | "wind_down_run"
+  | "sound_mix";
 
 export type SyncFailureStage = "post_value_sync" | "analytics_event_flush";
 

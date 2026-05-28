@@ -1,3 +1,9 @@
+import {
+  launchSoundCategoryIds,
+  launchSoundIds,
+  soundMixerLimits,
+  soundMixerTimerOptions,
+} from "@nidoru/domain";
 import PostHog, { type PostHogOptions } from "posthog-react-native";
 
 import { getAppEnvironment, isNonProductionEnvironment } from "./environment";
@@ -68,11 +74,18 @@ type AnalyticsEventProperties = Readonly<
       | "first_session_record"
       | "post_session_reflection"
       | "local_event_queue"
-      | "wind_down_run";
+      | "wind_down_run"
+      | "sound_mix";
     release: string;
     source: "observability_proof";
+    source_surface: "sound_mixer";
+    sound_category_id: (typeof launchSoundCategoryIds)[number];
+    sound_category_ids: (typeof launchSoundCategoryIds)[number][];
+    sound_id: (typeof launchSoundIds)[number];
+    sound_ids: (typeof launchSoundIds)[number][];
     sync_stage: "post_value_sync" | "analytics_event_flush";
     timer_duration_seconds: 1200 | 1800 | 2700 | 3600;
+    timer_option: 20 | 30 | 45 | 60 | "infinity";
   }>
 >;
 
@@ -81,6 +94,8 @@ export const posthogProofEventName = "observability_test_event";
 const posthogApiKey = process.env.EXPO_PUBLIC_POSTHOG_API_KEY ?? "";
 const posthogHost = process.env.EXPO_PUBLIC_POSTHOG_HOST || "https://us.i.posthog.com";
 const allowedEventNames = new Set<string>([...approvedAnalyticsEventNames, posthogProofEventName]);
+const allowedLaunchSoundIds = new Set<string>(launchSoundIds);
+const allowedLaunchSoundCategoryIds = new Set<string>(launchSoundCategoryIds);
 const allowedStringAnalyticsProperties = {
   app_environment: new Set(["development", "staging", "production"]),
   audio_asset_id: new Set([
@@ -116,13 +131,18 @@ const allowedStringAnalyticsProperties = {
     "post_session_reflection",
     "local_event_queue",
     "wind_down_run",
+    "sound_mix",
   ]),
   source: new Set(["observability_proof"]),
+  source_surface: new Set(["sound_mixer"]),
+  sound_category_id: allowedLaunchSoundCategoryIds,
+  sound_id: allowedLaunchSoundIds,
   sync_stage: new Set(["post_value_sync", "analytics_event_flush"]),
 } as const;
 
 const safeReleasePattern = /^[A-Za-z0-9._/@:+-]{1,120}$/;
 const safeTimerDurationSeconds = new Set([1200, 1800, 2700, 3600]);
+const safeSoundMixerTimerOptions = new Set<unknown>(soundMixerTimerOptions);
 
 const posthogOptions: PostHogOptions = {
   before_send: (event) => {
@@ -190,6 +210,29 @@ export function createPrivacySafeAnalyticsProperties(
     safeProperties.active_layer_count = activeLayerCount;
   }
 
+  const soundIds = filterAllowedStringArray(
+    properties.sound_ids,
+    allowedLaunchSoundIds,
+    soundMixerLimits.maxActiveLayers,
+  );
+  if (soundIds) {
+    safeProperties.sound_ids = soundIds;
+  }
+
+  const soundCategoryIds = filterAllowedStringArray(
+    properties.sound_category_ids,
+    allowedLaunchSoundCategoryIds,
+    soundMixerLimits.maxActiveLayers,
+  );
+  if (soundCategoryIds) {
+    safeProperties.sound_category_ids = soundCategoryIds;
+  }
+
+  const timerOption = properties.timer_option;
+  if (safeSoundMixerTimerOptions.has(timerOption)) {
+    safeProperties.timer_option = timerOption;
+  }
+
   const timerDurationSeconds = properties.timer_duration_seconds;
   if (
     typeof timerDurationSeconds === "number" &&
@@ -212,6 +255,22 @@ function isPrivacySafeRelease(value: string): boolean {
 
 function containsSensitiveToken(value: string): boolean {
   return /(?:install_|session_|reflection_|ExponentPushToken|token|secret)/i.test(value);
+}
+
+function filterAllowedStringArray(
+  value: unknown,
+  allowedValues: ReadonlySet<string>,
+  maximumLength: number,
+): string[] | undefined {
+  if (!Array.isArray(value) || value.length > maximumLength) {
+    return undefined;
+  }
+
+  if (!value.every((item) => typeof item === "string" && allowedValues.has(item))) {
+    return undefined;
+  }
+
+  return value;
 }
 
 function captureExplicitEvent(

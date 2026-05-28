@@ -74,7 +74,7 @@ Why it matters:
 
 Required behavior:
 
-- 10-15 curated sounds.
+- 16 launch sounds from the accepted Sound Mixer catalog.
 - Include rain, ocean, white noise, brown noise, forest, fan, and fireplace.
 - Treat 432 Hz, delta-wave binaural, and colored-noise tracks as preference/masking audio, not clinically proven sleep enhancers or premium proof points.
 - Users can mix 2-3 layers.

@@ -117,14 +117,14 @@ A 5-minute audio guide slowly drawing attention from toes to head, releasing ten
 
 **Why it matters more than it sounds:** Sound mixing is the single feature that generates the most "WHAT APP IS THIS?" comments on TikTok. When a creator screen records their mix setup — rain at 80%, brown noise at 60%, fireplace at 40%, adjusting sliders in real time — the result is visually captivating and immediately communicates value. This is the #1 viral feature in the product.[^19]
 
-**The full sound library (15 curated sounds at launch):**
+**The full sound library (16 curated sounds at launch):**
 
 | Category | Sounds |
 |----------|--------|
 | Rain | Light Rain, Heavy Rain, Rain on Window, Thunderstorm |
 | Nature | Ocean Waves, Forest, River Stream, Wind |
 | Noise | White Noise, Brown Noise, Pink Noise |
-| Environment | Fireplace Crackling, Café Ambience, Fan |
+| Environment | Fireplace Crackling, Cafe Ambience, Fan |
 | Tones | 432Hz Tone, Delta Wave Binaural (experimental/preference audio, not a premium proof point) |
 
 Each sound: **minimum 4 minutes of audio**, seamlessly looped (zero-cross fade at loop point — this prevents the jarring "click" when audio restarts that plagues cheaper apps). Production quality: recorded in actual environments, not synthesized. This is non-negotiable — users will immediately notice the difference.
@@ -149,7 +149,7 @@ At the bottom, a persistent mixer strip:
 - Fade duration: 2 minutes (not sudden cut) — users who are light sleepers hate sudden audio stops
 - When audio stops, the player releases any keep-awake or power-management lock so the device can dim and lock naturally.
 
-**Offline behavior:** All 15 base sounds are bundled in the app install (~40MB total for 15 looping audio files). Zero network required. This is the most important technical decision for the sound mixer. Competitors require network playback — causing buffer pauses that wake users up. This is mentioned directly in user complaints about Calm.[^20]
+**Offline behavior:** All 16 base sounds are bundled in the app install after licensing and loop QA clear. Zero network required. This is the most important technical decision for the sound mixer. Competitors require network playback — causing buffer pauses that wake users up. This is mentioned directly in user complaints about Calm.[^20]
 
 **What competitors get wrong:**
 - Calm's sound mixer UI is visually decent but doesn't allow fine-grained volume per sound in the same way

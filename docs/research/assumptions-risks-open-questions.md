@@ -94,7 +94,7 @@ Before writing production code, decide:
 2. Initial visual direction.
 3. Whether to start with local-first prototype or backend-connected MVP.
 4. Whether account creation exists at all in the first beta.
-5. First 10-15 sounds and their licensing source.
+5. Licensed source files for the 16 accepted launch Sound Mixer sounds.
 6. Initial subscription products and whether lifetime is available at launch.
 7. Minimum analytics schema.
 

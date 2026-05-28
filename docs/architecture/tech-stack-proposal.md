@@ -23,7 +23,7 @@ No stack can guarantee users never see lag. The decision is to keep the critical
 - First session must work without account creation, paywall, backend dependency, or notification permission.
 - The breathing pacer is the visual center of the product and must animate smoothly for full sessions.
 - Rescue Me must start immediately with no network calls and no setup.
-- The 15 base sound loops are bundled in the app and work fully offline.
+- The 16 base sound loops are bundled in the app and work fully offline after licensing and loop QA clear.
 - Sleep stories and premium/large audio are progressively downloaded from a global media CDN.
 - The app launches in English, Spanish, and Portuguese.
 - The app sends at most one habit notification per day by default.
@@ -193,7 +193,7 @@ Audio files:
 
 - Source masters are stored outside the app as archival WAV files.
 - App-bundled loops use AAC-LC `.m4a`, normalized and cut for seamless looping.
-- The launch bundle includes all 15 base sounds from the product bible.
+- The launch bundle includes all 16 base sounds from the accepted Sound Mixer catalog.
 - Remote story and premium audio objects live in Cloudflare R2.
 
 Screen-off guidance:
@@ -411,7 +411,7 @@ Supabase stores metadata only.
 
 Bundled media:
 
-- All 15 launch base sounds are included in the app install.
+- All 16 launch base sounds are included in the app install.
 - Bundled sounds must be loop-tested before release.
 - The app never streams the default sleep sound needed for first value.
 
@@ -681,7 +681,7 @@ Complete these before building broad app screens:
 7. Ambient audio plays in the background with a 2-minute timer fade-out.
 8. Sleep timer playback releases keep-awake or power-management locks when audio ends.
 9. Three-layer sound mix works with independent volume.
-10. All 15 bundled sounds play offline and loop without audible clicks.
+10. All 16 bundled sounds play offline and loop without audible clicks.
 11. Local session record persists before any Supabase auth requirement.
 12. Anonymous Supabase auth is created after first value or retried in the background.
 13. Synced Supabase user can create and read only their own check-ins.

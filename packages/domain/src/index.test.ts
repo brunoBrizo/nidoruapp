@@ -19,6 +19,8 @@ import {
   getOnboardingPlanForGoal,
   hasOpenedInReminderSuppressionWindow,
   initialInsightRuleTypes,
+  launchSoundCatalog,
+  launchSoundCategoryIds,
   launchSoundIds,
   mvpBreathTechniqueIds,
   onboardingGoalOptions,
@@ -85,6 +87,84 @@ assertEquals(mvpBreathTechniqueIds, [
   "diaphragmatic-breathing",
 ]);
 assertEquals(postMvpBreathTechniqueIds, ["physiological-sigh"]);
+assertEquals(launchSoundIds, [
+  "light-rain",
+  "heavy-rain",
+  "rain-on-window",
+  "thunderstorm",
+  "ocean-waves",
+  "forest",
+  "river-stream",
+  "wind",
+  "white-noise",
+  "brown-noise",
+  "pink-noise",
+  "fireplace-crackling",
+  "cafe-ambience",
+  "fan",
+  "432hz-tone",
+  "delta-wave-binaural",
+]);
+assertEquals(launchSoundCategoryIds, ["rain", "nature", "noise", "environment", "tones"]);
+assertEquals(
+  launchSoundCatalog.map((sound) => sound.id),
+  [...launchSoundIds],
+);
+assertEquals(
+  launchSoundCatalog.map((sound) => sound.displayName),
+  [
+    "Light Rain",
+    "Heavy Rain",
+    "Rain on Window",
+    "Thunderstorm",
+    "Ocean Waves",
+    "Forest",
+    "River Stream",
+    "Wind",
+    "White Noise",
+    "Brown Noise",
+    "Pink Noise",
+    "Fireplace Crackling",
+    "Cafe Ambience",
+    "Fan",
+    "432Hz Tone",
+    "Delta Wave Binaural",
+  ],
+);
+assertCondition(
+  new Set(launchSoundCatalog.map((sound) => sound.bundledAssetPath)).size ===
+    launchSoundCatalog.length,
+  "launch sound asset paths must be unique",
+);
+assertCondition(
+  launchSoundCatalog.every(
+    (sound) =>
+      sound.bundledAssetPath === `apps/mobile/assets/audio/sleep/${sound.id}.m4a` &&
+      sound.audioFormat === "aac-lc-m4a" &&
+      sound.defaultVolume === 0.7 &&
+      sound.defaultVolumeBehavior === "activate_at_70_percent" &&
+      sound.durationSeconds === null &&
+      sound.licenseStatus === "blocked_missing_license" &&
+      sound.licenseSource.startsWith("BLOCKED:") &&
+      sound.loop &&
+      sound.loopReviewStatus === "blocked_missing_audio" &&
+      sound.minimumDurationSeconds === 240 &&
+      sound.shipStatus === "blocked_missing_licensed_audio",
+  ),
+  "missing launch sleep loops must stay blocked until licensed AAC-LC files are committed",
+);
+assertNoAuditRiskPublicCopy(
+  launchSoundCatalog.flatMap((sound) => [
+    sound.displayName,
+    ...(sound.evidenceSafeNote === undefined ? [] : [sound.evidenceSafeNote]),
+  ]),
+);
+assertCondition(
+  launchSoundCatalog
+    .filter((sound) => sound.categoryId === "tones" || sound.categoryId === "noise")
+    .every((sound) => sound.evidenceSafeNote?.includes("no clinical sleep efficacy claim")),
+  "tones and colored noise need explicit evidence-safe notes",
+);
 assertEquals(
   mvpBreathTechniqueIds.map((techniqueId) => {
     const technique = breathTechniques[techniqueId];

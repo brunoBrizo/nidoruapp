@@ -148,7 +148,7 @@ The main differences are not philosophical. They are product-scope and decision-
 
 **New research:** Premium mixer supports up to four ambient loops. Free tier has three pre-mixed background loops.
 
-**Current docs:** Mixer supports 2-3 layers, 10-15 curated sounds, per-layer volume, 20/30/45/60 minute timers, smooth fade-out, and offline base sounds. The tech stack proposal explicitly requires two to three simultaneous ambient layers.
+**Current docs:** Mixer supports 2-3 layers, 16 launch sounds, per-layer volume, 20/30/45/60 minute timers, smooth fade-out, and offline base sounds. The tech stack proposal explicitly requires two to three simultaneous ambient layers.
 
 **Why this matters:** Four simultaneous audio channels may be fine, but it should be treated as a device-performance and audio-mixing proof question, not just a product copy change.
 

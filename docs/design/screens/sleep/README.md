@@ -40,9 +40,9 @@ Sound Mixer copy must frame audio as masking, preference, ambiance, and routine 
 
 The accepted sources may name preference audio such as `White Noise`, `Brown Noise`, `Pink Noise`, `432Hz Tone`, and `Delta Wave Binaural`, but implementation and public copy must keep those labels descriptive and non-clinical.
 
-## Catalog Count Discrepancy
+## Catalog Count Resolution
 
-The Feature 06 product doc says the launch library has 15 curated sounds. The named category list and the accepted Sound Mixer designs include 16 names:
+The launch library source of truth is 16 curated sounds. The named category list, accepted Sound Mixer designs, and `packages/domain/src/index.ts` include 16 names:
 
 | Category | Names in the source contract |
 | --- | --- |
@@ -52,7 +52,7 @@ The Feature 06 product doc says the launch library has 15 curated sounds. The na
 | Environment | Fireplace Crackling, Cafe Ambience, Fan |
 | Tones | 432Hz Tone, Delta Wave Binaural |
 
-Implementation must resolve the 15-vs-16 discrepancy before final catalog, licensing, bundled asset, offline playback, analytics, or sync work is closed.
+The implementation manifest is `docs/engineering/sound-mixer-launch-catalog-manifest.md`. Playback, offline, analytics, or sync work must not treat any launch sound as shippable until the matching licensed AAC-LC `.m4a` loop is committed and verified there.
 
 ## Verification Expectations
 

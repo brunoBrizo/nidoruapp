@@ -15,7 +15,7 @@ The sleep sound mixer lets users layer curated ambient sounds with independent v
 
 ## MVP Scope
 
-- Launch library: 15 curated sounds from the product bible.
+- Launch library: 16 curated sounds from the accepted Sound Mixer UI contract.
 - Categories:
   - Rain: Light Rain, Heavy Rain, Rain on Window, Thunderstorm.
   - Nature: Ocean Waves, Forest, River Stream, Wind.
@@ -46,14 +46,15 @@ The sleep sound mixer lets users layer curated ambient sounds with independent v
 ## Acceptance Criteria
 
 - Cached or bundled audio starts in less than 500 ms.
-- All 15 bundled sounds play offline.
-- All 15 bundled sounds loop without audible clicks.
+- All 16 bundled sounds play offline.
+- All 16 bundled sounds loop without audible clicks.
 - Three-layer sound mix works with independent volume.
 - Sleep timer begins a 2-minute fade before the end.
 - Sleep timer releases keep-awake or power-management locks when playback ends.
 - Interface fades to fully dark after 30 seconds of no interaction while audio continues.
 - User always knows whether audio will stop, fade, or continue.
 - Public copy avoids clinical efficacy claims for tones, binaural tracks, and colored noise.
+- Launch catalog, licensing, and asset readiness source of truth lives in `docs/engineering/sound-mixer-launch-catalog-manifest.md` and `packages/domain/src/index.ts`.
 
 ## UX References
 
@@ -112,6 +113,6 @@ The sleep sound mixer lets users layer curated ambient sounds with independent v
 - [ ] Add saved mixes with max 3.
 - [ ] Persist mixes locally.
 - [ ] Sync saved mixes after auth exists.
-- [ ] Verify all 15 bundled sounds offline.
+- [ ] Verify all 16 bundled sounds offline.
 - [ ] Verify locked-screen/background playback.
 - [ ] Verify timer-ended playback lets the device dim and lock naturally.

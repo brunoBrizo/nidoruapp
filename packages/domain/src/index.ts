@@ -288,6 +288,172 @@ export const launchSoundIds = [
   "delta-wave-binaural",
 ] as const;
 
+export const launchSoundCategoryIds = ["rain", "nature", "noise", "environment", "tones"] as const;
+
+export type LaunchSoundId = (typeof launchSoundIds)[number];
+export type LaunchSoundCategoryId = (typeof launchSoundCategoryIds)[number];
+
+export type LaunchSoundCatalogItem = {
+  readonly id: LaunchSoundId;
+  readonly displayName: string;
+  readonly categoryId: LaunchSoundCategoryId;
+  readonly categoryLabel: string;
+  readonly defaultVolume: number;
+  readonly defaultVolumeBehavior: "activate_at_70_percent";
+  readonly bundledAssetPath: `apps/mobile/assets/audio/sleep/${LaunchSoundId}.m4a`;
+  readonly audioFormat: "aac-lc-m4a";
+  readonly minimumDurationSeconds: 240;
+  readonly durationSeconds: number | null;
+  readonly loop: true;
+  readonly loopReviewStatus: "blocked_missing_audio" | "passed";
+  readonly licenseStatus: "blocked_missing_license" | "licensed";
+  readonly licenseSource: string;
+  readonly shipStatus: "blocked_missing_licensed_audio" | "bundled_verified";
+  readonly evidenceSafeNote?: string;
+};
+
+const missingLaunchAudioLicenseSource =
+  "BLOCKED: no licensed launch sleep loop source is committed for this asset.";
+
+function createBlockedLaunchSoundCatalogItem({
+  categoryId,
+  categoryLabel,
+  displayName,
+  evidenceSafeNote,
+  id,
+}: {
+  readonly categoryId: LaunchSoundCategoryId;
+  readonly categoryLabel: string;
+  readonly displayName: string;
+  readonly evidenceSafeNote?: string;
+  readonly id: LaunchSoundId;
+}): LaunchSoundCatalogItem {
+  return {
+    audioFormat: "aac-lc-m4a",
+    bundledAssetPath: `apps/mobile/assets/audio/sleep/${id}.m4a`,
+    categoryId,
+    categoryLabel,
+    defaultVolume: 0.7,
+    defaultVolumeBehavior: "activate_at_70_percent",
+    displayName,
+    durationSeconds: null,
+    ...(evidenceSafeNote === undefined ? {} : { evidenceSafeNote }),
+    id,
+    licenseSource: missingLaunchAudioLicenseSource,
+    licenseStatus: "blocked_missing_license",
+    loop: true,
+    loopReviewStatus: "blocked_missing_audio",
+    minimumDurationSeconds: 240,
+    shipStatus: "blocked_missing_licensed_audio",
+  };
+}
+
+export const launchSoundCatalog = [
+  createBlockedLaunchSoundCatalogItem({
+    categoryId: "rain",
+    categoryLabel: "Rain",
+    displayName: "Light Rain",
+    id: "light-rain",
+  }),
+  createBlockedLaunchSoundCatalogItem({
+    categoryId: "rain",
+    categoryLabel: "Rain",
+    displayName: "Heavy Rain",
+    id: "heavy-rain",
+  }),
+  createBlockedLaunchSoundCatalogItem({
+    categoryId: "rain",
+    categoryLabel: "Rain",
+    displayName: "Rain on Window",
+    id: "rain-on-window",
+  }),
+  createBlockedLaunchSoundCatalogItem({
+    categoryId: "rain",
+    categoryLabel: "Rain",
+    displayName: "Thunderstorm",
+    id: "thunderstorm",
+  }),
+  createBlockedLaunchSoundCatalogItem({
+    categoryId: "nature",
+    categoryLabel: "Nature",
+    displayName: "Ocean Waves",
+    id: "ocean-waves",
+  }),
+  createBlockedLaunchSoundCatalogItem({
+    categoryId: "nature",
+    categoryLabel: "Nature",
+    displayName: "Forest",
+    id: "forest",
+  }),
+  createBlockedLaunchSoundCatalogItem({
+    categoryId: "nature",
+    categoryLabel: "Nature",
+    displayName: "River Stream",
+    id: "river-stream",
+  }),
+  createBlockedLaunchSoundCatalogItem({
+    categoryId: "nature",
+    categoryLabel: "Nature",
+    displayName: "Wind",
+    id: "wind",
+  }),
+  createBlockedLaunchSoundCatalogItem({
+    categoryId: "noise",
+    categoryLabel: "Noise",
+    displayName: "White Noise",
+    evidenceSafeNote: "Preference and masking audio only; no clinical sleep efficacy claim.",
+    id: "white-noise",
+  }),
+  createBlockedLaunchSoundCatalogItem({
+    categoryId: "noise",
+    categoryLabel: "Noise",
+    displayName: "Brown Noise",
+    evidenceSafeNote: "Preference and masking audio only; no clinical sleep efficacy claim.",
+    id: "brown-noise",
+  }),
+  createBlockedLaunchSoundCatalogItem({
+    categoryId: "noise",
+    categoryLabel: "Noise",
+    displayName: "Pink Noise",
+    evidenceSafeNote: "Preference and masking audio only; no clinical sleep efficacy claim.",
+    id: "pink-noise",
+  }),
+  createBlockedLaunchSoundCatalogItem({
+    categoryId: "environment",
+    categoryLabel: "Environment",
+    displayName: "Fireplace Crackling",
+    id: "fireplace-crackling",
+  }),
+  createBlockedLaunchSoundCatalogItem({
+    categoryId: "environment",
+    categoryLabel: "Environment",
+    displayName: "Cafe Ambience",
+    id: "cafe-ambience",
+  }),
+  createBlockedLaunchSoundCatalogItem({
+    categoryId: "environment",
+    categoryLabel: "Environment",
+    displayName: "Fan",
+    id: "fan",
+  }),
+  createBlockedLaunchSoundCatalogItem({
+    categoryId: "tones",
+    categoryLabel: "Tones",
+    displayName: "432Hz Tone",
+    evidenceSafeNote:
+      "Experimental preference audio only; no clinical sleep efficacy claim or premium proof point.",
+    id: "432hz-tone",
+  }),
+  createBlockedLaunchSoundCatalogItem({
+    categoryId: "tones",
+    categoryLabel: "Tones",
+    displayName: "Delta Wave Binaural",
+    evidenceSafeNote:
+      "Experimental preference audio only; no clinical sleep efficacy claim or premium proof point.",
+    id: "delta-wave-binaural",
+  }),
+] as const satisfies readonly LaunchSoundCatalogItem[];
+
 export const streakRules = {
   completionIncludes: ["breathwork", "wind-down"] as const,
   missedDayPausesStreak: true,
@@ -306,7 +472,6 @@ export const initialInsightRuleTypes = [
   "session_duration_effect",
 ] as const;
 
-export type LaunchSoundId = (typeof launchSoundIds)[number];
 export type InitialInsightRuleType = (typeof initialInsightRuleTypes)[number];
 
 export const windDownContextGoals = [
